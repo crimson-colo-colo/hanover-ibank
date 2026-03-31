@@ -1,0 +1,75 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": ["**", "!**/src/routeTree.gen.ts", "!**/src/styles.css"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineEnding": "lf",
+		"lineWidth": 100,
+		"trailingNewline": true
+	},
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"domains": {
+			"project": "recommended",
+			"react": "recommended"
+		},
+		"rules": {
+			"recommended": true,
+			"a11y": {
+				"useButtonType": "off"
+			},
+			"complexity": {
+				"noBannedTypes": "off"
+			},
+			"correctness": {
+				"noUnusedVariables": "info",
+				"noUnusedFunctionParameters": "off",
+				"noUnknownFunction": {
+					"level": "error",
+					"options": {
+						"ignore": ["theme"]
+					}
+				},
+				"useParseIntRadix": "off",
+				"useImportExtensions": "error",
+				"useExhaustiveDependencies": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off"
+			},
+			"suspicious": {
+				"noRedeclare": "off"
+			}
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"arrowParentheses": "always",
+			"jsxQuoteStyle": "double",
+			"quoteStyle": "double",
+			"semicolons": "asNeeded",
+			"trailingCommas": "es5"
+		}
+	}
+}
