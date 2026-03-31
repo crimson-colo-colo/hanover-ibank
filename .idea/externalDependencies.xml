@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <plugin id="org.intellij.prisma" min-version="253.29346.45" />
+  </component>
+</project>
