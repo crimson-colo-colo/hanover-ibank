@@ -22,6 +22,7 @@
 		"db:seed": "NODE_ENV=development bun ./prisma/seed.ts"
 	},
 	"dependencies": {
+		"@prisma/adapter-pg": "^7.6.0",
 		"@t3-oss/env-core": "^0.13.11",
 		"@trpc/server": "^11.16.0",
 		"express": "^5.2.1",
@@ -51,11 +52,13 @@
 		"@types/express": "^5.0.6",
 		"@types/morgan": "^1.9.10",
 		"@types/node": "^25.5.0",
+		"@types/pg": "^8.20.0",
 		"@types/react": "^19.2.0",
 		"@types/react-dom": "^19.2.0",
 		"@vitejs/plugin-react": "^6.0.1",
 		"jsdom": "^29.0.1",
 		"lucide-react": "^1.7.0",
+		"prisma": "^7.6.0",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
 		"tailwindcss": "^4.1.18",
