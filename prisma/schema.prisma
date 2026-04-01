@@ -12,14 +12,39 @@ model User {
   email String @unique
 }
 
-model Content {
-  id       String    @id @default(uuid())
-  title    String
-  document Document?
+enum EmployeeRole {
+  Underwriter
+  BusinessAnalyst
+}
+// new to confirm status being just placeholders
+enum ContentStatus {
+  Incomplete
+  UnderReview
+  Complete
+}
+enum ContentType {
+  Workflow
+  Reference
 }
 
-model Document {
-  id       String  @id @default(uuid())
-  content  Content @relation(fields: [id], references: [id])
-  objectId String
+model Employee {
+  email     String       @id
+  name      String
+  role      EmployeeRole @default(Underwriter)
+  documents Document[]
 }
+model Document {
+  url              String        @id
+  ownerEmail       String
+  owner            Employee      @relation(fields: [ownerEmail], references: [email])
+  documentName     String        @unique
+  status           ContentStatus @default(incomplete)
+  type             ContentType
+  lastModifiedDate DateTime      @updatedAt
+  expirationDate   DateTime
+}
+// model Content {
+//   id       String    @id @default(uuid())
+//   title    String
+//   document Document?
+// }
