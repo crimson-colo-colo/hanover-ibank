@@ -1,6 +1,8 @@
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import { ScrollToTopButton } from "@/components/scroll-to-top-button.tsx";
+import { RouterScrollToTop } from "@/components/router-scroll-to-top.tsx";
 
 import "../styles.css"
 
@@ -14,7 +16,7 @@ function RootComponent() {
 			<Outlet />
 			<TanStackDevtools
 				config={{
-					position: "bottom-right",
+					position: "bottom-left",
 				}}
 				plugins={[
 					{
@@ -23,6 +25,8 @@ function RootComponent() {
 					},
 				]}
 			/>
+			<RouterScrollToTop />
+			<ScrollToTopButton threshold={50} />
 		</>
 	)
 }

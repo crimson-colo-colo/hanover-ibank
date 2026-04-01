@@ -3,3 +3,10 @@
 
 @theme {
 }
+
+button[aria-label="Open TanStack Devtools"] {
+    bottom: 1rem !important;
+    right: auto !important;
+    left: 1rem !important;
+    top: auto !important;
+}
