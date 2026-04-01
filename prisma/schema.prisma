@@ -1,13 +1,25 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../server/generated/prisma"
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
 }
 
 model User {
-    id    String @id @default(uuid())
-    email String @unique
+  id    String @id @default(uuid())
+  email String @unique
+}
+
+model Content {
+  id       String    @id @default(uuid())
+  title    String
+  document Document?
+}
+
+model Document {
+  id       String  @id @default(uuid())
+  content  Content @relation(fields: [id], references: [id])
+  objectId String
 }
