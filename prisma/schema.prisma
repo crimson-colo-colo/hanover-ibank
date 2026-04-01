@@ -19,7 +19,19 @@ model Content {
 }
 
 model Document {
-  id       String  @id @default(uuid())
-  content  Content @relation(fields: [id], references: [id])
-  objectId String
+  id              String          @id @default(uuid())
+  title           String
+  expirationDate  DateTime?
+  status          DocumentStatus  @default(PENDING)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  content         Content         @relation(fields: [id], references: [id])
+  objectId        String
+}
+
+enum DocumentStatus {
+  PENDING
+  NEEDS_WORK
+  APPROVED
+  REJECTED
 }
