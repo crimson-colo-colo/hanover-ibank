@@ -7,6 +7,12 @@ export const env = createEnv({
 		APP_URL: z.url().optional(),
 		DATABASE_URL: z.string(),
 		NODE_ENV: z.enum(["development", "production"]).default("development"),
+		S3_ENDPOINT: z.string(),
+		S3_PORT: z.coerce.number(),
+		S3_SSL: z.enum(["true", "false"]).transform((val) => val === "true"),
+		S3_ACCESS_KEY: z.string(),
+		S3_SECRET_KEY: z.string(),
+		S3_BUCKET: z.string(),
 	},
 	runtimeEnv: process.env,
 })
