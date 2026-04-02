@@ -1,19 +1,46 @@
+import crypto from "node:crypto"
+import { createReadStream } from "node:fs"
+import fs from "node:fs/promises"
 import { PrismaPg } from "@prisma/adapter-pg"
+import * as Minio from "minio"
+import { v4 as uuidv4 } from "uuid"
 import {
 	ContentStatus,
 	ContentType,
 	DocumentType,
 	EmployeeRole,
-	Prisma,
-	PrismaClient
+	type Prisma,
+	PrismaClient,
 } from "../server/generated/prisma/client.ts"
-import crypto from "node:crypto"
 
 const adapter = new PrismaPg({
 	connectionString: process.env.DATABASE_URL!,
 })
 
 const prisma = new PrismaClient({ adapter })
+
+export const s3 = new Minio.Client({
+	endPoint: process.env.S3_ENDPOINT!,
+	port: +process.env.S3_PORT!,
+	useSSL: process.env.S3_SSL! === "true",
+	accessKey: process.env.S3_ACCESS_KEY!,
+	secretKey: process.env.S3_SECRET_KEY!,
+})
+
+export const bucketName = process.env.S3_BUCKET!
+
+if (!(await s3.bucketExists(bucketName))) {
+	await s3.makeBucket(bucketName)
+}
+
+const objects = await new Promise<string[]>((resolve) => {
+	const names: string[] = []
+	s3.listObjects(bucketName)
+		.on("data", (obj) => obj.name && names.push(obj.name))
+		.on("end", () => resolve(names))
+})
+
+await Promise.all(objects.map((name) => s3.removeObject(bucketName, name, { forceDelete: true })))
 
 main()
 	.catch((e) => {
@@ -81,20 +108,22 @@ async function main() {
 			name: "Emily Cane",
 			email: "ecane@hanover.com",
 			role: EmployeeRole.BusinessAnalyst,
-		}
+		},
 	]
 
 	const [wilson, austin, jack, sarah, emily] = await prisma.$transaction(
-		employeeData.map((employee) => (prisma.employee.create({
-			data: {
-				...employee,
-				avatarUrl: getAvatarUrl(employee.email),
-			},
-			select: { id: true }
-		})))
+		employeeData.map((employee) =>
+			prisma.employee.create({
+				data: {
+					...employee,
+					avatarUrl: getAvatarUrl(employee.email),
+				},
+				select: { id: true },
+			})
+		)
 	)
 
-    console.log(`Created ${employeeData.length} employee rows`)
+	console.log(`Created ${employeeData.length} employee rows`)
 
 	const contentData = [
 		{
@@ -151,12 +180,39 @@ async function main() {
 			expirationDate: new Date("2026-04-15"),
 			documentType: DocumentType.Reference,
 			status: ContentStatus.Complete,
-		}
+		},
 	] satisfies Prisma.ContentCreateManyInput[]
-    
-    await prisma.content.createMany({ data: contentData })
-    
-    console.log(`Created ${contentData.length} content rows`)
+
+	await prisma.content.createMany({ data: contentData })
+
+	console.log(`Created ${contentData.length} content rows`)
+
+	const files = await fs.readdir("./prisma/seed-data")
+	const ids = new Map<string, string>()
+	for (const file of files) {
+		const id = uuidv4()
+		const f = createReadStream(`./prisma/seed-data/${file}`)
+		await s3.putObject(bucketName, id, f)
+		ids.set(file, id)
+	}
+
+	await prisma.content.createMany({
+		data: [
+			...ids.entries().map(
+				([filename, id]) =>
+					({
+						title: filename,
+						type: ContentType.Object,
+						ownerId: wilson.id,
+						documentType: DocumentType.Reference,
+						expirationDate: new Date("2026-12-31"),
+						objectId: id,
+					}) satisfies Prisma.ContentCreateManyInput
+			),
+		],
+	})
+
+	console.log(`Uploaded ${ids.size} files to S3 and created content rows for them`)
 }
 
 // returns the gravtar url for the given email
