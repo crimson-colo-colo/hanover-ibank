@@ -1,7 +1,7 @@
 import type {ReactNode} from "react";
 import {TextInput, Select} from "@mantine/core";
 
-export function inputForm(): ReactNode{
+export function infoInputForm(): ReactNode{
     return(
         <>
         <form>
