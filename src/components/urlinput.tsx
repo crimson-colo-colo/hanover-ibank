@@ -1,10 +1,15 @@
+import { TextInput } from "@mantine/core"
+
 function UrlInput() {
-    return (
-        <div>
-            <label htmlFor="urlinput">Paste URL for content here:</label>
-            <input type="text" id="urlinput" name="urlinput" />
-        </div>
-    )
+	return (
+		<TextInput
+			size="xs"
+			radius="xs"
+			label="Paste Hyperlink or URL of document"
+			placeholder="URL or Hyperlink"
+			error="Invalid URL or hyperlink"
+		/>
+	)
 }
 
-export default UrlInput;
+export default UrlInput
