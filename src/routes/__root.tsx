@@ -1,9 +1,11 @@
 import {TanStackDevtools} from "@tanstack/react-devtools"
 import {createRootRoute, Outlet} from "@tanstack/react-router"
 import {TanStackRouterDevtoolsPanel} from "@tanstack/react-router-devtools"
-import {createTheme, MantineProvider} from '@mantine/core';
+import {createTheme, MantineProvider} from '@mantine/core'
 
 import "../styles.css"
+import {DevSupport} from "@react-buddy/ide-toolbox"
+import {ComponentPreviews, useInitial} from "@/dev"
 import HeaderSimple from "@/components/navbar";
 
 export const Route = createRootRoute({
@@ -13,8 +15,12 @@ let theme = createTheme({})
 
 function RootComponent() {
     return (
-        <>
-            <MantineProvider theme={theme}>
+        <MantineProvider>
+            <DevSupport
+                ComponentPreviews={ComponentPreviews}
+                useInitialHook={useInitial}
+            >
+                <MantineProvider theme={theme}>
                 <HeaderSimple/>
                 <Outlet/>
                 <TanStackDevtools
@@ -27,8 +33,8 @@ function RootComponent() {
                             render: <TanStackRouterDevtoolsPanel/>,
                         },
                     ]}
-                />
-            </MantineProvider>
-        </>
+                /></MantineProvider>
+            </DevSupport>
+        </MantineProvider>
     )
 }

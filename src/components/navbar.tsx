@@ -6,10 +6,10 @@ import './navbar.css'
 
 const links = [
     { link: '/', label: 'Home' },
-    { link: '/form', label: 'Form' },
-    { link: '/overwriter', label: 'Overwriter' },
+    { link: '/upload-content', label: 'Upload Form' },
+    { link: '/manage-employees', label: 'Employee Management' },
+    { link: '/underwriter', label: 'Underwriter' },
     { link: '/analyst', label: 'Business Analyst' },
-    { link: '/users', label: 'Users' },
 ];
 
 export function HeaderSimple() {

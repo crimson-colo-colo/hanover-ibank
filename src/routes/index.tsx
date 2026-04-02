@@ -1,7 +1,4 @@
 import {createFileRoute} from "@tanstack/react-router"
-import {HeaderSimple} from "@/components/navbar.tsx";
-
-import {createTheme, MantineProvider} from "@mantine/core"
 
 export const Route = createFileRoute("/")({
     component: App,
@@ -17,3 +14,5 @@ function App() {
         </main>
     )
 }
+
+export default App
