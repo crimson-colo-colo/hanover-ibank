@@ -1,16 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router"
+import Navbar, {HeaderSimple} from "@/components/navbar.tsx";
+
+import { MantineProvider, createTheme } from "@mantine/core"
 
 export const Route = createFileRoute("/")({
 	component: App,
 })
 
+let theme = createTheme({})
+
 function App() {
 	return (
 		<main className="p-4">
-			<h1 className="text-xl font-semibold">Hello, world</h1>
-			<span className="text-sm text-gray-500">
-				This is an empty Tanstack Router + React + Vite + Tailwind CSS project.
-			</span>
+			<MantineProvider theme={theme}>
+				<HeaderSimple/>
+			</MantineProvider>
 		</main>
 	)
 }
