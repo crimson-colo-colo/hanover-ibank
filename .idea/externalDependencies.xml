@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <plugin id="Docker" min-version="261.22158.45" />
+    <plugin id="com.haulmont.rcb" min-version="261.22158.185" />
+    <plugin id="com.intellij.database" min-version="261.22158.274" />
+    <plugin id="com.intellij.react" min-version="261.22158.274" />
+    <plugin id="mobi.hsz.idea.gitignore" min-version="4.5.7" />
+    <plugin id="com.github.biomejs.intellijbiome" min-version="1.10.1" />
+    <plugin id="com.jetbrains.codeWithMe" min-version="261.22158.291" />
+    <plugin id="intellij.javascript.bun" min-version="261.22158.180" />
+    <plugin id="org.intellij.prisma" min-version="253.29346.45" />
+    <plugin id="ru.adelf.idea.dotenv" min-version="261.22158.354" />
+  </component>
+</project>
