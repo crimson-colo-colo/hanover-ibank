@@ -1,6 +1,8 @@
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import '@mantine/core/styles.css'
+import '@mantine/dates/styles.css'
 
 import "../styles.css"
 
