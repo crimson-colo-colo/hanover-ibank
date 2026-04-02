@@ -7,10 +7,10 @@ export const Route = createFileRoute("/")({
 function App() {
 	return (
 		<main className="p-4">
-			<h1 className="text-xl font-semibold">Hello, world</h1>
-			<span className="text-sm text-gray-500">
-				This is an empty Tanstack Router + React + Vite + Tailwind CSS project.
-			</span>
+			<p>Hello!</p>
 		</main>
 	)
 }
+
+export default App // this line is needed for the react buddy plugin previews. I
+// don't know why.
