@@ -1,14 +1,18 @@
 -- CreateEnum
+CREATE TYPE "EmployeeRole" AS ENUM ('BusinessAnalyst', 'Underwriter');
+
+-- CreateEnum
 CREATE TYPE "ContentType" AS ENUM ('Object', 'Link');
 
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "Employee" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "avatarUrl" TEXT NOT NULL,
+    "role" "EmployeeRole" NOT NULL,
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Employee_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -25,10 +29,10 @@ CREATE TABLE "Content" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "Employee_email_key" ON "Employee"("email");
 
 -- AddForeignKey
-ALTER TABLE "Content" ADD CONSTRAINT "Content_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Content" ADD CONSTRAINT "Content_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Employee"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- Custom: validate value columns based on type
 ALTER TABLE "Content" ADD CONSTRAINT "Content_type_check" CHECK (

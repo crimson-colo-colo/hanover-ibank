@@ -1,34 +1,40 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../server/generated/prisma"
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
 }
 
-model User {
-    id        String    @id @default(cuid())
-    email     String    @unique
-    name      String
-    avatarUrl String
-    content   Content[]
+enum EmployeeRole {
+  BusinessAnalyst
+  Underwriter
+}
+
+model Employee {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  name      String
+  avatarUrl String
+  role      EmployeeRole
+  content   Content[]
 }
 
 enum ContentType {
-    Object
-    Link
+  Object
+  Link
 }
 
 model Content {
-    id          String      @id @default(cuid())
-    title       String
-    description String
-    type        ContentType
-    /// S3 Object ID
-    objectId    String?
-    /// URL for links
-    url         String?
-    ownerId     String
-    owner       User        @relation(fields: [ownerId], references: [id])
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  type        ContentType
+  /// S3 Object ID
+  objectId    String?
+  /// URL for links
+  url         String?
+  ownerId     String
+  owner       Employee    @relation(fields: [ownerId], references: [id])
 }
