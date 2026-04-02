@@ -24,7 +24,7 @@ model Employee {
 model Content {
   id               String        @id @default(cuid())
   title            String
-  description      String
+  description      String?
   documentType     DocumentType
   type             ContentType
   status           ContentStatus @default(Incomplete)
