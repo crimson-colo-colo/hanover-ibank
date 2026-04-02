@@ -1,7 +1,6 @@
 import { Burger, Container, Divider, Drawer, Group, ScrollArea } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { useLocation } from "@tanstack/react-router"
-import { useState } from "react"
 
 import "./navbar.css"
 
