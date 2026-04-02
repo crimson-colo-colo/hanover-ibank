@@ -17,24 +17,40 @@ model Employee {
   email     String       @unique
   name      String
   avatarUrl String
-  role      EmployeeRole
+  role      EmployeeRole @default(Underwriter)
   content   Content[]
+}
+
+model Content {
+  id               String        @id @default(cuid())
+  title            String
+  description      String
+  documentType     DocumentType
+  type             ContentType
+  status           ContentStatus @default(Incomplete)
+  lastModifiedDate DateTime      @updatedAt
+  expirationDate   DateTime
+  /// S3 Object ID
+  objectId         String?
+  /// URL for links
+  url              String?
+  ownerId          String
+  owner            Employee      @relation(fields: [ownerId], references: [id])
+}
+
+// new to confirm status being just placeholders
+enum ContentStatus {
+  Incomplete
+  UnderReview
+  Complete
+}
+
+enum DocumentType {
+  Workflow
+  Reference
 }
 
 enum ContentType {
   Object
   Link
-}
-
-model Content {
-  id          String      @id @default(cuid())
-  title       String
-  description String
-  type        ContentType
-  /// S3 Object ID
-  objectId    String?
-  /// URL for links
-  url         String?
-  ownerId     String
-  owner       Employee    @relation(fields: [ownerId], references: [id])
 }
