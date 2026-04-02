@@ -1,18 +1,16 @@
-import {createFileRoute} from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/")({
-    component: App,
+	component: App,
 })
 
-
 function App() {
-    return (
-        <main className="p-4">
-            <p>
-                Hello!
-            </p>
-        </main>
-    )
+	return (
+		<main className="p-4">
+			<p>Hello!</p>
+		</main>
+	)
 }
 
-export default App
+export default App // this line is needed for the react buddy plugin previews. I
+// don't know why.

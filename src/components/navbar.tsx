@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Burger, Container, Divider, Drawer, Group, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useState } from 'react';
 
 import './navbar.css'
 
@@ -21,7 +21,7 @@ export function HeaderSimple() {
             key={link.label}
             href={link.link}
             className={"link"}
-            // @ts-ignore
+            // @ts-expect-error
             data-active={active === link || undefined}
             onClick={(event) => {
                 event.preventDefault();
