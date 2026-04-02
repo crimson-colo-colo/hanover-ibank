@@ -1,8 +1,6 @@
-import { Burger, Container, Divider, Drawer, Group, ScrollArea } from "@mantine/core"
+import { Burger, Button, Container, Divider, Drawer, Group, ScrollArea } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { useLocation } from "@tanstack/react-router"
-
-import "./navbar.css"
+import { Link, useLocation } from "@tanstack/react-router"
 
 const links = [
 	{ link: "/", label: "Home" },
@@ -16,19 +14,19 @@ export function HeaderSimple() {
 	const [opened, { toggle, close }] = useDisclosure(false)
 	const location = useLocation({ structuralSharing: true })
 	const items = links.map((link) => (
-		<a
+		<Button
+			component={Link}
+			variant={location.pathname === link.link ? "light" : "subtle"}
 			key={link.label}
-			href={link.link}
-			className={"link"}
-			data-active={location.pathname === link.link || undefined}
+			to={link.link}
 		>
 			{link.label}
-		</a>
+		</Button>
 	))
 
 	return (
-		<header className={"header"}>
-			<Container size="md" className={"inner"}>
+		<header className="h-14 mb-30 bg-bg border-b border-border">
+			<Container size="md" className="h-full flex justify-between items-center">
 				<Group gap={5} visibleFrom="xs">
 					{items}
 				</Group>
