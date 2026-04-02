@@ -130,7 +130,7 @@ async function main() {
 			title: "Risk Meter",
 			description: "",
 			type: ContentType.Link,
-			url: "https://riskmeter.corelogic.com",
+			url: "https://riskmeter.corelogic.com/",
 			ownerId: sarah.id,
 			lastModifiedDate: new Date("2026-03-27"),
 			expirationDate: new Date("2027-01-01"),

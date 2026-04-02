@@ -1,5 +1,6 @@
 import { Cli } from "clipanion"
-import InfoCommand from "./commands/info.ts"
+import { ContentCommand } from "./commands/content.ts"
+import { CreateUsersCommand, UsersCommand } from "./commands/users.ts"
 
 const [node, app, ...args] = process.argv
 
@@ -9,5 +10,7 @@ const cli = new Cli({
 	binaryVersion: `1.0.0`,
 })
 
-cli.register(InfoCommand)
+cli.register(UsersCommand)
+cli.register(CreateUsersCommand)
+cli.register(ContentCommand)
 cli.runExit(args)
