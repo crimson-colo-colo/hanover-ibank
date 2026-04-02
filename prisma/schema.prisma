@@ -7,19 +7,51 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id    String @id @default(uuid())
-  email String @unique
+enum EmployeeRole {
+  BusinessAnalyst
+  Underwriter
+}
+
+model Employee {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  name      String
+  avatarUrl String
+  role      EmployeeRole @default(Underwriter)
+  content   Content[]
 }
 
 model Content {
-  id       String    @id @default(uuid())
-  title    String
-  document Document?
+  id               String        @id @default(cuid())
+  title            String
+  description      String
+  documentType     DocumentType
+  type             ContentType
+  status           ContentStatus @default(Incomplete)
+  createdAt        DateTime      @default(now())
+  lastModifiedDate DateTime      @updatedAt
+  expirationDate   DateTime
+  /// S3 Object ID
+  objectId         String?
+  /// URL for links
+  url              String?
+  ownerId          String
+  owner            Employee      @relation(fields: [ownerId], references: [id])
 }
 
-model Document {
-  id       String  @id @default(uuid())
-  content  Content @relation(fields: [id], references: [id])
-  objectId String
+// new to confirm status being just placeholders
+enum ContentStatus {
+  Incomplete
+  UnderReview
+  Complete
+}
+
+enum DocumentType {
+  Workflow
+  Reference
+}
+
+enum ContentType {
+  Object
+  Link
 }
