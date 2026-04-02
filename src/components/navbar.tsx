@@ -1,68 +1,66 @@
-import { Burger, Container, Divider, Drawer, Group, ScrollArea } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { useState } from 'react';
+import { Burger, Container, Divider, Drawer, Group, ScrollArea } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
+import { useState } from "react"
 
-import './navbar.css'
+import "./navbar.css"
 
 const links = [
-    { link: '/', label: 'Home' },
-    { link: '/upload-content', label: 'Upload Form' },
-    { link: '/manage-employees', label: 'Employee Management' },
-    { link: '/underwriter', label: 'Underwriter' },
-    { link: '/analyst', label: 'Business Analyst' },
-];
+	{ link: "/", label: "Home" },
+	{ link: "/upload-content", label: "Upload Form" },
+	{ link: "/manage-employees", label: "Employee Management" },
+	{ link: "/underwriter", label: "Underwriter" },
+	{ link: "/analyst", label: "Business Analyst" },
+]
 
 export function HeaderSimple() {
-    const [opened, { toggle, close }] = useDisclosure(false);
-    const [active, setActive] = useState(links[0].link);
+	const [opened, { toggle, close }] = useDisclosure(false)
+	const [active, setActive] = useState(links[0].link)
 
-    const items = links.map((link) => (
-        <a
-            key={link.label}
-            href={link.link}
-            className={"link"}
-            // @ts-expect-error
-            data-active={active === link || undefined}
-            onClick={(event) => {
-                event.preventDefault();
-                setActive(link.link);
-            }}
-        >
-            {link.label}
-        </a>
-    ));
+	const items = links.map((link) => (
+		<a
+			key={link.label}
+			href={link.link}
+			className={"link"}
+			data-active={active === link.link || undefined}
+			onClick={(event) => {
+				setActive(link.link)
+			}}
+		>
+			{link.label}
+		</a>
+	))
 
-    return (
-        <header className={"header"}>
-            <Container size="md" className={"inner"}>
-                <Group gap={5} visibleFrom="xs">
-                    {items}
-                </Group>
+	return (
+		<header className={"header"}>
+			<Container size="md" className={"inner"}>
+				<Group gap={5} visibleFrom="xs">
+					{items}
+				</Group>
 
-                <Burger
-                    opened={opened}
-                    onClick={toggle}
-                    hiddenFrom="xs"
-                    size="sm"
-                    aria-label="Toggle navigation"
-                />
-            </Container>
+				<Burger
+					opened={opened}
+					onClick={toggle}
+					hiddenFrom="xs"
+					size="sm"
+					aria-label="Toggle navigation"
+				/>
+			</Container>
 
-            <Drawer
-                opened={opened}
-                onClose={close}
-                size="100%"
-                padding="md"
-                title="Navigation"
-                hiddenFrom="xs"
-                zIndex={1000000}
-            >
-                <ScrollArea h="calc(100vh - 80px" mx="-md">
-                    <Divider my="sm" />
-                    {items}
-                </ScrollArea>
-            </Drawer>
-        </header>
-    );
+			<Drawer
+				opened={opened}
+				onClose={close}
+				size="100%"
+				padding="md"
+				title="Navigation"
+				hiddenFrom="xs"
+				zIndex={1000000}
+			>
+				<ScrollArea h="calc(100vh - 80px)" mx="-md">
+					<Divider my="sm" />
+					{items}
+				</ScrollArea>
+			</Drawer>
+		</header>
+	)
 }
 export default HeaderSimple
