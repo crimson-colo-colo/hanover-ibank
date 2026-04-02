@@ -15,7 +15,6 @@ const links = [
 
 export function HeaderSimple() {
 	const [opened, { toggle, close }] = useDisclosure(false)
-	const [active, setActive] = useState(links[0].link)
 	const location = useLocation({ structuralSharing: true })
 	const items = links.map((link) => (
 		<a
