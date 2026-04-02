@@ -2,7 +2,7 @@ import { Button, Select, TextInput } from "@mantine/core"
 
 export function InfoInputForm() {
 	return (
-		<form>
+		<form className="max-w-md mx-auto">
 			<Select
 				mt="sm"
 				label="What is Your Role?"

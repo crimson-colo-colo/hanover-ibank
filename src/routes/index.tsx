@@ -7,7 +7,12 @@ export const Route = createFileRoute("/")({
 function App() {
 	return (
 		<main className="p-4">
-			<p>Hello!</p>
+			<p className="wrap-break-word">
+				Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello!
+				Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello!
+				Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello!
+				Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! foo
+			</p>
 		</main>
 	)
 }
