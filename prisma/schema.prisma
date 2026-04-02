@@ -15,7 +15,7 @@ enum EmployeeRole {
 model Employee {
   id        String       @id @default(cuid())
   email     String       @unique
-  name      String
+  name      String       @db.VarChar(100)
   avatarUrl String
   role      EmployeeRole @default(Underwriter)
   content   Content[]
