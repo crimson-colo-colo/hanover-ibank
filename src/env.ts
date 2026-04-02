@@ -6,3 +6,5 @@ export const env = createEnv({
 	clientPrefix: "VITE_",
 	runtimeEnv: import.meta.env,
 })
+
+export const isDevelopment = import.meta.env.NODE_ENV === "development"

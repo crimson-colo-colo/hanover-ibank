@@ -20,6 +20,14 @@ const app = express()
 // log api requests
 app.use(morgan("dev", { skip: (req, res) => req.vite ?? res.vite ?? false }))
 
+app.use(
+	"/trpc",
+	createExpressMiddleware({
+		router: appRouter,
+		createContext,
+	})
+)
+
 // create vite dev server
 const vite = await createServer()
 app.use((req, res, next) => {
@@ -29,13 +37,6 @@ app.use((req, res, next) => {
 	next()
 }, vite.middlewares)
 
-app.use(
-	"/trpc",
-	createExpressMiddleware({
-		router: appRouter,
-		createContext,
-	})
-)
 
 app.listen(env.PORT, () => {
 	console.log(`[dev] ready on ${env.APP_URL || `http://localhost:${env.PORT}`}`)
