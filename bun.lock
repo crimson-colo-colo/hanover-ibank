@@ -6,7 +6,6 @@
       "name": "project",
       "dependencies": {
         "@prisma/adapter-pg": "^7.6.0",
-        "@react-buddy/ide-toolbox": "^2.4.0",
         "@t3-oss/env-core": "^0.13.11",
         "@trpc/server": "^11.16.0",
         "express": "^5.2.1",
