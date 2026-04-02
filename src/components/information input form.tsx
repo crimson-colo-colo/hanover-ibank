@@ -1,4 +1,5 @@
 import type {ReactNode} from "react";
+import {TextInput, Select} from "@mantine/core";
 
 export function inputForm(): ReactNode{
     return(
@@ -6,20 +7,33 @@ export function inputForm(): ReactNode{
         <form>
             <p>What is your role? </p>
             <label htmlFor="role">Role:</label>
-            <select name="role" id="role">
-                <option value="Underwriter"> Underwriter</option>
-                <option value="Business Analyst"> Business Analyst</option>
-            </select>
+            <Select
+                label="What is Your Role?"
+                placeholder="Pick One"
+                data={['Underwriter', 'Business Analyst']}
+            />
             <br/>
 
             <label htmlFor="fname">First Name: </label>
-            <input type="text" id="fname" name="fname"/><br/>
+            <TextInput
+                label="First Name"
+                placeholder="Input Name"
+            />
+            <br/>
 
             <label htmlFor="lname">Last Name: </label>
-            <input type="text" id="lname" name="lname"/><br/>
+            <TextInput
+                label="Input Name"
+                placeholder="Input Name"
+            />
+            <br/>
 
             <label htmlFor="email">Email Address: </label>
-            <input type="text" id="email" name="email"/><br/>
+            <TextInput
+                label="Input Email Adress"
+                placeholder="Input Email Adress"
+            />
+            <br/>
         </form>
         </>
     );

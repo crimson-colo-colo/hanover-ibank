@@ -1,10 +1,13 @@
 import type {ReactNode} from 'react';
+import {TextInput} from '@mantine/core';
 
 export function ownerField(): ReactNode{
     return(
         <>
-            <label htmlFor="owner">Document Owner: </label>
-            <input type="text" id="owner" name="owner"/><br/>
+            <TextInput
+                label="Input Document Owner"
+                placeholder={"Enter Name of Document Owner"}
+            />
         </>
     );
 }
