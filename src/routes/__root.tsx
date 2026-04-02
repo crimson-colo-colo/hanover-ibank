@@ -1,4 +1,4 @@
-import { createTheme, MantineProvider } from "@mantine/core"
+import { AppShell, createTheme, MantineProvider } from "@mantine/core"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
@@ -19,8 +19,16 @@ function RootComponent() {
 	return (
 		<MantineProvider theme={theme}>
 			<DevSupport ComponentPreviews={ComponentPreviews} useInitialHook={useInitial}>
-				<HeaderSimple />
-				<Outlet />
+				<AppShell>
+					<AppShell.Header>
+						<HeaderSimple />
+					</AppShell.Header>
+					{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
+					<AppShell.Main>
+						<Outlet />
+					</AppShell.Main>
+				</AppShell>
+
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",
