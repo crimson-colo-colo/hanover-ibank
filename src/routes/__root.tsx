@@ -19,12 +19,12 @@ function RootComponent() {
 	return (
 		<MantineProvider theme={theme}>
 			<DevSupport ComponentPreviews={ComponentPreviews} useInitialHook={useInitial}>
-				<AppShell>
+				<AppShell padding="md" header={{ height: 56 }}>
 					<AppShell.Header>
 						<HeaderSimple />
 					</AppShell.Header>
 					{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
-					<AppShell.Main>
+					<AppShell.Main className="max-w-lg mx-auto">
 						<Outlet />
 					</AppShell.Main>
 				</AppShell>
