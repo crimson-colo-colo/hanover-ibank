@@ -1,5 +1,6 @@
 import { Burger, Container, Divider, Drawer, Group, ScrollArea } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { useLocation } from "@tanstack/react-router"
 import { useState } from "react"
 
 import "./navbar.css"
@@ -15,16 +16,13 @@ const links = [
 export function HeaderSimple() {
 	const [opened, { toggle, close }] = useDisclosure(false)
 	const [active, setActive] = useState(links[0].link)
-
+	const location = useLocation({ structuralSharing: true })
 	const items = links.map((link) => (
 		<a
 			key={link.label}
 			href={link.link}
 			className={"link"}
-			data-active={active === link.link || undefined}
-			onClick={(event) => {
-				setActive(link.link)
-			}}
+			data-active={location.pathname === link.link || undefined}
 		>
 			{link.label}
 		</a>
