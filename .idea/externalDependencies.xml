@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <plugin id="com.github.biomejs.intellijbiome" min-version="1.10.1" />
+    <plugin id="com.jetbrains.codeWithMe" min-version="261.22158.291" />
+    <plugin id="intellij.javascript.bun" min-version="261.22158.180" />
+    <plugin id="org.intellij.prisma" min-version="253.29346.45" />
+  </component>
+</project>
