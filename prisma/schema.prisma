@@ -37,6 +37,7 @@ model Content {
   url              String?
   ownerId          String
   owner            Employee      @relation(fields: [ownerId], references: [id])
+  intendedAudience EmployeeRole[]
 }
 
 // new to confirm status being just placeholders
