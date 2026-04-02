@@ -1,0 +1,1 @@
+ALTER TABLE "Content" ADD CONSTRAINT "Content_url_valid" CHECK (url IS NULL OR url LIKE '%://%/%');
