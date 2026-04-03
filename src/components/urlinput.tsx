@@ -12,11 +12,9 @@ function UrlInput({
 }) {
 	return (
 		<TextInput
-			size="xs"
-			radius="xs"
+			mt="sm"
 			label="Paste Hyperlink or URL of document"
 			placeholder="URL or Hyperlink"
-			error="Invalid URL or hyperlink"
 			value={value}
 			onChange={(e) => onChange(type.parse(e.target.value))}
 		/>

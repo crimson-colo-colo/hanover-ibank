@@ -1,5 +1,10 @@
 {
-	"include": ["src", "shared", "server/generated"],
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"shared/**/*.ts",
+		"server/generated/prisma/browser.ts"
+	],
 	"compilerOptions": {
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 		"target": "esnext",
@@ -23,7 +28,8 @@
 		"noUncheckedSideEffectImports": true,
 		"paths": {
 			"@/*": ["./src/*"],
-			"@shared/*": ["./shared/*"]
+			"@shared/*": ["./shared/*"],
+			"@prisma": ["./server/generated/prisma/browser.ts"]
 		}
 	}
 }

@@ -1,13 +1,13 @@
 import { Burger, Button, Container, Divider, Drawer, Group, ScrollArea } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { IconBuildingBank } from "@tabler/icons-react"
 import { Link, useLocation } from "@tanstack/react-router"
 
 const links = [
-	{ link: "/", label: "Home" },
+	{ link: "/analyst", label: "Analyst Home" },
+	{ link: "/underwriter", label: "Underwriter Home" },
 	{ link: "/upload-content", label: "Upload Form" },
-	{ link: "/manage-employees", label: "Employee Management" },
-	{ link: "/underwriter", label: "Underwriter" },
-	{ link: "/analyst", label: "Business Analyst" },
+	{ link: "/employee", label: "Employee Management" },
 ]
 
 export function HeaderSimple() {
@@ -28,6 +28,10 @@ export function HeaderSimple() {
 		<header className="h-14 mb-30 bg-bg border-b border-border">
 			<Container size="md" className="h-full flex justify-between items-center">
 				<Group gap={5} visibleFrom="xs">
+					<Link to="/" className="mr-4 gap-2 flex items-center no-underline">
+						<IconBuildingBank className="text-primary-hover" />
+						<span className="font-semibold text-lg text-primary-hover">Hanover CMS</span>
+					</Link>
 					{items}
 				</Group>
 
@@ -49,7 +53,7 @@ export function HeaderSimple() {
 				hiddenFrom="xs"
 				zIndex={1000000}
 			>
-				<ScrollArea h="calc(100vh - 80px)" mx="-md">
+				<ScrollArea h="calc(100vh - 56px)" mx="-md">
 					<Divider my="sm" />
 					{items}
 				</ScrollArea>
