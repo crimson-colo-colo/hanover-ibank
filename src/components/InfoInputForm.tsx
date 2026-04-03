@@ -12,11 +12,11 @@ export function InfoInputForm() {
 				clearable
 			/>
 
-			<TextInput mt="sm" label="First Name" placeholder="Input First Name" />
+			<TextInput mt="sm" label="Name" placeholder="Input Name" />
 
-			<TextInput mt="sm" label="Last Name" placeholder="Input Last Name" />
+			<TextInput mt="sm" label="Owner First Name" placeholder="Input Owner First Name" />
 
-			<TextInput mt="sm" label="Email Adress" placeholder="Input Email Address" />
+			<TextInput mt="sm" label="Owner Email Adress" placeholder="Input Owner Email Address" />
 
 			<DatePickerInput mt="sm" label="Deadline" placeholder="Pick date" />
 
