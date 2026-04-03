@@ -9,6 +9,7 @@ export function InfoInputForm() {
 				label="Your Role"
 				placeholder="Pick One"
 				data={["Underwriter", "Business Analyst"]}
+				clearable
 			/>
 
 			<TextInput mt="sm" label="First Name" placeholder="Input First Name" />
@@ -19,7 +20,15 @@ export function InfoInputForm() {
 
 			<DatePickerInput mt="sm" label="Deadline" placeholder="Pick date" />
 
-			<Button mt="md" variant="filled">
+            <Select
+				mt="sm"
+				label="What is the status of document you are uploading?"
+				placeholder="Select One"
+				data={["Complete", "Incomplete", "Under Review"]}
+				clearable
+			/>
+
+			<Button mt="sm" variant="filled">
 				Submit
 			</Button>
 		</form>
