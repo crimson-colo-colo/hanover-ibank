@@ -1,6 +1,6 @@
-import type { RefObject } from "react"
 import { Button, Transition } from "@mantine/core"
 import { IconArrowUp } from "@tabler/icons-react"
+import type { RefObject } from "react"
 import { useScrollToTop } from "./use-scroll-to-top.ts"
 
 export interface ScrollToTopButtonProps {

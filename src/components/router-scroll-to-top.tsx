@@ -1,5 +1,5 @@
-import { useEffect } from "react"
 import { useRouterState } from "@tanstack/react-router"
+import { useEffect } from "react"
 
 export function RouterScrollToTop({ smooth = false }: { smooth?: boolean }) {
 	useRouteScrollToTop({ smooth })
