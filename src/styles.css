@@ -2,6 +2,7 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 @import '@mantine/core/styles.css';
+@import '@mantine/dates/styles.css';
 
 @plugin "@tailwindcss/typography";
 

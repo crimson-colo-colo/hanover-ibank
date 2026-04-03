@@ -1,4 +1,6 @@
+import { MantineProvider } from "@mantine/core"
 import { createFileRoute } from "@tanstack/react-router"
+import { ContentDatesForm } from "@/components/content-dates-form.tsx"
 
 export const Route = createFileRoute("/")({
 	component: App,
@@ -6,9 +8,19 @@ export const Route = createFileRoute("/")({
 
 function App() {
 	return (
-		<main className="p-4">
-			<p>Hello!</p>
-		</main>
+		<MantineProvider>
+			<main className="p-4">
+				<h1 className="text-xl font-semibold">Hello, world</h1>
+				<span className="text-sm text-gray-500">
+					This is an empty Tanstack Router + React + Vite + Tailwind CSS project.
+				</span>
+				<ContentDatesForm
+					onSubmit={(values) => {
+						console.log(values)
+					}}
+				/>
+			</main>
+		</MantineProvider>
 	)
 }
 
