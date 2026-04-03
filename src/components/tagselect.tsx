@@ -1,5 +1,4 @@
 import { Combobox, Input, InputBase, useCombobox } from "@mantine/core"
-import { useState } from "react"
 import z from "zod"
 
 const fileTypes = ["Reference Material", "Workflow Material"]
