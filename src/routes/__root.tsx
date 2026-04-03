@@ -10,7 +10,7 @@ import "../styles.css"
 import { DevSupport } from "@react-buddy/ide-toolbox"
 import { QueryClientProvider } from "@tanstack/react-query"
 import tailwindcss from "tailwindcss/defaultTheme"
-import HeaderSimple from "@/components/navbar.tsx"
+import Navigation from "@/components/Navigation.tsx"
 import { ComponentPreviews, useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
 
@@ -34,7 +34,7 @@ function RootComponent() {
 				<DevSupport ComponentPreviews={ComponentPreviews} useInitialHook={useInitial}>
 					<AppShell padding="md" header={{ height: 56 }}>
 						<AppShell.Header>
-							<HeaderSimple />
+							<Navigation />
 						</AppShell.Header>
 						{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
 						<AppShell.Main className="max-w-240 mx-auto">
