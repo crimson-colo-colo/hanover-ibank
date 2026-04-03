@@ -1,7 +1,22 @@
-@import "tailwindcss";
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import '@mantine/core/styles.css';
+
 @plugin "@tailwindcss/typography";
 
 @theme {
+    --color-primary: #379392;
+    --color-primary-hover: #1F5F5E;
+    --color-primary-subtle: #EAF6F6;
+    --color-surface-tint: #DAF0EE;
+    --color-text-base: #3B413C;
+    --color-text-muted: #7D8580;
+    --color-surface: #FFFFFF;
+    --color-bg: #F2F3F2;
+    --color-border: #D7DAD8;
+    --color-danger: #D72638;
+    --color-danger-subtle: #FDEAEC;
 }
 
 button[aria-label="Open TanStack Devtools"] {
