@@ -5,10 +5,12 @@
     "": {
       "name": "project",
       "dependencies": {
+        "@mantine/dates": "^9.0.0",
         "@prisma/adapter-pg": "^7.6.0",
         "@prisma/client": "^7.6.0",
         "@t3-oss/env-core": "^0.13.11",
         "@trpc/server": "^11.16.0",
+        "dayjs": "^1.11.20",
         "express": "^5.2.1",
         "minio": "^8.0.7",
         "morgan": "^1.10.1",
@@ -241,6 +243,8 @@
     "@kurkle/color": ["@kurkle/color@0.3.4", "", {}, "sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w=="],
 
     "@mantine/core": ["@mantine/core@9.0.0", "", { "dependencies": { "@floating-ui/react": "^0.27.19", "clsx": "^2.1.1", "react-number-format": "^5.4.5", "react-remove-scroll": "^2.7.2", "type-fest": "^5.5.0" }, "peerDependencies": { "@mantine/hooks": "9.0.0", "react": "^19.2.0", "react-dom": "^19.2.0" } }, "sha512-GUUXlf+4uDpRu5iZ1PFy1NmgG7ttI+1I6VTw3v/b7N1jwOUhARwL1moGjPMjo3Eie3tHdVOCiVMYAvhlQ1GI5Q=="],
+
+    "@mantine/dates": ["@mantine/dates@9.0.0", "", { "dependencies": { "clsx": "^2.1.1" }, "peerDependencies": { "@mantine/core": "9.0.0", "@mantine/hooks": "9.0.0", "dayjs": ">=1.0.0", "react": "^19.2.0", "react-dom": "^19.2.0" } }, "sha512-tJaV9WVSKZQ8TZspSY1RetO8L2hHMWcZIAaMJ8Aqwu1QOp6QcrErlKRdC8rze9BYQ+RIUFUrWB9uyoD1jQiUDA=="],
 
     "@mantine/hooks": ["@mantine/hooks@9.0.0", "", { "peerDependencies": { "react": "^19.2.0" } }, "sha512-TKcz+k0JH/jtblBfwOw/vXBX2EpJO66psJ5ZVmdDhwc6vbHDsvY6oYN8ynt9TfRn/eHZXsEmLPNj+wuGtWy4BA=="],
 
