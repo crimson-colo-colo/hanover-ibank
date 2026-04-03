@@ -31,6 +31,7 @@ function TagSelect({
 		>
 			<Combobox.Target>
 				<InputBase
+					label="Document Type"
 					mt="sm"
 					component="button"
 					type="button"

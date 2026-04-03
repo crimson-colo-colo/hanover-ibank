@@ -8,7 +8,7 @@ import UrlInput from "@/components/urlinput.tsx"
 export function InfoInputForm() {
 	const [owner, setOwner] = useState<string | undefined>()
 	const [tag, setTag] = useState<string | undefined>()
-	const [url, setUrl] = useState<string | undefined>()
+	const [url, setUrl] = useState<string | undefined>("")
 	return (
 		<form className="max-w-md mx-auto">
 			<TextInput mt="sm" label="Content Name" placeholder="Input Content Name" />
