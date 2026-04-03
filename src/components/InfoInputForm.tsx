@@ -36,7 +36,9 @@ export function InfoInputForm() {
 			/>
 
 			<OwnerField value={owner} onChange={(v) => setOwner(v)} />
+
 			<TagSelect value={tag} onChange={(v) => setTag(v)} />
+
 			<UrlInput value={url} onChange={(v) => setUrl(v)} />
 
 			<Button mt="sm" variant="filled">
