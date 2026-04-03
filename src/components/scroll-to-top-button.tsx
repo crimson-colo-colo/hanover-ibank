@@ -30,7 +30,7 @@ export function ScrollToTopButton(
                     aria-label="Scroll to top"
                     rightSection={<IconArrowUp size={16} />}
                     variant="filled"
-                    color="#15aabf"
+                    color="teal"
                     radius="x1"
                     style={{
                         ...styles,
