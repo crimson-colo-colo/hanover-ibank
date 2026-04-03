@@ -19,7 +19,7 @@
 		"db:logs": "docker compose -p cs3733 logs -f",
 		"db:stop": "docker compose -p cs3733 down",
 		"db:migrate": "dotenvx run -qf .env.development -- prisma migrate",
-		"db:seed": "NODE_ENV=development bun db:stop && docker volume rm cs3733_minio_data cs3733_db_data && bun db:start && sleep 2 && bun db:migrate deploy && bun ./prisma/seed.ts",
+		"db:seed": "NODE_ENV=development bun db:stop && docker volume rm cs3733_minio_data cs3733_db_data && bun db:start && bun ./scripts/sleep.ts && bun db:migrate deploy && bun ./prisma/seed.ts",
 		"cli": "API_URL='http://localhost:3000' bun run cli/cli.ts"
 	},
 	"dependencies": {
