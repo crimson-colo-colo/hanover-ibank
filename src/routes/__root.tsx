@@ -5,9 +5,7 @@ import { createRootRoute, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { ScrollToTopButton } from "@/components/scroll-to-top-button.tsx";
 import { RouterScrollToTop } from "@/components/router-scroll-to-top.tsx";
-import '@mantine/core/styles.css'
-import '@mantine/dates/styles.css'
-import { MantineProvider } from '@mantine/core'
+
 
 import "../styles.css"
 import { DevSupport } from "@react-buddy/ide-toolbox"
