@@ -12,7 +12,7 @@ export const queryClient = new QueryClient({
 	},
 })
 
-const trpcClient = createTRPCClient<AppRouter>({
+export const trpcClient = createTRPCClient<AppRouter>({
 	links: [
 		loggerLink({
 			enabled: (opts) =>

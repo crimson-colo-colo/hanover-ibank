@@ -10,7 +10,7 @@ const links = [
 	{ link: "/employee", label: "Employee Management" },
 ]
 
-export function HeaderSimple() {
+export function Navigation() {
 	const [opened, { toggle, close }] = useDisclosure(false)
 	const location = useLocation({ structuralSharing: true })
 	const items = links.map((link) => (
@@ -61,4 +61,4 @@ export function HeaderSimple() {
 		</header>
 	)
 }
-export default HeaderSimple
+export default Navigation

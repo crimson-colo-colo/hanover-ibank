@@ -1,6 +1,6 @@
 import { ComponentPreview, Previews } from "@react-buddy/ide-toolbox"
 import { InfoInputForm } from "@/components/InfoInputForm.tsx"
-import HeaderSimple from "@/components/navbar.tsx"
+import Navigation from "@/components/Navigation.tsx"
 import { OwnerField } from "@/components/OwnerField.tsx"
 import TagSelect from "@/components/tagselect.tsx"
 import UrlInput from "@/components/urlinput.tsx"
@@ -12,7 +12,7 @@ const ComponentPreviews = () => {
 	return (
 		<Previews palette={<PaletteTree />}>
 			<ComponentPreview path="/HeaderSimple">
-				<HeaderSimple />
+				<Navigation />
 			</ComponentPreview>
 			<ComponentPreview path="/tagselect">
 				<TagSelect value="" onChange={() => {}} />
