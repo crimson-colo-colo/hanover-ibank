@@ -23,6 +23,7 @@ function TagSelect({
 
 	return (
 		<Combobox
+			mt="sm"
 			store={combobox}
 			onOptionSubmit={(val) => {
 				onChange(type.parse(val))

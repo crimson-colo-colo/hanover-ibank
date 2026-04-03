@@ -14,6 +14,7 @@ function UrlInput({
 		<TextInput
 			size="xs"
 			radius="xs"
+			mt="sm"
 			label="Paste Hyperlink or URL of document"
 			placeholder="URL or Hyperlink"
 			error="Invalid URL or hyperlink"
