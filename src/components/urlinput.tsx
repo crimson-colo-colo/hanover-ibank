@@ -3,7 +3,7 @@ import z from "zod"
 
 const type = z.string().or(z.undefined())
 
-export function OwnerField({
+function UrlInput({
 	value,
 	onChange,
 }: {
@@ -12,11 +12,15 @@ export function OwnerField({
 }) {
 	return (
 		<TextInput
-			mt="sm"
-			label="Input Document Owner"
-			placeholder={"Enter Name of Document Owner"}
+			size="xs"
+			radius="xs"
+			label="Paste Hyperlink or URL of document"
+			placeholder="URL or Hyperlink"
+			error="Invalid URL or hyperlink"
 			value={value}
 			onChange={(e) => onChange(type.parse(e.target.value))}
 		/>
 	)
 }
+
+export default UrlInput
