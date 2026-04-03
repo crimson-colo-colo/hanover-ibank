@@ -31,6 +31,7 @@ function TagSelect({
 		>
 			<Combobox.Target>
 				<InputBase
+					mt="sm"
 					component="button"
 					type="button"
 					pointer
