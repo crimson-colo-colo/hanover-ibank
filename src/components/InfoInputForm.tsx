@@ -11,35 +11,39 @@ export function InfoInputForm() {
 	const [url, setUrl] = useState<string | undefined>()
 	return (
 		<form className="max-w-md mx-auto">
+			<TextInput mt="sm" label="Content Name" placeholder="Input Content Name" />
+
+			<UrlInput value={url} onChange={(v) => setUrl(v)} />
+
+			<OwnerField value={owner} onChange={(v) => setOwner(v)} />
+
+			<TextInput
+				mt="sm"
+				label="Document Owner Email Address"
+				placeholder="Input Document Owner Email Address"
+			/>
+
 			<Select
 				mt="sm"
-				label="Your Role"
-				placeholder="Pick One"
+				label="Intended Audience for Document"
+				placeholder="Select One"
 				data={["Underwriter", "Business Analyst"]}
 				clearable
 			/>
 
-			<TextInput mt="sm" label="Name" placeholder="Input Name" />
-
-			<TextInput mt="sm" label="Owner First Name" placeholder="Input Owner First Name" />
-
-			<TextInput mt="sm" label="Owner Email Adress" placeholder="Input Owner Email Address" />
+			<DatePickerInput mt="sm" label="Last Modified Date" placeholder="Pick date" />
 
 			<DatePickerInput mt="sm" label="Deadline" placeholder="Pick date" />
 
+			<TagSelect value={tag} onChange={(v) => setTag(v)} />
+
 			<Select
 				mt="sm"
-				label="What is the status of document you are uploading?"
+				label="Document Status"
 				placeholder="Select One"
 				data={["Complete", "Incomplete", "Under Review"]}
 				clearable
 			/>
-
-			<OwnerField value={owner} onChange={(v) => setOwner(v)} />
-
-			<TagSelect value={tag} onChange={(v) => setTag(v)} />
-
-			<UrlInput value={url} onChange={(v) => setUrl(v)} />
 
 			<Button mt="sm" variant="filled">
 				Submit

@@ -13,7 +13,7 @@ export function OwnerField({
 	return (
 		<TextInput
 			mt="sm"
-			label="Input Document Owner"
+			label="Document Owner Name"
 			placeholder={"Enter Name of Document Owner"}
 			value={value}
 			onChange={(e) => onChange(type.parse(e.target.value))}
