@@ -26,6 +26,7 @@
 		"@prisma/adapter-pg": "^7.6.0",
 		"@prisma/client": "^7.6.0",
 		"@t3-oss/env-core": "^0.13.11",
+		"@tabler/icons-react": "^3.41.1",
 		"@trpc/server": "^11.16.0",
 		"dayjs": "^1.11.20",
 		"express": "^5.2.1",
@@ -37,6 +38,8 @@
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
+		"@mantine/core": "^9.0.0",
+		"@mantine/hooks": "^9.0.0",
 		"@biomejs/biome": "2.4.5",
 		"@dotenvx/dotenvx": "^1.59.1",
 		"@faker-js/faker": "^10.4.0",
