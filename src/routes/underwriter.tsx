@@ -23,7 +23,7 @@ function RouteComponent() {
 
 			<section>
 				<h2 className="mt-6 mb-4 text-xl font-semibold">Content</h2>
-				<SimpleGrid cols={3}>
+				<SimpleGrid minColWidth={250}>
 					{content.data?.content.map((item) => (
 						<Paper
 							component={"a"}
