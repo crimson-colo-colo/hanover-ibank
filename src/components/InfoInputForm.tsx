@@ -16,11 +16,11 @@ export function InfoInputForm() {
 
 			<TextInput mt="sm" label="Last Name" placeholder="Input Last Name" />
 
-			<TextInput mt="sm" label="Email Adress" placeholder="Input Email Adress" />
+			<TextInput mt="sm" label="Email Adress" placeholder="Input Email Address" />
 
 			<DatePickerInput mt="sm" label="Deadline" placeholder="Pick date" />
 
-            <Select
+			<Select
 				mt="sm"
 				label="What is the status of document you are uploading?"
 				placeholder="Select One"
