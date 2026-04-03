@@ -4,6 +4,7 @@ import morgan from "morgan"
 import { createServer } from "vite"
 import { env } from "./env.ts"
 import { appRouter } from "./router.ts"
+import { contentDownloadRouter } from "./routers/download.ts"
 import { createContext } from "./trpc.ts"
 
 declare module "http" {
@@ -19,6 +20,8 @@ const app = express()
 
 // log api requests
 app.use(morgan("dev", { skip: (req, res) => req.vite ?? res.vite ?? false }))
+
+app.use(contentDownloadRouter)
 
 app.use(
 	"/trpc",

@@ -12,7 +12,6 @@ function UrlInput({
 }) {
 	return (
 		<TextInput
-			radius="xs"
 			mt="sm"
 			label="Paste Hyperlink or URL of document"
 			placeholder="URL or Hyperlink"

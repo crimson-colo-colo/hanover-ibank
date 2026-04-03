@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadContentRouteImport } from './routes/upload-content'
+import { Route as UnderwriterRouteImport } from './routes/underwriter'
 import { Route as EmployeeRouteImport } from './routes/employee'
+import { Route as AnalystRouteImport } from './routes/analyst'
 import { Route as IndexRouteImport } from './routes/index'
 
 const UploadContentRoute = UploadContentRouteImport.update({
@@ -18,9 +20,19 @@ const UploadContentRoute = UploadContentRouteImport.update({
   path: '/upload-content',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnderwriterRoute = UnderwriterRouteImport.update({
+  id: '/underwriter',
+  path: '/underwriter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmployeeRoute = EmployeeRouteImport.update({
   id: '/employee',
   path: '/employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalystRoute = AnalystRouteImport.update({
+  id: '/analyst',
+  path: '/analyst',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,31 +43,45 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analyst': typeof AnalystRoute
   '/employee': typeof EmployeeRoute
+  '/underwriter': typeof UnderwriterRoute
   '/upload-content': typeof UploadContentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analyst': typeof AnalystRoute
   '/employee': typeof EmployeeRoute
+  '/underwriter': typeof UnderwriterRoute
   '/upload-content': typeof UploadContentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analyst': typeof AnalystRoute
   '/employee': typeof EmployeeRoute
+  '/underwriter': typeof UnderwriterRoute
   '/upload-content': typeof UploadContentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/employee' | '/upload-content'
+  fullPaths: '/' | '/analyst' | '/employee' | '/underwriter' | '/upload-content'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/employee' | '/upload-content'
-  id: '__root__' | '/' | '/employee' | '/upload-content'
+  to: '/' | '/analyst' | '/employee' | '/underwriter' | '/upload-content'
+  id:
+    | '__root__'
+    | '/'
+    | '/analyst'
+    | '/employee'
+    | '/underwriter'
+    | '/upload-content'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalystRoute: typeof AnalystRoute
   EmployeeRoute: typeof EmployeeRoute
+  UnderwriterRoute: typeof UnderwriterRoute
   UploadContentRoute: typeof UploadContentRoute
 }
 
@@ -68,11 +94,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UploadContentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/underwriter': {
+      id: '/underwriter'
+      path: '/underwriter'
+      fullPath: '/underwriter'
+      preLoaderRoute: typeof UnderwriterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/employee': {
       id: '/employee'
       path: '/employee'
       fullPath: '/employee'
       preLoaderRoute: typeof EmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analyst': {
+      id: '/analyst'
+      path: '/analyst'
+      fullPath: '/analyst'
+      preLoaderRoute: typeof AnalystRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,7 +127,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalystRoute: AnalystRoute,
   EmployeeRoute: EmployeeRoute,
+  UnderwriterRoute: UnderwriterRoute,
   UploadContentRoute: UploadContentRoute,
 }
 export const routeTree = rootRouteImport

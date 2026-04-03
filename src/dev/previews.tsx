@@ -15,16 +15,16 @@ const ComponentPreviews = () => {
 				<HeaderSimple />
 			</ComponentPreview>
 			<ComponentPreview path="/tagselect">
-				<TagSelect />
+				<TagSelect value="" onChange={() => {}} />
 			</ComponentPreview>
 			<ComponentPreview path="/urlinput">
-				<UrlInput />
+				<UrlInput value="" onChange={() => {}} />
 			</ComponentPreview>
 			<ComponentPreview path="/InfoInputForm">
 				<InfoInputForm />
 			</ComponentPreview>
 			<ComponentPreview path="/OwnerField">
-				<OwnerField />
+				<OwnerField value="" onChange={() => {}} />
 			</ComponentPreview>
 		</Previews>
 	)

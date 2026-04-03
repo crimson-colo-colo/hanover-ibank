@@ -6,6 +6,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import "../styles.css"
 import { DevSupport } from "@react-buddy/ide-toolbox"
 import { QueryClientProvider } from "@tanstack/react-query"
+import tailwindcss from "tailwindcss/defaultTheme"
 import HeaderSimple from "@/components/navbar.tsx"
 import { ComponentPreviews, useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
@@ -15,6 +16,12 @@ export const Route = createRootRoute({
 })
 const theme = createTheme({
 	primaryColor: "teal",
+	breakpoints: {
+		sm: tailwindcss.screens.sm,
+		md: tailwindcss.screens.md,
+		lg: tailwindcss.screens.lg,
+		xl: tailwindcss.screens.xl,
+	},
 })
 
 function RootComponent() {
@@ -27,7 +34,7 @@ function RootComponent() {
 							<HeaderSimple />
 						</AppShell.Header>
 						{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
-						<AppShell.Main className="max-w-lg mx-auto">
+						<AppShell.Main className="max-w-240 mx-auto">
 							<Outlet />
 						</AppShell.Main>
 					</AppShell>
