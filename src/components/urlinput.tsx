@@ -1,22 +1,16 @@
 import { TextInput } from "@mantine/core"
-import z from "zod"
+import type { UseFormReturnType } from "@mantine/form"
+import type z from "zod"
+import type { schema } from "./InfoInputForm.tsx"
 
-const type = z.string().or(z.undefined())
-
-function UrlInput({
-	value,
-	onChange,
-}: {
-	value: z.infer<typeof type>
-	onChange: (val: z.infer<typeof type>) => void
-}) {
+function UrlInput({ form }: { form: UseFormReturnType<z.infer<typeof schema>> }) {
 	return (
 		<TextInput
 			mt="sm"
 			label="Paste Hyperlink or URL of document"
 			placeholder="URL or Hyperlink"
-			value={value}
-			onChange={(e) => onChange(type.parse(e.target.value))}
+			key={form.key("url")}
+			{...form.getInputProps("url")}
 		/>
 	)
 }

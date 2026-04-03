@@ -1,51 +1,116 @@
-import { Button, Select, TextInput } from "@mantine/core"
+import { Button, MultiSelect, Select, TextInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
-import { useState } from "react"
-import { OwnerField } from "@/components/OwnerField.tsx"
-import TagSelect from "@/components/tagselect.tsx"
+import { schemaResolver, useForm } from "@mantine/form"
+import { ContentStatus, DocumentType, EmployeeRole } from "@prisma/browser.ts"
+import z from "zod"
 import UrlInput from "@/components/urlinput.tsx"
+import {
+	contentStatusDisplayName,
+	documentTypeDisplayName,
+	employeeRoleDisplayName,
+} from "@/lib/enums.ts"
+
+export const schema = z.object({
+	name: z.string(),
+	url: z.url(),
+	email: z.email(),
+	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))),
+	// FIXME: Mantine 8.x date components work with string values instead of Dates, and
+	// useForm isn't running zod transformers on submitted values. This should be z.date()
+	// instead of z.string() when that is working.
+	lastModifiedDate: z.string(),
+	expirationDate: z.string(),
+	documentType: z.enum(Object.values(DocumentType)),
+	documentStatus: z.enum(Object.values(ContentStatus)),
+})
 
 export function InfoInputForm() {
-	const [owner, setOwner] = useState<string | undefined>()
-	const [tag, setTag] = useState<string | undefined>()
-	const [url, setUrl] = useState<string | undefined>("")
+	const form = useForm<z.infer<typeof schema>>({
+		validate: schemaResolver(schema, { sync: true }),
+	})
+
+	function onSubmit(values: z.infer<typeof schema>) {
+		console.log(values)
+	}
+
 	return (
-		<form className="max-w-md mx-auto">
-			<TextInput mt="sm" label="Content Name" placeholder="Input Content Name" />
+		<form className="max-w-md mx-auto" onSubmit={form.onSubmit(onSubmit)}>
+			<TextInput
+				mt="sm"
+				label="Content Name"
+				placeholder="Input Content Name"
+				key={form.key("name")}
+				{...form.getInputProps("name")}
+			/>
 
-			<UrlInput value={url} onChange={(v) => setUrl(v)} />
+			<UrlInput form={form} />
 
-			<OwnerField value={owner} onChange={(v) => setOwner(v)} />
+			{/*<OwnerField value={owner} onChange={(v) => setOwner(v)} />*/}
 
 			<TextInput
 				mt="sm"
 				label="Document Owner Email Address"
 				placeholder="Input Document Owner Email Address"
+				key={form.key("email")}
+				{...form.getInputProps("email")}
+			/>
+
+			<MultiSelect
+				mt="sm"
+				label="Intended Audience for Document"
+				placeholder="Select multiple"
+				data={Object.values(EmployeeRole).map((role) => ({
+					value: role,
+					label: employeeRoleDisplayName[role],
+				}))}
+				clearable
+				key={form.key("intendedAudience")}
+				{...form.getInputProps("intendedAudience")}
+			/>
+
+			<DatePickerInput
+				mt="sm"
+				label="Last Modified Date"
+				placeholder="Pick date"
+				key={form.key("lastModifiedDate")}
+				{...form.getInputProps("lastModifiedDate")}
+			/>
+
+			<DatePickerInput
+				mt="sm"
+				label="Deadline"
+				placeholder="Pick date"
+				key={form.key("expirationDate")}
+				{...form.getInputProps("expirationDate")}
 			/>
 
 			<Select
 				mt="sm"
-				label="Intended Audience for Document"
+				label="Document Type"
 				placeholder="Select One"
-				data={["Underwriter", "Business Analyst"]}
+				data={Object.values(DocumentType).map((type) => ({
+					value: type,
+					label: documentTypeDisplayName[type],
+				}))}
 				clearable
+				key={form.key("documentType")}
+				{...form.getInputProps("documentType")}
 			/>
-
-			<DatePickerInput mt="sm" label="Last Modified Date" placeholder="Pick date" />
-
-			<DatePickerInput mt="sm" label="Deadline" placeholder="Pick date" />
-
-			<TagSelect value={tag} onChange={(v) => setTag(v)} />
 
 			<Select
 				mt="sm"
 				label="Document Status"
 				placeholder="Select One"
-				data={["Complete", "Incomplete", "Under Review"]}
+				data={Object.values(ContentStatus).map((status) => ({
+					value: status,
+					label: contentStatusDisplayName[status],
+				}))}
 				clearable
+				key={form.key("documentStatus")}
+				{...form.getInputProps("documentStatus")}
 			/>
 
-			<Button mt="sm" variant="filled">
+			<Button mt="sm" type="submit" variant="filled">
 				Submit
 			</Button>
 		</form>
