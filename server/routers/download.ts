@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express"
-import { db } from "../database"
-import { bucketName, s3 } from "../s3"
+import { db } from "../database.ts"
+import { bucketName, s3 } from "../s3.ts"
 
 export const contentDownloadRouter = express.Router()
 
@@ -16,7 +16,7 @@ contentDownloadRouter.get(
 			where: { id: contentId },
 		})
 		if (!content) {
-			return res.redirect("/analyst")
+			return res.status(404).json({ error: "Content not found" })
 		}
 
 		if (content.type === "Link") {

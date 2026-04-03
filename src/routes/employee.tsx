@@ -18,7 +18,7 @@ function UploadContentForm() {
 
 			<TextInput mt="sm" label="Name" placeholder="Input Name" />
 
-			<TextInput mt="sm" label="Email Adress" placeholder="Input Email Address" />
+			<TextInput mt="sm" label="Email Address" placeholder="Input Email Address" />
 
 			<Button mt="sm" variant="filled">
 				Submit
