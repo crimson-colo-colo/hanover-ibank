@@ -23,7 +23,6 @@ function TagSelect({
 
 	return (
 		<Combobox
-			mt="sm"
 			store={combobox}
 			onOptionSubmit={(val) => {
 				onChange(type.parse(val))
@@ -32,6 +31,7 @@ function TagSelect({
 		>
 			<Combobox.Target>
 				<InputBase
+					mt="sm"
 					component="button"
 					type="button"
 					pointer
