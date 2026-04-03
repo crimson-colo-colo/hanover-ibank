@@ -1,15 +1,21 @@
 import { Combobox, Input, InputBase, useCombobox } from "@mantine/core"
 import { useState } from "react"
+import z from "zod"
 
 const fileTypes = ["Reference Material", "Workflow Material"]
 
-function TagSelect() {
+const type = z.enum(fileTypes).or(z.undefined())
+
+function TagSelect({
+	value,
+	onChange,
+}: {
+	value: z.infer<typeof type>
+	onChange: (val: z.infer<typeof type>) => void
+}) {
 	const combobox = useCombobox({
 		onDropdownClose: () => combobox.resetSelectedOption(),
 	})
-
-	const [value, setValue] = useState<string | null>(null)
-
 	const options = fileTypes.map((item) => (
 		<Combobox.Option value={item} key={item}>
 			{item}
@@ -20,7 +26,7 @@ function TagSelect() {
 		<Combobox
 			store={combobox}
 			onOptionSubmit={(val) => {
-				setValue(val)
+				onChange(type.parse(val))
 				combobox.closeDropdown()
 			}}
 		>
