@@ -1,14 +1,14 @@
-import z from "zod"
+import { db } from "./database.ts"
+import { cliRouter } from "./routers/cli.ts"
+import { storageRouter } from "./s3.ts"
 import { publicProcedure, router } from "./trpc.ts"
 
 export type AppRouter = typeof appRouter
 export const appRouter = router({
-	getUser: publicProcedure.input(z.string()).query((opts) => {
-		return { id: opts.input, name: "Bilbo" }
+	s3: storageRouter,
+	cli: cliRouter,
+	listContent: publicProcedure.query(async () => {
+		const data = await db.content.findMany()
+		return data
 	}),
-	createUser: publicProcedure
-		.input(z.object({ name: z.string().min(5) }))
-		.mutation(async (opts) => {
-			return { id: "1", ...opts.input }
-		}),
 })

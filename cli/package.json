@@ -1,0 +1,13 @@
+{
+	"name": "cli",
+	"private": true,
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^6.0.2"
+	},
+	"dependencies": {
+		"clipanion": "^4.0.0-rc.4"
+	}
+}
