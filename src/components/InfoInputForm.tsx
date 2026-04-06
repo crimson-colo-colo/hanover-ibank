@@ -3,7 +3,6 @@ import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { ContentStatus, DocumentType, EmployeeRole } from "@prisma/browser.ts"
 import z from "zod"
-import UrlInput from "@/components/urlinput.tsx"
 import {
 	contentStatusDisplayName,
 	documentTypeDisplayName,
@@ -43,7 +42,13 @@ export function InfoInputForm() {
 				{...form.getInputProps("name")}
 			/>
 
-			<UrlInput form={form} />
+			<TextInput
+				mt="sm"
+				label="Paste Hyperlink or URL of document"
+				placeholder="URL or Hyperlink"
+				key={form.key("url")}
+				{...form.getInputProps("url")}
+			/>
 
 			{/*<OwnerField value={owner} onChange={(v) => setOwner(v)} />*/}
 
