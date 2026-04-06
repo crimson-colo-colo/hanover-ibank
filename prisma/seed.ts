@@ -1,7 +1,9 @@
 import crypto from "node:crypto"
 import { createReadStream } from "node:fs"
 import fs from "node:fs/promises"
+import path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
+import { unzipSync } from "fflate"
 import * as Minio from "minio"
 import { v4 as uuidv4 } from "uuid"
 import {
@@ -48,6 +50,7 @@ main()
 		process.exit(1)
 	})
 	.finally(async () => {
+		console.log("✅ Finished seeding database")
 		await prisma.$disconnect()
 	})
 
@@ -57,7 +60,7 @@ async function main() {
 	const [employees, content] = await Promise.all([prisma.employee.count(), prisma.content.count()])
 	if (employees > 0 || content > 0) {
 		process.stdout.write(
-			`⚠️ \x1b[33mDatabase already has data (employee: ${employees}, content: ${content}. Continuing will erase existing data and cannot be undone. Really continue[y/N] \x1b[0m`
+			`⚠️ \x1b[33mDatabase already has data (employee: ${employees}, content: ${content}. Continuing will erase existing data and cannot be undone. Really continue? [y/N] \x1b[0m`
 		)
 		const answer = await new Promise<string>((resolve) => {
 			process.stdin.setEncoding("utf-8")
@@ -75,7 +78,7 @@ async function main() {
 
 	console.log("🌱 Seeding database...")
 
-	await prisma.$transaction([prisma.employee.deleteMany(), prisma.content.deleteMany()])
+	await prisma.$transaction([prisma.content.deleteMany(), prisma.employee.deleteMany()])
 
 	// Wilson Harper, wharper@hanover.com, Business Analyst
 	// Austin Johnson, ajohnson@hanover.com, Underwriter
@@ -371,6 +374,23 @@ async function main() {
 		ids.set(file, id)
 	}
 
+	const hanoverData = unzipSync(
+		await fs.readFile("prisma/seed-data/Hanover Data.zip").catch((err) => {
+			console.error("Error reading zip file:", err)
+			console.error(
+				"Make sure the file 'Hanover Data.zip' exists in the 'prisma/seed-data' directory. Download this file from Canvas if you don't have it."
+			)
+			process.exit(1)
+		})
+	)
+
+	for (const [filename, content] of Object.entries(hanoverData)) {
+		if (filename.endsWith("/")) continue // skip directories
+		const id = uuidv4()
+		await s3.putObject(bucketName, id, Buffer.from(content))
+		ids.set(path.basename(filename), id)
+	}
+
 	await prisma.content.createMany({
 		data: [
 			...ids.entries().map(
@@ -388,7 +408,9 @@ async function main() {
 		],
 	})
 
-	console.log(`Uploaded ${ids.size} files to S3 and created content rows for them`)
+	console.log(
+		`Uploaded ${ids.size} files (${Object.entries(hanoverData).length} from Hanover Data.zip) to S3 and created content rows for them`
+	)
 }
 
 // returns the gravtar url for the given email
