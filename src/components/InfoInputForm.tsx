@@ -2,6 +2,7 @@ import { Button, MultiSelect, Select, TextInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { ContentStatus, DocumentType, EmployeeRole } from "@prisma/browser.ts"
+import { useState } from "react"
 import z from "zod"
 import {
 	contentStatusDisplayName,
@@ -34,6 +35,21 @@ export function InfoInputForm() {
 
 	return (
 		<form className="max-w-md mx-auto" onSubmit={form.onSubmit(onSubmit)}>
+			<SegmentedControl<contentType>
+				value={contentType}
+				onChange={(value) => {
+					if (contentType !== value) {
+						userUploadedFile(null)
+						form.setFieldValue("url", "")
+					}
+					setContentType(value)
+				}}
+				data={[
+					{ label: "URL", value: "url" },
+					{ label: "File", value: "file" },
+				]}
+			/>
+
 			<TextInput
 				mt="sm"
 				label="Content Name"
