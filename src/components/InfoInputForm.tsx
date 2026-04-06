@@ -33,6 +33,26 @@ export function InfoInputForm() {
 		console.log(values)
 	}
 
+	type contentType = "url" | "file"
+	const [contentType, setContentType] = useState<contentType>("url")
+	const [file, setFile] = useState<File | null>(null)
+
+	function userUploadedFile(newFile: File | null) {
+		if (file === null && newFile === null) return // if the user switches tabs, don't clear the
+		// text input unless there is a file that already is there
+		let name: string
+
+		if (newFile !== null) {
+			name = newFile.name.substring(0, newFile.name.lastIndexOf("."))
+		} else {
+			name = ""
+		}
+		form.setFieldValue("file", newFile === null ? undefined : newFile)
+		form.setFieldValue("name", name)
+
+		setFile(newFile)
+	}
+
 	return (
 		<form className="max-w-md mx-auto" onSubmit={form.onSubmit(onSubmit)}>
 			<SegmentedControl<contentType>
