@@ -1,5 +1,11 @@
 {
-	"include": ["vite.config.ts", "server/**/*.ts", "prisma/**/*.ts", "shared/**/*.ts"],
+	"include": [
+		"vite.config.ts",
+		"server/**/*.ts",
+		"prisma/**/*.ts",
+		"shared/**/*.ts",
+		"scripts/**/*.ts"
+	],
 	"compilerOptions": {
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
 		"target": "esnext",
