@@ -1,4 +1,4 @@
-import { Button, MultiSelect, Select, TextInput } from "@mantine/core"
+import { Button, FileInput, MultiSelect, SegmentedControl, Select, TextInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { ContentStatus, DocumentType, EmployeeRole } from "@prisma/browser.ts"
@@ -10,18 +10,19 @@ import {
 	employeeRoleDisplayName,
 } from "@/lib/enums.ts"
 
-export const schema = z.object({
-	name: z.string(),
-	url: z.url(),
-	email: z.email(),
+const schema = z.object({
+	name: z.string().max(250),
+	url: z.url().max(2000),
+	email: z.email().max(320),
 	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))),
 	// FIXME: Mantine 8.x date components work with string values instead of Dates, and
 	// useForm isn't running zod transformers on submitted values. This should be z.date()
 	// instead of z.string() when that is working.
-	lastModifiedDate: z.string(),
-	expirationDate: z.string(),
+	lastModifiedDate: z.string().max(200),
+	expirationDate: z.string().max(200),
 	documentType: z.enum(Object.values(DocumentType)),
 	documentStatus: z.enum(Object.values(ContentStatus)),
+	file: z.file().max(50_000_000_000).optional(),
 })
 
 export function InfoInputForm() {
@@ -30,7 +31,7 @@ export function InfoInputForm() {
 	})
 
 	function onSubmit(values: z.infer<typeof schema>) {
-		console.log(values)
+		console.dir(values)
 	}
 
 	type contentType = "url" | "file"
@@ -78,13 +79,25 @@ export function InfoInputForm() {
 				{...form.getInputProps("name")}
 			/>
 
-			<TextInput
-				mt="sm"
-				label="Paste Hyperlink or URL of document"
-				placeholder="URL or Hyperlink"
-				key={form.key("url")}
-				{...form.getInputProps("url")}
-			/>
+			{contentType === "url" ? (
+				<TextInput
+					mt="sm"
+					label="Paste Hyperlink or URL of document"
+					placeholder="URL or Hyperlink"
+					key={form.key("url")}
+					{...form.getInputProps("url")}
+				/>
+			) : (
+				<FileInput
+					mt="sm"
+					label="File Input"
+					placeholder="Click this box to upload a file"
+					key={form.key("file")}
+					value={file}
+					onChange={userUploadedFile}
+					clearable
+				/>
+			)}
 
 			{/*<OwnerField value={owner} onChange={(v) => setOwner(v)} />*/}
 
