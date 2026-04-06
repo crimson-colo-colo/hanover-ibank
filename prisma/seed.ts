@@ -368,6 +368,10 @@ async function main() {
 	const files = await fs.readdir("./prisma/seed-data")
 	const ids = new Map<string, string>()
 	for (const file of files) {
+		if (file === "Hanover Data.zip") {
+			// we'll handle this separately since we need to unzip it
+			continue
+		}
 		const id = uuidv4()
 		const f = createReadStream(`./prisma/seed-data/${file}`)
 		await s3.putObject(bucketName, id, f)
