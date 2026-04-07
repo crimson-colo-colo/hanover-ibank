@@ -11,9 +11,8 @@ export async function createContext({
 	req,
 	res,
 }: CreateExpressContextOptions): Promise<TRPCContext> {
-	console.log(req.auth)
-
-	const accessToken = req.headers.authorization?.replace(/^Bearer /, "")
+	const authorization = req.headers.authorization?.trim()
+	const accessToken = authorization?.match(/^Bearer\s+(.+)$/i)?.[1]
 	if (!accessToken) {
 		return {
 			auth: undefined,
