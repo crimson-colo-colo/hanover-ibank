@@ -9,6 +9,7 @@ import {
 	documentTypeDisplayName,
 	employeeRoleDisplayName,
 } from "@/lib/enums.ts"
+import { trpcClient } from "@/lib/trpc.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
@@ -36,13 +37,13 @@ export function InfoInputForm() {
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {
 			name: "",
-			contentType: "Link",
+			contentType: "Object",
 			url: "",
-			file: undefined,
+			file: undefined!,
 			email: "",
 			intendedAudience: [],
-			lastModifiedDate: "",
-			expirationDate: "",
+			lastModifiedDate: undefined!,
+			expirationDate: undefined!,
 			documentType: "" as DocumentType,
 			documentStatus: "" as ContentStatus,
 		} as z.input<typeof schema>,
@@ -50,8 +51,16 @@ export function InfoInputForm() {
 		transformValues: schema.parse,
 	})
 
-	function onSubmit(values: z.infer<typeof schema>) {
-		console.dir(values)
+	async function onSubmit(values: z.infer<typeof schema>) {
+		await trpcClient.submitForms.createContent.mutate({
+			...values,
+			...{
+				file:
+					values.contentType === "Object"
+						? new Uint8Array(await values.file.arrayBuffer()).toBase64()
+						: undefined!,
+			},
+		})
 	}
 
 	form.watch("contentType", (ctx) => {
