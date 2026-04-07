@@ -2,10 +2,10 @@ import z from "zod"
 import { db } from "../database.ts"
 import { EmployeeRole } from "../generated/prisma/enums.ts"
 import { bucketName, s3 } from "../s3.ts"
-import { publicProcedure, router } from "../trpc.ts"
+import { authProcedure, router } from "../trpc.ts"
 
 export const contentRouter = router({
-	list: publicProcedure
+	list: authProcedure
 		.input(z.object({ role: z.enum(Object.values(EmployeeRole)) }))
 		.query(async (opts) => {
 			const data = await db.content.findMany({

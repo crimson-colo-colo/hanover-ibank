@@ -13,6 +13,11 @@ export const env = createEnv({
 		S3_ACCESS_KEY: z.string(),
 		S3_SECRET_KEY: z.string(),
 		S3_BUCKET: z.string(),
+		VITE_AUTH0_DOMAIN: z.string(),
+		VITE_AUTH0_CLIENT_ID: z.string(),
+		VITE_AUTH0_AUDIENCE: z.string(),
+		AUTH0_CLIENT_SECRET: z.string(),
+		AUTH0_TENANT: z.string(),
 	},
 	runtimeEnv: process.env,
 })

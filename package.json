@@ -38,7 +38,8 @@
 		"pino": "^10.3.1",
 		"superjson": "^2.2.6",
 		"uuid": "^13.0.0",
-		"zod": "^4.3.6"
+		"zod": "^4.3.6",
+		"express-oauth2-jwt-bearer": "^1.7.4"
 	},
 	"devDependencies": {
 		"@auth0/auth0-react": "^2.16.1",
