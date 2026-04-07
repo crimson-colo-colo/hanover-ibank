@@ -9,30 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UploadContentRouteImport } from './routes/upload-content'
-import { Route as UnderwriterRouteImport } from './routes/underwriter'
-import { Route as EmployeeRouteImport } from './routes/employee'
-import { Route as AnalystRouteImport } from './routes/analyst'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedUploadContentRouteImport } from './routes/_authenticated.upload-content'
+import { Route as AuthenticatedUnderwriterRouteImport } from './routes/_authenticated.underwriter'
+import { Route as AuthenticatedEmployeeRouteImport } from './routes/_authenticated.employee'
+import { Route as AuthenticatedAnalystRouteImport } from './routes/_authenticated.analyst'
 
-const UploadContentRoute = UploadContentRouteImport.update({
-  id: '/upload-content',
-  path: '/upload-content',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UnderwriterRoute = UnderwriterRouteImport.update({
-  id: '/underwriter',
-  path: '/underwriter',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmployeeRoute = EmployeeRouteImport.update({
-  id: '/employee',
-  path: '/employee',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalystRoute = AnalystRouteImport.update({
-  id: '/analyst',
-  path: '/analyst',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -40,28 +25,51 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedUploadContentRoute =
+  AuthenticatedUploadContentRouteImport.update({
+    id: '/upload-content',
+    path: '/upload-content',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedUnderwriterRoute =
+  AuthenticatedUnderwriterRouteImport.update({
+    id: '/underwriter',
+    path: '/underwriter',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedEmployeeRoute = AuthenticatedEmployeeRouteImport.update({
+  id: '/employee',
+  path: '/employee',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAnalystRoute = AuthenticatedAnalystRouteImport.update({
+  id: '/analyst',
+  path: '/analyst',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/analyst': typeof AnalystRoute
-  '/employee': typeof EmployeeRoute
-  '/underwriter': typeof UnderwriterRoute
-  '/upload-content': typeof UploadContentRoute
+  '/analyst': typeof AuthenticatedAnalystRoute
+  '/employee': typeof AuthenticatedEmployeeRoute
+  '/underwriter': typeof AuthenticatedUnderwriterRoute
+  '/upload-content': typeof AuthenticatedUploadContentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/analyst': typeof AnalystRoute
-  '/employee': typeof EmployeeRoute
-  '/underwriter': typeof UnderwriterRoute
-  '/upload-content': typeof UploadContentRoute
+  '/analyst': typeof AuthenticatedAnalystRoute
+  '/employee': typeof AuthenticatedEmployeeRoute
+  '/underwriter': typeof AuthenticatedUnderwriterRoute
+  '/upload-content': typeof AuthenticatedUploadContentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/analyst': typeof AnalystRoute
-  '/employee': typeof EmployeeRoute
-  '/underwriter': typeof UnderwriterRoute
-  '/upload-content': typeof UploadContentRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/analyst': typeof AuthenticatedAnalystRoute
+  '/_authenticated/employee': typeof AuthenticatedEmployeeRoute
+  '/_authenticated/underwriter': typeof AuthenticatedUnderwriterRoute
+  '/_authenticated/upload-content': typeof AuthenticatedUploadContentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,48 +79,25 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/analyst'
-    | '/employee'
-    | '/underwriter'
-    | '/upload-content'
+    | '/_authenticated'
+    | '/_authenticated/analyst'
+    | '/_authenticated/employee'
+    | '/_authenticated/underwriter'
+    | '/_authenticated/upload-content'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnalystRoute: typeof AnalystRoute
-  EmployeeRoute: typeof EmployeeRoute
-  UnderwriterRoute: typeof UnderwriterRoute
-  UploadContentRoute: typeof UploadContentRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/upload-content': {
-      id: '/upload-content'
-      path: '/upload-content'
-      fullPath: '/upload-content'
-      preLoaderRoute: typeof UploadContentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/underwriter': {
-      id: '/underwriter'
-      path: '/underwriter'
-      fullPath: '/underwriter'
-      preLoaderRoute: typeof UnderwriterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/employee': {
-      id: '/employee'
-      path: '/employee'
-      fullPath: '/employee'
-      preLoaderRoute: typeof EmployeeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analyst': {
-      id: '/analyst'
-      path: '/analyst'
-      fullPath: '/analyst'
-      preLoaderRoute: typeof AnalystRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -122,15 +107,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/upload-content': {
+      id: '/_authenticated/upload-content'
+      path: '/upload-content'
+      fullPath: '/upload-content'
+      preLoaderRoute: typeof AuthenticatedUploadContentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/underwriter': {
+      id: '/_authenticated/underwriter'
+      path: '/underwriter'
+      fullPath: '/underwriter'
+      preLoaderRoute: typeof AuthenticatedUnderwriterRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/employee': {
+      id: '/_authenticated/employee'
+      path: '/employee'
+      fullPath: '/employee'
+      preLoaderRoute: typeof AuthenticatedEmployeeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/analyst': {
+      id: '/_authenticated/analyst'
+      path: '/analyst'
+      fullPath: '/analyst'
+      preLoaderRoute: typeof AuthenticatedAnalystRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAnalystRoute: typeof AuthenticatedAnalystRoute
+  AuthenticatedEmployeeRoute: typeof AuthenticatedEmployeeRoute
+  AuthenticatedUnderwriterRoute: typeof AuthenticatedUnderwriterRoute
+  AuthenticatedUploadContentRoute: typeof AuthenticatedUploadContentRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAnalystRoute: AuthenticatedAnalystRoute,
+  AuthenticatedEmployeeRoute: AuthenticatedEmployeeRoute,
+  AuthenticatedUnderwriterRoute: AuthenticatedUnderwriterRoute,
+  AuthenticatedUploadContentRoute: AuthenticatedUploadContentRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnalystRoute: AnalystRoute,
-  EmployeeRoute: EmployeeRoute,
-  UnderwriterRoute: UnderwriterRoute,
-  UploadContentRoute: UploadContentRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
