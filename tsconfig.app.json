@@ -29,7 +29,7 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"@shared/*": ["./shared/*"],
-			"@prisma": ["./server/generated/prisma/browser.ts"]
+			"@prisma/browser.ts": ["./server/generated/prisma/browser.ts"]
 		}
 	}
 }

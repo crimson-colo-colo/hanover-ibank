@@ -7,6 +7,8 @@ export const Route = createFileRoute("/")({
 })
 
 function Index() {
+	const { auth0 } = Route.useRouteContext()
+
 	return (
 		<main>
 			<header
@@ -23,12 +25,18 @@ function Index() {
 				</p>
 
 				<div className="mb-2 flex gap-4 mt-12">
-					<Button component={Link} to="/analyst">
-						Business Analyst Home
-					</Button>
-					<Button component={Link} to="/underwriter">
-						Underwriter Home
-					</Button>
+					{auth0.isAuthenticated ? (
+						<>
+							<Button component={Link} to="/analyst">
+								Business Analyst Home
+							</Button>
+							<Button component={Link} to="/underwriter">
+								Underwriter Home
+							</Button>
+						</>
+					) : (
+						<Button onClick={() => auth0.loginWithRedirect()}>Login to Get Started</Button>
+					)}
 				</div>
 			</header>
 

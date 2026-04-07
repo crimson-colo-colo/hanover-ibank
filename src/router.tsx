@@ -6,6 +6,11 @@ export function getRouter() {
 		routeTree,
 		scrollRestoration: true,
 		defaultPreload: "intent",
+		context: {
+			// this will be provided by React context by <App /> in main.tsx,
+			// but we have to provide a default here.
+			auth0: undefined!,
+		},
 	})
 
 	return router

@@ -5,19 +5,19 @@ import { createFileRoute } from "@tanstack/react-router"
 import { formatBytes, getContentTarget } from "@/lib/content.ts"
 import { trpc } from "@/lib/trpc.ts"
 
-export const Route = createFileRoute("/analyst")({
+export const Route = createFileRoute("/_authenticated/underwriter")({
 	component: RouteComponent,
 })
 
 function RouteComponent() {
-	const content = useQuery(trpc.content.list.queryOptions({ role: "BusinessAnalyst" }))
+	const content = useQuery(trpc.content.list.queryOptions({ role: "Underwriter" }))
 
 	return (
 		<div>
 			<header className="w-full bg-primary-hover text-white p-4 rounded-xl">
-				<h1 className="m-0 -mb-1">Welcome, Alice</h1>
+				<h1 className="m-0 -mb-1">Welcome, Bob</h1>
 				<small className="uppercase tracking-wider text-gray-300 font-semibold mb-3">
-					Business Analyst
+					Underwriter
 				</small>
 			</header>
 
@@ -41,11 +41,24 @@ function RouteComponent() {
 									<IconFile className="ml-auto" />
 								)}
 							</Flex>
-							<p className="text-sm text-gray-600 mt-1 mb-0">
+							<p className="text-sm text-gray-600 mt-1 mb-2">
 								{item.type === "Link"
 									? new URL(item.url!).hostname
 									: formatBytes(content.data?.objectMetadata.get(item.id)?.size || 0)}
 							</p>
+							<div className="text-sm text-gray-700 space-y-1">
+								<p className="m-0">
+									<strong>Owner:</strong> {item.owner.name}
+								</p>
+								<p className="m-0">
+									<strong>Last Modified:</strong>{" "}
+									{new Date(item.lastModifiedDate).toLocaleString()}
+								</p>
+								<p className="m-0">
+									<strong>Expires:</strong>{" "}
+									{new Date(item.expirationDate).toLocaleDateString()}
+								</p>
+							</div>
 						</Paper>
 					))}
 				</SimpleGrid>

@@ -1,7 +1,18 @@
-import { Burger, Button, Container, Divider, Drawer, Group, ScrollArea } from "@mantine/core"
+import { useAuth0 } from "@auth0/auth0-react"
+import {
+	Burger,
+	Button,
+	Container,
+	Divider,
+	Drawer,
+	Group,
+	Image,
+	Menu,
+	ScrollArea,
+} from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconBuildingBank } from "@tabler/icons-react"
-import { Link, useLocation } from "@tanstack/react-router"
+import { IconBuildingBank, IconLayoutSidebarLeftExpand } from "@tabler/icons-react"
+import { Link } from "@tanstack/react-router"
 
 const links = [
 	{ link: "/analyst", label: "Analyst Home" },
@@ -11,8 +22,8 @@ const links = [
 ]
 
 export function Navigation() {
+	const auth0 = useAuth0()
 	const [opened, { toggle, close }] = useDisclosure(false)
-	const location = useLocation({ structuralSharing: true })
 	const items = links.map((link) => (
 		<Button
 			component={Link}
@@ -32,7 +43,34 @@ export function Navigation() {
 						<IconBuildingBank className="text-primary-hover" />
 						<span className="font-semibold text-lg text-primary-hover">Hanover CMS</span>
 					</Link>
-					{items}
+					{auth0.isAuthenticated && items}
+				</Group>
+
+				<Group>
+					{auth0.isAuthenticated && auth0.user ? (
+						<Menu trigger="click" position="bottom-end">
+							<Menu.Target>
+								<Image
+									h={40}
+									bdrs="100%"
+									className="cursor-pointer"
+									src={auth0.user.picture}
+									alt={auth0.user.name}
+								/>
+							</Menu.Target>
+							<Menu.Dropdown>
+								<Menu.Item
+									leftSection={<IconLayoutSidebarLeftExpand />}
+									onClick={() => auth0.logout()}
+									color="red"
+								>
+									Sign Out
+								</Menu.Item>
+							</Menu.Dropdown>
+						</Menu>
+					) : (
+						<Button onClick={() => auth0.loginWithRedirect()}>Login</Button>
+					)}
 				</Group>
 
 				<Burger

@@ -1,4 +1,4 @@
-import type { Content } from "@prisma"
+import type { Content } from "@prisma/browser.ts"
 
 export function formatBytes(bytes: number) {
 	if (bytes === 0) return "0 Bytes"
