@@ -1,4 +1,4 @@
-import type { ContentStatus, DocumentType, EmployeeRole } from "@prisma/browser.ts"
+import type { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
 
 export const employeeRoleDisplayName: Record<EmployeeRole, string> = {
 	BusinessAnalyst: "Business Analyst",
@@ -14,4 +14,9 @@ export const contentStatusDisplayName: Record<ContentStatus, string> = {
 	Complete: "Complete",
 	Incomplete: "Incomplete",
 	UnderReview: "Under Review",
+}
+
+export const contentTypeDisplayName: Record<ContentType, string> = {
+	Link: "URL",
+	Object: "File",
 }

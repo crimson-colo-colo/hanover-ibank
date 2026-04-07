@@ -1,74 +1,85 @@
 import { Button, FileInput, MultiSelect, SegmentedControl, Select, TextInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
-import { ContentStatus, DocumentType, EmployeeRole } from "@prisma/browser.ts"
-import { useState } from "react"
+import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
 import z from "zod"
 import {
 	contentStatusDisplayName,
+	contentTypeDisplayName,
 	documentTypeDisplayName,
 	employeeRoleDisplayName,
 } from "@/lib/enums.ts"
 
-const schema = z.object({
-	name: z.string().max(250),
-	url: z.url().max(2000),
+const baseSchema = z.object({
+	name: z.string().max(250).min(3),
 	email: z.email().max(320),
-	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))),
-	// FIXME: Mantine 8.x date components work with string values instead of Dates, and
-	// useForm isn't running zod transformers on submitted values. This should be z.date()
-	// instead of z.string() when that is working.
-	lastModifiedDate: z.string().max(200),
-	expirationDate: z.string().max(200),
+	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))).min(1),
+	lastModifiedDate: z.iso.date(),
+	expirationDate: z.iso.date(),
 	documentType: z.enum(Object.values(DocumentType)),
 	documentStatus: z.enum(Object.values(ContentStatus)),
-	file: z.file().max(50_000_000_000).optional(),
 })
 
+const linkSchema = baseSchema.extend({
+	contentType: z.literal(ContentType.Link),
+	url: z.url().max(2000),
+})
+
+const fileSchema = baseSchema.extend({
+	contentType: z.literal(ContentType.Object),
+	file: z.file().max(50_000_000_000),
+})
+
+const schema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
+
 export function InfoInputForm() {
-	const form = useForm<z.infer<typeof schema>>({
+	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
+		initialValues: {
+			name: "",
+			contentType: "Link",
+			url: "",
+			file: undefined,
+			email: "",
+			intendedAudience: [],
+			lastModifiedDate: "",
+			expirationDate: "",
+			documentType: "" as DocumentType,
+			documentStatus: "" as ContentStatus,
+		} as z.input<typeof schema>,
 		validate: schemaResolver(schema, { sync: true }),
+		transformValues: schema.parse,
 	})
 
 	function onSubmit(values: z.infer<typeof schema>) {
 		console.dir(values)
 	}
 
-	type contentType = "url" | "file"
-	const [contentType, setContentType] = useState<contentType>("url")
-	const [file, setFile] = useState<File | null>(null)
+	form.watch("contentType", (ctx) => {
+		form.setFieldValue("url", "")
+		form.setFieldValue("file", undefined!)
+	})
 
-	function userUploadedFile(newFile: File | null) {
-		if (file === null && newFile === null) return // if the user switches tabs, don't clear the
-		// text input unless there is a file that already is there
-		let name: string
-
-		if (newFile !== null) {
-			name = newFile.name.substring(0, newFile.name.lastIndexOf("."))
-		} else {
-			name = ""
+	form.watch("file", (ctx) => {
+		if (ctx.previousValue == null && ctx.value == null) {
+			// if the user switches tabs, don't clear the text input unless there is a file that already is there
+			return
 		}
-		form.setFieldValue("file", newFile === null ? undefined : newFile)
-		form.setFieldValue("name", name)
-
-		setFile(newFile)
-	}
+		if (ctx.value === undefined) {
+			form.setFieldValue("name", "")
+		} else {
+			form.setFieldValue("name", ctx.value.name.substring(0, ctx.value.name.lastIndexOf(".")))
+		}
+	})
 
 	return (
 		<form className="max-w-md mx-auto" onSubmit={form.onSubmit(onSubmit)}>
-			<SegmentedControl<contentType>
-				value={contentType}
-				onChange={(value) => {
-					if (contentType !== value) {
-						userUploadedFile(null)
-						form.setFieldValue("url", "")
-					}
-					setContentType(value)
-				}}
-				data={[
-					{ label: "URL", value: "url" },
-					{ label: "File", value: "file" },
-				]}
+			<SegmentedControl
+				key={form.key("contentType")}
+				{...form.getInputProps("contentType")}
+				data={Object.entries(contentTypeDisplayName).map(([value, label]) => ({
+					value,
+					label,
+				}))}
 			/>
 
 			<TextInput
@@ -79,7 +90,7 @@ export function InfoInputForm() {
 				{...form.getInputProps("name")}
 			/>
 
-			{contentType === "url" ? (
+			{form.values.contentType === "Link" ? (
 				<TextInput
 					mt="sm"
 					label="Paste Hyperlink or URL of document"
@@ -92,10 +103,9 @@ export function InfoInputForm() {
 					mt="sm"
 					label="File Input"
 					placeholder="Click this box to upload a file"
-					key={form.key("file")}
-					value={file}
-					onChange={userUploadedFile}
 					clearable
+					key={form.key("file")}
+					{...form.getInputProps("file")}
 				/>
 			)}
 
