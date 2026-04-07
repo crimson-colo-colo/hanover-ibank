@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from "express"
-import authorizationMiddlelayer from "../auth.ts"
+import authorizationMiddleware from "../auth.ts"
 import { db } from "../database.ts"
 import { bucketName, s3 } from "../s3.ts"
 
@@ -7,7 +7,7 @@ export const contentDownloadRouter = express.Router()
 
 contentDownloadRouter.get(
 	"/content/download/:id",
-	authorizationMiddlelayer,
+	authorizationMiddleware,
 	async (req: Request<{ id: string }>, res: Response) => {
 		if (!req.auth?.payload) {
 			return res.status(401).json({ error: "Unauthorized" })
