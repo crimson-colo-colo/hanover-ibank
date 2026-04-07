@@ -49,3 +49,17 @@ const t = initTRPC.context<Context>().create({
 
 export const router = t.router
 export const publicProcedure = t.procedure
+
+export const authProcedure = publicProcedure.use((opts) => {
+	const { ctx } = opts
+	const auth = ctx.auth
+	if (auth === undefined) {
+		throw new TRPCError({ code: "UNAUTHORIZED" })
+	} else
+		return opts.next({
+			ctx: {
+				...ctx,
+				auth: auth,
+			},
+		})
+})
