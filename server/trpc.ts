@@ -1,10 +1,46 @@
-import { initTRPC } from "@trpc/server"
+import { initTRPC, TRPCError } from "@trpc/server"
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 import superjson from "superjson"
+import { auth0Api, type JWTPayload } from "./auth.ts"
 
-export async function createContext({ req, res }: CreateExpressContextOptions) {
-	return {}
+interface TRPCContext {
+	auth: JWTPayload | undefined
 }
+
+export async function createContext({
+	req,
+	res,
+}: CreateExpressContextOptions): Promise<TRPCContext> {
+	console.log(req.auth)
+
+	const accessToken = req.headers.authorization?.replace(/^Bearer /, "")
+	if (!accessToken) {
+		return {
+			auth: undefined,
+		}
+	}
+
+	let payload: Partial<JWTPayload>
+	try {
+		payload = await auth0Api.verifyAccessToken({
+			accessToken,
+		})
+	} catch {
+		return {
+			auth: undefined,
+		}
+	}
+
+	const sub = payload.sub
+	if (!sub) {
+		throw new TRPCError({ code: "BAD_REQUEST" })
+	}
+
+	return {
+		auth: { sub: sub },
+	}
+}
+
 type Context = Awaited<ReturnType<typeof createContext>>
 
 const t = initTRPC.context<Context>().create({
