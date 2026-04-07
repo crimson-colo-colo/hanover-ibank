@@ -14,6 +14,9 @@ export const contentRouter = router({
 						has: opts.input.role,
 					},
 				},
+				include: {
+					owner: true,
+				},
 			})
 
 			const metadata = await Promise.all(

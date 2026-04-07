@@ -41,11 +41,24 @@ function RouteComponent() {
 									<IconFile className="ml-auto" />
 								)}
 							</Flex>
-							<p className="text-sm text-gray-600 mt-1 mb-0">
+							<p className="text-sm text-gray-600 mt-1 mb-2">
 								{item.type === "Link"
 									? new URL(item.url!).hostname
 									: formatBytes(content.data?.objectMetadata.get(item.id)?.size || 0)}
 							</p>
+							<div className="text-sm text-gray-700 space-y-1">
+								<p className="m-0">
+									<strong>Owner:</strong> {item.owner.name}
+								</p>
+								<p className="m-0">
+									<strong>Last Modified:</strong>{" "}
+									{new Date(item.lastModifiedDate).toLocaleString()}
+								</p>
+								<p className="m-0">
+									<strong>Expires:</strong>{" "}
+									{new Date(item.expirationDate).toLocaleDateString()}
+								</p>
+							</div>
 						</Paper>
 					))}
 				</SimpleGrid>
