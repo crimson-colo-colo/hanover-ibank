@@ -20,7 +20,7 @@ function App() {
 
 	useEffect(() => {
 		setAuth0(auth0)
-	}, [auth0.isLoading, auth0.isAuthenticated])
+	}, [auth0])
 
 	if (auth0.isLoading) {
 		return (
