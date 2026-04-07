@@ -5,7 +5,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import z from "zod"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 
-export const Route = createFileRoute("/employee")({
+export const Route = createFileRoute("/_authenticated/employee")({
 	component: UploadContentForm,
 })
 
