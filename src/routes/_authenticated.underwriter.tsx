@@ -51,12 +51,10 @@ function RouteComponent() {
 									<strong>Owner:</strong> {item.owner.name}
 								</p>
 								<p className="m-0">
-									<strong>Last Modified:</strong>{" "}
-									{new Date(item.lastModifiedDate).toLocaleString()}
+									<strong>Last Modified:</strong> {new Date(item.lastModifiedDate).toLocaleString()}
 								</p>
 								<p className="m-0">
-									<strong>Expires:</strong>{" "}
-									{new Date(item.expirationDate).toLocaleDateString()}
+									<strong>Expires:</strong> {new Date(item.expirationDate).toLocaleDateString()}
 								</p>
 							</div>
 						</Paper>
