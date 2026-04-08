@@ -33,7 +33,7 @@ const fileSchema = baseSchema.extend({
 
 const schema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
 
-export function InfoInputForm() {
+export function CreateContentForm() {
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {
 			name: "",

@@ -1,5 +1,5 @@
 import { ComponentPreview, Previews } from "@react-buddy/ide-toolbox"
-import { InfoInputForm } from "@/components/InfoInputForm.tsx"
+import { CreateContentForm } from "@/components/CreateContentForm.tsx"
 import Navigation from "@/components/Navigation.tsx"
 import { OwnerField } from "@/components/OwnerField.tsx"
 import TagSelect from "@/components/tagselect.tsx"
@@ -17,7 +17,7 @@ const ComponentPreviews = () => {
 				<TagSelect value="" onChange={() => {}} />
 			</ComponentPreview>
 			<ComponentPreview path="/InfoInputForm">
-				<InfoInputForm />
+				<CreateContentForm />
 			</ComponentPreview>
 			<ComponentPreview path="/OwnerField">
 				<OwnerField value="" onChange={() => {}} />

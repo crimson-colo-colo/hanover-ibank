@@ -1,0 +1,124 @@
+import { Button, Radio, Stack, TextInput } from "@mantine/core"
+import { schemaResolver, useForm } from "@mantine/form"
+import { EmployeeRole } from "@prisma/browser.ts"
+import { IconLoader2 } from "@tabler/icons-react"
+import { useMutation } from "@tanstack/react-query"
+import z from "zod"
+import { employeeRoleDisplayName } from "@/lib/enums.ts"
+import { trpc } from "@/lib/trpc.ts"
+
+const createSchema = z
+	.object({
+		name: z.string().min(3).max(100),
+		email: z.email(),
+		username: z.string().min(3).max(100),
+		role: z.enum(Object.values(EmployeeRole)),
+		password: z.string().min(4).max(100),
+		confirmPassword: z.string().min(4).max(100),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		path: ["confirmPassword"],
+		message: "Passwords do not match",
+	})
+
+interface CreateUserFormProps {
+	onSuccess: () => void
+}
+
+export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
+	const createUser = useMutation(trpc.admin.createUser.mutationOptions())
+
+	const createForm = useForm<z.input<typeof createSchema>, z.infer<typeof createSchema>>({
+		initialValues: {
+			name: "",
+			email: "",
+			username: "",
+			password: "",
+			confirmPassword: "",
+			role: "" as EmployeeRole,
+		},
+		validate: schemaResolver(createSchema, { sync: true }),
+		transformValues: createSchema.parse,
+	})
+
+	return (
+		<form
+			onSubmit={createForm.onSubmit((values) => {
+				createUser.mutate(values, { onSuccess })
+			})}
+		>
+			<TextInput
+				mt="sm"
+				label="Name"
+				description="User's full name, e.g. John Doe."
+				placeholder="User name"
+				required
+				key={createForm.key("name")}
+				{...createForm.getInputProps("name")}
+			/>
+
+			<TextInput
+				mt="sm"
+				label="Email"
+				description="Used for login, password resets, and notifications."
+				placeholder="User email"
+				required
+				type="email"
+				key={createForm.key("email")}
+				{...createForm.getInputProps("email")}
+			/>
+
+			<TextInput
+				mt="sm"
+				label="Username"
+				description="Used for login and display. Must be unique across all users."
+				placeholder="User username"
+				required
+				key={createForm.key("username")}
+				{...createForm.getInputProps("username")}
+			/>
+
+			<TextInput
+				mt="sm"
+				label="Password"
+				description="The initial password for the user."
+				placeholder="User password"
+				type="password"
+				required
+				autoComplete="new-password"
+				key={createForm.key("password")}
+				{...createForm.getInputProps("password")}
+			/>
+
+			<TextInput
+				mt="sm"
+				label="Confirm Password"
+				description="Re-enter the password to confirm."
+				placeholder="Confirm password"
+				type="password"
+				required
+				autoComplete="new-password"
+				key={createForm.key("confirmPassword")}
+				{...createForm.getInputProps("confirmPassword")}
+			/>
+
+			<Radio.Group
+				mt="sm"
+				label="Role"
+				required
+				key={createForm.key("role")}
+				{...createForm.getInputProps("role")}
+			>
+				<Stack gap="xs">
+					{Object.entries(employeeRoleDisplayName).map(([value, label]) => (
+						<Radio key={value} value={value} label={label as string} />
+					))}
+				</Stack>
+			</Radio.Group>
+
+			<Button type="submit" mt="md" disabled={createUser.isPending}>
+				{createUser.isPending ? <IconLoader2 className="animate-spin" /> : "Create"}
+			</Button>
+		</form>
+	)
+}

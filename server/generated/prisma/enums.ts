@@ -11,7 +11,8 @@
 
 export const EmployeeRole = {
   BusinessAnalyst: 'BusinessAnalyst',
-  Underwriter: 'Underwriter'
+  Underwriter: 'Underwriter',
+  Admin: 'Admin'
 } as const
 
 export type EmployeeRole = (typeof EmployeeRole)[keyof typeof EmployeeRole]
