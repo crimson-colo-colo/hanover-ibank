@@ -10,10 +10,10 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import tailwindcss from "tailwindcss/defaultTheme"
 import Navigation from "@/components/Navigation.tsx"
 import { ScrollToTopButton, useRouteScrollToTop } from "@/components/ScrollToTopButton.tsx"
-import { ComponentPreviews, useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
 
 import "../styles.css"
+import { useInitial } from "@/dev/index.ts"
 
 interface RouterContext {
 	auth0: Auth0ContextInterface<User>
@@ -38,7 +38,7 @@ function RootComponent() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<MantineProvider theme={theme}>
-				<DevSupport ComponentPreviews={ComponentPreviews} useInitialHook={useInitial}>
+				<DevSupport ComponentPreviews={() => null} useInitialHook={useInitial}>
 					<AppShell padding="md" header={{ height: 56 }}>
 						<AppShell.Header>
 							<Navigation />
