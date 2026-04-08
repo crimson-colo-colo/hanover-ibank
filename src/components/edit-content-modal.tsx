@@ -1,98 +1,106 @@
-import { Button, Modal, Stack, TextInput } from "@mantine/core"
+import { Button, Modal, Select, TextInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
-import { useForm } from "@tanstack/react-form"
+import { schemaResolver, useForm } from "@mantine/form"
+import { ContentStatus, DocumentType } from "@prisma/browser.ts"
+import z from "zod"
+import { contentStatusDisplayName, documentTypeDisplayName } from "@/lib/enums.ts"
 
 interface EditContentModalProps {
 	opened: boolean
 	onClose: () => void
-	initialModifiedAt?: Date
-	initialExpirationDate?: Date | null
-	initialOwner?: string
-	onSubmit: (values: {
-		modifiedAt: Date | null
-		expirationDate: Date | null
-		owner?: string | null
-	}) => void
+	content: z.infer<typeof schema>
+	onSubmit: (values: z.infer<typeof schema>) => void
 }
 
-export function EditContentModal({
-	opened,
-	onClose,
-	initialModifiedAt,
-	initialExpirationDate,
-	initialOwner,
-	onSubmit,
-}: EditContentModalProps) {
+const schema = z.object({
+	id: z.string(),
+	name: z.string(),
+	ownerId: z.string(),
+	lastModifiedDate: z.iso.date(),
+	expirationDate: z.iso.date(),
+	documentType: z.enum(Object.values(DocumentType)),
+	contentStatus: z.enum(Object.values(ContentStatus)),
+})
+
+export function EditContentModal({ opened, onClose, content, onSubmit }: EditContentModalProps) {
 	const form = useForm({
-		defaultValues: {
-			modifiedAt: initialModifiedAt ?? null,
-			expirationDate: initialExpirationDate ?? null,
-			owner: initialOwner ?? "",
+		initialValues: {
+			id: content.id,
+			name: content.name,
+			ownerId: content.ownerId,
+			lastModifiedDate: content.lastModifiedDate,
+			expirationDate: content.expirationDate,
+			documentType: content.documentType,
+			contentStatus: content.contentStatus,
 		},
-		onSubmit: async ({ value }) => {
-			onSubmit(value)
-		},
+		validate: schemaResolver(schema, { sync: true }),
+		transformValues: schema.parse,
 	})
 	return (
 		<Modal opened={opened} onClose={onClose} title="Edit Metadata">
-			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-					form.handleSubmit()
-				}}
-				noValidate
-			>
-				<Stack gap="md">
-					<form.Field name="modifiedAt">
-						{(field) => (
-							<DatePickerInput
-								label="Last Modified Date"
-								value={field.state.value}
-								onChange={(date) => field.handleChange(date as Date | null)}
-								onBlur={field.handleBlur}
-								w={256}
-							/>
-						)}
-					</form.Field>
+			<form onSubmit={form.onSubmit(onSubmit)} noValidate>
+				<TextInput
+					label="Content Name"
+					placeholder="Important Document"
+					required
+					key={form.key("name")}
+					{...form.getInputProps("name")}
+				/>
 
-					<form.Field name="expirationDate">
-						{(field) => (
-							<DatePickerInput
-								label="Expiration Date"
-								value={field.state.value}
-								onChange={(date) => field.handleChange(date as Date | null)}
-								onBlur={field.handleBlur}
-								w={256}
-							/>
-						)}
-					</form.Field>
+				<TextInput
+					mt="sm"
+					label="Content Owner"
+					placeholder="Owner ID"
+					required
+					key={form.key("ownerId")}
+					{...form.getInputProps("ownerId")}
+				/>
 
-					<form.Field name="owner">
-						{(field) => (
-							<TextInput
-								label="Owner"
-								value={field.state.value}
-								onChange={(e) => field.handleChange(e.target.value)}
-								onBlur={field.handleBlur}
-								w={256}
-							/>
-						)}
-					</form.Field>
+				<DatePickerInput
+					mt="sm"
+					label="Last Modified Date"
+					placeholder="Select date"
+					key={form.key("lastModifiedDate")}
+					{...form.getInputProps("lastModifiedDate")}
+				/>
 
-					<form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-						{([canSubmit, isSubmitting]) => (
-							<Button
-								type="submit"
-								disabled={!canSubmit}
-								loading={isSubmitting}
-								color="#1098ad"
-								w={96}
-							>
-								Save
-							</Button>
-						)}
-					</form.Subscribe>
-				</Stack>
+				<DatePickerInput
+					mt="sm"
+					label="Expiration Date"
+					placeholder="Select date"
+					key={form.key("expirationDate")}
+					{...form.getInputProps("expirationDate")}
+				/>
+
+				<Select
+					mt="sm"
+					label="Document Type"
+					placeholder="Select One"
+					data={Object.values(DocumentType).map((type) => ({
+						value: type,
+						label: documentTypeDisplayName[type],
+					}))}
+					clearable
+					key={form.key("documentType")}
+					{...form.getInputProps("documentType")}
+				/>
+
+				<Select
+					mt="sm"
+					label="Document Status"
+					placeholder="Select..."
+					data={Object.values(ContentStatus).map((status) => ({
+						value: status,
+						label: contentStatusDisplayName[status],
+					}))}
+					clearable
+					key={form.key("documentStatus")}
+					{...form.getInputProps("documentStatus")}
+				/>
+
+				<Button type="submit" loading={form.submitting} w={96}>
+					Save
+				</Button>
 			</form>
 		</Modal>
 	)
