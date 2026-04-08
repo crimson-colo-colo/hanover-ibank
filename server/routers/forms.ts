@@ -8,7 +8,7 @@ import {
 	DocumentType,
 	EmployeeRole,
 } from "../generated/prisma/browser.ts"
-import { getGravatarUrl } from "../lib.ts"
+import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, publicProcedure, router } from "../trpc.ts"
 
@@ -92,7 +92,3 @@ export const formsRouter = router({
 			})
 		}),
 })
-
-function isoDateToTimestamp(date: string) {
-	return `${date}T00:00:00Z`
-}

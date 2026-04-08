@@ -79,7 +79,7 @@ export function CreateContentForm() {
 						: undefined!,
 			},
 		})
-		navigate({ to: "/underwriter" })
+		navigate({ to: "/dashboard" })
 		notifications.show({
 			title: "Content created",
 			message: "The content has been successfully created.",
@@ -230,7 +230,7 @@ export function CreateContentForm() {
 			/>
 
 			<Group justify="flex-end" mt="lg">
-				<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/underwriter" })}>
+				<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/dashboard" })}>
 					Cancel
 				</Button>
 				<Button
