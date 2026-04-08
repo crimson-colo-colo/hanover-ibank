@@ -2,7 +2,6 @@ import { Flex, Paper, SimpleGrid } from "@mantine/core"
 import { IconFile, IconLink } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import type { Role } from "auth0/dist/cjs/management/api"
 import { formatBytes, getContentTarget } from "@/lib/content.ts"
 import { trpc } from "@/lib/trpc.ts"
 
@@ -11,7 +10,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 })
 
 function RoleDashboard() {
-	const { auth0 } = Route.useRouteContext()
 	const userRole = useQuery(trpc.userRole.role.queryOptions()).data
 	const content = useQuery(trpc.content.list.queryOptions({ role: userRole }))
 
