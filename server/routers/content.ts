@@ -33,4 +33,32 @@ export const contentRouter = router({
 				objectMetadata: new Map(metadata),
 			}
 		}),
+	update: authProcedure //added for the updateContent const
+		.input(
+			z.object({
+				id: z.string(),
+				modifiedAt: z.string().optional(),
+				ownerName: z.string().optional(),
+				expirationDate: z.string().optional(),
+			})
+		)
+		.mutation(async (opts) => {
+			const updated = await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					lastModifiedDate: opts.input.modifiedAt ? new Date(opts.input.modifiedAt) : undefined,
+					expirationDate: opts.input.expirationDate
+						? new Date(opts.input.expirationDate)
+						: undefined,
+					owner: opts.input.ownerName
+						? {
+								update: {
+									name: opts.input.ownerName,
+								},
+							}
+						: undefined,
+				},
+			})
+			return updated
+		}),
 })
