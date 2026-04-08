@@ -12,28 +12,39 @@ import {
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { IconBuildingBank, IconLayoutSidebarLeftExpand } from "@tabler/icons-react"
+import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
+import { trpc } from "@/lib/trpc.ts"
 
-const links = [
-	{ link: "/analyst", label: "Analyst Home" },
-	{ link: "/underwriter", label: "Underwriter Home" },
-	{ link: "/upload-content", label: "Upload Form" },
-	{ link: "/admin/manage-users", label: "Employee Management" },
-]
+function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
+	return (
+		<>
+			{!isLoading && !isAdmin && (
+				<Button
+					component={Link}
+					variant={location.pathname === "/upload-content" ? "light" : "subtle"}
+					to="/upload-content"
+				>
+					Upload Content
+				</Button>
+			)}
+			{isAdmin && (
+				<Button
+					component={Link}
+					variant={location.pathname === "/admin/manage-users" ? "light" : "subtle"}
+					to="/admin/manage-users"
+				>
+					Manage Employees
+				</Button>
+			)}
+		</>
+	)
+}
 
 export function Navigation() {
 	const auth0 = useAuth0()
+	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
-	const items = links.map((link) => (
-		<Button
-			component={Link}
-			variant={location.pathname === link.link ? "light" : "subtle"}
-			key={link.label}
-			to={link.link}
-		>
-			{link.label}
-		</Button>
-	))
 
 	return (
 		<header className="h-14 mb-30 bg-bg border-b border-border">
@@ -43,7 +54,9 @@ export function Navigation() {
 						<IconBuildingBank className="text-primary-hover" />
 						<span className="font-semibold text-lg text-primary-hover">Hanover CMS</span>
 					</Link>
-					{auth0.isAuthenticated && items}
+					{auth0.isAuthenticated && (
+						<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} />
+					)}
 				</Group>
 
 				<Group>
@@ -93,7 +106,7 @@ export function Navigation() {
 			>
 				<ScrollArea h="calc(100vh - 56px)" mx="-md">
 					<Divider my="sm" />
-					{items}
+					<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} />
 				</ScrollArea>
 			</Drawer>
 		</header>

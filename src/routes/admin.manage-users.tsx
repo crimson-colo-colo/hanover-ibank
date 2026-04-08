@@ -1,5 +1,6 @@
 import { ActionIcon, Button, Checkbox, Group, Modal, Table } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
 import {
 	IconLoader2,
 	IconPencil,
@@ -8,7 +9,7 @@ import {
 	IconSortDescending2,
 	IconTrash,
 } from "@tabler/icons-react"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import {
 	createColumnHelper,
@@ -35,6 +36,8 @@ function RouteComponent() {
 	const [deleteOpened, { open: openDeleteDialog, close: closeDeleteDialog }] = useDisclosure(false)
 	const [createOpened, { open: openCreateDialog, close: closeCreateDialog }] = useDisclosure(false)
 	const [selectedUserForUpdate, setSelectedUserForUpdate] = useState<UpdateUserValues | null>(null)
+
+	const deleteUser = useMutation(trpc.admin.deleteUsers.mutationOptions())
 
 	const columnHelper = createColumnHelper<NonNullable<(typeof users)["data"]>[number]>()
 
@@ -160,15 +163,34 @@ function RouteComponent() {
 					<Button variant="subtle" onClick={closeDeleteDialog}>
 						Cancel
 					</Button>
-					<Button color="red" onClick={() => {}}>
-						Delete
+					<Button
+						color="red"
+						disabled={deleteUser.isPending}
+						onClick={() => {
+							deleteUser.mutate(selectedRows, {
+								onSuccess: () => {
+									users.refetch()
+									setSelectedRows([])
+									closeDeleteDialog()
+									notifications.show({
+										title: "Users deleted",
+										message: "The selected users have been deleted successfully.",
+										color: "green",
+									})
+								},
+							})
+						}}
+					>
+						{deleteUser.isPending ? <IconLoader2 className="animate-spin" /> : "Delete"}
 					</Button>
 				</Group>
 			</Modal>
 			<Modal opened={createOpened} onClose={closeCreateDialog} title="Add User">
 				<CreateUserForm
 					onSuccess={() => {
-						users.refetch()
+						setTimeout(() => {
+							users.refetch()
+						}, 500)
 						closeCreateDialog()
 					}}
 				/>
