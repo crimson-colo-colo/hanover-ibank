@@ -1,9 +1,17 @@
 import { Button } from "@mantine/core"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import office from "@/assets/office.png"
 
 export const Route = createFileRoute("/")({
 	component: Index,
+	beforeLoad: (opts) => {
+		const { auth0 } = opts.context
+		if (auth0.isAuthenticated) {
+			throw redirect({
+				to: '/dashboard'
+			})
+		}
+	}
 })
 
 function Index() {
