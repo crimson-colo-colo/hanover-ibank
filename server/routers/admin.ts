@@ -64,6 +64,8 @@ export const adminRouter = router({
 				username: opts.input.username,
 			})
 
+			await new Promise((resolve) => setTimeout(resolve, 1000))
+
 			await db.employee.update({
 				where: {
 					id: opts.input.id,
@@ -92,6 +94,8 @@ export const adminRouter = router({
 				password: opts.input.password,
 				connection: "Username-Password-Authentication",
 			})
+
+			await new Promise((resolve) => setTimeout(resolve, 1000))
 
 			await db.employee.create({
 				data: {

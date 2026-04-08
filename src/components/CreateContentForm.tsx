@@ -1,4 +1,12 @@
-import { Button, FileInput, MultiSelect, SegmentedControl, Select, TextInput } from "@mantine/core"
+import {
+	Button,
+	FileInput,
+	Group,
+	MultiSelect,
+	SegmentedControl,
+	Select,
+	TextInput,
+} from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
@@ -183,9 +191,11 @@ export function CreateContentForm() {
 				{...form.getInputProps("documentStatus")}
 			/>
 
-			<Button mt="sm" type="submit" variant="filled">
-				Submit
-			</Button>
+			<Group justify="flex-end">
+				<Button mt="sm" type="submit" variant="filled">
+					Submit
+				</Button>
+			</Group>
 		</form>
 	)
 }

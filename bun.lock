@@ -6,7 +6,6 @@
       "name": "project",
       "dependencies": {
         "@auth0/auth0-api-js": "^1.4.0",
-        "@fontsource/miranda-sans": "^5.2.1",
         "@mantine/dates": "^9.0.0",
         "@prisma/adapter-pg": "^7.6.0",
         "@prisma/client": "^7.6.0",
@@ -30,6 +29,8 @@
         "@biomejs/biome": "2.4.6",
         "@dotenvx/dotenvx": "^1.59.1",
         "@faker-js/faker": "^10.4.0",
+        "@fontsource-variable/plus-jakarta-sans": "^5.2.8",
+        "@fontsource/miranda-sans": "^5.2.1",
         "@mantine/core": "^9.0.0",
         "@mantine/form": "^9.0.0",
         "@mantine/hooks": "^9.0.0",
@@ -247,6 +248,8 @@
     "@floating-ui/react-dom": ["@floating-ui/react-dom@2.1.8", "", { "dependencies": { "@floating-ui/dom": "^1.7.6" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-cC52bHwM/n/CxS87FH0yWdngEZrjdtLW/qVruo68qg+prK7ZQ4YGdut2GyDVpoGeAYe/h899rVeOVm6Oi40k2A=="],
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.11", "", {}, "sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg=="],
+
+    "@fontsource-variable/plus-jakarta-sans": ["@fontsource-variable/plus-jakarta-sans@5.2.8", "", {}, "sha512-iQecBizIdZxezODNHzOn4SvvRMrZL/S8k4MEXGDynCmUrImVW0VmX+tIAMqnADwH4haXlHSXqMgU6+kcfBQJdw=="],
 
     "@fontsource/miranda-sans": ["@fontsource/miranda-sans@5.2.1", "", {}, "sha512-AyzSgkTOx29jmLAKv0G+su529VpjG69FjZd7XuJ2C8xvqykGK5nk2GCo8dbOUjwRfh+CpcAgymndcrU5CuU6Wg=="],
 

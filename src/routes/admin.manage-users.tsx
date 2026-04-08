@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Checkbox, Group, Modal, Table } from "@mantine/core"
+import { ActionIcon, Button, Checkbox, Group, Modal, Table, Text, Title } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -116,10 +116,7 @@ function RouteComponent() {
 	}
 
 	const rows = table.getRowModel().rows.map((row) => (
-		<Table.Tr
-			key={row.id}
-			bg={selectedRows.includes(row.original.id) ? "var(--mantine-color-blue-light)" : undefined}
-		>
+		<Table.Tr key={row.id} bg={selectedRows.includes(row.original.id) ? "fuchsia.0" : undefined}>
 			{row.getVisibleCells().map((cell) => (
 				<Table.Td key={cell.id}>
 					{flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -130,9 +127,11 @@ function RouteComponent() {
 
 	return (
 		<div>
-			<Group justify="space-between">
-				<h1 className="text-2xl font-bold">Manage Users</h1>
-				<Group gap="xs">
+			<Group justify="space-between" className="flex-col sm:flex-row">
+				<Title order={2} className="self-start">
+					Manage Users
+				</Title>
+				<Group gap="xs" mb="md" className="self-end">
 					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"
@@ -155,12 +154,12 @@ function RouteComponent() {
 				</Group>
 			</Group>
 			<Modal opened={deleteOpened} onClose={closeDeleteDialog} title="Confirm Deletion">
-				<p>
+				<Text>
 					Are you sure you want to delete the selected users?{" "}
 					<strong>This action cannot be undone.</strong>
-				</p>
+				</Text>
 				<Group mt="md" gap="sm" justify="end">
-					<Button variant="subtle" onClick={closeDeleteDialog}>
+					<Button variant="subtle" color="gray" onClick={closeDeleteDialog}>
 						Cancel
 					</Button>
 					<Button
@@ -175,7 +174,7 @@ function RouteComponent() {
 									notifications.show({
 										title: "Users deleted",
 										message: "The selected users have been deleted successfully.",
-										color: "green",
+										color: "emerald",
 									})
 								},
 							})
@@ -188,11 +187,10 @@ function RouteComponent() {
 			<Modal opened={createOpened} onClose={closeCreateDialog} title="Add User">
 				<CreateUserForm
 					onSuccess={() => {
-						setTimeout(() => {
-							users.refetch()
-						}, 500)
+						users.refetch()
 						closeCreateDialog()
 					}}
+					close={closeCreateDialog}
 				/>
 			</Modal>
 			<Table>
