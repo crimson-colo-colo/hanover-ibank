@@ -1,4 +1,4 @@
-import { Button, Radio, Stack, TextInput } from "@mantine/core"
+import { Button, Group, Radio, Stack, TextInput } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { EmployeeRole } from "@prisma/browser.ts"
 import { IconLoader2 } from "@tabler/icons-react"
@@ -21,11 +21,7 @@ const createSchema = z
 		message: "Passwords do not match",
 	})
 
-interface CreateUserFormProps {
-	onSuccess: () => void
-}
-
-export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
+export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; close: () => void }) {
 	const createUser = useMutation(trpc.admin.createUser.mutationOptions())
 
 	const createForm = useForm<z.input<typeof createSchema>, z.infer<typeof createSchema>>({
@@ -48,7 +44,6 @@ export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
 			})}
 		>
 			<TextInput
-				mt="sm"
 				label="Name"
 				description="User's full name, e.g. John Doe."
 				placeholder="User name"
@@ -105,20 +100,33 @@ export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
 			<Radio.Group
 				mt="sm"
 				label="Role"
+				description="Determines the user's permissions and access level within the system."
 				required
 				key={createForm.key("role")}
 				{...createForm.getInputProps("role")}
 			>
-				<Stack gap="xs">
+				<Stack gap="xs" mt="xs">
 					{Object.entries(employeeRoleDisplayName).map(([value, label]) => (
 						<Radio key={value} value={value} label={label as string} />
 					))}
 				</Stack>
 			</Radio.Group>
 
-			<Button type="submit" mt="md" disabled={createUser.isPending}>
-				{createUser.isPending ? <IconLoader2 className="animate-spin" /> : "Create"}
-			</Button>
+			<Group justify="flex-end" mt="md" gap="sm">
+				<Button
+					variant="subtle"
+					onClick={() => {
+						createForm.reset()
+						close()
+					}}
+					disabled={createUser.isPending}
+				>
+					Cancel
+				</Button>
+				<Button type="submit" disabled={createUser.isPending}>
+					{createUser.isPending ? <IconLoader2 className="animate-spin" /> : "Create"}
+				</Button>
+			</Group>
 		</form>
 	)
 }

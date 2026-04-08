@@ -14,7 +14,7 @@ function RouteComponent() {
 
 	return (
 		<div>
-			<header className="w-full bg-primary-hover text-white p-4 rounded-xl">
+			<header className="w-full bg-primary text-white p-4 rounded-xl">
 				<h1 className="m-0 -mb-1">Welcome, Alice</h1>
 				<small className="uppercase tracking-wider text-gray-300 font-semibold mb-3">
 					Business Analyst
