@@ -26,14 +26,9 @@ function Index() {
 
 				<div className="mb-2 flex gap-4 mt-12">
 					{auth0.isAuthenticated ? (
-						<>
-							<Button component={Link} to="/analyst">
-								Business Analyst Home
-							</Button>
-							<Button component={Link} to="/underwriter">
-								Underwriter Home
-							</Button>
-						</>
+						<Button component={Link} to="/dashboard">
+							Dashboard
+						</Button>
 					) : (
 						<Button onClick={() => auth0.loginWithRedirect()}>Login to Get Started</Button>
 					)}
