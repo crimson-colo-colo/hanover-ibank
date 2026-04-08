@@ -2,16 +2,19 @@ import { UTCDate } from "@date-fns/utc"
 import {
 	ActionIcon,
 	Anchor,
+	Button,
 	Checkbox,
 	Flex,
 	Group,
 	Image,
 	Kbd,
+	Modal,
 	Table,
 	Text,
 	TextInput,
 } from "@mantine/core"
-import { useDebouncedValue } from "@mantine/hooks"
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
 import {
 	IconFile,
 	IconFilePencil,
@@ -20,8 +23,10 @@ import {
 	IconPencil,
 	IconSortAscending2,
 	IconSortDescending2,
+	IconTrash,
 } from "@tabler/icons-react"
 import { compareItems, type RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
+import { useMutation } from "@tanstack/react-query"
 import {
 	createColumnHelper,
 	type FilterFn,
@@ -37,7 +42,7 @@ import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { useMemo, useState } from "react"
 import { formatBytes } from "@/lib/content.ts"
-import { trpcClient } from "@/lib/trpc.ts"
+import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
 
 declare module "@tanstack/react-table" {
@@ -82,6 +87,9 @@ export function ContentTable({
 	const [rowSelection, setRowSelection] = useState({})
 	const [globalFilter, setGlobalFilter] = useState("")
 	const [downloadingItemId, setDownloadingItemId] = useState<string | null>(null)
+	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
+		useDisclosure(false)
+	const deleteContent = useMutation(trpc.content.delete.mutationOptions())
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
@@ -257,17 +265,30 @@ export function ContentTable({
 			<Flex align="center" justify="space-between" gap="md">
 				<h2 className="mt-6 mb-4 text-xl font-semibold">Content</h2>
 
-				<TextInput
-					className="flex-1 max-w-100"
-					value={globalFilter ?? ""}
-					onChange={(value) => setGlobalFilter(value.currentTarget.value)}
-					placeholder="Search..."
-					rightSection={
-						<Flex gap={4} mr={32}>
-							<Kbd size="xs">Ctrl</Kbd> <Kbd size="xs">K</Kbd>
-						</Flex>
-					}
-				/>
+				<Flex gap="sm">
+					<Button
+						leftSection={<IconTrash />}
+						variant="subtle"
+						disabled={Object.keys(rowSelection).length === 0}
+						color="red"
+						onClick={() => {
+							openDeleteDialog()
+						}}
+					>
+						Delete selected
+					</Button>
+					<TextInput
+						className="grow max-w-120"
+						value={globalFilter ?? ""}
+						onChange={(value) => setGlobalFilter(value.currentTarget.value)}
+						placeholder="Search..."
+						rightSection={
+							<Flex gap={4} mr={32}>
+								<Kbd size="xs">Ctrl</Kbd> <Kbd size="xs">K</Kbd>
+							</Flex>
+						}
+					/>
+				</Flex>
 			</Flex>
 			<Table>
 				<Table.Thead>
@@ -301,7 +322,7 @@ export function ContentTable({
 				<Table.Tbody>
 					{table.getRowModel().rows.map((row) => {
 						return (
-							<Table.Tr key={row.id}>
+							<Table.Tr key={row.id} bg={row.getIsSelected() ? "fuchsia.0" : undefined}>
 								{row.getVisibleCells().map((cell) => {
 									return (
 										<Table.Td key={cell.id}>
@@ -321,6 +342,49 @@ export function ContentTable({
 					)}
 				</Table.Tbody>
 			</Table>
+			<Modal opened={deleteDialogOpen} onClose={closeDeleteDialog} title="Confirm Deletion">
+				<Text>Are you sure you want to delete the selected content?</Text>
+				<Flex mt="md" justify="flex-end" gap="sm">
+					<Button
+						variant="subtle"
+						color="gray"
+						disabled={deleteContent.isPending}
+						onClick={closeDeleteDialog}
+					>
+						Cancel
+					</Button>
+					<Button
+						color="red"
+						loading={deleteContent.isPending}
+						onClick={() => {
+							const idsToDelete = Object.keys(rowSelection).map(
+								(index) => data.content[Number(index)].id
+							)
+							deleteContent.mutate(
+								{ ids: idsToDelete },
+								{
+									onSuccess: () => {
+										table.resetRowSelection()
+										table.setPageIndex(0)
+										table.options.data = table.options.data.filter(
+											(item) => !idsToDelete.includes(item.id)
+										)
+										queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+										notifications.show({
+											title: "Content deleted",
+											message: "The selected content has been deleted successfully.",
+											color: "emerald",
+										})
+										closeDeleteDialog()
+									},
+								}
+							)
+						}}
+					>
+						Delete
+					</Button>
+				</Flex>
+			</Modal>
 		</>
 	)
 }
