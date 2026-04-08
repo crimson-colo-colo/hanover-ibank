@@ -10,14 +10,12 @@ datasource db {
 enum EmployeeRole {
   BusinessAnalyst
   Underwriter
+  Admin
 }
 
 model Employee {
-  id        String       @id @default(cuid())
-  email     String       @unique
-  name      String
-  avatarUrl String
-  role      EmployeeRole @default(Underwriter)
+  id        String       @id
+  role      EmployeeRole
   content   Content[]
 }
 

@@ -3,6 +3,7 @@ import type { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@pr
 export const employeeRoleDisplayName: Record<EmployeeRole, string> = {
 	BusinessAnalyst: "Business Analyst",
 	Underwriter: "Underwriter",
+	Admin: "Admin",
 }
 
 export const documentTypeDisplayName: Record<DocumentType, string> = {

@@ -9,13 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminManageUsersRouteImport } from './routes/admin.manage-users'
 import { Route as AuthenticatedUploadContentRouteImport } from './routes/_authenticated.upload-content'
 import { Route as AuthenticatedUnderwriterRouteImport } from './routes/_authenticated.underwriter'
 import { Route as AuthenticatedEmployeeRouteImport } from './routes/_authenticated.employee'
 import { Route as AuthenticatedAnalystRouteImport } from './routes/_authenticated.analyst'
 
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -24,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminManageUsersRoute = AdminManageUsersRouteImport.update({
+  id: '/manage-users',
+  path: '/manage-users',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AuthenticatedUploadContentRoute =
   AuthenticatedUploadContentRouteImport.update({
@@ -50,49 +62,79 @@ const AuthenticatedAnalystRoute = AuthenticatedAnalystRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/analyst': typeof AuthenticatedAnalystRoute
   '/employee': typeof AuthenticatedEmployeeRoute
   '/underwriter': typeof AuthenticatedUnderwriterRoute
   '/upload-content': typeof AuthenticatedUploadContentRoute
+  '/admin/manage-users': typeof AdminManageUsersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/analyst': typeof AuthenticatedAnalystRoute
   '/employee': typeof AuthenticatedEmployeeRoute
   '/underwriter': typeof AuthenticatedUnderwriterRoute
   '/upload-content': typeof AuthenticatedUploadContentRoute
+  '/admin/manage-users': typeof AdminManageUsersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/_authenticated/analyst': typeof AuthenticatedAnalystRoute
   '/_authenticated/employee': typeof AuthenticatedEmployeeRoute
   '/_authenticated/underwriter': typeof AuthenticatedUnderwriterRoute
   '/_authenticated/upload-content': typeof AuthenticatedUploadContentRoute
+  '/admin/manage-users': typeof AdminManageUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analyst' | '/employee' | '/underwriter' | '/upload-content'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/analyst'
+    | '/employee'
+    | '/underwriter'
+    | '/upload-content'
+    | '/admin/manage-users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analyst' | '/employee' | '/underwriter' | '/upload-content'
+  to:
+    | '/'
+    | '/admin'
+    | '/analyst'
+    | '/employee'
+    | '/underwriter'
+    | '/upload-content'
+    | '/admin/manage-users'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/_authenticated/analyst'
     | '/_authenticated/employee'
     | '/_authenticated/underwriter'
     | '/_authenticated/upload-content'
+    | '/admin/manage-users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -106,6 +148,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/manage-users': {
+      id: '/admin/manage-users'
+      path: '/manage-users'
+      fullPath: '/admin/manage-users'
+      preLoaderRoute: typeof AdminManageUsersRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_authenticated/upload-content': {
       id: '/_authenticated/upload-content'
@@ -156,9 +205,20 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface AdminRouteChildren {
+  AdminManageUsersRoute: typeof AdminManageUsersRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminManageUsersRoute: AdminManageUsersRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,3 +1,4 @@
+import { adminRouter } from "./routers/admin.ts"
 import { cliRouter } from "./routers/cli.ts"
 import { contentRouter } from "./routers/content.ts"
 import { submitRouter } from "./routers/submitForms.ts"
@@ -10,4 +11,5 @@ export const appRouter = router({
 	cli: cliRouter,
 	content: contentRouter,
 	submitForms: submitRouter,
+	admin: adminRouter,
 })

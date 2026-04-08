@@ -26,25 +26,16 @@ export type AggregateEmployee = {
 
 export type EmployeeMinAggregateOutputType = {
   id: string | null
-  email: string | null
-  name: string | null
-  avatarUrl: string | null
   role: $Enums.EmployeeRole | null
 }
 
 export type EmployeeMaxAggregateOutputType = {
   id: string | null
-  email: string | null
-  name: string | null
-  avatarUrl: string | null
   role: $Enums.EmployeeRole | null
 }
 
 export type EmployeeCountAggregateOutputType = {
   id: number
-  email: number
-  name: number
-  avatarUrl: number
   role: number
   _all: number
 }
@@ -52,25 +43,16 @@ export type EmployeeCountAggregateOutputType = {
 
 export type EmployeeMinAggregateInputType = {
   id?: true
-  email?: true
-  name?: true
-  avatarUrl?: true
   role?: true
 }
 
 export type EmployeeMaxAggregateInputType = {
   id?: true
-  email?: true
-  name?: true
-  avatarUrl?: true
   role?: true
 }
 
 export type EmployeeCountAggregateInputType = {
   id?: true
-  email?: true
-  name?: true
-  avatarUrl?: true
   role?: true
   _all?: true
 }
@@ -149,9 +131,6 @@ export type EmployeeGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type EmployeeGroupByOutputType = {
   id: string
-  email: string
-  name: string
-  avatarUrl: string
   role: $Enums.EmployeeRole
   _count: EmployeeCountAggregateOutputType | null
   _min: EmployeeMinAggregateOutputType | null
@@ -178,39 +157,27 @@ export type EmployeeWhereInput = {
   OR?: Prisma.EmployeeWhereInput[]
   NOT?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
   id?: Prisma.StringFilter<"Employee"> | string
-  email?: Prisma.StringFilter<"Employee"> | string
-  name?: Prisma.StringFilter<"Employee"> | string
-  avatarUrl?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.EnumEmployeeRoleFilter<"Employee"> | $Enums.EmployeeRole
   content?: Prisma.ContentListRelationFilter
 }
 
 export type EmployeeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  avatarUrl?: Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.ContentOrderByRelationAggregateInput
 }
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  email?: string
   AND?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
   OR?: Prisma.EmployeeWhereInput[]
   NOT?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
-  name?: Prisma.StringFilter<"Employee"> | string
-  avatarUrl?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.EnumEmployeeRoleFilter<"Employee"> | $Enums.EmployeeRole
   content?: Prisma.ContentListRelationFilter
-}, "id" | "email">
+}, "id">
 
 export type EmployeeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  avatarUrl?: Prisma.SortOrder
   role?: Prisma.SortOrder
   _count?: Prisma.EmployeeCountOrderByAggregateInput
   _max?: Prisma.EmployeeMaxOrderByAggregateInput
@@ -222,93 +189,60 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   OR?: Prisma.EmployeeScalarWhereWithAggregatesInput[]
   NOT?: Prisma.EmployeeScalarWhereWithAggregatesInput | Prisma.EmployeeScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Employee"> | string
-  email?: Prisma.StringWithAggregatesFilter<"Employee"> | string
-  name?: Prisma.StringWithAggregatesFilter<"Employee"> | string
-  avatarUrl?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   role?: Prisma.EnumEmployeeRoleWithAggregatesFilter<"Employee"> | $Enums.EmployeeRole
 }
 
 export type EmployeeCreateInput = {
-  id?: string
-  email: string
-  name: string
-  avatarUrl: string
-  role?: $Enums.EmployeeRole
+  id: string
+  role: $Enums.EmployeeRole
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
 }
 
 export type EmployeeUncheckedCreateInput = {
-  id?: string
-  email: string
-  name: string
-  avatarUrl: string
-  role?: $Enums.EmployeeRole
+  id: string
+  role: $Enums.EmployeeRole
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
 }
 
 export type EmployeeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  avatarUrl?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
 }
 
 export type EmployeeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  avatarUrl?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type EmployeeCreateManyInput = {
-  id?: string
-  email: string
-  name: string
-  avatarUrl: string
-  role?: $Enums.EmployeeRole
+  id: string
+  role: $Enums.EmployeeRole
 }
 
 export type EmployeeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  avatarUrl?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
 }
 
 export type EmployeeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  avatarUrl?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
 }
 
 export type EmployeeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  avatarUrl?: Prisma.SortOrder
   role?: Prisma.SortOrder
 }
 
 export type EmployeeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  avatarUrl?: Prisma.SortOrder
   role?: Prisma.SortOrder
 }
 
 export type EmployeeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  email?: Prisma.SortOrder
-  name?: Prisma.SortOrder
-  avatarUrl?: Prisma.SortOrder
   role?: Prisma.SortOrder
 }
 
@@ -340,19 +274,13 @@ export type EmployeeUpdateOneRequiredWithoutContentNestedInput = {
 }
 
 export type EmployeeCreateWithoutContentInput = {
-  id?: string
-  email: string
-  name: string
-  avatarUrl: string
-  role?: $Enums.EmployeeRole
+  id: string
+  role: $Enums.EmployeeRole
 }
 
 export type EmployeeUncheckedCreateWithoutContentInput = {
-  id?: string
-  email: string
-  name: string
-  avatarUrl: string
-  role?: $Enums.EmployeeRole
+  id: string
+  role: $Enums.EmployeeRole
 }
 
 export type EmployeeCreateOrConnectWithoutContentInput = {
@@ -373,17 +301,11 @@ export type EmployeeUpdateToOneWithWhereWithoutContentInput = {
 
 export type EmployeeUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  avatarUrl?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
 }
 
 export type EmployeeUncheckedUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  avatarUrl?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
 }
 
@@ -420,9 +342,6 @@ export type EmployeeCountOutputTypeCountContentArgs<ExtArgs extends runtime.Type
 
 export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  email?: boolean
-  name?: boolean
-  avatarUrl?: boolean
   role?: boolean
   content?: boolean | Prisma.Employee$contentArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
@@ -430,29 +349,20 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 
 export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  email?: boolean
-  name?: boolean
-  avatarUrl?: boolean
   role?: boolean
 }, ExtArgs["result"]["employee"]>
 
 export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  email?: boolean
-  name?: boolean
-  avatarUrl?: boolean
   role?: boolean
 }, ExtArgs["result"]["employee"]>
 
 export type EmployeeSelectScalar = {
   id?: boolean
-  email?: boolean
-  name?: boolean
-  avatarUrl?: boolean
   role?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "avatarUrl" | "role", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   content?: boolean | Prisma.Employee$contentArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
@@ -467,9 +377,6 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    email: string
-    name: string
-    avatarUrl: string
     role: $Enums.EmployeeRole
   }, ExtArgs["result"]["employee"]>
   composites: {}
@@ -896,9 +803,6 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
  */
 export interface EmployeeFieldRefs {
   readonly id: Prisma.FieldRef<"Employee", 'String'>
-  readonly email: Prisma.FieldRef<"Employee", 'String'>
-  readonly name: Prisma.FieldRef<"Employee", 'String'>
-  readonly avatarUrl: Prisma.FieldRef<"Employee", 'String'>
   readonly role: Prisma.FieldRef<"Employee", 'EmployeeRole'>
 }
     
