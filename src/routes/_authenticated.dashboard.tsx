@@ -1,11 +1,13 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { Flex, Paper, SimpleGrid } from "@mantine/core"
+import { notifications } from "@mantine/notifications"
 import { IconFile, IconLink } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { formatBytes, getContentTarget } from "@/lib/content.ts"
+import clsx from "clsx"
+import { formatBytes } from "@/lib/content.ts"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
-import { trpc } from "@/lib/trpc.ts"
+import { trpc, trpcClient } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -33,19 +35,39 @@ function RoleDashboard() {
 					<SimpleGrid minColWidth={250}>
 						{content.data?.content.map((item) => (
 							<Paper
-								component={"a"}
-								target="_blank"
-								href={getContentTarget(item)}
+								{...(item.type === "Link"
+									? { component: "a", target: "_blank", href: item.url! }
+									: {
+											component: "button",
+											onClick: async () => {
+												try {
+													const { url } = await trpcClient.content.download.query({ id: item.id })
+													window.open(url, "_blank")
+												} catch (error) {
+													notifications.show({
+														title: "Failed to download content",
+														message:
+															error instanceof Error ? error.message : "An unknown error occurred",
+														color: "red",
+													})
+												}
+											},
+										})}
 								key={item.id}
 								shadow="xs"
-								className="p-4 border border-border rounded-lg hover:-translate-y-1 transition-transform text-black"
+								className={clsx(
+									"p-4 border border-gray-200 text-left rounded-lg hover:-translate-y-1 transition-transform text-black",
+									item.type === "Object" && "cursor-pointer"
+								)}
 							>
 								<Flex align="start">
-									<h3 className="font-semibold m-0">{item.title}</h3>
+									<h3 className="font-semibold m-0 truncate" title={item.title}>
+										{item.title}
+									</h3>
 									{item.type === "Link" ? (
-										<IconLink className="ml-auto" />
+										<IconLink className="ml-auto shrink-0" />
 									) : (
-										<IconFile className="ml-auto" />
+										<IconFile className="ml-auto shrink-0" />
 									)}
 								</Flex>
 								<p className="text-sm text-gray-600 mt-1 mb-2">
@@ -55,7 +77,7 @@ function RoleDashboard() {
 								</p>
 								<div className="text-sm text-gray-700 space-y-1">
 									<p className="m-0">
-										<strong>Owner:</strong> <span title={item.owner.email}>{item.owner.name}</span>
+										<strong>Owner:</strong> {item.owner.id}
 									</p>
 									<p className="m-0">
 										<strong>Last Modified:</strong>{" "}

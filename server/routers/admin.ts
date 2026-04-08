@@ -4,6 +4,7 @@ import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { EmployeeRole } from "../generated/prisma/client.ts"
+import { getGravatarUrl } from "../lib.ts"
 import { adminProcedure, authProcedure, router } from "../trpc.ts"
 
 export const adminRouter = router({
@@ -30,7 +31,7 @@ export const adminRouter = router({
 				email: auth0User.email!,
 				username: auth0User.username!,
 				role: user.role,
-				avatarUrl: auth0User.picture ?? getAvatarUrl(auth0User.email!),
+				avatarUrl: auth0User.picture ?? getGravatarUrl(auth0User.email!),
 			}
 		})
 	}),
@@ -114,7 +115,3 @@ export const adminRouter = router({
 		)
 	}),
 })
-function getAvatarUrl(email: string) {
-	const hash = crypto.createHash("md5").update(email.trim().toLowerCase()).digest("hex")
-	return `https://www.gravatar.com/avatar/${hash}?d=identicon`
-}
