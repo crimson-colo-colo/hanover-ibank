@@ -5,6 +5,7 @@ export const env = createEnv({
 	server: {
 		PORT: z.coerce.number().default(3000),
 		APP_URL: z.url().optional(),
+		APP_SECRET: z.string().min(32),
 		DATABASE_URL: z.string(),
 		NODE_ENV: z.enum(["development", "production"]).default("development"),
 		S3_ENDPOINT: z.string(),
