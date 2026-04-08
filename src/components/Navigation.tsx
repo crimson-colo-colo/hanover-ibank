@@ -18,7 +18,7 @@ const links = [
 	{ link: "/analyst", label: "Analyst Home" },
 	{ link: "/underwriter", label: "Underwriter Home" },
 	{ link: "/upload-content", label: "Upload Form" },
-	{ link: "/employee", label: "Employee Management" },
+	{ link: "/admin/manage-users", label: "Employee Management" },
 ]
 
 export function Navigation() {
