@@ -1,16 +1,17 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Button, Flex, Modal, Paper, SimpleGrid, Title } from "@mantine/core"
+import { UTCDate } from "@date-fns/utc"
+import { Modal, Text, Title } from "@mantine/core"
+import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { IconFile, IconLink } from "@tabler/icons-react"
+import { IconFileUpload } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import clsx from "clsx"
 import { useState } from "react"
+import { ContentTable } from "@/components/ContentTable.tsx"
 import { EditContentForm } from "@/components/EditContentForm.tsx"
-import { formatBytes } from "@/lib/content.ts"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
-import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -23,6 +24,8 @@ function RoleDashboard() {
 		NonNullable<(typeof content)["data"]>["content"][number] | null
 	>(null)
 	const [editDialogOpen, { open: openEditDialog, close: closeEditDialog }] = useDisclosure(false)
+	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
+		useDisclosure(false)
 
 	const updateContent = useMutation(
 		trpc.content.update.mutationOptions({
@@ -33,6 +36,17 @@ function RoleDashboard() {
 			},
 		})
 	)
+
+	const updateContentFile = useMutation(
+		trpc.content.updateFile.mutationOptions({
+			onSuccess() {
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey(),
+				})
+			},
+		})
+	)
+
 	return (
 		<main>
 			<header className="w-full bg-primary text-white p-4 rounded-lg">
@@ -47,78 +61,25 @@ function RoleDashboard() {
 
 			<div>
 				<section>
-					<h2 className="mt-6 mb-4 text-xl font-semibold">Content</h2>
-					<SimpleGrid minColWidth={250}>
-						{content.data?.content.map((item) => (
-							<Paper
-								{...(item.type === "Link"
-									? { component: "a", target: "_blank", href: item.url! }
-									: {
-											component: "div",
-											onClick: async () => {
-												try {
-													const { url } = await trpcClient.content.download.query({ id: item.id })
-													window.open(url, "_blank")
-												} catch (error) {
-													notifications.show({
-														title: "Failed to download content",
-														message:
-															error instanceof Error ? error.message : "An unknown error occurred",
-														color: "red",
-													})
-												}
-											},
-										})}
-								key={item.id}
-								shadow="xs"
-								className={clsx(
-									"p-4 border border-gray-200 text-left rounded-lg hover:-translate-y-1 transition-transform text-black",
-									item.type === "Object" && "cursor-pointer"
-								)}
-							>
-								<Flex align="start">
-									<h3 className="font-semibold m-0 truncate" title={item.title}>
-										{item.title}
-									</h3>
-									{item.type === "Link" ? (
-										<IconLink className="ml-auto shrink-0" />
-									) : (
-										<IconFile className="ml-auto shrink-0" />
-									)}
-								</Flex>
-								<p className="text-sm text-gray-600 mt-1 mb-2">
-									{item.type === "Link"
-										? new URL(item.url!).hostname
-										: formatBytes(content.data?.objectMetadata.get(item.id)?.size || 0)}
-								</p>
-								<div className="text-sm text-gray-700 space-y-1">
-									<p className="m-0">
-										<strong>Owner:</strong> {item.owner.name}
-									</p>
-									<p className="m-0">
-										<strong>Last Modified:</strong>{" "}
-										{new Date(item.lastModifiedDate).toLocaleString()}
-									</p>
-									<p className="m-0">
-										<strong>Expires:</strong> {new Date(item.expirationDate).toLocaleDateString()}
-									</p>
-								</div>
-								<Button
-									mt="sm"
-									variant="white"
-									size="sm"
-									onClick={(e) => {
-										e.preventDefault()
-										e.stopPropagation()
-										setEditingItem(item)
-										openEditDialog()
-									}}
-								>
-									Edit Metadata
-								</Button>
-							</Paper>
-						))}
-					</SimpleGrid>
+					{content.isLoading ? (
+						<p>Loading content...</p>
+					) : content.isError ? (
+						<p className="text-red-500">Failed to load content: {content.error.message}</p>
+					) : content.data?.content.length === 0 ? (
+						<p>No content available.</p>
+					) : (
+						<ContentTable
+							data={content.data!}
+							openEditDialog={(item) => {
+								setEditingItem(item)
+								openEditDialog()
+							}}
+							openFileEditDialog={(item) => {
+								setEditingItem(item)
+								openFileEditDialog()
+							}}
+						/>
+					)}
 				</section>
 				<Modal opened={editDialogOpen} onClose={closeEditDialog} title="Edit Content Metadata">
 					{editingItem && (
@@ -135,6 +96,56 @@ function RoleDashboard() {
 								closeEditDialog()
 							}}
 						/>
+					)}
+				</Modal>
+				<Modal opened={fileEditDialogOpen} onClose={closeFileEditDialog} title="Edit Content File">
+					<Text mb="md">
+						Updating <b>{editingItem?.title}</b> with a new copy/version. This will replace the
+						existing file but keep the same metadata.
+					</Text>
+					<div className="grid grid-cols-2 mb-4">
+						<span className="font-semibold">Content owner</span>
+						<span>{editingItem?.owner.email}</span>
+						<span className="font-semibold">Last modified</span>
+						<span>{editingItem && new UTCDate(editingItem.lastModifiedDate).toLocaleString()}</span>
+						<span className="font-semibold">Expiration date</span>
+						<span>{editingItem && new UTCDate(editingItem.expirationDate).toLocaleString()}</span>
+					</div>
+					{editingItem && (
+						<Dropzone
+							onDrop={async (files) => {
+								if (files.length === 0) return
+								await updateContentFile.mutateAsync({
+									id: editingItem.id,
+									file: new Uint8Array(await files[0].arrayBuffer()).toBase64(),
+								})
+								setEditingItem(null)
+								closeFileEditDialog()
+								notifications.show({
+									title: "File updated",
+									message: "The file has been updated successfully.",
+									color: "emerald",
+								})
+							}}
+							loading={updateContentFile.isPending}
+							maxFiles={1}
+							maxSize={50_000_000_000}
+							onReject={(files) => {
+								notifications.show({
+									title: "Upload failed",
+									message: files[0].errors.join("; "),
+									color: "red",
+								})
+							}}
+							className="bg-gray-50 hover:bg-gray-100"
+						>
+							<div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4 p-12">
+								<IconFileUpload size={48} className="" stroke={1} />
+								<Text className="text-center">
+									Drag and drop a file here, or click to select a file
+								</Text>
+							</div>
+						</Dropzone>
 					)}
 				</Modal>
 			</div>

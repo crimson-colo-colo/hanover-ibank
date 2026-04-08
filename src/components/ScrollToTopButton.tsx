@@ -34,7 +34,7 @@ export function ScrollToTopButton({
 					rightSection={<IconArrowUp size={16} />}
 					variant="filled"
 					color="fuchsia"
-					radius="x1"
+					className="shadow-lg"
 					style={{
 						...styles,
 						position: "fixed",

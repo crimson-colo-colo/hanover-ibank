@@ -1,16 +1,50 @@
 import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
+import type { BucketItemStat } from "minio"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import { ContentStatus, DocumentType, EmployeeRole } from "../generated/prisma/enums.ts"
-import { isoDateToTimestamp } from "../lib.ts"
+import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
+export type ContentListItem = {
+	id: string
+	title: string
+	readonly owner: {
+		id: string
+		name: string
+		email: string
+		username: string
+		avatarUrl: string
+	}
+	ownerId: string
+	lastModifiedDate: Date
+	expirationDate: Date
+	documentType: DocumentType
+	status: ContentStatus
+	intendedAudience: EmployeeRole[]
+} & (
+	| {
+			type: "Link"
+			url: string
+	  }
+	| {
+			type: "Object"
+			objectId: string
+	  }
+)
+
+export interface ContentList {
+	role: EmployeeRole
+	content: ContentListItem[]
+	objectMetadata: Map<string, BucketItemStat>
+}
+
 export const contentRouter = router({
-	list: authProcedure.query(async (opts) => {
+	list: authProcedure.query(async (opts): Promise<ContentList> => {
 		const user = await db.employee.findUnique({
 			where: {
 				id: opts.ctx.auth.sub,
@@ -60,8 +94,9 @@ export const contentRouter = router({
 						name: owner.name ?? owner.nickname ?? owner.username!,
 						email: owner.email!,
 						username: owner.username!,
-					},
-				}
+						avatarUrl: owner.picture || getGravatarUrl(owner.email!),
+					} satisfies ContentListItem["owner"],
+				} as ContentListItem
 			}),
 			objectMetadata: new Map(metadata),
 		}
@@ -122,4 +157,37 @@ export const contentRouter = router({
 
 		return { url: `/content/download?token=${token}` }
 	}),
+
+	updateFile: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				file: z.string(),
+			})
+		)
+		.mutation(async (opts) => {
+			const content = await db.content.findUnique({
+				where: { id: opts.input.id },
+			})
+			if (!content) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Content not found",
+				})
+			}
+			if (content.type !== "Object") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Content is not a file",
+				})
+			}
+
+			await s3.putObject(bucketName, content.objectId!, Buffer.from(opts.input.file, "base64"))
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					lastModifiedDate: new Date(),
+				},
+			})
+		}),
 })
