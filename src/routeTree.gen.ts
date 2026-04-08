@@ -14,9 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminManageUsersRouteImport } from './routes/admin.manage-users'
 import { Route as AuthenticatedUploadContentRouteImport } from './routes/_authenticated.upload-content'
-import { Route as AuthenticatedUnderwriterRouteImport } from './routes/_authenticated.underwriter'
-import { Route as AuthenticatedEmployeeRouteImport } from './routes/_authenticated.employee'
-import { Route as AuthenticatedAnalystRouteImport } from './routes/_authenticated.analyst'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -43,38 +41,23 @@ const AuthenticatedUploadContentRoute =
     path: '/upload-content',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedUnderwriterRoute =
-  AuthenticatedUnderwriterRouteImport.update({
-    id: '/underwriter',
-    path: '/underwriter',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedEmployeeRoute = AuthenticatedEmployeeRouteImport.update({
-  id: '/employee',
-  path: '/employee',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAnalystRoute = AuthenticatedAnalystRouteImport.update({
-  id: '/analyst',
-  path: '/analyst',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/analyst': typeof AuthenticatedAnalystRoute
-  '/employee': typeof AuthenticatedEmployeeRoute
-  '/underwriter': typeof AuthenticatedUnderwriterRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/upload-content': typeof AuthenticatedUploadContentRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/analyst': typeof AuthenticatedAnalystRoute
-  '/employee': typeof AuthenticatedEmployeeRoute
-  '/underwriter': typeof AuthenticatedUnderwriterRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/upload-content': typeof AuthenticatedUploadContentRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
 }
@@ -83,9 +66,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
-  '/_authenticated/analyst': typeof AuthenticatedAnalystRoute
-  '/_authenticated/employee': typeof AuthenticatedEmployeeRoute
-  '/_authenticated/underwriter': typeof AuthenticatedUnderwriterRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/upload-content': typeof AuthenticatedUploadContentRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
 }
@@ -94,28 +75,17 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/analyst'
-    | '/employee'
-    | '/underwriter'
+    | '/dashboard'
     | '/upload-content'
     | '/admin/manage-users'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/admin'
-    | '/analyst'
-    | '/employee'
-    | '/underwriter'
-    | '/upload-content'
-    | '/admin/manage-users'
+  to: '/' | '/admin' | '/dashboard' | '/upload-content' | '/admin/manage-users'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/admin'
-    | '/_authenticated/analyst'
-    | '/_authenticated/employee'
-    | '/_authenticated/underwriter'
+    | '/_authenticated/dashboard'
     | '/_authenticated/upload-content'
     | '/admin/manage-users'
   fileRoutesById: FileRoutesById
@@ -163,41 +133,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUploadContentRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/underwriter': {
-      id: '/_authenticated/underwriter'
-      path: '/underwriter'
-      fullPath: '/underwriter'
-      preLoaderRoute: typeof AuthenticatedUnderwriterRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/employee': {
-      id: '/_authenticated/employee'
-      path: '/employee'
-      fullPath: '/employee'
-      preLoaderRoute: typeof AuthenticatedEmployeeRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/analyst': {
-      id: '/_authenticated/analyst'
-      path: '/analyst'
-      fullPath: '/analyst'
-      preLoaderRoute: typeof AuthenticatedAnalystRouteImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAnalystRoute: typeof AuthenticatedAnalystRoute
-  AuthenticatedEmployeeRoute: typeof AuthenticatedEmployeeRoute
-  AuthenticatedUnderwriterRoute: typeof AuthenticatedUnderwriterRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedUploadContentRoute: typeof AuthenticatedUploadContentRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAnalystRoute: AuthenticatedAnalystRoute,
-  AuthenticatedEmployeeRoute: AuthenticatedEmployeeRoute,
-  AuthenticatedUnderwriterRoute: AuthenticatedUnderwriterRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedUploadContentRoute: AuthenticatedUploadContentRoute,
 }
 

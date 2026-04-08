@@ -1,9 +1,17 @@
 import { Button, Text, Title } from "@mantine/core"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import office from "@/assets/office.png"
 
 export const Route = createFileRoute("/")({
 	component: Index,
+	beforeLoad: (opts) => {
+		const { auth0 } = opts.context
+		if (auth0.isAuthenticated) {
+			throw redirect({
+				to: "/dashboard",
+			})
+		}
+	},
 })
 
 function Index() {
@@ -26,14 +34,9 @@ function Index() {
 
 				<div className="mb-2 flex gap-4 mt-12">
 					{auth0.isAuthenticated ? (
-						<>
-							<Button component={Link} to="/analyst">
-								Business Analyst Home
-							</Button>
-							<Button component={Link} to="/underwriter">
-								Underwriter Home
-							</Button>
-						</>
+						<Button component={Link} to="/dashboard">
+							Dashboard
+						</Button>
 					) : (
 						<Button onClick={() => auth0.loginWithRedirect()} size="md">
 							Login to Get Started
