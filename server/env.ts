@@ -18,6 +18,8 @@ export const env = createEnv({
 		VITE_AUTH0_AUDIENCE: z.string(),
 		AUTH0_CLIENT_SECRET: z.string(),
 		AUTH0_TENANT: z.string(),
+		AUTH0_MANAGEMENT_CLIENT_ID: z.string(),
+		AUTH0_MANAGEMENT_CLIENT_SECRET: z.string(),
 	},
 	runtimeEnv: process.env,
 })

@@ -22,7 +22,7 @@ export interface JWTPayload {
 
 export const auth0Management = new ManagementClient({
 	domain: env.AUTH0_TENANT,
-	clientId: env.VITE_AUTH0_CLIENT_ID,
-	clientSecret: env.AUTH0_CLIENT_SECRET,
+	clientId: env.AUTH0_MANAGEMENT_CLIENT_ID,
+	clientSecret: env.AUTH0_MANAGEMENT_CLIENT_SECRET,
 	withCustomDomainHeader: env.VITE_AUTH0_DOMAIN,
 })
