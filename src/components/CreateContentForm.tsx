@@ -1,19 +1,35 @@
-import { Button, FileInput, MultiSelect, SegmentedControl, Select, TextInput } from "@mantine/core"
+import {
+	Button,
+	FileInput,
+	Group,
+	InputDescription,
+	InputLabel,
+	MultiSelect,
+	SegmentedControl,
+	Select,
+	TextInput,
+	Title,
+} from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
+import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
+import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
+import { useMutation } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import z from "zod"
+import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import {
 	contentStatusDisplayName,
 	contentTypeDisplayName,
 	documentTypeDisplayName,
 	employeeRoleDisplayName,
 } from "@/lib/enums.ts"
-import { trpcClient } from "@/lib/trpc.ts"
+import { trpc } from "@/lib/trpc.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
-	email: z.email().max(320),
+	ownerId: z.email().max(320),
 	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))).min(1),
 	lastModifiedDate: z.iso.date(),
 	expirationDate: z.iso.date(),
@@ -33,14 +49,15 @@ const fileSchema = baseSchema.extend({
 
 const schema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
 
-export function InfoInputForm() {
+export function CreateContentForm() {
+	const createContent = useMutation(trpc.forms.createContent.mutationOptions())
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {
 			name: "",
 			contentType: "Object",
 			url: "",
 			file: undefined!,
-			email: "",
+			ownerId: "",
 			intendedAudience: [],
 			lastModifiedDate: undefined!,
 			expirationDate: undefined!,
@@ -50,9 +67,10 @@ export function InfoInputForm() {
 		validate: schemaResolver(schema, { sync: true }),
 		transformValues: schema.parse,
 	})
+	const navigate = useNavigate()
 
 	async function onSubmit(values: z.infer<typeof schema>) {
-		await trpcClient.submitForms.createContent.mutate({
+		await createContent.mutateAsync({
 			...values,
 			...{
 				file:
@@ -60,6 +78,12 @@ export function InfoInputForm() {
 						? new Uint8Array(await values.file.arrayBuffer()).toBase64()
 						: undefined!,
 			},
+		})
+		navigate({ to: "/underwriter" })
+		notifications.show({
+			title: "Content created",
+			message: "The content has been successfully created.",
+			color: "emerald",
 		})
 	}
 
@@ -81,91 +105,112 @@ export function InfoInputForm() {
 	})
 
 	return (
-		<form className="max-w-md mx-auto" onSubmit={form.onSubmit(onSubmit)}>
+		<form className="max-w-[50ch] mx-auto" onSubmit={form.onSubmit(onSubmit)}>
+			<Title order={2} mb="md">
+				Create New Content
+			</Title>
+
+			<InputLabel required>Content Type</InputLabel>
 			<SegmentedControl
+				size="sm"
+				fullWidth
 				key={form.key("contentType")}
 				{...form.getInputProps("contentType")}
 				data={Object.entries(contentTypeDisplayName).map(([value, label]) => ({
 					value,
 					label,
 				}))}
-			/>
-
-			<TextInput
-				mt="sm"
-				label="Content Name"
-				placeholder="Input Content Name"
-				key={form.key("name")}
-				{...form.getInputProps("name")}
+				radius="lg"
 			/>
 
 			{form.values.contentType === "Link" ? (
 				<TextInput
 					mt="sm"
-					label="Paste Hyperlink or URL of document"
-					placeholder="URL or Hyperlink"
+					label="Content URL"
+					description="Enter the URL to link to. Must start with http:// or https://."
+					placeholder="https://example.com/"
+					required
 					key={form.key("url")}
 					{...form.getInputProps("url")}
 				/>
 			) : (
 				<FileInput
 					mt="sm"
-					label="File Input"
-					placeholder="Click this box to upload a file"
+					label="Content File"
+					description="Upload a file. Maximum size is 50 GB."
+					placeholder="Choose file..."
+					leftSection={<IconFileUpload size={20} stroke={1.5} />}
 					clearable
+					required
 					key={form.key("file")}
 					{...form.getInputProps("file")}
 				/>
 			)}
 
-			{/*<OwnerField value={owner} onChange={(v) => setOwner(v)} />*/}
-
 			<TextInput
 				mt="sm"
-				label="Document Owner Email Address"
-				placeholder="Input Document Owner Email Address"
-				key={form.key("email")}
-				{...form.getInputProps("email")}
+				label="Content Name"
+				description="Enter a human-readable name for the content."
+				placeholder="Important Document"
+				required
+				key={form.key("name")}
+				{...form.getInputProps("name")}
 			/>
 
 			<MultiSelect
 				mt="sm"
-				label="Intended Audience for Document"
-				placeholder="Select multiple"
+				label="Intended Audience"
+				description="Select the employee roles that are the intended audience for this content. This is used to help route the content to the appropriate people."
+				placeholder="Select..."
 				data={Object.values(EmployeeRole).map((role) => ({
 					value: role,
 					label: employeeRoleDisplayName[role],
 				}))}
-				clearable
+				required
 				key={form.key("intendedAudience")}
 				{...form.getInputProps("intendedAudience")}
 			/>
 
+			<InputLabel mt="sm" required>
+				Content Owner
+			</InputLabel>
+			<InputDescription mb={4}>
+				Search for the owner of this content by name or email.
+			</InputDescription>
+			<ContentOwnerSelect form={form} />
+
 			<DatePickerInput
 				mt="sm"
 				label="Last Modified Date"
-				placeholder="Pick date"
+				description="Select the date this content was last modified."
+				placeholder="Select date"
+				leftSection={<IconCalendar size={20} stroke={1.5} />}
+				required
 				key={form.key("lastModifiedDate")}
 				{...form.getInputProps("lastModifiedDate")}
 			/>
 
 			<DatePickerInput
 				mt="sm"
-				label="Deadline"
-				placeholder="Pick date"
+				label="Expiration Date"
+				description="Select the date this content expires. Expired content must be reviewed and re-approved prior to usage."
+				placeholder="Select date"
+				leftSection={<IconCalendar size={20} stroke={1.5} />}
+				required
 				key={form.key("expirationDate")}
 				{...form.getInputProps("expirationDate")}
 			/>
 
 			<Select
 				mt="sm"
-				label="Document Type"
-				placeholder="Select One"
+				label="Content Category"
+				description="Select the category that best describes this content."
+				placeholder="Select..."
 				data={Object.values(DocumentType).map((type) => ({
 					value: type,
 					label: documentTypeDisplayName[type],
 				}))}
-				clearable
+				required
 				key={form.key("documentType")}
 				{...form.getInputProps("documentType")}
 			/>
@@ -173,19 +218,30 @@ export function InfoInputForm() {
 			<Select
 				mt="sm"
 				label="Document Status"
-				placeholder="Select One"
+				description="Select the current lifecycle status of this content."
+				placeholder="Select..."
 				data={Object.values(ContentStatus).map((status) => ({
 					value: status,
 					label: contentStatusDisplayName[status],
 				}))}
-				clearable
+				required
 				key={form.key("documentStatus")}
 				{...form.getInputProps("documentStatus")}
 			/>
 
-			<Button mt="sm" type="submit" variant="filled">
-				Submit
-			</Button>
+			<Group justify="flex-end" mt="lg">
+				<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/underwriter" })}>
+					Cancel
+				</Button>
+				<Button
+					type="submit"
+					variant="filled"
+					disabled={createContent.isPending}
+					leftSection={<IconCloudUpload size={20} stroke={1.5} />}
+				>
+					{createContent.isPending ? "Creating..." : "Create Content"}
+				</Button>
+			</Group>
 		</form>
 	)
 }

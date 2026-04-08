@@ -1,4 +1,3 @@
-import crypto from "node:crypto"
 import { createReadStream } from "node:fs"
 import fs from "node:fs/promises"
 import path from "node:path"
@@ -80,51 +79,95 @@ async function main() {
 
 	await prisma.$transaction([prisma.content.deleteMany(), prisma.employee.deleteMany()])
 
-	// Wilson Harper, wharper@hanover.com, Business Analyst
-	// Austin Johnson, ajohnson@hanover.com, Underwriter
-	// Jack Needleham, jneedleham@hanover.com, Business Analyst
-	// Sarah Miles, smiles@hanover.com, Underwriter
-	// Emily Cane, ecane@hanover.com,
-
+	// admins: admin, mjordan, wharper
+	// underwriter: emp1
+	// business analyst: emp2
 	const employeeData = [
 		{
-			name: "Wilson Harper",
-			email: "wharper@hanover.com",
+			id: "auth0|69d3f8c36ddd007770a559bb",
 			role: EmployeeRole.BusinessAnalyst,
 		},
 		{
-			name: "Austin Johnson",
-			email: "ajohnson@hanover.com",
+			id: "auth0|69d57c86bebf497028094f86",
+			role: EmployeeRole.Admin,
+		},
+		{
+			id: "auth0|69d57cb6f36c0b4100640abb",
 			role: EmployeeRole.Underwriter,
 		},
 		{
-			name: "Jack Needleham",
-			email: "jneedleham@hanover.com",
+			id: "auth0|69d57ccee7bf39d172e848e9",
 			role: EmployeeRole.BusinessAnalyst,
 		},
 		{
-			name: "Sarah Miles",
-			email: "smiles@hanover.com",
+			id: "auth0|69d57cd6e7bf39d172e848f0",
 			role: EmployeeRole.Underwriter,
 		},
 		{
-			name: "Emily Cane",
-			email: "ecane@hanover.com",
+			id: "auth0|69d57cdf3f6e9b609fe8a916",
+			role: EmployeeRole.BusinessAnalyst,
+		},
+		{
+			id: "auth0|69d57cf83f6e9b609fe8a92f",
+			role: EmployeeRole.Admin,
+		},
+		{
+			id: "auth0|69d57d03e7bf39d172e84921",
+			role: EmployeeRole.Underwriter,
+		},
+		{
+			id: "auth0|69d57d0af36c0b4100640b0a",
+			role: EmployeeRole.BusinessAnalyst,
+		},
+		{
+			id: "auth0|69d57d78bebf497028095069",
+			role: EmployeeRole.Admin,
+		},
+		{
+			id: "auth0|69d57d91f36c0b4100640b99",
+			role: EmployeeRole.Underwriter,
+		},
+		{
+			id: "auth0|69d57d9d3f6e9b609fe8a9c4",
+			role: EmployeeRole.BusinessAnalyst,
+		},
+		{
+			id: "auth0|69d57daee7bf39d172e849b0",
+			role: EmployeeRole.Underwriter,
+		},
+		{
+			id: "auth0|69d57dc6e7bf39d172e849cb",
 			role: EmployeeRole.BusinessAnalyst,
 		},
 	]
 
-	const [wilson, austin, jack, sarah, emily] = await prisma.$transaction(
+	await prisma.$transaction(
 		employeeData.map((employee) =>
 			prisma.employee.create({
 				data: {
 					...employee,
-					avatarUrl: getAvatarUrl(employee.email),
 				},
 				select: { id: true },
 			})
 		)
 	)
+
+	const analysts = employeeData.filter((employee) => employee.role === EmployeeRole.BusinessAnalyst)
+	const underwriters = employeeData.filter((employee) => employee.role === EmployeeRole.Underwriter)
+	let analystIndex = 0
+	let undewriterIndex = 0
+
+	function nextAnalyst() {
+		const a = analysts[analystIndex]
+		analystIndex = (analystIndex + 1) % analysts.length
+		return a.id
+	}
+
+	function nextUndewriter() {
+		const u = underwriters[undewriterIndex]
+		undewriterIndex = (undewriterIndex + 1) % underwriters.length
+		return u.id
+	}
 
 	console.log(`Created ${employeeData.length} employee rows`)
 
@@ -135,7 +178,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://riskmeter.corelogic.com/",
-				ownerId: sarah.id,
 				lastModifiedDate: new Date("2026-03-27"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Workflow,
@@ -146,7 +188,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.adobe.com/express/feature/image/editor",
-				ownerId: emily.id,
 				lastModifiedDate: new Date("2025-10-26"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Workflow,
@@ -157,7 +198,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://drive.google.com/drive/my-drive",
-				ownerId: austin.id,
 				lastModifiedDate: new Date("2025-07-13"),
 				expirationDate: new Date("2026-06-15"),
 				documentType: DocumentType.Workflow,
@@ -168,7 +208,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.docusign.com/",
-				ownerId: sarah.id,
 				lastModifiedDate: new Date("2025-11-01"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Workflow,
@@ -179,7 +218,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.teamviewer.com/en-us/",
-				ownerId: wilson.id,
 				lastModifiedDate: new Date("2025-09-15"),
 				expirationDate: new Date("2026-12-31"),
 				documentType: DocumentType.Workflow,
@@ -190,7 +228,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.flowforma.com/",
-				ownerId: emily.id,
 				lastModifiedDate: new Date("2025-08-20"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Workflow,
@@ -201,7 +238,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.genre.com/us/knowledge?filters=article-type:publication,genre-languages:en&page=1&facet=all",
-				ownerId: austin.id,
 				lastModifiedDate: new Date("2025-10-05"),
 				expirationDate: new Date("2026-10-01"),
 				documentType: DocumentType.Reference,
@@ -212,7 +248,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.adobe.com/express/feature/image/editor",
-				ownerId: jack.id,
 				lastModifiedDate: new Date("2025-07-30"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Workflow,
@@ -223,7 +258,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://msc.fema.gov/portal/home",
-				ownerId: sarah.id,
 				lastModifiedDate: new Date("2025-09-10"),
 				expirationDate: new Date("2026-12-31"),
 				documentType: DocumentType.Reference,
@@ -234,7 +268,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.osha.gov/laws-regs",
-				ownerId: wilson.id,
 				lastModifiedDate: new Date("2025-11-20"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Reference,
@@ -245,20 +278,22 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://pcrb.com/industry-reports/schedule-rating-plan/",
-				ownerId: emily.id,
 				lastModifiedDate: new Date("2025-08-05"),
 				expirationDate: new Date("2026-10-01"),
 				documentType: DocumentType.Reference,
 				status: ContentStatus.Incomplete,
 			},
-		].map((content) => ({ ...content, intendedAudience: [EmployeeRole.Underwriter] })),
+		].map((content) => ({
+			...content,
+			ownerId: nextUndewriter(),
+			intendedAudience: [EmployeeRole.Underwriter],
+		})),
 		...[
 			{
 				title: "Kentucky Tax Law",
 				description: "",
 				type: ContentType.Link,
 				url: "https://revenue.ky.gov/Get-Help/pages/research-tax-laws.aspx",
-				ownerId: wilson.id,
 				lastModifiedDate: new Date("2026-02-04"),
 				expirationDate: new Date("2026-04-15"),
 				documentType: DocumentType.Reference,
@@ -269,7 +304,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.oregon.gov/dor/pages/rules-laws.aspx",
-				ownerId: jack.id,
 				lastModifiedDate: new Date("2025-12-12"),
 				expirationDate: new Date("2026-04-15"),
 				documentType: DocumentType.Reference,
@@ -280,7 +314,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.policygenius.com/homeowners-insurance/home-insurance-availability-guide-states-crisis/",
-				ownerId: austin.id,
 				lastModifiedDate: new Date("2025-11-15"),
 				expirationDate: new Date("2026-12-31"),
 				documentType: DocumentType.Reference,
@@ -291,7 +324,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.google.com/",
-				ownerId: jack.id,
 				lastModifiedDate: new Date("2025-10-01"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Reference,
@@ -302,7 +334,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://monday.com/",
-				ownerId: emily.id,
 				lastModifiedDate: new Date("2025-09-20"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Reference,
@@ -313,7 +344,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://claimsearch.iso.com/index.asp",
-				ownerId: sarah.id,
 				lastModifiedDate: new Date("2025-08-10"),
 				expirationDate: new Date("2026-12-31"),
 				documentType: DocumentType.Reference,
@@ -323,7 +353,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.iiba.org/career-resources/a-business-analysis-professionals-foundation-for-success/babok/",
-				ownerId: wilson.id,
 				lastModifiedDate: new Date("2025-07-01"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Reference,
@@ -333,7 +362,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.namic.org/compliance/50-state-research-guides/",
-				ownerId: austin.id,
 				lastModifiedDate: new Date("2025-11-05"),
 				expirationDate: new Date("2026-10-01"),
 				documentType: DocumentType.Reference,
@@ -343,7 +371,6 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.agencybloc.com/",
-				ownerId: emily.id,
 				lastModifiedDate: new Date("2025-10-15"),
 				expirationDate: new Date("2027-01-01"),
 				documentType: DocumentType.Reference,
@@ -353,12 +380,15 @@ async function main() {
 				description: "",
 				type: ContentType.Link,
 				url: "https://www.insurancejournal.com/",
-				ownerId: sarah.id,
 				lastModifiedDate: new Date("2025-09-05"),
 				expirationDate: new Date("2026-12-31"),
 				documentType: DocumentType.Reference,
 			},
-		].map((content) => ({ ...content, intendedAudience: [EmployeeRole.BusinessAnalyst] })),
+		].map((content) => ({
+			...content,
+			ownerId: nextAnalyst(),
+			intendedAudience: [EmployeeRole.BusinessAnalyst],
+		})),
 	] satisfies Prisma.ContentCreateManyInput[]
 
 	await prisma.content.createMany({ data: contentData })
@@ -402,7 +432,7 @@ async function main() {
 					({
 						title: filename,
 						type: ContentType.Object,
-						ownerId: wilson.id,
+						ownerId: nextUndewriter(),
 						documentType: DocumentType.Reference,
 						expirationDate: new Date("2026-12-31"),
 						objectId: id,
@@ -415,10 +445,4 @@ async function main() {
 	console.log(
 		`Uploaded ${ids.size} files (${Object.entries(hanoverData).length} from Hanover Data.zip) to S3 and created content rows for them`
 	)
-}
-
-// returns the gravtar url for the given email
-function getAvatarUrl(email: string) {
-	const hash = crypto.createHash("md5").update(email.trim().toLowerCase()).digest("hex")
-	return `https://www.gravatar.com/avatar/${hash}?d=identicon`
 }

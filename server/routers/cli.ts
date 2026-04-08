@@ -2,6 +2,7 @@ import crypto from "node:crypto"
 import z from "zod"
 import { db } from "../database.ts"
 import { EmployeeRole } from "../generated/prisma/enums.ts"
+import { getGravatarUrl } from "../lib.ts"
 import { publicProcedure, router } from "../trpc.ts"
 
 export type CliRouter = typeof cliRouter
@@ -24,7 +25,7 @@ export const cliRouter = router({
 					name: opts.input.name,
 					email: opts.input.email,
 					role: opts.input.role,
-					avatarUrl: getAvatarUrl(opts.input.email),
+					avatarUrl: getGravatarUrl(opts.input.email),
 				},
 			})
 			return user
@@ -34,9 +35,3 @@ export const cliRouter = router({
 		return content
 	}),
 })
-
-// returns the gravtar url for the given email
-function getAvatarUrl(email: string) {
-	const hash = crypto.createHash("md5").update(email.trim().toLowerCase()).digest("hex")
-	return `https://www.gravatar.com/avatar/${hash}?d=identicon`
-}

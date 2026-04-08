@@ -1,23 +1,31 @@
-@layer theme, base, components, utilities;
+@layer theme, base, mantine, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
-@import '@mantine/core/styles.css';
-@import '@mantine/dates/styles.css';
+@import '@mantine/core/styles.layer.css';
+@import '@mantine/dates/styles.layer.css';
+@import '@mantine/notifications/styles.layer.css';
+@import '@mantine/dropzone/styles.layer.css';
+@import '@fontsource/miranda-sans/400.css';
+@import '@fontsource/miranda-sans/500.css';
+@import '@fontsource/miranda-sans/600.css';
+@import '@fontsource/miranda-sans/700.css';
+@import '@fontsource/miranda-sans/400-italic.css';
+@import '@fontsource/miranda-sans/500-italic.css';
+@import '@fontsource/miranda-sans/600-italic.css';
+@import '@fontsource/miranda-sans/700-italic.css';
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
+@import '@fontsource-variable/plus-jakarta-sans/wght-italic.css';
 
 @plugin "@tailwindcss/typography";
 
-@theme {
-    --color-primary: #379392;
-    --color-primary-hover: #1F5F5E;
-    --color-primary-subtle: #EAF6F6;
-    --color-surface-tint: #DAF0EE;
-    --color-text-base: #3B413C;
-    --color-text-muted: #7D8580;
-    --color-surface: #FFFFFF;
-    --color-bg: #F2F3F2;
-    --color-border: #D7DAD8;
-    --color-danger: #D72638;
-    --color-danger-subtle: #FDEAEC;
+@import "./colors.css";
+
+/*
+  Generated via Harmonizer: https://harmonizer.evilmartians.com/#fZPbitswEIbfZXprgnW2dZm0hcKWlqYUSumF1lEcsbIVZCclDXn34tDEI-0SXc4vfZp_Dmc42ji40IMmBXh7tH4A_esMveksaBAlFNCEfoxmGEHXVQHNLobOgC4XJSWVErfIyuyvQSEuxf09KTNAmQD4lVDeDslZiiAWzVhKJSyl6Ex6g1VLxGIZSwrMIoS98kU49sWz9yIpDGFS4Vx4zpIVYomcRRKWkIkvlrEoZYglc188y-sNY0ohgHpYZEKEfNQwwnCRq8fNr2ohKa_vJ2cRbKzOWKRMYXJyNleJvkqMYpjIYTwdy4qzR2NZycvvAnYHm-zKN7uBAkzfegua0gUuxZdo-tbOsqiR-NN6H_7MYo0b8tWaOEuEYO3JdYiZFv9DZ6PxKCMi2YKjC6uT6ZFa8wVetvXLCZlhWFr6A_qVSvzrp-gGpFV4Z3644O04q6zE6Xw8NLvBGSQng708_TX96A4dusDp1IbBjqPr2wH0-d7Sz2FjPWgw-2Yibly0zehCP8VBw7b9HpYt3Nr6P2qPdirIc7sKPsQn1-5G0PBuu93O0fcmvkzB8jqOz-311no0cdrbaaR8iOu9aSbensHl8g8
+*/
+:root {
+    --font-display: "Plus Jakarta Sans Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-sans: "Miranda Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 button[aria-label="Open TanStack Devtools"] {
@@ -25,4 +33,38 @@ button[aria-label="Open TanStack Devtools"] {
     right: auto !important;
     left: 1rem !important;
     top: auto !important;
+}
+
+@theme {
+    --font-display: var(--font-display);
+    --font-sans: var(--font-sans);
+
+    --text-xs: 0.75rem;
+    --text-xs--line-height: 1.4;
+    --text-sm: 0.875rem;
+    --text-sm--line-height: 1.45;
+    --text-md: 1rem;
+    --text-md--line-height: 1.55;
+    --text-lg: 1.125rem;
+    --text-lg--line-height: 1.6;
+    --text-xl: 1.25rem;
+    --text-xl--line-height: 1.65;
+
+    --radius-xs: 0.125rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-xl: 2rem;
+
+    --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 10px 15px -5px, rgba(0, 0, 0, 0.04) 0 7px 7px -5px;
+    --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 20px 25px -5px, rgba(0, 0, 0, 0.04) 0 10px 10px -5px;
+    --shadow-lg: 0 1px 3px rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 28px 23px -7px, rgba(0, 0, 0, 0.04) 0 12px 12px -7px;
+    --shadow-xl: 0 1px 3px rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 36px 28px -7px, rgba(0, 0, 0, 0.04) 0 17px 17px -7px;
+
+    --spacing-xs: 0.625rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.25rem;
+    --spacing-xl: 2rem;
 }

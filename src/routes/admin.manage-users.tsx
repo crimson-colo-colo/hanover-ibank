@@ -1,0 +1,239 @@
+import { ActionIcon, Button, Checkbox, Group, Modal, Table, Text, Title } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
+import {
+	IconLoader2,
+	IconPencil,
+	IconPlus,
+	IconSortAscending2,
+	IconSortDescending2,
+	IconTrash,
+} from "@tabler/icons-react"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { createFileRoute } from "@tanstack/react-router"
+import {
+	createColumnHelper,
+	flexRender,
+	getCoreRowModel,
+	getSortedRowModel,
+	useReactTable,
+} from "@tanstack/react-table"
+import clsx from "clsx"
+import { useState } from "react"
+import { CreateUserForm } from "@/components/CreateUserForm.tsx"
+import { UpdateUserForm, type UpdateUserValues } from "@/components/UpdateUserForm.tsx"
+import { employeeRoleDisplayName } from "@/lib/enums.ts"
+import { trpc } from "@/lib/trpc.ts"
+
+export const Route = createFileRoute("/admin/manage-users")({
+	component: RouteComponent,
+})
+
+function RouteComponent() {
+	const users = useQuery(trpc.admin.listUsers.queryOptions())
+
+	const [updateOpened, { open: openUpdateDialog, close: closeUpdateDialog }] = useDisclosure(false)
+	const [deleteOpened, { open: openDeleteDialog, close: closeDeleteDialog }] = useDisclosure(false)
+	const [createOpened, { open: openCreateDialog, close: closeCreateDialog }] = useDisclosure(false)
+	const [selectedUserForUpdate, setSelectedUserForUpdate] = useState<UpdateUserValues | null>(null)
+
+	const deleteUser = useMutation(trpc.admin.deleteUsers.mutationOptions())
+
+	const columnHelper = createColumnHelper<NonNullable<(typeof users)["data"]>[number]>()
+
+	const table = useReactTable({
+		data: users.data ?? [],
+		initialState: {
+			sorting: [{ id: "name", desc: false }],
+		},
+		enableSortingRemoval: false,
+		columns: [
+			columnHelper.display({
+				id: "checkbox",
+				cell: (props) => (
+					<Checkbox
+						aria-label="Select row"
+						checked={selectedRows.includes(props.row.original.id)}
+						onChange={(event) =>
+							setSelectedRows(
+								event.currentTarget.checked
+									? [...selectedRows, props.row.original.id]
+									: selectedRows.filter((position) => position !== props.row.original.id)
+							)
+						}
+					/>
+				),
+			}),
+			columnHelper.accessor("name", {
+				header: "Name",
+				enableSorting: true,
+				sortingFn: "alphanumeric",
+			}),
+			columnHelper.accessor("email", {
+				header: "Email",
+				enableSorting: true,
+				sortingFn: "alphanumeric",
+			}),
+			columnHelper.accessor("role", {
+				header: "Role",
+				cell: (props) => employeeRoleDisplayName[props.row.original.role],
+				enableSorting: true,
+				sortingFn: "alphanumeric",
+			}),
+			columnHelper.display({
+				id: "actions",
+				cell: (props) => (
+					<ActionIcon
+						variant="subtle"
+						onClick={() => {
+							setSelectedUserForUpdate({
+								id: props.row.original.id,
+								name: props.row.original.name,
+								email: props.row.original.email,
+								username: props.row.original.username,
+								role: props.row.original.role,
+							})
+							openUpdateDialog()
+						}}
+					>
+						<IconPencil />
+					</ActionIcon>
+				),
+			}),
+		],
+		getCoreRowModel: getCoreRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+	})
+
+	const [selectedRows, setSelectedRows] = useState<string[]>([])
+
+	if (users.isLoading) {
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<IconLoader2 className="animate-spin" />
+			</div>
+		)
+	}
+
+	const rows = table.getRowModel().rows.map((row) => (
+		<Table.Tr key={row.id} bg={selectedRows.includes(row.original.id) ? "fuchsia.0" : undefined}>
+			{row.getVisibleCells().map((cell) => (
+				<Table.Td key={cell.id}>
+					{flexRender(cell.column.columnDef.cell, cell.getContext())}
+				</Table.Td>
+			))}
+		</Table.Tr>
+	))
+
+	return (
+		<div>
+			<Group justify="space-between" className="flex-col sm:flex-row">
+				<Title order={2} className="self-start">
+					Manage Users
+				</Title>
+				<Group gap="xs" mb="md" className="self-end">
+					<Button
+						leftSection={<IconTrash />}
+						variant="subtle"
+						disabled={selectedRows.length === 0}
+						color="red"
+						onClick={() => {
+							openDeleteDialog()
+						}}
+					>
+						Delete selected
+					</Button>
+					<Button
+						leftSection={<IconPlus />}
+						onClick={() => {
+							openCreateDialog()
+						}}
+					>
+						Add user
+					</Button>
+				</Group>
+			</Group>
+			<Modal opened={deleteOpened} onClose={closeDeleteDialog} title="Confirm Deletion">
+				<Text>
+					Are you sure you want to delete the selected users?{" "}
+					<strong>This action cannot be undone.</strong>
+				</Text>
+				<Group mt="md" gap="sm" justify="end">
+					<Button variant="subtle" color="gray" onClick={closeDeleteDialog}>
+						Cancel
+					</Button>
+					<Button
+						color="red"
+						disabled={deleteUser.isPending}
+						onClick={() => {
+							deleteUser.mutate(selectedRows, {
+								onSuccess: () => {
+									users.refetch()
+									setSelectedRows([])
+									closeDeleteDialog()
+									notifications.show({
+										title: "Users deleted",
+										message: "The selected users have been deleted successfully.",
+										color: "emerald",
+									})
+								},
+							})
+						}}
+					>
+						{deleteUser.isPending ? <IconLoader2 className="animate-spin" /> : "Delete"}
+					</Button>
+				</Group>
+			</Modal>
+			<Modal opened={createOpened} onClose={closeCreateDialog} title="Add User">
+				<CreateUserForm
+					onSuccess={() => {
+						users.refetch()
+						closeCreateDialog()
+					}}
+					close={closeCreateDialog}
+				/>
+			</Modal>
+			<Table>
+				<Table.Thead>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<Table.Tr key={headerGroup.id}>
+							{headerGroup.headers.map((header) => (
+								<Table.Th
+									key={header.id}
+									className={clsx(
+										header.column.getCanSort() ? "cursor-pointer select-none" : "",
+										"text-left hover:underline"
+									)}
+									onClick={header.column.getToggleSortingHandler()}
+								>
+									<Group gap="sm">
+										{header.isPlaceholder
+											? null
+											: flexRender(header.column.columnDef.header, header.getContext())}
+										{header.column.getIsSorted() === "asc" ? (
+											<IconSortAscending2 className="inline" size={20} />
+										) : header.column.getIsSorted() === "desc" ? (
+											<IconSortDescending2 className="inline" size={20} />
+										) : null}
+									</Group>
+								</Table.Th>
+							))}
+						</Table.Tr>
+					))}
+				</Table.Thead>
+				<Table.Tbody>{rows}</Table.Tbody>
+			</Table>
+			<Modal opened={updateOpened} onClose={closeUpdateDialog} title="Edit User">
+				{selectedUserForUpdate && (
+					<UpdateUserForm
+						user={selectedUserForUpdate}
+						onSuccess={() => {
+							users.refetch()
+							closeUpdateDialog()
+						}}
+					/>
+				)}
+			</Modal>
+		</div>
+	)
+}

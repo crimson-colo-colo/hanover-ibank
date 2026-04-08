@@ -581,7 +581,7 @@ export const PaletteTree = () => (
 				<Variant>
 					<CopyButton value="Copied text">
 						{({ copied, copy }) => (
-							<Button color={copied ? "teal" : "blue"} onClick={copy}>
+							<Button color={copied ? "cyan" : "blue"} onClick={copy}>
 								{copied ? "Copied" : "Copy"}
 							</Button>
 						)}
@@ -773,7 +773,7 @@ export const PaletteTree = () => (
 
 			<Component name="Notification">
 				<Variant>
-					<Notification title="Success!" icon={<span>✓</span>} color="teal">
+					<Notification title="Success!" icon={<span>✓</span>} color="cyan">
 						Operation completed successfully
 					</Notification>
 				</Variant>
@@ -1039,7 +1039,7 @@ export const PaletteTree = () => (
 					<Badge>New</Badge>
 				</Variant>
 				<Variant name="Dot">
-					<Badge leftSection={<span>●</span>} color="green">
+					<Badge leftSection={<span>●</span>} color="emerald">
 						Online
 					</Badge>
 				</Variant>
