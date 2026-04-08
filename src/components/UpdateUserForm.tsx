@@ -43,9 +43,10 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 			})}
 		>
 			<TextInput
-				mt="sm"
 				label="Name"
+				description="User's full name, e.g. John Doe."
 				placeholder="User name"
+				required
 				key={updateForm.key("name")}
 				{...updateForm.getInputProps("name")}
 			/>
@@ -53,7 +54,9 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 			<TextInput
 				mt="sm"
 				label="Email"
+				description="Used for login, password resets, and notifications."
 				placeholder="User email"
+				required
 				key={updateForm.key("email")}
 				{...updateForm.getInputProps("email")}
 			/>
@@ -61,7 +64,9 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 			<TextInput
 				mt="sm"
 				label="Username"
+				description="Used for login and display. Must be unique across all users."
 				placeholder="User username"
+				required
 				key={updateForm.key("username")}
 				{...updateForm.getInputProps("username")}
 			/>
@@ -69,10 +74,12 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 			<Radio.Group
 				mt="sm"
 				label="Role"
+				description="Changing a user's role may affect their content access and permissions. Use with caution."
+				required
 				key={updateForm.key("role")}
 				{...updateForm.getInputProps("role")}
 			>
-				<Stack gap="xs">
+				<Stack gap="xs" mt="xs">
 					{Object.entries(employeeRoleDisplayName).map(([value, label]) => (
 						<Radio key={value} value={value} label={label as string} />
 					))}
