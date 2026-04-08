@@ -5,20 +5,343 @@
 @import '@mantine/dates/styles.css';
 @import '@mantine/notifications/styles.css';
 
-@plugin "@tailwindcss/typography";
+/* miranda-sans-latin-400-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 400;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-400-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-400-italic.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
 
+/* miranda-sans-latin-500-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 500;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-500-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-500-italic.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* miranda-sans-latin-600-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 600;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-600-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-600-italic.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* miranda-sans-latin-700-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 700;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-700-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-700-italic.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* miranda-sans-latin-ext-400-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 400;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-400-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-400-italic.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* miranda-sans-latin-ext-500-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 500;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-500-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-500-italic.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* miranda-sans-latin-ext-600-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 600;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-600-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-600-italic.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* miranda-sans-latin-ext-700-italic */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: italic;
+    font-display: auto;
+    font-weight: 700;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-700-italic.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-700-italic.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* miranda-sans-latin-400-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 400;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-400-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-400-normal.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* miranda-sans-latin-500-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 500;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-500-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-500-normal.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* miranda-sans-latin-600-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 600;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-600-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-600-normal.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* miranda-sans-latin-700-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 700;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-700-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-700-normal.woff2) format('woff2');
+    unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* miranda-sans-latin-ext-400-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 400;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-400-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-400-normal.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* miranda-sans-latin-ext-500-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 500;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-500-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-500-normal.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* miranda-sans-latin-ext-600-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 600;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-600-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-600-normal.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+/* miranda-sans-latin-ext-700-normal */
+@font-face {
+    font-family: 'Miranda Sans';
+    font-style: normal;
+    font-display: auto;
+    font-weight: 700;
+    src: url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-700-normal.woff) format('woff'),
+    url(@fontsource/miranda-sans/files/miranda-sans-latin-ext-700-normal.woff2) format('woff2');
+    unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+@plugin "@tailwindcss/typography";
+/*
+  Generated via Harmonizer: https://harmonizer.evilmartians.com/#fZPbitswEIbfZXprgnW2dZm0hcKWlqYUSumF1lEcsbIVZCclDXn34tDEI-0SXc4vfZp_Dmc42ji40IMmBXh7tH4A_esMveksaBAlFNCEfoxmGEHXVQHNLobOgC4XJSWVErfIyuyvQSEuxf09KTNAmQD4lVDeDslZiiAWzVhKJSyl6Ex6g1VLxGIZSwrMIoS98kU49sWz9yIpDGFS4Vx4zpIVYomcRRKWkIkvlrEoZYglc188y-sNY0ohgHpYZEKEfNQwwnCRq8fNr2ohKa_vJ2cRbKzOWKRMYXJyNleJvkqMYpjIYTwdy4qzR2NZycvvAnYHm-zKN7uBAkzfegua0gUuxZdo-tbOsqiR-NN6H_7MYo0b8tWaOEuEYO3JdYiZFv9DZ6PxKCMi2YKjC6uT6ZFa8wVetvXLCZlhWFr6A_qVSvzrp-gGpFV4Z3644O04q6zE6Xw8NLvBGSQng708_TX96A4dusDp1IbBjqPr2wH0-d7Sz2FjPWgw-2Yibly0zehCP8VBw7b9HpYt3Nr6P2qPdirIc7sKPsQn1-5G0PBuu93O0fcmvkzB8jqOz-311no0cdrbaaR8iOu9aSbensHl8g8
+*/
+:root {
+    --red-50: oklch(0.96 0.02 22.6);
+    --red-100: oklch(0.92 0.04 22.6);
+    --red-200: oklch(0.86 0.08 22.6);
+    --red-300: oklch(0.8 0.11 22.6);
+    --red-400: oklch(0.76 0.14 22.6);
+    --red-500: oklch(0.72 0.16 22.6);
+    --red-600: oklch(0.63 0.14 22.6);
+    --red-700: oklch(0.54 0.12 22.6);
+    --red-800: oklch(0.42 0.09 22.6);
+    --red-900: oklch(0.31 0.07 22.6);
+    --red-950: oklch(0.23 0.05 22.6);
+    --orange-50: oklch(0.96 0.02 59);
+    --orange-100: oklch(0.92 0.04 59);
+    --orange-200: oklch(0.86 0.08 59);
+    --orange-300: oklch(0.79 0.11 59);
+    --orange-400: oklch(0.76 0.14 59);
+    --orange-500: oklch(0.72 0.16 59);
+    --orange-600: oklch(0.63 0.14 59);
+    --orange-700: oklch(0.53 0.12 59);
+    --orange-800: oklch(0.42 0.09 59);
+    --orange-900: oklch(0.3 0.07 59);
+    --orange-950: oklch(0.23 0.05 59);
+    --yellow-50: oklch(0.95 0.02 97);
+    --yellow-100: oklch(0.92 0.04 97);
+    --yellow-200: oklch(0.85 0.08 97);
+    --yellow-300: oklch(0.79 0.11 97);
+    --yellow-400: oklch(0.75 0.14 97);
+    --yellow-500: oklch(0.7 0.16 97);
+    --yellow-600: oklch(0.62 0.14 97);
+    --yellow-700: oklch(0.52 0.12 97);
+    --yellow-800: oklch(0.41 0.09 97);
+    --yellow-900: oklch(0.3 0.07 97);
+    --yellow-950: oklch(0.22 0.05 97);
+    --pear-50: oklch(0.95 0.02 117);
+    --pear-100: oklch(0.91 0.04 117);
+    --pear-200: oklch(0.85 0.08 117);
+    --pear-300: oklch(0.78 0.11 117);
+    --pear-400: oklch(0.74 0.14 117);
+    --pear-500: oklch(0.7 0.16 117);
+    --pear-600: oklch(0.61 0.14 117);
+    --pear-700: oklch(0.52 0.12 117);
+    --pear-800: oklch(0.41 0.09 117);
+    --pear-900: oklch(0.3 0.07 117);
+    --pear-950: oklch(0.22 0.05 117);
+    --lime-50: oklch(0.95 0.02 136);
+    --lime-100: oklch(0.91 0.04 136);
+    --lime-200: oklch(0.84 0.08 136);
+    --lime-300: oklch(0.78 0.11 136);
+    --lime-400: oklch(0.74 0.14 136);
+    --lime-500: oklch(0.69 0.16 136);
+    --lime-600: oklch(0.61 0.14 136);
+    --lime-700: oklch(0.51 0.12 136);
+    --lime-800: oklch(0.4 0.09 136);
+    --lime-900: oklch(0.29 0.07 136);
+    --lime-950: oklch(0.22 0.05 136);
+    --emerald-50: oklch(0.95 0.02 163.4);
+    --emerald-100: oklch(0.91 0.04 163.4);
+    --emerald-200: oklch(0.84 0.08 163.4);
+    --emerald-300: oklch(0.77 0.11 163.4);
+    --emerald-400: oklch(0.73 0.14 163.4);
+    --emerald-500: oklch(0.68 0.16 163.4);
+    --emerald-600: oklch(0.6 0.14 163.4);
+    --emerald-700: oklch(0.51 0.12 163.4);
+    --emerald-800: oklch(0.4 0.09 163.4);
+    --emerald-900: oklch(0.29 0.07 163.4);
+    --emerald-950: oklch(0.22 0.05 163.4);
+    --cyan-50: oklch(0.95 0.02 194.1);
+    --cyan-100: oklch(0.91 0.04 194.1);
+    --cyan-200: oklch(0.84 0.08 194.1);
+    --cyan-300: oklch(0.77 0.11 194.1);
+    --cyan-400: oklch(0.73 0.14 194.1);
+    --cyan-500: oklch(0.68 0.16 194.1);
+    --cyan-600: oklch(0.6 0.14 194.1);
+    --cyan-700: oklch(0.51 0.12 194.1);
+    --cyan-800: oklch(0.4 0.09 194.1);
+    --cyan-900: oklch(0.29 0.07 194.1);
+    --cyan-950: oklch(0.21 0.05 194.1);
+    --sky-50: oklch(0.95 0.02 231);
+    --sky-100: oklch(0.91 0.04 231);
+    --sky-200: oklch(0.85 0.08 231);
+    --sky-300: oklch(0.78 0.11 231);
+    --sky-400: oklch(0.74 0.14 231);
+    --sky-500: oklch(0.69 0.16 231);
+    --sky-600: oklch(0.61 0.14 231);
+    --sky-700: oklch(0.51 0.12 231);
+    --sky-800: oklch(0.4 0.09 231);
+    --sky-900: oklch(0.29 0.07 231);
+    --sky-950: oklch(0.22 0.05 231);
+    --blue-50: oklch(0.96 0.02 266);
+    --blue-100: oklch(0.92 0.04 266);
+    --blue-200: oklch(0.85 0.08 266);
+    --blue-300: oklch(0.79 0.11 266);
+    --blue-400: oklch(0.75 0.14 266);
+    --blue-500: oklch(0.71 0.16 266);
+    --blue-600: oklch(0.62 0.14 266);
+    --blue-700: oklch(0.53 0.12 266);
+    --blue-800: oklch(0.41 0.09 266);
+    --blue-900: oklch(0.3 0.07 266);
+    --blue-950: oklch(0.22 0.05 266);
+    --iris-50: oklch(0.96 0.02 285);
+    --iris-100: oklch(0.92 0.04 285);
+    --iris-200: oklch(0.86 0.08 285);
+    --iris-300: oklch(0.79 0.11 285);
+    --iris-400: oklch(0.76 0.14 285);
+    --iris-500: oklch(0.72 0.16 285);
+    --iris-600: oklch(0.63 0.14 285);
+    --iris-700: oklch(0.53 0.12 285);
+    --iris-800: oklch(0.42 0.09 285);
+    --iris-900: oklch(0.31 0.07 285);
+    --iris-950: oklch(0.23 0.05 285);
+    --violet-50: oklch(0.96 0.02 304);
+    --violet-100: oklch(0.92 0.04 304);
+    --violet-200: oklch(0.86 0.08 304);
+    --violet-300: oklch(0.8 0.11 304);
+    --violet-400: oklch(0.76 0.14 304);
+    --violet-500: oklch(0.72 0.16 304);
+    --violet-600: oklch(0.63 0.14 304);
+    --violet-700: oklch(0.53 0.12 304);
+    --violet-800: oklch(0.42 0.09 304);
+    --violet-900: oklch(0.31 0.07 304);
+    --violet-950: oklch(0.23 0.05 304);
+    --fuchsia-50: oklch(0.96 0.02 323);
+    --fuchsia-100: oklch(0.92 0.04 323);
+    --fuchsia-200: oklch(0.86 0.08 323);
+    --fuchsia-300: oklch(0.8 0.11 323);
+    --fuchsia-400: oklch(0.76 0.14 323);
+    --fuchsia-500: oklch(0.72 0.16 323);
+    --fuchsia-600: oklch(0.63 0.14 323);
+    --fuchsia-700: oklch(0.54 0.12 323);
+    --fuchsia-800: oklch(0.42 0.09 323);
+    --fuchsia-900: oklch(0.31 0.07 323);
+    --fuchsia-950: oklch(0.23 0.05 323);
+    --byzantium-50: oklch(0.96 0.02 342);
+    --byzantium-100: oklch(0.92 0.04 342);
+    --byzantium-200: oklch(0.86 0.08 342);
+    --byzantium-300: oklch(0.8 0.11 342);
+    --byzantium-400: oklch(0.76 0.14 342);
+    --byzantium-500: oklch(0.72 0.16 342);
+    --byzantium-600: oklch(0.64 0.14 342);
+    --byzantium-700: oklch(0.54 0.12 342);
+    --byzantium-800: oklch(0.42 0.09 342);
+    --byzantium-900: oklch(0.31 0.07 342);
+    --byzantium-950: oklch(0.23 0.05 342);
+}
 @theme {
-    --color-primary: #379392;
-    --color-primary-hover: #1F5F5E;
-    --color-primary-subtle: #EAF6F6;
-    --color-surface-tint: #DAF0EE;
+    --color-primary: var(--fuchsia-700);
+    --color-primary-hover: var(--fuchsia-400);
+    --color-primary-subtle: var(--fuchsia-200);
+    --color-surface-tint: var(--fuchsia-100);
     --color-text-base: #3B413C;
     --color-text-muted: #7D8580;
     --color-surface: #FFFFFF;
     --color-bg: #F2F3F2;
-    --color-border: #D7DAD8;
-    --color-danger: #D72638;
-    --color-danger-subtle: #FDEAEC;
+    --color-border: var(--emerald-600);
+    --color-danger: var(--red-600);
+    --color-danger-subtle: var(--red-200);
 }
 
 button[aria-label="Open TanStack Devtools"] {

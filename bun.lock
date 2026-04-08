@@ -6,6 +6,7 @@
       "name": "project",
       "dependencies": {
         "@auth0/auth0-api-js": "^1.4.0",
+        "@fontsource/miranda-sans": "^5.2.1",
         "@mantine/dates": "^9.0.0",
         "@prisma/adapter-pg": "^7.6.0",
         "@prisma/client": "^7.6.0",
@@ -246,6 +247,8 @@
     "@floating-ui/react-dom": ["@floating-ui/react-dom@2.1.8", "", { "dependencies": { "@floating-ui/dom": "^1.7.6" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-cC52bHwM/n/CxS87FH0yWdngEZrjdtLW/qVruo68qg+prK7ZQ4YGdut2GyDVpoGeAYe/h899rVeOVm6Oi40k2A=="],
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.11", "", {}, "sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg=="],
+
+    "@fontsource/miranda-sans": ["@fontsource/miranda-sans@5.2.1", "", {}, "sha512-AyzSgkTOx29jmLAKv0G+su529VpjG69FjZd7XuJ2C8xvqykGK5nk2GCo8dbOUjwRfh+CpcAgymndcrU5CuU6Wg=="],
 
     "@hono/node-server": ["@hono/node-server@1.19.11", "", { "peerDependencies": { "hono": "^4" } }, "sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g=="],
 
