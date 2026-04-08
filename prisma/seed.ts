@@ -80,6 +80,8 @@ async function main() {
 	await prisma.$transaction([prisma.content.deleteMany(), prisma.employee.deleteMany()])
 
 	// admins: admin, mjordan, wharper
+	// underwriter: emp1
+	// business analyst: emp2
 	const employeeData = [
 		{
 			id: "auth0|69d3f8c36ddd007770a559bb",
