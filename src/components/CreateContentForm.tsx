@@ -29,7 +29,7 @@ import { trpc } from "@/lib/trpc.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
-	ownerId: z.email().max(320),
+	ownerId: z.string().max(320),
 	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))).min(1),
 	lastModifiedDate: z.iso.date(),
 	expirationDate: z.iso.date(),
