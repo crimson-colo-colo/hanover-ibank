@@ -4,7 +4,8 @@ import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
-import { EmployeeRole } from "../generated/prisma/enums.ts"
+import { ContentStatus, DocumentType, EmployeeRole } from "../generated/prisma/enums.ts"
+import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
@@ -70,26 +71,26 @@ export const contentRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				modifiedAt: z.string().optional(),
-				ownerName: z.string().optional(),
-				expirationDate: z.string().optional(),
+				title: z.string().min(3).max(250),
+				ownerId: z.string(),
+				intendedAudience: z.array(z.enum(Object.values(EmployeeRole))).min(1),
+				lastModifiedDate: z.iso.date(),
+				expirationDate: z.iso.date(),
+				documentType: z.enum(Object.values(DocumentType)),
+				status: z.enum(Object.values(ContentStatus)),
 			})
 		)
 		.mutation(async (opts) => {
 			const updated = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
-					lastModifiedDate: opts.input.modifiedAt ? new Date(opts.input.modifiedAt) : undefined,
-					expirationDate: opts.input.expirationDate
-						? new Date(opts.input.expirationDate)
-						: undefined,
-					owner: opts.input.ownerName
-						? {
-								update: {
-									name: opts.input.ownerName,
-								},
-							}
-						: undefined,
+					title: opts.input.title,
+					owner: { connect: { id: opts.input.ownerId } },
+					intendedAudience: opts.input.intendedAudience,
+					lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
+					expirationDate: isoDateToTimestamp(opts.input.expirationDate),
+					documentType: opts.input.documentType,
+					status: opts.input.status,
 				},
 			})
 			return updated

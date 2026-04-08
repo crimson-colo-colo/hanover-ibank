@@ -10,10 +10,12 @@ import { trpc } from "@/lib/trpc.ts"
 
 export function ContentOwnerSelect({
 	form,
+	initialSearchValue,
 }: {
 	form: UseFormReturnType<{ ownerId: string; intendedAudience: EmployeeRole[] }>
+	initialSearchValue?: string
 }) {
-	const [searchValue, setSearchValue] = useState("")
+	const [searchValue, setSearchValue] = useState(initialSearchValue || "")
 	const roles = form.getValues().intendedAudience
 	const [debouncedSearchValue] = useDebouncedValue(searchValue, 300)
 	const searchResults = useQuery(
