@@ -1,11 +1,11 @@
+import { useAuth0 } from "@auth0/auth0-react"
 import { Flex, Paper, SimpleGrid } from "@mantine/core"
 import { IconFile, IconLink } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { formatBytes, getContentTarget } from "@/lib/content.ts"
+import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
-import { useAuth0 } from '@auth0/auth0-react'
-import {employeeRoleDisplayName} from "@/lib/enums.ts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -18,9 +18,12 @@ function RoleDashboard() {
 	return (
 		<main>
 			<header className="w-full bg-primary-hover text-white p-4 rounded-xl">
-				<h1 className="m-0 -mb-1">Welcome, {auth0.user?.name ?? auth0.user?.nickname ?? auth0.user?.preferred_username!}</h1>
+				<h1 className="m-0 -mb-1">
+					Welcome,{" "}
+					{auth0.user?.name ?? auth0.user?.nickname ?? auth0.user?.preferred_username ?? "User"}
+				</h1>
 				<small className="uppercase tracking-wider text-gray-300 font-semibold mb-3">
-					{content.data ? employeeRoleDisplayName[content.data.role] : ''}
+					{content.data ? employeeRoleDisplayName[content.data.role] : ""}
 				</small>
 			</header>
 
@@ -67,7 +70,6 @@ function RoleDashboard() {
 					</SimpleGrid>
 				</section>
 			</div>
-
 		</main>
 	)
 }
