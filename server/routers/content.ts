@@ -190,4 +190,21 @@ export const contentRouter = router({
 				},
 			})
 		}),
+
+	delete: authProcedure.input(z.object({ ids: z.array(z.string()) })).mutation(async (opts) => {
+		const contents = await db.content.findMany({
+			where: { id: { in: opts.input.ids } },
+		})
+
+		const objectsToDelete = contents
+			.filter((content) => content.type === "Object")
+			.map((content) => content.objectId!)
+
+		await Promise.all([
+			db.content.deleteMany({
+				where: { id: { in: opts.input.ids } },
+			}),
+			...objectsToDelete.map((objectId) => s3.removeObject(bucketName, objectId)),
+		])
+	}),
 })
