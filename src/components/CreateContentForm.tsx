@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react"
 import {
 	Button,
 	FileInput,
@@ -50,6 +51,7 @@ const fileSchema = baseSchema.extend({
 const schema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
 
 export function CreateContentForm() {
+	const auth0 = useAuth0()
 	const createContent = useMutation(trpc.forms.createContent.mutationOptions())
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {
@@ -57,9 +59,9 @@ export function CreateContentForm() {
 			contentType: "Object",
 			url: "",
 			file: undefined!,
-			ownerId: "",
+			ownerId: auth0.user?.sub || "",
 			intendedAudience: [],
-			lastModifiedDate: undefined!,
+			lastModifiedDate: new Date().toISOString().split("T")[0],
 			expirationDate: undefined!,
 			documentType: "" as DocumentType,
 			documentStatus: "" as ContentStatus,
@@ -177,7 +179,7 @@ export function CreateContentForm() {
 			<InputDescription mb={4}>
 				Search for the owner of this content by name or email.
 			</InputDescription>
-			<ContentOwnerSelect form={form} />
+			<ContentOwnerSelect form={form} initialSearchValue={auth0.user?.email} />
 
 			<DatePickerInput
 				mt="sm"
