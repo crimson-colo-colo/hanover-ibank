@@ -30,7 +30,7 @@ function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean
 
 	return (
 		<>
-			{!isLoading && !isAdmin && (
+			{!isLoading && (
 				<Button
 					component={Link}
 					variant={location.pathname === "/upload-content" ? "light" : "subtle"}
@@ -75,7 +75,7 @@ function DrawerNavLinks({
 				active={location.pathname === "/"}
 				onClick={closeDrawer}
 			/>
-			{!isLoading && !isAdmin && (
+			{!isLoading && (
 				<NavLink
 					component={Link}
 					to="/upload-content"
