@@ -40,7 +40,7 @@ import {
 } from "@tanstack/react-table"
 import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { formatBytes } from "@/lib/content.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
@@ -260,6 +260,24 @@ export function ContentTable({
 		getFilteredRowModel: getFilteredRowModel(),
 	})
 
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			console.log(e)
+			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+				e.preventDefault()
+				const searchInput = document.getElementById("content-search-input")
+				if (searchInput) {
+					searchInput.focus()
+				}
+			}
+		}
+
+		window.addEventListener("keydown", handleKeyDown)
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown)
+		}
+	}, [])
+
 	return (
 		<>
 			<Flex align="center" justify="space-between" gap="md">
@@ -287,6 +305,7 @@ export function ContentTable({
 								<Kbd size="xs">Ctrl</Kbd> <Kbd size="xs">K</Kbd>
 							</Flex>
 						}
+						id="content-search-input"
 					/>
 				</Flex>
 			</Flex>
