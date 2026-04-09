@@ -18,6 +18,7 @@ import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/
 import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import { format } from "date-fns"
 import z from "zod"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import {
@@ -61,7 +62,7 @@ export function CreateContentForm() {
 			file: undefined!,
 			ownerId: auth0.user?.sub || "",
 			intendedAudience: [],
-			lastModifiedDate: new Date().toISOString().split("T")[0],
+			lastModifiedDate: format(new Date(), "yyyy-MM-dd"),
 			expirationDate: undefined!,
 			documentType: "" as DocumentType,
 			documentStatus: "" as ContentStatus,
