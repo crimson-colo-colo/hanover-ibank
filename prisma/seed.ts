@@ -1,9 +1,7 @@
-import { createReadStream } from "node:fs"
-import fs from "node:fs/promises"
+import fs, { readFile } from "node:fs/promises"
 import path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { unzipSync } from "fflate"
-import * as Minio from "minio"
 import { v4 as uuidv4 } from "uuid"
 import {
 	ContentStatus,
@@ -13,35 +11,12 @@ import {
 	type Prisma,
 	PrismaClient,
 } from "../server/generated/prisma/client.ts"
+import { bucketName, s3 } from "../server/s3.ts"
 
 const adapter = new PrismaPg({
 	connectionString: process.env.DATABASE_URL!,
 })
-
 const prisma = new PrismaClient({ adapter })
-
-export const s3 = new Minio.Client({
-	endPoint: process.env.S3_ENDPOINT!,
-	port: +process.env.S3_PORT!,
-	useSSL: process.env.S3_SSL! === "true",
-	accessKey: process.env.S3_ACCESS_KEY!,
-	secretKey: process.env.S3_SECRET_KEY!,
-})
-
-export const bucketName = process.env.S3_BUCKET!
-
-if (!(await s3.bucketExists(bucketName))) {
-	await s3.makeBucket(bucketName)
-}
-
-const objects = await new Promise<string[]>((resolve) => {
-	const names: string[] = []
-	s3.listObjects(bucketName)
-		.on("data", (obj) => obj.name && names.push(obj.name))
-		.on("end", () => resolve(names))
-})
-
-await Promise.all(objects.map((name) => s3.removeObject(bucketName, name, { forceDelete: true })))
 
 main()
 	.catch((e) => {
@@ -79,6 +54,13 @@ async function main() {
 
 	await prisma.$transaction([prisma.content.deleteMany(), prisma.employee.deleteMany()])
 
+	const objects = await s3.listObjectsV2({ Bucket: bucketName, MaxKeys: 1000 })
+	if (objects.Contents && objects.Contents.length > 0) {
+		await s3.deleteObjects({
+			Bucket: bucketName,
+			Delete: { Objects: objects.Contents.map((obj) => ({ Key: obj.Key! })) },
+		})
+	}
 	// admins: admin, mjordan, wharper
 	// underwriter: emp1
 	// business analyst: emp2
@@ -403,8 +385,13 @@ async function main() {
 			continue
 		}
 		const id = uuidv4()
-		const f = createReadStream(`./prisma/seed-data/${file}`)
-		await s3.putObject(bucketName, id, f)
+		const f = await readFile(`./prisma/seed-data/${file}`)
+		console.log(`Uploading file ${file} (${id}) to S3...`)
+		await s3.putObject({
+			Bucket: bucketName,
+			Key: id,
+			Body: f,
+		})
 		ids.set(file, id)
 	}
 
@@ -421,7 +408,12 @@ async function main() {
 	for (const [filename, content] of Object.entries(hanoverData)) {
 		if (filename.endsWith("/")) continue // skip directories
 		const id = uuidv4()
-		await s3.putObject(bucketName, id, Buffer.from(content))
+		console.log(`Uploading file ${filename} (${id}) to S3...`)
+		await s3.putObject({
+			Bucket: bucketName,
+			Key: id,
+			Body: Buffer.from(content),
+		})
 		ids.set(path.basename(filename), id)
 	}
 

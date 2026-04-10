@@ -25,54 +25,22 @@ import {
 	IconSortDescending2,
 	IconTrash,
 } from "@tabler/icons-react"
-import { compareItems, type RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
 import { useMutation } from "@tanstack/react-query"
 import {
 	createColumnHelper,
-	type FilterFn,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
 	getSortedRowModel,
-	type SortingFn,
-	sortingFns,
 	useReactTable,
 } from "@tanstack/react-table"
 import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { useEffect, useMemo, useState } from "react"
 import { formatBytes } from "@/lib/content.ts"
+import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
-
-declare module "@tanstack/react-table" {
-	//add fuzzy filter to the filterFns
-	interface FilterFns {
-		fuzzy: FilterFn<unknown>
-	}
-	interface FilterMeta {
-		itemRank: RankingInfo
-	}
-}
-
-const fuzzyFilter: FilterFn<ContentListItem> = (row, columnId, value, addMeta) => {
-	const itemRank = rankItem(row.getValue(columnId), value)
-	addMeta({ itemRank })
-	return itemRank.passed
-}
-
-const fuzzySort: SortingFn<ContentListItem> = (rowA, rowB, columnId) => {
-	let dir = 0
-
-	if (rowA.columnFiltersMeta[columnId]) {
-		dir = compareItems(
-			rowA.columnFiltersMeta[columnId].itemRank!,
-			rowB.columnFiltersMeta[columnId].itemRank!
-		)
-	}
-
-	return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir
-}
 
 export function ContentTable({
 	data,
@@ -109,8 +77,8 @@ export function ContentTable({
 			}),
 			columnHelper.accessor("title", {
 				header: "Name",
-				filterFn: fuzzyFilter,
-				sortingFn: fuzzySort,
+				filterFn: "fuzzy",
+				sortingFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => {
 					const item = info.row.original
@@ -133,7 +101,9 @@ export function ContentTable({
 							</div>
 						)
 					} else {
-						const size = formatBytes(data.objectMetadata.get(info.row.original.id)?.size ?? 0)
+						const size = formatBytes(
+							data.objectMetadata.get(info.row.original.id)?.ContentLength ?? 0
+						)
 						return (
 							<div className="flex items-center gap-2">
 								{downloadingItemId === item.id ? (
@@ -262,7 +232,6 @@ export function ContentTable({
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			console.log(e)
 			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
 				e.preventDefault()
 				const searchInput = document.getElementById("content-search-input")

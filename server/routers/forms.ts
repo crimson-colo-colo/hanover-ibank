@@ -39,7 +39,11 @@ export const formsRouter = router({
 		let objectId: string | undefined
 		if (opts.input.contentType === ContentType.Object) {
 			objectId = uuidv4()
-			await s3.putObject(bucketName, objectId, Buffer.from(opts.input.file, "base64"))
+			await s3.putObject({
+				Bucket: bucketName,
+				Key: objectId,
+				Body: Buffer.from(opts.input.file, "base64"),
+			})
 		}
 		const content = await db.content.create({
 			data: {

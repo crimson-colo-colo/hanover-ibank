@@ -23,6 +23,7 @@ import { useState } from "react"
 import { CreateUserForm } from "@/components/CreateUserForm.tsx"
 import { UpdateUserForm, type UpdateUserValues } from "@/components/UpdateUserForm.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
+import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/admin/manage-users")({
@@ -45,6 +46,12 @@ function RouteComponent() {
 		data: users.data ?? [],
 		initialState: {
 			sorting: [{ id: "name", desc: false }],
+		},
+		filterFns: {
+			fuzzy: fuzzyFilter,
+		},
+		sortingFns: {
+			fuzzy: fuzzySort,
 		},
 		enableSortingRemoval: false,
 		columns: [

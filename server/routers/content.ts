@@ -1,6 +1,6 @@
+import type { HeadObjectOutput } from "@aws-sdk/client-s3"
 import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
-import type { BucketItemStat } from "minio"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
@@ -40,7 +40,7 @@ export type ContentListItem = {
 export interface ContentList {
 	role: EmployeeRole
 	content: ContentListItem[]
-	objectMetadata: Map<string, BucketItemStat>
+	objectMetadata: Map<string, HeadObjectOutput>
 }
 
 export const contentRouter = router({
@@ -79,7 +79,10 @@ export const contentRouter = router({
 				.filter((content) => content.type === "Object")
 				.map(
 					async (content) =>
-						[content.id, await s3.statObject(bucketName, content.objectId!)] as const
+						[
+							content.id,
+							await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
+						] as const
 				)
 		)
 
@@ -182,7 +185,11 @@ export const contentRouter = router({
 				})
 			}
 
-			await s3.putObject(bucketName, content.objectId!, Buffer.from(opts.input.file, "base64"))
+			await s3.putObject({
+				Bucket: bucketName,
+				Key: content.objectId!,
+				Body: Buffer.from(opts.input.file, "base64"),
+			})
 			await db.content.update({
 				where: { id: opts.input.id },
 				data: {
@@ -204,7 +211,7 @@ export const contentRouter = router({
 			db.content.deleteMany({
 				where: { id: { in: opts.input.ids } },
 			}),
-			...objectsToDelete.map((objectId) => s3.removeObject(bucketName, objectId)),
+			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
 		])
 	}),
 })
