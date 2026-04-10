@@ -4,6 +4,7 @@ import { env } from "./env.ts"
 export const s3 = new S3({
 	endpoint: env.S3_ENDPOINT,
 	region: env.S3_REGION,
+	forcePathStyle: true,
 	credentials: {
 		accessKeyId: env.S3_ACCESS_KEY,
 		secretAccessKey: env.S3_SECRET_KEY,
