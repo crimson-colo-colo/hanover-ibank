@@ -1,6 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import {
-	ActionIcon,
 	Button,
 	FileInput,
 	Group,
@@ -34,24 +33,19 @@ import { trpc } from "@/lib/trpc.ts"
 function InfoTooltip({ label }: { label: string }) {
 	return (
 		<Tooltip label={label} multiline w={260} withArrow position="top-start">
-			<ActionIcon variant="transparent" color="gray" size="xs" aria-label="More Info">
-				<IconInfoCircle size={14} stroke={1.5} />
-			</ActionIcon>
+			<IconInfoCircle
+				size={14}
+				stroke={1.5}
+				style={{ color: "var(--mantine-color-dimmed)", cursor: "default"}}
+				onClick={(e) => e.preventDefault()}
+			/>
 		</Tooltip>
 	)
 }
 
-function LabelWithTooltip({
-	children,
-	tooltip,
-	required,
-}: {
-	children: React.ReactNode
-	tooltip: string
-	required?: boolean
-}) {
+function LabelWithTooltip({ children, tooltip, required }: { children: React.ReactNode; tooltip: string; required?: boolean }) {
 	return (
-		<Group gap={4} align="center">
+		<Group gap={4} align="center" mt="sm">
 			<InputLabel required={required}>{children}</InputLabel>
 			<InfoTooltip label={tooltip} />
 		</Group>
@@ -158,6 +152,7 @@ export function CreateContentForm() {
 			{form.values.contentType === "Link" ? (
 				<TextInput
 					mt="sm"
+					withAsterisk={false}
 					label={
 						<Group gap={4} align="center">
 							Content URL <span style={{ color: "var(--mantine-color-error)" }}>*</span>
@@ -172,6 +167,7 @@ export function CreateContentForm() {
 			) : (
 				<FileInput
 					mt="sm"
+					withAsterisk={false}
 					label={
 						<Group gap={4} align="center">
 							Content File <span style={{ color: "var(--mantine-color-error)" }}>*</span>
@@ -189,6 +185,7 @@ export function CreateContentForm() {
 
 			<TextInput
 				mt="sm"
+				withAsterisk={false}
 				label={
 					<Group gap={4} align="center">
 						Content Name <span style={{ color: "var(--mantine-color-error)" }}>*</span>
@@ -203,6 +200,7 @@ export function CreateContentForm() {
 
 			<MultiSelect
 				mt="sm"
+				withAsterisk={false}
 				label={
 					<Group gap={4} align="center">
 						Intended Audience <span style={{ color: "var(--mantine-color-error)" }}>*</span>
