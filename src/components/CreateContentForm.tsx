@@ -224,6 +224,7 @@ export function CreateContentForm() {
 
 			<DatePickerInput
 				mt="sm"
+				withAsterisk={false}
 				label={
 					<Group gap={4} align="center">
 						Last Modified Date <span style={{ color: "var(--mantine-color-error)" }}>*</span>
@@ -239,6 +240,7 @@ export function CreateContentForm() {
 
 			<DatePickerInput
 				mt="sm"
+				withAsterisk={false}
 				label={
 					<Group gap={4} align="center">
 						Expiration Date <span style={{ color: "var(--mantine-color-error)" }}>*</span>
@@ -254,6 +256,7 @@ export function CreateContentForm() {
 
 			<Select
 				mt="sm"
+				withAsterisk={false}
 				label={
 					<Group gap={4} align="center">
 						Content Category <span style={{ color: "var(--mantine-color-error)" }}>*</span>
@@ -272,6 +275,7 @@ export function CreateContentForm() {
 
 			<Select
 				mt="sm"
+				withAsterisk={false}
 				label={
 					<Group gap={4} align="center">
 						Document Status <span style={{ color: "var(--mantine-color-error)" }}>*</span>
