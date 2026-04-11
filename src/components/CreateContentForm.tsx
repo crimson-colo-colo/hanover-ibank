@@ -3,7 +3,6 @@ import {
 	Button,
 	FileInput,
 	Group,
-	InputDescription,
 	InputLabel,
 	MultiSelect,
 	SegmentedControl,
@@ -36,14 +35,22 @@ function InfoTooltip({ label }: { label: string }) {
 			<IconInfoCircle
 				size={14}
 				stroke={1.5}
-				style={{ color: "var(--mantine-color-dimmed)", cursor: "default"}}
+				style={{ color: "var(--mantine-color-dimmed)", cursor: "default" }}
 				onClick={(e) => e.preventDefault()}
 			/>
 		</Tooltip>
 	)
 }
 
-function LabelWithTooltip({ children, tooltip, required }: { children: React.ReactNode; tooltip: string; required?: boolean }) {
+function LabelWithTooltip({
+							  children,
+							  tooltip,
+							  required,
+						  }: {
+	children: React.ReactNode
+	tooltip: string
+	required?: boolean
+}) {
 	return (
 		<Group gap={4} align="center" mt="sm">
 			<InputLabel required={required}>{children}</InputLabel>
