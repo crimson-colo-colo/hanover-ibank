@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import {
+	ActionIcon,
 	Button,
 	FileInput,
 	Group,
@@ -10,12 +11,13 @@ import {
 	Select,
 	TextInput,
 	Title,
+	Tooltip,
 } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
-import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
+import { IconCalendar, IconCloudUpload, IconFileUpload, IconInfoCircle } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
@@ -28,6 +30,33 @@ import {
 	employeeRoleDisplayName,
 } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
+
+function InfoTooltip({ label }: { label: string }) {
+	return (
+		<Tooltip label={label} multiline w={260} withArrow position="top-start">
+			<ActionIcon variant="transparent" color="gray" size="xs" aria-label="More Info">
+				<IconInfoCircle size={14} stroke={1.5} />
+			</ActionIcon>
+		</Tooltip>
+	)
+}
+
+function LabelWithTooltip({
+	children,
+	tooltip,
+	required,
+}: {
+	children: React.ReactNode
+	tooltip: string
+	required?: boolean
+}) {
+	return (
+		<Group gap={4} align="center">
+			<InputLabel required={required}>{children}</InputLabel>
+			<InfoTooltip label={tooltip} />
+		</Group>
+	)
+}
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
@@ -129,8 +158,12 @@ export function CreateContentForm() {
 			{form.values.contentType === "Link" ? (
 				<TextInput
 					mt="sm"
-					label="Content URL"
-					description="Enter the URL to link to. Must start with http:// or https://."
+					label={
+						<Group gap={4} align="center">
+							Content URL <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+							<InfoTooltip label="Enter the URL to link to. Must start with http:// or https://" />
+						</Group>
+					}
 					placeholder="https://example.com/"
 					required
 					key={form.key("url")}
@@ -139,8 +172,12 @@ export function CreateContentForm() {
 			) : (
 				<FileInput
 					mt="sm"
-					label="Content File"
-					description="Upload a file. Maximum size is 50 GB."
+					label={
+						<Group gap={4} align="center">
+							Content File <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+							<InfoTooltip label="Upload a file. Maximum size is 50 GB." />
+						</Group>
+					}
 					placeholder="Choose file..."
 					leftSection={<IconFileUpload size={20} stroke={1.5} />}
 					clearable
@@ -152,8 +189,12 @@ export function CreateContentForm() {
 
 			<TextInput
 				mt="sm"
-				label="Content Name"
-				description="Enter a human-readable name for the content."
+				label={
+					<Group gap={4} align="center">
+						Content Name <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+						<InfoTooltip label="Enter a human-readable name for the content." />
+					</Group>
+				}
 				placeholder="Important Document"
 				required
 				key={form.key("name")}
@@ -162,8 +203,12 @@ export function CreateContentForm() {
 
 			<MultiSelect
 				mt="sm"
-				label="Intended Audience"
-				description="Select the employee roles that are the intended audience for this content. This is used to help route the content to the appropriate people."
+				label={
+					<Group gap={4} align="center">
+						Intended Audience <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+						<InfoTooltip label="Select the employee roles that are the intended audience. This helps route content to the appropriate people." />
+					</Group>
+				}
 				placeholder="Select..."
 				data={Object.values(EmployeeRole).map((role) => ({
 					value: role,
@@ -174,18 +219,19 @@ export function CreateContentForm() {
 				{...form.getInputProps("intendedAudience")}
 			/>
 
-			<InputLabel mt="sm" required>
+			<LabelWithTooltip required tooltip="Search for the owner of this content by name or email.">
 				Content Owner
-			</InputLabel>
-			<InputDescription mb={4}>
-				Search for the owner of this content by name or email.
-			</InputDescription>
+			</LabelWithTooltip>
 			<ContentOwnerSelect form={form} initialSearchValue={auth0.user?.email} />
 
 			<DatePickerInput
 				mt="sm"
-				label="Last Modified Date"
-				description="Select the date this content was last modified."
+				label={
+					<Group gap={4} align="center">
+						Last Modified Date <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+						<InfoTooltip label="Select the date this content was last modified." />
+					</Group>
+				}
 				placeholder="Select date"
 				leftSection={<IconCalendar size={20} stroke={1.5} />}
 				required
@@ -195,8 +241,12 @@ export function CreateContentForm() {
 
 			<DatePickerInput
 				mt="sm"
-				label="Expiration Date"
-				description="Select the date this content expires. Expired content must be reviewed and re-approved prior to usage."
+				label={
+					<Group gap={4} align="center">
+						Expiration Date <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+						<InfoTooltip label="Select the date this content expires. Expired content must be reviewed and re-approved before usage." />
+					</Group>
+				}
 				placeholder="Select date"
 				leftSection={<IconCalendar size={20} stroke={1.5} />}
 				required
@@ -206,8 +256,12 @@ export function CreateContentForm() {
 
 			<Select
 				mt="sm"
-				label="Content Category"
-				description="Select the category that best describes this content."
+				label={
+					<Group gap={4} align="center">
+						Content Category <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+						<InfoTooltip label="Select the category that best describes this content." />
+					</Group>
+				}
 				placeholder="Select..."
 				data={Object.values(DocumentType).map((type) => ({
 					value: type,
@@ -220,8 +274,12 @@ export function CreateContentForm() {
 
 			<Select
 				mt="sm"
-				label="Document Status"
-				description="Select the current lifecycle status of this content."
+				label={
+					<Group gap={4} align="center">
+						Document Status <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+						<InfoTooltip label="Select the current lifecycle status of this content." />
+					</Group>
+				}
 				placeholder="Select..."
 				data={Object.values(ContentStatus).map((status) => ({
 					value: status,
