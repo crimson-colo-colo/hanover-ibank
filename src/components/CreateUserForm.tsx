@@ -20,23 +20,6 @@ function InfoTooltip({ label }: { label: string }) {
 	)
 }
 
-function LabelWithTooltip({
-							  children,
-							  tooltip,
-							  required,
-						  }: {
-	children: React.ReactNode
-	tooltip: string
-	required?: boolean
-}) {
-	return (
-		<Group gap={4} align="center" mt="sm">
-			<InputLabel required={required}>{children}</InputLabel>
-			<InfoTooltip label={tooltip} />
-		</Group>
-	)
-}
-
 const createSchema = z
 	.object({
 		name: z.string().min(3).max(100),
