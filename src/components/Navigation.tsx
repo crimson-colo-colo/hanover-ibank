@@ -19,10 +19,12 @@ import {
 	IconHome,
 	IconLayoutSidebarLeftExpand,
 	IconPlus,
+	IconUser,
 	IconUsers,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
+import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
 
 function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
@@ -197,17 +199,14 @@ export function Navigation() {
 												{auth0.user.email}
 											</Text>
 										</div>
-										<Image
-											h={32}
-											bdrs="100%"
-											className="cursor-pointer"
-											src={auth0.user.picture}
-											alt={auth0.user.name}
-										/>
+										<Avatar userId={auth0.user.sub!} h={32} />
 									</div>
 								</Button>
 							</Menu.Target>
 							<Menu.Dropdown>
+								<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
+									Profile
+								</Menu.Item>
 								<Menu.Item
 									leftSection={<IconLayoutSidebarLeftExpand />}
 									onClick={() => auth0.logout()}

@@ -6,7 +6,6 @@ import {
 	Checkbox,
 	Flex,
 	Group,
-	Image,
 	Kbd,
 	Modal,
 	Table,
@@ -37,6 +36,7 @@ import {
 import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { useEffect, useMemo, useState } from "react"
+import { Avatar } from "@/components/Avatar.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
@@ -141,8 +141,8 @@ export function ContentTable({
 				sortingFn: (a, b) => a.original.owner.name.localeCompare(b.original.owner.name),
 				cell: (info) => (
 					<div className="flex items-center gap-2">
-						<Image
-							src={info.getValue().avatarUrl}
+						<Avatar
+							userId={info.getValue().id}
 							alt={info.getValue().name}
 							width={24}
 							height={24}
@@ -345,9 +345,7 @@ export function ContentTable({
 						color="red"
 						loading={deleteContent.isPending}
 						onClick={() => {
-							const idsToDelete = Object.keys(rowSelection).map(
-								(index) => data.content[Number(index)].id
-							)
+							const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
 							deleteContent.mutate(
 								{ ids: idsToDelete },
 								{

@@ -89,7 +89,12 @@ export const contentRouter = router({
 		return {
 			role: user.role,
 			content: data.map((content) => {
-				const owner = users.data.find((u) => u.user_id === content.ownerId)!
+				const owner = users.data.find((u) => u.user_id === content.ownerId) ?? {
+					name: "Unknown User",
+					email: "unknown",
+					username: "unknown",
+					avatarUrl: "",
+				}
 				return {
 					...content,
 					owner: {
