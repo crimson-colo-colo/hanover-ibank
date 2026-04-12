@@ -19,7 +19,8 @@ import {
 	useReactTable,
 } from "@tanstack/react-table"
 import clsx from "clsx"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { Avatar } from "@/components/Avatar.tsx"
 import { CreateUserForm } from "@/components/CreateUserForm.tsx"
 import { UpdateUserForm, type UpdateUserValues } from "@/components/UpdateUserForm.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"

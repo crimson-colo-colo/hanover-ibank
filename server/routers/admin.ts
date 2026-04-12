@@ -3,7 +3,9 @@ import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { EmployeeRole } from "../generated/prisma/client.ts"
+import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { getGravatarUrl } from "../lib.ts"
+import { bucketName, s3 } from "../s3.ts"
 import { adminProcedure, authProcedure, router } from "../trpc.ts"
 
 export const adminRouter = router({
