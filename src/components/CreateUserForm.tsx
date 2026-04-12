@@ -1,24 +1,12 @@
-import { Button, Group, Radio, Stack, TextInput, Tooltip } from "@mantine/core"
+import { Button, Group, Radio, Stack, TextInput } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { EmployeeRole } from "@prisma/browser.ts"
-import { IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
+import { IconLoader2 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import z from "zod"
+import { LabelWithTooltip } from "@/components/FormComponents.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
-
-function InfoTooltip({ label }: { label: string }) {
-	return (
-		<Tooltip label={label} multiline w={260} withArrow position="top-start">
-			<IconInfoCircle
-				size={14}
-				stroke={1.5}
-				style={{ color: "var(--mantine-color-dimmed)", cursor: "default" }}
-				onClick={(e) => e.preventDefault()}
-			/>
-		</Tooltip>
-	)
-}
 
 const createSchema = z
 	.object({
@@ -59,10 +47,9 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 			<TextInput
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Name <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="User's full name, e.g. John Doe" />
-					</Group>
+					<LabelWithTooltip tooltip="User's full name, e.g. John Doe." required>
+						Name
+					</LabelWithTooltip>
 				}
 				placeholder="User name"
 				required
@@ -74,10 +61,9 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Email <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Used for login, password resets, and notifications" />
-					</Group>
+					<LabelWithTooltip tooltip="Used for login, password resets, and notifications." required>
+						Email
+					</LabelWithTooltip>
 				}
 				placeholder="User email"
 				required
@@ -90,10 +76,12 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Username <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Used for login and display. Must be unique across all users" />
-					</Group>
+					<LabelWithTooltip
+						tooltip="Used for login and display. Must be unique across all users."
+						required
+					>
+						Username
+					</LabelWithTooltip>
 				}
 				placeholder="User username"
 				required
@@ -105,10 +93,9 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Password <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="The initial password for the user" />
-					</Group>
+					<LabelWithTooltip tooltip="The initial password for the user." required>
+						Password
+					</LabelWithTooltip>
 				}
 				placeholder="User password"
 				type="password"
@@ -122,10 +109,9 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Confirm Password <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Re-enter the password to confirm" />
-					</Group>
+					<LabelWithTooltip tooltip="Re-enter the password to confirm." required>
+						Confirm Password
+					</LabelWithTooltip>
 				}
 				placeholder="Confirm password"
 				type="password"
@@ -139,10 +125,12 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Role <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Determines the user's permissions and access level within the system" />
-					</Group>
+					<LabelWithTooltip
+						tooltip="Determines the user's permissions and access level within the system."
+						required
+					>
+						Role
+					</LabelWithTooltip>
 				}
 				required
 				key={createForm.key("role")}

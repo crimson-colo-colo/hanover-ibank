@@ -1,25 +1,13 @@
-import { Button, Group, Radio, Stack, TextInput, Tooltip } from "@mantine/core"
+import { Button, Radio, Stack, TextInput } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { EmployeeRole } from "@prisma/browser.ts"
-import { IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
+import { IconLoader2 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import { useEffect } from "react"
 import z from "zod"
+import { LabelWithTooltip } from "@/components/FormComponents.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
-
-function InfoTooltip({ label }: { label: string }) {
-	return (
-		<Tooltip label={label} multiline w={260} withArrow position="top-start">
-			<IconInfoCircle
-				size={14}
-				stroke={1.5}
-				style={{ color: "var(--mantine-color-dimmed)", cursor: "default" }}
-				onClick={(e) => e.preventDefault()}
-			/>
-		</Tooltip>
-	)
-}
 
 export const updateSchema = z.object({
 	id: z.string(),
@@ -58,10 +46,9 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 			<TextInput
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Name <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="User's full name, e.g. John Doe" />
-					</Group>
+					<LabelWithTooltip tooltip="User's full name, e.g. John Doe." required>
+						Name
+					</LabelWithTooltip>
 				}
 				placeholder="User name"
 				required
@@ -73,10 +60,9 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Email <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Used for login, password resets, and notifications" />
-					</Group>
+					<LabelWithTooltip tooltip="Used for login, password resets, and notifications." required>
+						Email
+					</LabelWithTooltip>
 				}
 				placeholder="User email"
 				required
@@ -88,10 +74,12 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Username <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Used for login and display. Must be unique across all users" />
-					</Group>
+					<LabelWithTooltip
+						tooltip="Used for login and display. Must be unique across all users."
+						required
+					>
+						Username
+					</LabelWithTooltip>
 				}
 				placeholder="User username"
 				required
@@ -103,10 +91,12 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Role <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Changing a user's role may affect their content access and permissions. Use with caution" />
-					</Group>
+					<LabelWithTooltip
+						tooltip="Changing a user's role may affect their content access and permissions. Use with caution."
+						required
+					>
+						Role
+					</LabelWithTooltip>
 				}
 				required
 				key={updateForm.key("role")}

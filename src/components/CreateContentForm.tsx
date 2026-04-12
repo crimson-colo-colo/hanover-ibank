@@ -3,24 +3,23 @@ import {
 	Button,
 	FileInput,
 	Group,
-	InputLabel,
 	MultiSelect,
 	SegmentedControl,
 	Select,
 	TextInput,
 	Title,
-	Tooltip,
 } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
-import { IconCalendar, IconCloudUpload, IconFileUpload, IconInfoCircle } from "@tabler/icons-react"
+import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
 import z from "zod"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
+import { LabelWithTooltip } from "@/components/FormComponents.tsx"
 import {
 	contentStatusDisplayName,
 	contentTypeDisplayName,
@@ -28,36 +27,6 @@ import {
 	employeeRoleDisplayName,
 } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
-
-function InfoTooltip({ label }: { label: string }) {
-	return (
-		<Tooltip label={label} multiline w={260} withArrow position="top-start">
-			<IconInfoCircle
-				size={14}
-				stroke={1.5}
-				style={{ color: "var(--mantine-color-dimmed)", cursor: "default" }}
-				onClick={(e) => e.preventDefault()}
-			/>
-		</Tooltip>
-	)
-}
-
-function LabelWithTooltip({
-	children,
-	tooltip,
-	required,
-}: {
-	children: React.ReactNode
-	tooltip: string
-	required?: boolean
-}) {
-	return (
-		<Group gap={4} align="center" mt="sm">
-			<InputLabel required={required}>{children}</InputLabel>
-			<InfoTooltip label={tooltip} />
-		</Group>
-	)
-}
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
@@ -143,7 +112,12 @@ export function CreateContentForm() {
 				Create New Content
 			</Title>
 
-			<InputLabel required>Content Type</InputLabel>
+			<LabelWithTooltip
+				tooltip="Choose whether this content is a file upload or an external link."
+				required
+			>
+				Content Type
+			</LabelWithTooltip>
 			<SegmentedControl
 				size="sm"
 				fullWidth
@@ -161,10 +135,12 @@ export function CreateContentForm() {
 					mt="sm"
 					withAsterisk={false}
 					label={
-						<Group gap={4} align="center">
-							Content URL <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-							<InfoTooltip label="Enter the URL to link to. Must start with http:// or https://" />
-						</Group>
+						<LabelWithTooltip
+							tooltip="Enter the URL to link to. Must start with http:// or https://."
+							required
+						>
+							Content URL
+						</LabelWithTooltip>
 					}
 					placeholder="https://example.com/"
 					required
@@ -176,10 +152,9 @@ export function CreateContentForm() {
 					mt="sm"
 					withAsterisk={false}
 					label={
-						<Group gap={4} align="center">
-							Content File <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-							<InfoTooltip label="Upload a file. Maximum size is 50 GB." />
-						</Group>
+						<LabelWithTooltip tooltip="Upload a file. Maximum size is 50 GB." required>
+							Content File
+						</LabelWithTooltip>
 					}
 					placeholder="Choose file..."
 					leftSection={<IconFileUpload size={20} stroke={1.5} />}
@@ -194,10 +169,9 @@ export function CreateContentForm() {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Content Name <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Enter a human-readable name for the content." />
-					</Group>
+					<LabelWithTooltip tooltip="Enter a human-readable name for the content." required>
+						Content Name
+					</LabelWithTooltip>
 				}
 				placeholder="Important Document"
 				required
@@ -209,10 +183,12 @@ export function CreateContentForm() {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Intended Audience <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Select the employee roles that are the intended audience. This helps route content to the appropriate people." />
-					</Group>
+					<LabelWithTooltip
+						tooltip="Select the employee roles that are the intended audience. This helps route content to the appropriate people."
+						required
+					>
+						Intended Audience
+					</LabelWithTooltip>
 				}
 				placeholder="Select..."
 				data={Object.values(EmployeeRole).map((role) => ({
@@ -224,7 +200,7 @@ export function CreateContentForm() {
 				{...form.getInputProps("intendedAudience")}
 			/>
 
-			<LabelWithTooltip required tooltip="Search for the owner of this content by name or email.">
+			<LabelWithTooltip tooltip="Search for the owner of this content by name or email." required>
 				Content Owner
 			</LabelWithTooltip>
 			<ContentOwnerSelect form={form} initialSearchValue={auth0.user?.email} />
@@ -233,10 +209,9 @@ export function CreateContentForm() {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Last Modified Date <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Select the date this content was last modified." />
-					</Group>
+					<LabelWithTooltip tooltip="Select the date this content was last modified." required>
+						Last Modified Date
+					</LabelWithTooltip>
 				}
 				placeholder="Select date"
 				leftSection={<IconCalendar size={20} stroke={1.5} />}
@@ -249,10 +224,12 @@ export function CreateContentForm() {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Expiration Date <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Select the date this content expires. Expired content must be reviewed and re-approved before usage." />
-					</Group>
+					<LabelWithTooltip
+						tooltip="Select the date this content expires. Expired content must be reviewed and re-approved before usage."
+						required
+					>
+						Expiration Date
+					</LabelWithTooltip>
 				}
 				placeholder="Select date"
 				leftSection={<IconCalendar size={20} stroke={1.5} />}
@@ -265,10 +242,12 @@ export function CreateContentForm() {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Content Category <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Select the category that best describes this content." />
-					</Group>
+					<LabelWithTooltip
+						tooltip="Select the category that best describes this content."
+						required
+					>
+						Content Category
+					</LabelWithTooltip>
 				}
 				placeholder="Select..."
 				data={Object.values(DocumentType).map((type) => ({
@@ -284,10 +263,9 @@ export function CreateContentForm() {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						Document Status <span style={{ color: "var(--mantine-color-error)" }}>*</span>
-						<InfoTooltip label="Select the current lifecycle status of this content." />
-					</Group>
+					<LabelWithTooltip tooltip="Select the current lifecycle status of this content." required>
+						Document Status
+					</LabelWithTooltip>
 				}
 				placeholder="Select..."
 				data={Object.values(ContentStatus).map((status) => ({
