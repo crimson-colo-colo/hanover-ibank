@@ -4,6 +4,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express"
 import express from "express"
 import { env } from "./env.ts"
 import { appRouter } from "./router.ts"
+import { avatarRouter } from "./routers/avatar.ts"
 import { contentDownloadRouter } from "./routers/download.ts"
 import { createContext } from "./trpc.ts"
 
@@ -14,6 +15,7 @@ const staticDir = path.join(__dirname, "../dist")
 const app = express()
 
 app.use(contentDownloadRouter)
+app.use(avatarRouter)
 
 app.use(
 	"/trpc",
