@@ -1,4 +1,4 @@
-import { Button, Group, InputLabel, Radio, Stack, TextInput, Tooltip } from "@mantine/core"
+import { Button, Group, Radio, Stack, TextInput, Tooltip } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { EmployeeRole } from "@prisma/browser.ts"
 import { IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
@@ -139,8 +139,7 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center">
-						 Role <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+					<Group gap={4} align="center"> Role <span style={{ color: "var(--mantine-color-error)" }}>*</span>
 						<InfoTooltip label="Determines the user's permissions and access level within the system" />
 					</Group>
 				}

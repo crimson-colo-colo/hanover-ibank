@@ -1,4 +1,4 @@
-import { Button, Group, InputLabel, Radio, Stack, TextInput, Tooltip } from "@mantine/core"
+import { Button, Group, Radio, Stack, TextInput, Tooltip } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { EmployeeRole } from "@prisma/browser.ts"
 import { IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
