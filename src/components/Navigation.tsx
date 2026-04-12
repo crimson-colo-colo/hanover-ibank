@@ -19,6 +19,7 @@ import {
 	IconHome,
 	IconLayoutSidebarLeftExpand,
 	IconPlus,
+	IconUser,
 	IconUsers,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
@@ -203,6 +204,9 @@ export function Navigation() {
 								</Button>
 							</Menu.Target>
 							<Menu.Dropdown>
+								<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
+									Profile
+								</Menu.Item>
 								<Menu.Item
 									leftSection={<IconLayoutSidebarLeftExpand />}
 									onClick={() => auth0.logout()}
