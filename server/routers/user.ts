@@ -2,6 +2,7 @@ import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
+import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
@@ -41,6 +42,20 @@ export const userRouter = router({
 				await auth0Management.users.update(opts.ctx.auth.sub, {
 					username: opts.input.username,
 				})
+
+				const avatar = await s3.headObject({
+					Bucket: bucketName,
+					Key: `avatar/${opts.ctx.auth.sub}.png`,
+				})
+				if (avatar.Metadata?.source !== "user") {
+					const avatar = generateDefaultAvatar(opts.input.name)
+					await s3.putObject({
+						Bucket: bucketName,
+						Key: `avatar/${opts.ctx.auth.sub}.png`,
+						Body: avatar,
+					})
+				}
+
 				return { error: null }
 			} catch (err) {
 				console.log(err)
@@ -65,6 +80,9 @@ export const userRouter = router({
 				Bucket: bucketName,
 				Key: `avatar/${opts.ctx.auth.sub}.png`,
 				Body: buffer,
+				Metadata: {
+					source: "user",
+				},
 			})
 		}),
 })
