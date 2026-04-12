@@ -28,8 +28,8 @@ export function ProfilePage() {
 
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {
-			name: "",
-			email: "",
+			name: user!.name!,
+			email: user!.email!,
 			username: "",
 		},
 		validate: schemaResolver(schema, { sync: true }),
@@ -51,13 +51,21 @@ export function ProfilePage() {
 	}
 
 	async function onSubmit(values: { name: string; email: string; username: string }) {
-		await updateProfile.mutateAsync(values)
-		await refreshIdToken()
-		notifications.show({
-			title: "Profile updated",
-			message: "Your profile has been updated.",
-			color: "green",
-		})
+		const result = await updateProfile.mutateAsync(values)
+		if (result.error) {
+			notifications.show({
+				title: "Failed to update profile",
+				message: result.error,
+				color: "red",
+			})
+		} else {
+			await refreshIdToken()
+			notifications.show({
+				title: "Profile updated",
+				message: "Your profile has been updated.",
+				color: "green",
+			})
+		}
 	}
 
 	async function onAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -86,7 +94,7 @@ export function ProfilePage() {
 	}
 
 	return (
-		<Stack maw={480} mx="auto" mt="xl" gap="xl">
+		<Stack maw={480} mx="auto" mt="md" gap="xl">
 			<Title order={2}>Profile</Title>
 
 			<Group align="center" gap="md">
@@ -122,9 +130,16 @@ export function ProfilePage() {
 					/>
 				</div>
 				<Stack gap={2}>
-					<p style={{ margin: 0, fontWeight: 500 }}>{profileQuery.data?.name ?? user?.name}</p>
+					<p
+						style={{
+							margin: 0,
+							fontWeight: 500,
+						}}
+					>
+						{user?.name}
+					</p>
 					<p style={{ margin: 0, fontSize: 14, color: "var(--mantine-color-dimmed)" }}>
-						{profileQuery.data?.email ?? user?.email}
+						{user?.email}
 					</p>
 				</Stack>
 			</Group>
