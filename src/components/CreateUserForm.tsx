@@ -139,7 +139,8 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<Group gap={4} align="center"> Role <span style={{ color: "var(--mantine-color-error)" }}>*</span>
+					<Group gap={4} align="center">
+						Role <span style={{ color: "var(--mantine-color-error)" }}>*</span>
 						<InfoTooltip label="Determines the user's permissions and access level within the system" />
 					</Group>
 				}
