@@ -43,10 +43,10 @@ function InfoTooltip({ label }: { label: string }) {
 }
 
 function LabelWithTooltip({
-							  children,
-							  tooltip,
-							  required,
-						  }: {
+	children,
+	tooltip,
+	required,
+}: {
 	children: React.ReactNode
 	tooltip: string
 	required?: boolean
