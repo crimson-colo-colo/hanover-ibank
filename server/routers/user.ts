@@ -37,11 +37,14 @@ export const userRouter = router({
 				await auth0Management.users.update(opts.ctx.auth.sub, {
 					name: opts.input.name,
 					email: opts.input.email,
+				})
+				await auth0Management.users.update(opts.ctx.auth.sub, {
 					username: opts.input.username,
 				})
-				return "Successfully updated user profile information"
-			} catch {
-				return "Failed to update user profile information (duplicate email or username)."
+				return { error: null }
+			} catch (err) {
+				console.log(err)
+				return { error: "Failed to update user profile information (duplicate email or username)." }
 			}
 		}),
 	uploadAvatar: authProcedure
