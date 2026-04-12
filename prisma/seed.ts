@@ -3,6 +3,7 @@ import path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { unzipSync } from "fflate"
 import { v4 as uuidv4 } from "uuid"
+import { auth0Management } from "../server/auth.ts"
 import {
 	ContentStatus,
 	ContentType,
@@ -11,6 +12,7 @@ import {
 	type Prisma,
 	PrismaClient,
 } from "../server/generated/prisma/client.ts"
+import { generateDefaultAvatar } from "../server/lib/avatar.ts"
 import { bucketName, s3 } from "../server/s3.ts"
 
 const adapter = new PrismaPg({
@@ -133,6 +135,19 @@ async function main() {
 			})
 		)
 	)
+
+	for (const employee of employeeData) {
+		const user = await auth0Management.users.get(employee.id)
+		const avatar = generateDefaultAvatar(user.name ?? user.email!)
+
+		console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
+
+		await s3.putObject({
+			Bucket: bucketName,
+			Key: `avatar/${employee.id}.png`,
+			Body: avatar,
+		})
+	}
 
 	const analysts = employeeData.filter((employee) => employee.role === EmployeeRole.BusinessAnalyst)
 	const underwriters = employeeData.filter((employee) => employee.role === EmployeeRole.Underwriter)
