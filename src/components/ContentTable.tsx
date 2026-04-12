@@ -6,7 +6,6 @@ import {
 	Checkbox,
 	Flex,
 	Group,
-	Image,
 	Kbd,
 	Modal,
 	Table,
@@ -345,9 +344,7 @@ export function ContentTable({
 						color="red"
 						loading={deleteContent.isPending}
 						onClick={() => {
-							const idsToDelete = Object.keys(rowSelection).map(
-								(index) => data.content[Number(index)].id
-							)
+							const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
 							deleteContent.mutate(
 								{ ids: idsToDelete },
 								{

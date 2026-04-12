@@ -1,4 +1,3 @@
-import crypto from "node:crypto"
 import { TRPCError } from "@trpc/server"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
@@ -96,7 +95,13 @@ export const adminRouter = router({
 				connection: "Username-Password-Authentication",
 			})
 
-			await new Promise((resolve) => setTimeout(resolve, 1000))
+			const avatar = generateDefaultAvatar(opts.input.name ?? opts.input.email!)
+
+			await s3.putObject({
+				Bucket: bucketName,
+				Key: `avatar/${auth0User.user_id}.png`,
+				Body: avatar,
+			})
 
 			await db.employee.create({
 				data: {
@@ -110,6 +115,12 @@ export const adminRouter = router({
 		await Promise.all(
 			opts.input.map(async (id) => {
 				await auth0Management.users.delete(id)
+				try {
+					await s3.deleteObject({
+						Bucket: bucketName,
+						Key: `avatar/${id}.png`,
+					})
+				} catch {}
 				await db.employee.delete({ where: { id } })
 			})
 		)

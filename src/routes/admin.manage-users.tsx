@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Checkbox, Group, Modal, Table, Text, Title } from "@mantine/core"
+import { ActionIcon, Button, Checkbox, Flex, Group, Modal, Table, Text, Title } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -40,34 +40,19 @@ function RouteComponent() {
 
 	const deleteUser = useMutation(trpc.admin.deleteUsers.mutationOptions())
 
+	const [rowSelection, setRowSelection] = useState({})
+
 	const columnHelper = createColumnHelper<NonNullable<(typeof users)["data"]>[number]>()
 
-	const table = useReactTable({
-		data: users.data ?? [],
-		initialState: {
-			sorting: [{ id: "name", desc: false }],
-		},
-		filterFns: {
-			fuzzy: fuzzyFilter,
-		},
-		sortingFns: {
-			fuzzy: fuzzySort,
-		},
-		enableSortingRemoval: false,
-		columns: [
+	const columns = useMemo(
+		() => [
 			columnHelper.display({
 				id: "checkbox",
 				cell: (props) => (
 					<Checkbox
 						aria-label="Select row"
-						checked={selectedRows.includes(props.row.original.id)}
-						onChange={(event) =>
-							setSelectedRows(
-								event.currentTarget.checked
-									? [...selectedRows, props.row.original.id]
-									: selectedRows.filter((position) => position !== props.row.original.id)
-							)
-						}
+						checked={props.row.getIsSelected()}
+						onChange={() => props.row.toggleSelected()}
 					/>
 				),
 			}),
@@ -75,6 +60,12 @@ function RouteComponent() {
 				header: "Name",
 				enableSorting: true,
 				sortingFn: "alphanumeric",
+				cell: (props) => (
+					<Flex gap="xs">
+						<Avatar userId={props.row.original.id} alt={props.row.original.name} h={24} w={24} />
+						<span>{props.getValue()}</span>
+					</Flex>
+				),
 			}),
 			columnHelper.accessor("email", {
 				header: "Email",
@@ -108,11 +99,30 @@ function RouteComponent() {
 				),
 			}),
 		],
+		[]
+	)
+
+	const table = useReactTable({
+		data: users.data ?? [],
+		initialState: {
+			sorting: [{ id: "name", desc: false }],
+		},
+		filterFns: {
+			fuzzy: fuzzyFilter,
+		},
+		sortingFns: {
+			fuzzy: fuzzySort,
+		},
+		enableSortingRemoval: false,
+		columns: columns,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		state: {
+			rowSelection,
+		},
+		enableRowSelection: true,
+		onRowSelectionChange: setRowSelection,
 	})
-
-	const [selectedRows, setSelectedRows] = useState<string[]>([])
 
 	if (users.isLoading) {
 		return (
@@ -123,7 +133,7 @@ function RouteComponent() {
 	}
 
 	const rows = table.getRowModel().rows.map((row) => (
-		<Table.Tr key={row.id} bg={selectedRows.includes(row.original.id) ? "fuchsia.0" : undefined}>
+		<Table.Tr key={row.id} bg={row.getIsSelected() ? "fuchsia.0" : undefined}>
 			{row.getVisibleCells().map((cell) => (
 				<Table.Td key={cell.id}>
 					{flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -142,7 +152,7 @@ function RouteComponent() {
 					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"
-						disabled={selectedRows.length === 0}
+						disabled={table.getSelectedRowModel().rows.length === 0}
 						color="red"
 						onClick={() => {
 							openDeleteDialog()
@@ -173,10 +183,11 @@ function RouteComponent() {
 						color="red"
 						disabled={deleteUser.isPending}
 						onClick={() => {
-							deleteUser.mutate(selectedRows, {
+							const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
+							deleteUser.mutate(idsToDelete, {
 								onSuccess: () => {
+									table.resetRowSelection()
 									users.refetch()
-									setSelectedRows([])
 									closeDeleteDialog()
 									notifications.show({
 										title: "Users deleted",
