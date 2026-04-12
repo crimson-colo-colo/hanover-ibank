@@ -80,7 +80,7 @@ async function main() {
 			role: EmployeeRole.Underwriter,
 		},
 		{
-			id: "auth0|69d57ccee7bf39d172e848e9",
+			id: "auth0|69db05b92c0b718e1d54aaec",
 			role: EmployeeRole.BusinessAnalyst,
 		},
 		{
