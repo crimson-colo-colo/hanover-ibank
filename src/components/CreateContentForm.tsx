@@ -3,6 +3,7 @@ import {
 	Button,
 	FileInput,
 	Group,
+	InputLabel,
 	MultiSelect,
 	SegmentedControl,
 	Select,
@@ -200,9 +201,11 @@ export function CreateContentForm() {
 				{...form.getInputProps("intendedAudience")}
 			/>
 
-			<LabelWithTooltip tooltip="Search for the owner of this content by name or email." required>
-				Content Owner
-			</LabelWithTooltip>
+			<InputLabel mt="sm">
+				<LabelWithTooltip tooltip="Search for the owner of this content by name or email." required>
+					Content Owner
+				</LabelWithTooltip>
+			</InputLabel>
 			<ContentOwnerSelect form={form} initialSearchValue={auth0.user?.email} />
 
 			<DatePickerInput
