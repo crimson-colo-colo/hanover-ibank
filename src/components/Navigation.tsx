@@ -7,6 +7,8 @@ import {
 	Drawer,
 	Group,
 	Image,
+	localStorageColorSchemeManager,
+	MantineProvider,
 	Menu,
 	NavLink,
 	ScrollArea,
@@ -26,6 +28,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
+import { theme } from "@/theme.ts"
 
 function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
 	const location = useLocation()
@@ -158,8 +161,12 @@ export function Navigation() {
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
 
+	const colorSchemeManager = localStorageColorSchemeManager({
+		key: "mantine-color-scheme",
+	})
+
 	return (
-		<header className="h-14 mb-30 bg-gray-50 border-b border-gray-300">
+		<MantineProvider theme={theme} colorSchemeManager={colorSchemeManager}>
 			<Container size="1120px" className="h-full flex justify-between items-center">
 				<Group hiddenFrom="xs">
 					<Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
@@ -189,7 +196,7 @@ export function Navigation() {
 					{auth0.isAuthenticated && auth0.user ? (
 						<Menu trigger="click" position="bottom-end">
 							<Menu.Target>
-								<Button variant="subtle" color="gray" p="0" className="hover:bg-gray-100 h-max">
+								<Button variant="subtle" color="gray" p="0" className="h-max">
 									<div className="gap-2 flex items-center px-2 py-1">
 										<div className="flex flex-col items-end">
 											<Text size="sm" fw={500}>
@@ -250,7 +257,7 @@ export function Navigation() {
 				</ScrollArea>
 				<DrawerUserMenu />
 			</Drawer>
-		</header>
+		</MantineProvider>
 	)
 }
 export default Navigation

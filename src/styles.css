@@ -68,3 +68,7 @@ button[aria-label="Open TanStack Devtools"] {
     --spacing-lg: 1.25rem;
     --spacing-xl: 2rem;
 }
+
+html.color-scheme-transitioning * {
+    transition: background-color 0.3s ease, color 0.2s ease, border-color 0.3s ease !important;
+}

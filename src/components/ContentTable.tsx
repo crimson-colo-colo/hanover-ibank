@@ -88,7 +88,7 @@ export function ContentTable({
 							<div className="flex items-center gap-2">
 								<IconLink className="shrink-0" stroke={1.5} />
 								<Anchor
-									c="black"
+									c="var(--mantine-color-bright)"
 									className="font-semibold m-0 truncate max-w-[30ch]"
 									title={item.title}
 									href={item.url}
@@ -180,7 +180,7 @@ export function ContentTable({
 				cell: (info) => (
 					<>
 						<ActionIcon
-							variant="white"
+							variant="subtle"
 							size="sm"
 							onClick={(e) => {
 								openEditDialog(info.row.original)
@@ -190,7 +190,7 @@ export function ContentTable({
 						</ActionIcon>
 						{info.row.original.type === "Object" && (
 							<ActionIcon
-								variant="white"
+								variant="subtle"
 								size="sm"
 								onClick={(e) => {
 									openFileEditDialog(info.row.original)
