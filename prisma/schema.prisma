@@ -14,10 +14,11 @@ enum EmployeeRole {
 }
 
 model Employee {
-  id       String            @id
-  role     EmployeeRole
-  content  Content[]
-  favorite FavoriteContent[]
+  id                String            @id
+  role              EmployeeRole
+  content           Content[]
+  favorite          FavoriteContent[]
+  checkedOutContent Content[]         @relation("CheckedOutContent")
 }
 
 model Content {
@@ -38,6 +39,8 @@ model Content {
   owner            Employee          @relation(fields: [ownerId], references: [id])
   intendedAudience EmployeeRole[]
   favoritedBy      FavoriteContent[]
+  checkedOutById   String?
+  checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
 }
 
 model FavoriteContent {
