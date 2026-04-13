@@ -1,5 +1,5 @@
 import type { Auth0ContextInterface, User } from "@auth0/auth0-react"
-import { AppShell, MantineProvider } from "@mantine/core"
+import { AppShell, MantineProvider, localStorageColorSchemeManager } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import { DevSupport } from "@react-buddy/ide-toolbox"
 import { TanStackDevtools } from "@tanstack/react-devtools"
@@ -26,9 +26,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
 	useRouteScrollToTop({ smooth: false })
 
+	const colorSchemeManager = localStorageColorSchemeManager({
+		key: "mantine-color-scheme",
+	})
+
 	return (
 		<QueryClientProvider client={queryClient}>
-			<MantineProvider theme={theme}>
+			<MantineProvider theme={theme} colorSchemeManager={colorSchemeManager}>
 				<DevSupport ComponentPreviews={() => null} useInitialHook={useInitial}>
 					<AppShell padding="md" header={{ height: 56 }}>
 						<AppShell.Header>

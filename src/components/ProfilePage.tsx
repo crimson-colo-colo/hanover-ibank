@@ -9,6 +9,8 @@ import { useEffect, useRef } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
+import { IconMoon, IconSun } from "@tabler/icons-react"
+import { useColorScheme } from "@/lib/useColorScheme.ts";
 
 const schema = z.object({
 	name: z.string().min(3).max(100),
@@ -20,6 +22,7 @@ export function ProfilePage() {
 	const { user, getAccessTokenSilently } = useAuth0()
 	const navigate = useNavigate()
 	const avatarInputRef = useRef<HTMLInputElement>(null)
+	const { colorScheme, toggleColorScheme } = useColorScheme()
 
 	const profileQuery = useQuery(trpc.user.getProfile.queryOptions())
 
@@ -95,7 +98,22 @@ export function ProfilePage() {
 
 	return (
 		<Stack maw={480} mx="auto" mt="md" gap="xl">
-			<Title order={2}>Profile</Title>
+
+			<Group justify="space-between" align="center">
+				<Title order={2}>Profile</Title>
+				<Button
+					variant="subtle"
+					color="gray"
+					onClick={toggleColorScheme}
+					leftSection={
+					colorScheme === "dark"
+						? <IconSun size={16} stroke={1.5} />
+						: <IconMoon size={16} stroke={1.5} />
+					}
+				>
+					{colorScheme === "dark" ? "Light mode" : "Dark mode"}
+				</Button>
+			</Group>
 
 			<Group align="center" gap="md">
 				<div style={{ position: "relative", display: "inline-block" }}>
