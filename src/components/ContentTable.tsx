@@ -12,9 +12,11 @@ import {
 	Text,
 	TextInput,
 	Title,
+	SegmentedControl,
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconFilePencil,
@@ -37,7 +39,7 @@ import {
 } from "@tanstack/react-table"
 import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
-import { useEffect, useMemo, useState } from "react"
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
@@ -49,10 +51,14 @@ export function ContentTable({
 	data,
 	openEditDialog,
 	openFileEditDialog,
+	filter,
+	changeFilter,
 }: {
 	data: ContentList
 	openEditDialog: (item: ContentListItem) => void
 	openFileEditDialog: (item: ContentListItem) => void
+	filter: ContentFilter
+	changeFilter: Dispatch<SetStateAction<ContentFilter>>
 }) {
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
@@ -368,6 +374,15 @@ export function ContentTable({
 				<Title order={3}>Your Content ({data.content.length})</Title>
 
 				<Flex gap="sm">
+					<SegmentedControl
+						data={[
+							{ label: "For You", value: ContentFilter.Own },
+							{ label: "Show All", value: ContentFilter.All },
+						]}
+						value={filter}
+						onChange={changeFilter}
+					/>
+
 					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"

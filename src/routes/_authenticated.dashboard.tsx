@@ -4,6 +4,7 @@ import { Modal, SimpleGrid, Text, Title } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import { IconFileUpload } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
@@ -21,7 +22,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function RoleDashboard() {
 	const auth0 = useAuth0()
-	const content = useQuery(trpc.content.list.queryOptions())
+	const [contentFilter, setContentFilter] = useState<ContentFilter>(ContentFilter.Own)
+	const content = useQuery(trpc.content.list.queryOptions({ filter: contentFilter }))
 	const [editingItem, setEditingItem] = useState<
 		NonNullable<(typeof content)["data"]>["content"][number] | null
 	>(null)
@@ -115,6 +117,8 @@ function RoleDashboard() {
 								setEditingItem(item)
 								openFileEditDialog()
 							}}
+							filter={contentFilter}
+							changeFilter={setContentFilter}
 						/>
 					)}
 				</section>
