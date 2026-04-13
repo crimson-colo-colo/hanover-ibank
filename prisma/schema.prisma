@@ -14,9 +14,9 @@ enum EmployeeRole {
 }
 
 model Employee {
-  id        String       @id
-  role      EmployeeRole
-  content   Content[]
+  id      String       @id
+  role    EmployeeRole
+  content Content[]
 }
 
 model Content {
