@@ -51,12 +51,14 @@ export function ContentTable({
 	data,
 	openEditDialog,
 	openFileEditDialog,
+	openFilePreview,
 	filter,
 	changeFilter,
 }: {
 	data: ContentList
 	openEditDialog: (item: ContentListItem) => void
 	openFileEditDialog: (item: ContentListItem) => void
+	openFilePreview: (item: ContentListItem) => void
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
 }) {
@@ -226,13 +228,15 @@ export function ContentTable({
 									className="font-semibold m-0 truncate max-w-[30ch] hover:underline p-0 border-none bg-transparent text-base cursor-pointer"
 									title={item.title}
 									onClick={async () => {
-										setDownloadingItemId(item.id)
-										try {
-											const { url } = await trpcClient.content.download.query({ id: item.id })
-											window.open(url, "_blank")
-										} finally {
-											setDownloadingItemId(null)
-										}
+										// setDownloadingItemId(item.id)
+										// try {
+										// 	const { url } = await trpcClient.content.download.query({ id: item.id })
+										// 	window.open(url, "_blank")
+										// } finally {
+										// 	setDownloadingItemId(null)
+										// }
+
+										openFilePreview(info.row.original)
 									}}
 								>
 									{item.title}
