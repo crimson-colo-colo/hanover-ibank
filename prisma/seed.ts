@@ -179,7 +179,7 @@ async function main() {
 	console.log(`Created ${employeeData.length} employee rows`)
 
 	// ===== Content Tags =====
-	const contentTags = await prisma.contentTag.createManyAndReturn({
+	await prisma.contentTag.createManyAndReturn({
 		data: [
 			// Document Type
 			{
