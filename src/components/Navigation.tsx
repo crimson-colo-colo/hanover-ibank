@@ -203,7 +203,7 @@ export function Navigation() {
 									</div>
 								</Button>
 							</Menu.Target>
-							<Menu.Dropdown>
+							<Menu.Dropdown className="shadow-sm">
 								<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
 									Profile
 								</Menu.Item>

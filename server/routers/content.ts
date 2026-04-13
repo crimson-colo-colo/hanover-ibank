@@ -6,6 +6,7 @@ import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import { ContentStatus, DocumentType, EmployeeRole } from "../generated/prisma/enums.ts"
+import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
@@ -20,6 +21,7 @@ export type ContentListItem = {
 		username: string
 		avatarUrl: string
 	}
+	favorited: boolean
 	ownerId: string
 	lastModifiedDate: Date
 	expirationDate: Date
@@ -69,6 +71,11 @@ export const contentRouter = router({
 						},
 			include: {
 				owner: true,
+				favoritedBy: {
+					where: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
 			},
 		})
 
@@ -97,6 +104,7 @@ export const contentRouter = router({
 				}
 				return {
 					...content,
+					favorited: content.favoritedBy.length > 0,
 					owner: {
 						...content.owner,
 						name: owner.name ?? owner.nickname ?? owner.username!,
@@ -190,10 +198,15 @@ export const contentRouter = router({
 				})
 			}
 
+			const buffer = Buffer.from(opts.input.file, "base64")
+			const fileType = await getFileTypeFromFile(content.title, buffer)
 			await s3.putObject({
 				Bucket: bucketName,
 				Key: content.objectId!,
-				Body: Buffer.from(opts.input.file, "base64"),
+				Body: buffer,
+				Metadata: {
+					filetype: fileType,
+				},
 			})
 			await db.content.update({
 				where: { id: opts.input.id },
@@ -219,32 +232,52 @@ export const contentRouter = router({
 			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
 		])
 	}),
-	favorite: authProcedure.input(z.object({id: z.string()})).mutation(async (opts) => {
+	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const favorite = await db.favoriteContent.create({
 			data: {
 				contentId: opts.input.id,
-				employeeId: opts.ctx.auth.sub
-			}
+				employeeId: opts.ctx.auth.sub,
+			},
 		})
 		return favorite
-		}),
-	unfavorite: authProcedure.input(z.object({id: z.string()})).mutation(async (opts) => {
+	}),
+	unfavorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const unfavorite = await db.favoriteContent.delete({
 			where: {
 				contentId_employeeId: {
 					contentId: opts.input.id,
-					employeeId: opts.ctx.auth.sub
-				}
-			}
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
 		})
 		return unfavorite
 	}),
 	listFavorites: authProcedure.query(async (opts) => {
-		const listFavorites = await db.favoriteContent.findMany({
+		const data = await db.content.findMany({
 			where: {
-				employeeId: opts.ctx.auth.sub
-			}
+				favoritedBy: {
+					some: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
+			},
 		})
-		return listFavorites
-	})
+
+		const metadata = await Promise.all(
+			data
+				.filter((content) => content.type === "Object")
+				.map(
+					async (content) =>
+						[
+							content.id,
+							await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
+						] as const
+				)
+		)
+
+		return {
+			content: data,
+			objectMetadata: new Map(metadata),
+		}
+	}),
 })
