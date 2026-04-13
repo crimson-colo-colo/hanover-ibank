@@ -78,7 +78,6 @@ function RoleDashboard() {
 					) : (
 						favoriteContent.data!.content.map((item) => {
 							const object = favoriteContent.data!.objectMetadata.get(item.id)
-							console.log(object)
 							return (
 								<FavoriteContentCard
 									fileName={item.title}

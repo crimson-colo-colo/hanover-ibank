@@ -75,47 +75,45 @@ export function FavoriteContentCard({
 							{fileName}
 						</Text>
 					</Tooltip>
-					<ActionIcon variant="subtle">
-						<Menu position="bottom-end">
-							<Menu.Target>
-								<ActionIcon onClick={(e) => e.preventDefault()} variant="subtle">
-									<IconDotsVertical size={20} />
-								</ActionIcon>
-							</Menu.Target>
-							<Menu.Dropdown className="shadow-sm">
+					<Menu position="bottom-end">
+						<Menu.Target>
+							<ActionIcon onClick={(e) => e.preventDefault()} variant="subtle">
+								<IconDotsVertical size={20} />
+							</ActionIcon>
+						</Menu.Target>
+						<Menu.Dropdown className="shadow-sm">
+							<Menu.Item
+								leftSection={
+									unfavoriteContent.isPending ? (
+										<IconLoader2 size={20} className="animate-spin" />
+									) : (
+										<IconStarFilled className="fill-[#f8de1f]" size={20} />
+									)
+								}
+								onClick={() => unfavoriteContent.mutate({ id: contentId })}
+							>
+								Unfavorite
+							</Menu.Item>
+							{contentType === FileType.Link ? (
 								<Menu.Item
-									leftSection={
-										unfavoriteContent.isPending ? (
-											<IconLoader2 size={20} className="animate-spin" />
-										) : (
-											<IconStarFilled className="fill-[#f8de1f]" size={20} />
-										)
-									}
-									onClick={() => unfavoriteContent.mutate({ id: contentId })}
+									leftSection={<IconCircleArrowUpRight size={20} />}
+									// TODO: open preview panel
 								>
-									Unfavorite
+									View Details
 								</Menu.Item>
-								{contentType === FileType.Link ? (
-									<Menu.Item
-										leftSection={<IconCircleArrowUpRight size={20} />}
-										// TODO: open preview panel
-									>
-										View Details
-									</Menu.Item>
-								) : (
-									<Menu.Item
-										leftSection={<IconDownload size={20} />}
-										onClick={async () => {
-											const { url } = await trpcClient.content.download.query({ id: contentId })
-											window.open(url, "_blank", "noopener")
-										}}
-									>
-										Download
-									</Menu.Item>
-								)}
-							</Menu.Dropdown>
-						</Menu>
-					</ActionIcon>
+							) : (
+								<Menu.Item
+									leftSection={<IconDownload size={20} />}
+									onClick={async () => {
+										const { url } = await trpcClient.content.download.query({ id: contentId })
+										window.open(url, "_blank", "noopener")
+									}}
+								>
+									Download
+								</Menu.Item>
+							)}
+						</Menu.Dropdown>
+					</Menu>
 				</Flex>
 			</Card.Section>
 			<Card.Section bg="white" bdrs="md" mt="xs">
