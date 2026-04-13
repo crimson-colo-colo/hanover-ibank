@@ -219,4 +219,32 @@ export const contentRouter = router({
 			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
 		])
 	}),
+	favorite: authProcedure.input(z.object({id: z.string()})).mutation(async (opts) => {
+		const favorite = await db.favoriteContent.create({
+			data: {
+				contentId: opts.input.id,
+				employeeId: opts.ctx.auth.sub
+			}
+		})
+		return favorite
+		}),
+	unfavorite: authProcedure.input(z.object({id: z.string()})).mutation(async (opts) => {
+		const unfavorite = await db.favoriteContent.delete({
+			where: {
+				contentId_employeeId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub
+				}
+			}
+		})
+		return unfavorite
+	}),
+	listFavorites: authProcedure.query(async (opts) => {
+		const listFavorites = await db.favoriteContent.findMany({
+			where: {
+				employeeId: opts.ctx.auth.sub
+			}
+		})
+		return listFavorites
+	})
 })
