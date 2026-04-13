@@ -2,16 +2,16 @@ import { S3 } from "@aws-sdk/client-s3"
 import { env } from "./env.ts"
 
 export const s3 = new S3({
-	endpoint: env.S3_ENDPOINT,
-	region: env.S3_REGION,
+	endpoint: env.AWS_ENDPOINT_URL,
+	region: env.AWS_DEFAULT_REGION,
 	forcePathStyle: true,
 	credentials: {
-		accessKeyId: env.S3_ACCESS_KEY,
-		secretAccessKey: env.S3_SECRET_KEY,
+		accessKeyId: env.AWS_ACCESS_KEY_ID,
+		secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
 	},
 })
 
-export const bucketName = env.S3_BUCKET
+export const bucketName = env.AWS_S3_BUCKET_NAME
 
 async function createBucketIfNotExists() {
 	try {
