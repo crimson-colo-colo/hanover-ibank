@@ -11,7 +11,7 @@ import { useMutation } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type {ContentListItem, ContentList} from "../../server/routers/content.ts";
+	import type {ContentListItem, ContentList} from "../../server/routers/content.ts";
 
 function isTruncated(e: HTMLElement) {
 	const temp = e.cloneNode(true) as HTMLElement
@@ -71,7 +71,7 @@ export function FavoriteContentCard({
 			target="_blank"
 			p="28"
 			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
-			//onClick={async () => {openFilePreview()}}
+			onClick={async () => {openFilePreview()}}
 		>
 			<Card.Section>
 				<Flex justify="space-between" align="center" gap="sm">

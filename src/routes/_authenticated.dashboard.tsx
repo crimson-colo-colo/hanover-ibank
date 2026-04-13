@@ -15,6 +15,8 @@ import { EditContentForm } from "@/components/EditContentForm.tsx"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
+import DocViewer, { DocViewerRenderers } from "@iamjariwala/react-doc-viewer";
+import "@iamjariwala/react-doc-viewer/dist/index.css";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -33,6 +35,17 @@ function RoleDashboard() {
 	const [filePreviewOpen, { open: openFilePreview, close: closeFilePreview }] =
 		useDisclosure(false)
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
+	const [previewFile, setPreviewFile] = useState<null | {
+		id: string
+		url: string
+		name: string
+		type: FileType
+	}>(null)
+
+	const docs = [
+		{ uri: "https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf" },
+		{ uri: "./prisma/seed-data/sample-pdf.pdf" },
+	];
 
 	const updateContent = useMutation(
 		trpc.content.update.mutationOptions({
@@ -122,8 +135,9 @@ function RoleDashboard() {
 							}}
 							filter={contentFilter}
 							changeFilter={setContentFilter}
-							openFilePreview={(item) =>{
-									openFilePreview()
+							openFilePreview={(file) => {
+
+								openFilePreview()
 							}}
 						/>
 					)}
@@ -195,16 +209,22 @@ function RoleDashboard() {
 						</Dropzone>
 					)}
 				</Modal>
+
+			</div>
+
+			<div>
 				<Modal opened={filePreviewOpen} onClose={closeFilePreview} title={"Viewing Uploaded File"}
 					   overlayProps={{
 						   backgroundOpacity: 0.55,
 						   blur: 3,
 					   }}
-						size= "80%" >
-					<Text mb="md">
-						Updating <b>{editingItem?.title}</b> with a new copy/version. This will replace the
-						existing file but keep the same metadata.
-					</Text>
+					   size= "80%" >
+					<DocViewer
+						documents={docs}
+						initialActiveDocument={docs[1]}
+						pluginRenderers={DocViewerRenderers}
+					/>
+
 				</Modal>
 			</div>
 		</main>
