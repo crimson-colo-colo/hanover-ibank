@@ -40,7 +40,7 @@ model Content {
 }
 
 model ContentTag {
-  name     String // Incomplete
+  name     String
   category TagCategory
 
   contents ContentTagsOnContent[]
@@ -59,8 +59,10 @@ model ContentTagsOnContent {
 }
 
 enum TagCategory {
-  DocumentType
-  ContentType
+  DocumentType //Workflow or Reference
+  ContentType //Object or Link
+  IntendedAudience //Underwriter or Business Analyst
+  Custom //Custom tag created by user
 }
 
 model FavoriteContent {
@@ -72,7 +74,6 @@ model FavoriteContent {
   @@id([contentId, employeeId])
 }
 
-// new to confirm status being just placeholders
 enum ContentStatus {
   Incomplete
   UnderReview

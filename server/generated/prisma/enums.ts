@@ -20,7 +20,9 @@ export type EmployeeRole = (typeof EmployeeRole)[keyof typeof EmployeeRole]
 
 export const TagCategory = {
   DocumentType: 'DocumentType',
-  ContentType: 'ContentType'
+  ContentType: 'ContentType',
+  IntendedAudience: 'IntendedAudience',
+  Custom: 'Custom'
 } as const
 
 export type TagCategory = (typeof TagCategory)[keyof typeof TagCategory]
