@@ -71,7 +71,7 @@ export function FavoriteContentCard({
 			target="_blank"
 			p="28"
 			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
-			onClick={async () => {openFilePreview(null)}}
+			//onClick={async () => {openFilePreview()}}
 		>
 			<Card.Section>
 				<Flex justify="space-between" align="center" gap="sm">
