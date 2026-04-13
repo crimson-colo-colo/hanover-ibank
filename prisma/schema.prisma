@@ -16,7 +16,7 @@ enum EmployeeRole {
 model Employee {
   id                String            @id
   role              EmployeeRole
-  content           Content[]
+  content           Content[]         @relation("Owner")
   favorite          FavoriteContent[]
   checkedOutContent Content[]         @relation("CheckedOutContent")
 }
@@ -36,7 +36,7 @@ model Content {
   /// URL for links
   url              String?
   ownerId          String
-  owner            Employee          @relation(fields: [ownerId], references: [id])
+  owner            Employee          @relation("Owner", fields: [ownerId], references: [id])
   intendedAudience EmployeeRole[]
   favoritedBy      FavoriteContent[]
   checkedOutById   String?
