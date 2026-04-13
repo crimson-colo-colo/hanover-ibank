@@ -45,6 +45,8 @@ model FavoriteContent {
   contentId  String
   employee   Employee @relation(fields: [employeeId], references: [id])
   employeeId String
+
+  @@id([contentId, employeeId])
 }
 
 // new to confirm status being just placeholders
