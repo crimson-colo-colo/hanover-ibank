@@ -26,18 +26,16 @@ import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
+import { CreateContentModal} from "@/components/CreateContentModal.tsx";
 
-function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
+function NavLinks({ isLoading, isAdmin, openUpload }: { isLoading: boolean; isAdmin: boolean | undefined; openUpload: () => void }) {
 	const location = useLocation()
 
 	return (
 		<>
 			{!isLoading && (
 				<Button
-					component={Link}
-					variant={location.pathname === "/upload-content" ? "light" : "subtle"}
-					to="/upload-content"
-				>
+					variant="subtle" onClick={openUpload}>
 					Upload Content
 				</Button>
 			)}
@@ -157,6 +155,7 @@ export function Navigation() {
 	const auth0 = useAuth0()
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
+	const [uploadOpened, { open: openUpload, close: closeUpload }] = useDisclosure(false)
 
 	return (
 		<header className="h-14 mb-30 bg-gray-50 border-b border-gray-300">
@@ -181,7 +180,7 @@ export function Navigation() {
 						<span className="font-semibold font-display text-xl">iBank</span>
 					</Link>
 					{auth0.isAuthenticated && (
-						<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} />
+						<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} openUpload={openUpload} />
 					)}
 				</Group>
 
@@ -250,6 +249,7 @@ export function Navigation() {
 				</ScrollArea>
 				<DrawerUserMenu />
 			</Drawer>
+			<CreateContentModal opened={uploadOpened} onClose={closeUpload} />
 		</header>
 	)
 }
