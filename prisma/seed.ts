@@ -1,10 +1,11 @@
-import { createReadStream } from "node:fs"
-import fs from "node:fs/promises"
+import { existsSync } from "node:fs"
+import fs, { readFile } from "node:fs/promises"
 import path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
+import type { FileType } from "@shared/filetype.ts"
 import { unzipSync } from "fflate"
-import * as Minio from "minio"
 import { v4 as uuidv4 } from "uuid"
+import { auth0Management } from "../server/auth.ts"
 import {
 	ContentStatus,
 	ContentType,
@@ -13,35 +14,14 @@ import {
 	type Prisma,
 	PrismaClient,
 } from "../server/generated/prisma/client.ts"
+import { generateDefaultAvatar } from "../server/lib/avatar.ts"
+import { getFileTypeFromFile } from "../server/lib/filetype.ts"
+import { bucketName, s3 } from "../server/s3.ts"
 
 const adapter = new PrismaPg({
 	connectionString: process.env.DATABASE_URL!,
 })
-
 const prisma = new PrismaClient({ adapter })
-
-export const s3 = new Minio.Client({
-	endPoint: process.env.S3_ENDPOINT!,
-	port: +process.env.S3_PORT!,
-	useSSL: process.env.S3_SSL! === "true",
-	accessKey: process.env.S3_ACCESS_KEY!,
-	secretKey: process.env.S3_SECRET_KEY!,
-})
-
-export const bucketName = process.env.S3_BUCKET!
-
-if (!(await s3.bucketExists(bucketName))) {
-	await s3.makeBucket(bucketName)
-}
-
-const objects = await new Promise<string[]>((resolve) => {
-	const names: string[] = []
-	s3.listObjects(bucketName)
-		.on("data", (obj) => obj.name && names.push(obj.name))
-		.on("end", () => resolve(names))
-})
-
-await Promise.all(objects.map((name) => s3.removeObject(bucketName, name, { forceDelete: true })))
 
 main()
 	.catch((e) => {
@@ -86,6 +66,13 @@ async function main() {
 		prisma.contentTag.deleteMany(),
 	])
 
+	const objects = await s3.listObjectsV2({ Bucket: bucketName, MaxKeys: 1000 })
+	if (objects.Contents && objects.Contents.length > 0) {
+		await s3.deleteObjects({
+			Bucket: bucketName,
+			Delete: { Objects: objects.Contents.map((obj) => ({ Key: obj.Key! })) },
+		})
+	}
 	// admins: admin, mjordan, wharper
 	// underwriter: emp1
 	// business analyst: emp2
@@ -103,7 +90,7 @@ async function main() {
 			role: EmployeeRole.Underwriter,
 		},
 		{
-			id: "auth0|69d57ccee7bf39d172e848e9",
+			id: "auth0|69db05b92c0b718e1d54aaec",
 			role: EmployeeRole.BusinessAnalyst,
 		},
 		{
@@ -158,6 +145,19 @@ async function main() {
 			})
 		)
 	)
+
+	for (const employee of employeeData) {
+		const user = await auth0Management.users.get(employee.id)
+		const avatar = generateDefaultAvatar(user.name ?? user.email!)
+
+		console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
+
+		await s3.putObject({
+			Bucket: bucketName,
+			Key: `avatar/${employee.id}.png`,
+			Body: avatar,
+		})
+	}
 
 	const analysts = employeeData.filter((employee) => employee.role === EmployeeRole.BusinessAnalyst)
 	const underwriters = employeeData.filter((employee) => employee.role === EmployeeRole.Underwriter)
@@ -379,21 +379,41 @@ async function main() {
 		})),
 	] satisfies Prisma.ContentCreateManyInput[]
 
-	const urlContent = await prisma.content.createManyAndReturn({ data: contentData })
-
+	const urlContent = await prisma.content.createManyAndReturn({
+		data: contentData,
+		select: { id: true },
+	})
 	console.log(`Created ${contentData.length} content rows`)
 
-	const files = await fs.readdir("./prisma/seed-data")
+	const baseDir = "./prisma/seed-data"
+	const generatedDir = path.join(baseDir, "generated")
+	const allFiles = (await fs.readdir(baseDir)).filter(
+		(f) => f !== "Hanover Data.zip" && f !== "generated"
+	)
+	if (existsSync(generatedDir)) {
+		const genFiles = await fs.readdir(generatedDir)
+		allFiles.push(...genFiles.map((f) => path.join("generated", f)))
+	}
+
 	const ids = new Map<string, string>()
-	for (const file of files) {
-		if (file === "Hanover Data.zip") {
-			// we'll handle this separately since we need to unzip it
-			continue
-		}
+	const idToFileType = new Map<string, FileType>()
+	for (const file of allFiles) {
 		const id = uuidv4()
-		const f = createReadStream(`./prisma/seed-data/${file}`)
-		await s3.putObject(bucketName, id, f)
-		ids.set(file, id)
+		const filePath = path.join(baseDir, file)
+		const f = await readFile(filePath)
+		console.log(`Uploading file ${file} (${id}) to S3...`)
+		const buffer = Buffer.from(f)
+		const fileType = await getFileTypeFromFile(file, buffer)
+		await s3.putObject({
+			Bucket: bucketName,
+			Key: id,
+			Body: buffer,
+			Metadata: {
+				filetype: fileType,
+			},
+		})
+		ids.set(path.basename(file), id)
+		idToFileType.set(id, fileType)
 	}
 
 	const hanoverData = unzipSync(
@@ -409,42 +429,69 @@ async function main() {
 	for (const [filename, content] of Object.entries(hanoverData)) {
 		if (filename.endsWith("/")) continue // skip directories
 		const id = uuidv4()
-		await s3.putObject(bucketName, id, Buffer.from(content))
+		console.log(`Uploading file ${filename} (${id}) to S3...`)
+		const buffer = Buffer.from(content)
+		const fileType = await getFileTypeFromFile(filename, buffer)
+		await s3.putObject({
+			Bucket: bucketName,
+			Key: id,
+			Body: buffer,
+			Metadata: {
+				filetype: fileType,
+			},
+		})
 		ids.set(path.basename(filename), id)
 	}
 
-	const fileContent = await prisma.content.createManyAndReturn({
-		data: [
-			...ids.entries().map(
-				([filename, id]) =>
-					({
-						title: filename,
-						ownerId: nextUndewriter(),
-						expirationDate: new Date("2026-12-31"),
-						objectId: id,
-						intendedAudience: [EmployeeRole.Underwriter, EmployeeRole.BusinessAnalyst],
-					}) satisfies Prisma.ContentCreateManyInput
-			),
-		],
+	const fileContent = [...ids.entries()].map(([filename, id]) => {
+		const daysEditedAgo = Math.floor(Math.random() * 365)
+		const lastModifiedDate = new Date()
+		lastModifiedDate.setDate(lastModifiedDate.getDate() - daysEditedAgo)
+		const expiresInDays = 30 + Math.floor(Math.random() * 365)
+		const expirationDate = new Date()
+		expirationDate.setDate(expirationDate.getDate() + expiresInDays)
+		const isUnderwriter = Math.random() < 0.5
+		return {
+			title: filename,
+			type: ContentType.Object,
+			ownerId: isUnderwriter ? nextUndewriter() : nextAnalyst(),
+			lastModifiedDate,
+			expirationDate,
+			documentType: Math.random() < 0.5 ? DocumentType.Reference : DocumentType.Workflow,
+			objectId: id,
+			intendedAudience: [isUnderwriter ? EmployeeRole.Underwriter : EmployeeRole.BusinessAnalyst],
+		} satisfies Prisma.ContentCreateManyInput
 	})
+
+	const contentByFileType = new Map<FileType, string[]>()
+	const fileContentIds: string[] = []
+	await Promise.all(
+		fileContent.map(async (content) => {
+			const res = await prisma.content.create({ data: content, select: { id: true } })
+			fileContentIds.push(res.id)
+			const fileType = idToFileType.get(content.objectId!)!
+			if (!contentByFileType.has(fileType)) contentByFileType.set(fileType, [])
+			contentByFileType.get(fileType)!.push(res.id)
+		})
+	)
 
 	await prisma.contentTagsOnContent.createMany({
 		data: [
-			...fileContent.flatMap((cont: Prisma.ContentModel) => {
-				const contentID = cont.id
-				return [
-					{
-						tagCategory: "DocumentType",
-						tagName: "Reference",
-						contentID: contentID,
-					},
-					{
-						contentID,
-						tagName: "Object",
-						tagCategory: "ContentType",
-					},
-				] satisfies Prisma.ContentTagsOnContentCreateManyInput[]
-			}),
+			...fileContentIds.flatMap(
+				(contentID) =>
+					[
+						{
+							tagCategory: "DocumentType",
+							tagName: "Reference",
+							contentID: contentID,
+						},
+						{
+							contentID,
+							tagName: "Object",
+							tagCategory: "ContentType",
+						},
+					] satisfies Prisma.ContentTagsOnContentCreateManyInput[]
+			),
 
 			...urlContent.flatMap((cont) => {
 				const contentID = cont.id
@@ -467,4 +514,36 @@ async function main() {
 	console.log(
 		`Uploaded ${ids.size} files (${Object.entries(hanoverData).length} from Hanover Data.zip) to S3 and created content rows for them`
 	)
+
+	const [admin, emp1, emp2] = await Promise.all(
+		["cccadmin@calebc.co", "cccemp1@calebc.co", "cccemp2@calebc.co"].map((email) =>
+			auth0Management.users.listUsersByEmail({ email }).then((users) => users[0])
+		)
+	)
+	if (!admin || !emp1 || !emp2) {
+		console.error(
+			"Could not find one or more required users in Auth0. Make sure these users exist before running the seed script."
+		)
+		process.exit(1)
+	}
+
+	const thingsToFavorite = [
+		...urlContent.slice(0, 3).map((c) => c.id),
+		...[...contentByFileType.values()].flatMap((ids) => ids.slice(0, 1)),
+	]
+
+	await Promise.all(
+		[admin, emp1, emp2].flatMap((user) =>
+			thingsToFavorite.map((contentId) =>
+				prisma.favoriteContent.create({
+					data: {
+						contentId,
+						employeeId: user.user_id!,
+					},
+				})
+			)
+		)
+	)
+
+	console.log(`Favorited ${thingsToFavorite.length} content items for each of the 3 users`)
 }

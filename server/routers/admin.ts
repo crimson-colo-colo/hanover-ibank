@@ -1,10 +1,11 @@
-import crypto from "node:crypto"
 import { TRPCError } from "@trpc/server"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { EmployeeRole } from "../generated/prisma/client.ts"
+import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { getGravatarUrl } from "../lib.ts"
+import { bucketName, s3 } from "../s3.ts"
 import { adminProcedure, authProcedure, router } from "../trpc.ts"
 
 export const adminRouter = router({
@@ -96,7 +97,13 @@ export const adminRouter = router({
 				connection: "Username-Password-Authentication",
 			})
 
-			await new Promise((resolve) => setTimeout(resolve, 1000))
+			const avatar = generateDefaultAvatar(opts.input.name ?? opts.input.email!)
+
+			await s3.putObject({
+				Bucket: bucketName,
+				Key: `avatar/${auth0User.user_id}.png`,
+				Body: avatar,
+			})
 
 			await db.employee.create({
 				data: {
@@ -110,6 +117,12 @@ export const adminRouter = router({
 		await Promise.all(
 			opts.input.map(async (id) => {
 				await auth0Management.users.delete(id)
+				try {
+					await s3.deleteObject({
+						Bucket: bucketName,
+						Key: `avatar/${id}.png`,
+					})
+				} catch {}
 				await db.employee.delete({ where: { id } })
 			})
 		)

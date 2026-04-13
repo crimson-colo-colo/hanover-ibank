@@ -3,7 +3,6 @@ import {
 	Button,
 	FileInput,
 	Group,
-	InputDescription,
 	InputLabel,
 	MultiSelect,
 	SegmentedControl,
@@ -21,6 +20,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
 import z from "zod"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
+import { LabelWithTooltip } from "@/components/FormComponents.tsx"
 import {
 	contentStatusDisplayName,
 	contentTypeDisplayName,
@@ -113,7 +113,12 @@ export function CreateContentForm() {
 				Create New Content
 			</Title>
 
-			<InputLabel required>Content Type</InputLabel>
+			<LabelWithTooltip
+				tooltip="Choose whether this content is a file upload or an external link."
+				required
+			>
+				Content Type
+			</LabelWithTooltip>
 			<SegmentedControl
 				size="sm"
 				fullWidth
@@ -129,8 +134,15 @@ export function CreateContentForm() {
 			{form.values.contentType === "Link" ? (
 				<TextInput
 					mt="sm"
-					label="Content URL"
-					description="Enter the URL to link to. Must start with http:// or https://."
+					withAsterisk={false}
+					label={
+						<LabelWithTooltip
+							tooltip="Enter the URL to link to. Must start with http:// or https://."
+							required
+						>
+							Content URL
+						</LabelWithTooltip>
+					}
 					placeholder="https://example.com/"
 					required
 					key={form.key("url")}
@@ -139,8 +151,12 @@ export function CreateContentForm() {
 			) : (
 				<FileInput
 					mt="sm"
-					label="Content File"
-					description="Upload a file. Maximum size is 50 GB."
+					withAsterisk={false}
+					label={
+						<LabelWithTooltip tooltip="Upload a file. Maximum size is 50 GB." required>
+							Content File
+						</LabelWithTooltip>
+					}
 					placeholder="Choose file..."
 					leftSection={<IconFileUpload size={20} stroke={1.5} />}
 					clearable
@@ -152,8 +168,12 @@ export function CreateContentForm() {
 
 			<TextInput
 				mt="sm"
-				label="Content Name"
-				description="Enter a human-readable name for the content."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip tooltip="Enter a human-readable name for the content." required>
+						Content Name
+					</LabelWithTooltip>
+				}
 				placeholder="Important Document"
 				required
 				key={form.key("name")}
@@ -162,8 +182,15 @@ export function CreateContentForm() {
 
 			<MultiSelect
 				mt="sm"
-				label="Intended Audience"
-				description="Select the employee roles that are the intended audience for this content. This is used to help route the content to the appropriate people."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip
+						tooltip="Select the employee roles that are the intended audience. This helps route content to the appropriate people."
+						required
+					>
+						Intended Audience
+					</LabelWithTooltip>
+				}
 				placeholder="Select..."
 				data={Object.values(EmployeeRole).map((role) => ({
 					value: role,
@@ -174,18 +201,21 @@ export function CreateContentForm() {
 				{...form.getInputProps("intendedAudience")}
 			/>
 
-			<InputLabel mt="sm" required>
-				Content Owner
+			<InputLabel mt="sm">
+				<LabelWithTooltip tooltip="Search for the owner of this content by name or email." required>
+					Content Owner
+				</LabelWithTooltip>
 			</InputLabel>
-			<InputDescription mb={4}>
-				Search for the owner of this content by name or email.
-			</InputDescription>
 			<ContentOwnerSelect form={form} initialSearchValue={auth0.user?.email} />
 
 			<DatePickerInput
 				mt="sm"
-				label="Last Modified Date"
-				description="Select the date this content was last modified."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip tooltip="Select the date this content was last modified." required>
+						Last Modified Date
+					</LabelWithTooltip>
+				}
 				placeholder="Select date"
 				leftSection={<IconCalendar size={20} stroke={1.5} />}
 				required
@@ -195,8 +225,15 @@ export function CreateContentForm() {
 
 			<DatePickerInput
 				mt="sm"
-				label="Expiration Date"
-				description="Select the date this content expires. Expired content must be reviewed and re-approved prior to usage."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip
+						tooltip="Select the date this content expires. Expired content must be reviewed and re-approved before usage."
+						required
+					>
+						Expiration Date
+					</LabelWithTooltip>
+				}
 				placeholder="Select date"
 				leftSection={<IconCalendar size={20} stroke={1.5} />}
 				required
@@ -206,8 +243,15 @@ export function CreateContentForm() {
 
 			<Select
 				mt="sm"
-				label="Content Category"
-				description="Select the category that best describes this content."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip
+						tooltip="Select the category that best describes this content."
+						required
+					>
+						Content Category
+					</LabelWithTooltip>
+				}
 				placeholder="Select..."
 				data={Object.values(DocumentType).map((type) => ({
 					value: type,
@@ -220,8 +264,12 @@ export function CreateContentForm() {
 
 			<Select
 				mt="sm"
-				label="Document Status"
-				description="Select the current lifecycle status of this content."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip tooltip="Select the current lifecycle status of this content." required>
+						Document Status
+					</LabelWithTooltip>
+				}
 				placeholder="Select..."
 				data={Object.values(ContentStatus).map((status) => ({
 					value: status,

@@ -387,7 +387,8 @@ export const ModelName = {
   Employee: 'Employee',
   Content: 'Content',
   ContentTag: 'ContentTag',
-  ContentTagsOnContent: 'ContentTagsOnContent'
+  ContentTagsOnContent: 'ContentTagsOnContent',
+  FavoriteContent: 'FavoriteContent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "employee" | "content" | "contentTag" | "contentTagsOnContent"
+    modelProps: "employee" | "content" | "contentTag" | "contentTagsOnContent" | "favoriteContent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -703,6 +704,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FavoriteContent: {
+      payload: Prisma.$FavoriteContentPayload<ExtArgs>
+      fields: Prisma.FavoriteContentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FavoriteContentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FavoriteContentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>
+        }
+        findFirst: {
+          args: Prisma.FavoriteContentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FavoriteContentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>
+        }
+        findMany: {
+          args: Prisma.FavoriteContentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>[]
+        }
+        create: {
+          args: Prisma.FavoriteContentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>
+        }
+        createMany: {
+          args: Prisma.FavoriteContentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FavoriteContentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>[]
+        }
+        delete: {
+          args: Prisma.FavoriteContentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>
+        }
+        update: {
+          args: Prisma.FavoriteContentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>
+        }
+        deleteMany: {
+          args: Prisma.FavoriteContentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FavoriteContentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FavoriteContentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>[]
+        }
+        upsert: {
+          args: Prisma.FavoriteContentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FavoriteContentPayload>
+        }
+        aggregate: {
+          args: Prisma.FavoriteContentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFavoriteContent>
+        }
+        groupBy: {
+          args: Prisma.FavoriteContentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FavoriteContentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FavoriteContentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FavoriteContentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -782,6 +857,14 @@ export const ContentTagsOnContentScalarFieldEnum = {
 } as const
 
 export type ContentTagsOnContentScalarFieldEnum = (typeof ContentTagsOnContentScalarFieldEnum)[keyof typeof ContentTagsOnContentScalarFieldEnum]
+
+
+export const FavoriteContentScalarFieldEnum = {
+  contentId: 'contentId',
+  employeeId: 'employeeId'
+} as const
+
+export type FavoriteContentScalarFieldEnum = (typeof FavoriteContentScalarFieldEnum)[keyof typeof FavoriteContentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -996,6 +1079,7 @@ export type GlobalOmitConfig = {
   content?: Prisma.ContentOmit
   contentTag?: Prisma.ContentTagOmit
   contentTagsOnContent?: Prisma.ContentTagsOnContentOmit
+  favoriteContent?: Prisma.FavoriteContentOmit
 }
 
 /* Types for Logging */

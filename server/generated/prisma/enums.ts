@@ -33,19 +33,3 @@ export const ContentStatus = {
 } as const
 
 export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus]
-
-
-export const DocumentType = {
-  Workflow: 'Workflow',
-  Reference: 'Reference'
-} as const
-
-export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
-
-
-export const ContentType = {
-  Object: 'Object',
-  Link: 'Link'
-} as const
-
-export type ContentType = (typeof ContentType)[keyof typeof ContentType]

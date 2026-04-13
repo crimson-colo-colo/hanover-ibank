@@ -1,3 +1,5 @@
+import assert from "node:assert"
+import { Readable } from "node:stream"
 import express, { type Request, type Response } from "express"
 import * as jose from "jose"
 import z from "zod"
@@ -48,7 +50,12 @@ contentDownloadRouter.get("/content/download", async (req: Request, res: Respons
 		return res.redirect(content.url!)
 	}
 
-	const stream = await s3.getObject(bucketName, content.objectId!)
+	const object = await s3.getObject({
+		Bucket: bucketName,
+		Key: content.objectId!,
+	})
 	res.setHeader("Content-Disposition", `attachment; filename="${content.title}"`)
-	stream.pipe(res)
+	assert(object.Body, "S3 object body is undefined")
+	assert(object.Body instanceof Readable, "S3 object body is not a stream.Readable")
+	object.Body.pipe(res)
 })

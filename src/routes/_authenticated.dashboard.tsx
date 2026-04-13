@@ -1,15 +1,18 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { UTCDate } from "@date-fns/utc"
-import { Modal, Text, Title } from "@mantine/core"
+import { Modal, SimpleGrid, Text, Title } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { ContentFilter } from "@shared/enum.ts"
+import { FileType } from "@shared/filetype.ts"
 import { IconFileUpload } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import { ContentTable } from "@/components/ContentTable.tsx"
 import { EditContentForm } from "@/components/EditContentForm.tsx"
+import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 
@@ -19,13 +22,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function RoleDashboard() {
 	const auth0 = useAuth0()
-	const content = useQuery(trpc.content.list.queryOptions())
+	const [contentFilter, setContentFilter] = useState<ContentFilter>(ContentFilter.Own)
+	const content = useQuery(trpc.content.list.queryOptions({ filter: contentFilter }))
 	const [editingItem, setEditingItem] = useState<
 		NonNullable<(typeof content)["data"]>["content"][number] | null
 	>(null)
 	const [editDialogOpen, { open: openEditDialog, close: closeEditDialog }] = useDisclosure(false)
 	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
 		useDisclosure(false)
+	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
 
 	const updateContent = useMutation(
 		trpc.content.update.mutationOptions({
@@ -60,6 +65,40 @@ function RoleDashboard() {
 			</header>
 
 			<div>
+				<Title order={3} className="mt-6 mb-4">
+					Your Favorites
+				</Title>
+				<SimpleGrid minColWidth={250} spacing="md">
+					{favoriteContent.isLoading ? (
+						<p>Loading favorite content...</p>
+					) : favoriteContent.isError ? (
+						<p className="text-red-500">
+							Failed to load favorite content: {favoriteContent.error.message}
+						</p>
+					) : favoriteContent.data?.content.length === 0 ? (
+						<p>You have no favorite content.</p>
+					) : (
+						favoriteContent.data!.content.map((item) => {
+							const object = favoriteContent.data!.objectMetadata.get(item.id)
+							return (
+								<FavoriteContentCard
+									fileName={item.title}
+									key={item.id}
+									contentUrl={item.url}
+									contentId={item.id}
+									contentType={
+										item.type === "Link"
+											? FileType.Link
+											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
+									}
+								/>
+							)
+						})
+					)}
+				</SimpleGrid>
+			</div>
+
+			<div>
 				<section>
 					{content.isLoading ? (
 						<p>Loading content...</p>
@@ -78,6 +117,8 @@ function RoleDashboard() {
 								setEditingItem(item)
 								openFileEditDialog()
 							}}
+							filter={contentFilter}
+							changeFilter={setContentFilter}
 						/>
 					)}
 				</section>

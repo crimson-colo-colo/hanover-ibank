@@ -37,3 +37,8 @@ export type ContentTag = Prisma.ContentTagModel
  * 
  */
 export type ContentTagsOnContent = Prisma.ContentTagsOnContentModel
+/**
+ * Model FavoriteContent
+ * 
+ */
+export type FavoriteContent = Prisma.FavoriteContentModel

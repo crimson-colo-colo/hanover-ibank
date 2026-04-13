@@ -228,6 +228,7 @@ export type ContentWhereInput = {
   intendedAudience?: Prisma.EnumEmployeeRoleNullableListFilter<"Content">
   owner?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   tags?: Prisma.ContentTagsOnContentListRelationFilter
+  favoritedBy?: Prisma.FavoriteContentListRelationFilter
 }
 
 export type ContentOrderByWithRelationInput = {
@@ -244,6 +245,7 @@ export type ContentOrderByWithRelationInput = {
   intendedAudience?: Prisma.SortOrder
   owner?: Prisma.EmployeeOrderByWithRelationInput
   tags?: Prisma.ContentTagsOnContentOrderByRelationAggregateInput
+  favoritedBy?: Prisma.FavoriteContentOrderByRelationAggregateInput
 }
 
 export type ContentWhereUniqueInput = Prisma.AtLeast<{
@@ -263,6 +265,7 @@ export type ContentWhereUniqueInput = Prisma.AtLeast<{
   intendedAudience?: Prisma.EnumEmployeeRoleNullableListFilter<"Content">
   owner?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   tags?: Prisma.ContentTagsOnContentListRelationFilter
+  favoritedBy?: Prisma.FavoriteContentListRelationFilter
 }, "id">
 
 export type ContentOrderByWithAggregationInput = {
@@ -312,6 +315,7 @@ export type ContentCreateInput = {
   intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagsOnContentCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateInput = {
@@ -327,6 +331,7 @@ export type ContentUncheckedCreateInput = {
   ownerId: string
   intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
   tags?: Prisma.ContentTagsOnContentUncheckedCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentUpdateInput = {
@@ -342,6 +347,7 @@ export type ContentUpdateInput = {
   intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagsOnContentUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateInput = {
@@ -357,6 +363,7 @@ export type ContentUncheckedUpdateInput = {
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
   tags?: Prisma.ContentTagsOnContentUncheckedUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyInput = {
@@ -540,6 +547,20 @@ export type ContentUpdateOneRequiredWithoutTagsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutTagsInput, Prisma.ContentUpdateWithoutTagsInput>, Prisma.ContentUncheckedUpdateWithoutTagsInput>
 }
 
+export type ContentCreateNestedOneWithoutFavoritedByInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutFavoritedByInput, Prisma.ContentUncheckedCreateWithoutFavoritedByInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutFavoritedByInput
+  connect?: Prisma.ContentWhereUniqueInput
+}
+
+export type ContentUpdateOneRequiredWithoutFavoritedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutFavoritedByInput, Prisma.ContentUncheckedCreateWithoutFavoritedByInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutFavoritedByInput
+  upsert?: Prisma.ContentUpsertWithoutFavoritedByInput
+  connect?: Prisma.ContentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutFavoritedByInput, Prisma.ContentUpdateWithoutFavoritedByInput>, Prisma.ContentUncheckedUpdateWithoutFavoritedByInput>
+}
+
 export type ContentCreateWithoutOwnerInput = {
   id?: string
   title: string
@@ -552,6 +573,7 @@ export type ContentCreateWithoutOwnerInput = {
   url?: string | null
   intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
   tags?: Prisma.ContentTagsOnContentCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutOwnerInput = {
@@ -566,6 +588,7 @@ export type ContentUncheckedCreateWithoutOwnerInput = {
   url?: string | null
   intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
   tags?: Prisma.ContentTagsOnContentUncheckedCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutOwnerInput = {
@@ -623,6 +646,7 @@ export type ContentCreateWithoutTagsInput = {
   url?: string | null
   intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutTagsInput = {
@@ -637,6 +661,7 @@ export type ContentUncheckedCreateWithoutTagsInput = {
   url?: string | null
   ownerId: string
   intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutTagsInput = {
@@ -667,6 +692,7 @@ export type ContentUpdateWithoutTagsInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutTagsInput = {
@@ -681,6 +707,83 @@ export type ContentUncheckedUpdateWithoutTagsInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+}
+
+export type ContentCreateWithoutFavoritedByInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  createdAt?: Date | string
+  lastModifiedDate?: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
+  owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  tags?: Prisma.ContentTagsOnContentCreateNestedManyWithoutContentInput
+}
+
+export type ContentUncheckedCreateWithoutFavoritedByInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  createdAt?: Date | string
+  lastModifiedDate?: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  ownerId: string
+  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagsOnContentUncheckedCreateNestedManyWithoutContentInput
+}
+
+export type ContentCreateOrConnectWithoutFavoritedByInput = {
+  where: Prisma.ContentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentCreateWithoutFavoritedByInput, Prisma.ContentUncheckedCreateWithoutFavoritedByInput>
+}
+
+export type ContentUpsertWithoutFavoritedByInput = {
+  update: Prisma.XOR<Prisma.ContentUpdateWithoutFavoritedByInput, Prisma.ContentUncheckedUpdateWithoutFavoritedByInput>
+  create: Prisma.XOR<Prisma.ContentCreateWithoutFavoritedByInput, Prisma.ContentUncheckedCreateWithoutFavoritedByInput>
+  where?: Prisma.ContentWhereInput
+}
+
+export type ContentUpdateToOneWithWhereWithoutFavoritedByInput = {
+  where?: Prisma.ContentWhereInput
+  data: Prisma.XOR<Prisma.ContentUpdateWithoutFavoritedByInput, Prisma.ContentUncheckedUpdateWithoutFavoritedByInput>
+}
+
+export type ContentUpdateWithoutFavoritedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
+  owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  tags?: Prisma.ContentTagsOnContentUpdateManyWithoutContentNestedInput
+}
+
+export type ContentUncheckedUpdateWithoutFavoritedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagsOnContentUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyOwnerInput = {
@@ -708,6 +811,7 @@ export type ContentUpdateWithoutOwnerInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
   tags?: Prisma.ContentTagsOnContentUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutOwnerInput = {
@@ -722,6 +826,7 @@ export type ContentUncheckedUpdateWithoutOwnerInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
   tags?: Prisma.ContentTagsOnContentUncheckedUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutOwnerInput = {
@@ -744,10 +849,12 @@ export type ContentUncheckedUpdateManyWithoutOwnerInput = {
 
 export type ContentCountOutputType = {
   tags: number
+  favoritedBy: number
 }
 
 export type ContentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | ContentCountOutputTypeCountTagsArgs
+  favoritedBy?: boolean | ContentCountOutputTypeCountFavoritedByArgs
 }
 
 /**
@@ -767,6 +874,13 @@ export type ContentCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.ContentTagsOnContentWhereInput
 }
 
+/**
+ * ContentCountOutputType without action
+ */
+export type ContentCountOutputTypeCountFavoritedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FavoriteContentWhereInput
+}
+
 
 export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -782,6 +896,7 @@ export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   intendedAudience?: boolean
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
+  favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
 
@@ -833,6 +948,7 @@ export type ContentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type ContentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
+  favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -847,6 +963,7 @@ export type $ContentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     owner: Prisma.$EmployeePayload<ExtArgs>
     tags: Prisma.$ContentTagsOnContentPayload<ExtArgs>[]
+    favoritedBy: Prisma.$FavoriteContentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1262,6 +1379,7 @@ export interface Prisma__ContentClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.EmployeeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmployeeDefaultArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   tags<T extends Prisma.Content$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTagsOnContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  favoritedBy<T extends Prisma.Content$favoritedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$favoritedByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1724,6 +1842,30 @@ export type Content$tagsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.ContentTagsOnContentScalarFieldEnum | Prisma.ContentTagsOnContentScalarFieldEnum[]
+}
+
+/**
+ * Content.favoritedBy
+ */
+export type Content$favoritedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FavoriteContent
+   */
+  select?: Prisma.FavoriteContentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FavoriteContent
+   */
+  omit?: Prisma.FavoriteContentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FavoriteContentInclude<ExtArgs> | null
+  where?: Prisma.FavoriteContentWhereInput
+  orderBy?: Prisma.FavoriteContentOrderByWithRelationInput | Prisma.FavoriteContentOrderByWithRelationInput[]
+  cursor?: Prisma.FavoriteContentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FavoriteContentScalarFieldEnum | Prisma.FavoriteContentScalarFieldEnum[]
 }
 
 /**

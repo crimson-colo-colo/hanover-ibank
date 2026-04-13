@@ -4,6 +4,7 @@ import morgan from "morgan"
 import { createServer } from "vite"
 import { env } from "./env.ts"
 import { appRouter } from "./router.ts"
+import { avatarRouter } from "./routers/avatar.ts"
 import { contentDownloadRouter } from "./routers/download.ts"
 import { createContext } from "./trpc.ts"
 
@@ -22,6 +23,7 @@ const app = express()
 app.use(morgan("dev", { skip: (req, res) => req.vite ?? res.vite ?? false }))
 
 app.use(contentDownloadRouter)
+app.use(avatarRouter)
 
 app.use(
 	"/trpc",

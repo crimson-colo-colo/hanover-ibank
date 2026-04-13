@@ -5,6 +5,7 @@ import { IconLoader2 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import { useEffect } from "react"
 import z from "zod"
+import { LabelWithTooltip } from "@/components/FormComponents.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
 
@@ -43,8 +44,12 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 			})}
 		>
 			<TextInput
-				label="Name"
-				description="User's full name, e.g. John Doe."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip tooltip="User's full name, e.g. John Doe." required>
+						Name
+					</LabelWithTooltip>
+				}
 				placeholder="User name"
 				required
 				key={updateForm.key("name")}
@@ -53,8 +58,12 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 
 			<TextInput
 				mt="sm"
-				label="Email"
-				description="Used for login, password resets, and notifications."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip tooltip="Used for login, password resets, and notifications." required>
+						Email
+					</LabelWithTooltip>
+				}
 				placeholder="User email"
 				required
 				key={updateForm.key("email")}
@@ -63,8 +72,15 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 
 			<TextInput
 				mt="sm"
-				label="Username"
-				description="Used for login and display. Must be unique across all users."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip
+						tooltip="Used for login and display. Must be unique across all users."
+						required
+					>
+						Username
+					</LabelWithTooltip>
+				}
 				placeholder="User username"
 				required
 				key={updateForm.key("username")}
@@ -73,8 +89,15 @@ export function UpdateUserForm({ user, onSuccess }: UpdateUserFormProps) {
 
 			<Radio.Group
 				mt="sm"
-				label="Role"
-				description="Changing a user's role may affect their content access and permissions. Use with caution."
+				withAsterisk={false}
+				label={
+					<LabelWithTooltip
+						tooltip="Changing a user's role may affect their content access and permissions. Use with caution."
+						required
+					>
+						Role
+					</LabelWithTooltip>
+				}
 				required
 				key={updateForm.key("role")}
 				{...updateForm.getInputProps("role")}
