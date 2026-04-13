@@ -11,17 +11,19 @@ import {
 	Table,
 	Text,
 	TextInput,
+	Title,
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { FileType } from "@shared/filetype.ts"
 import {
-	IconFile,
 	IconFilePencil,
-	IconLink,
 	IconLoader2,
 	IconPencil,
 	IconSortAscending2,
 	IconSortDescending2,
+	IconStar,
+	IconStarFilled,
 	IconTrash,
 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
@@ -37,6 +39,7 @@ import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
+import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
@@ -57,7 +60,71 @@ export function ContentTable({
 	const [downloadingItemId, setDownloadingItemId] = useState<string | null>(null)
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
-	const deleteContent = useMutation(trpc.content.delete.mutationOptions())
+	const deleteContent = useMutation(
+		trpc.content.delete.mutationOptions({
+			onMutate: async (data, context) => {
+				const listContent = trpc.content.list.queryKey()
+				await context.client.cancelQueries({ queryKey: listContent })
+				const previousContent = context.client.getQueryData(listContent)
+				context.client.setQueryData(listContent, (old) => ({
+					...old!,
+					content: old!.content.filter((item) => !data.ids.includes(item.id)) ?? [],
+				}))
+				return { previousContent }
+			},
+			onError: (err, data, onMutateResult, context) => {
+				if (onMutateResult) {
+					context.client.setQueryData(trpc.content.list.queryKey(), onMutateResult.previousContent)
+				}
+			},
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			},
+		})
+	)
+	const favoriteContent = useMutation(
+		trpc.content.favorite.mutationOptions({
+			onMutate: async (data, context) => {
+				const listContent = trpc.content.list.queryKey()
+				await context.client.cancelQueries({ queryKey: listContent })
+				const previousContent = context.client.getQueryData(listContent)
+				context.client.setQueryData(listContent, (old) => ({
+					...old!,
+					content:
+						old!.content.map((item) =>
+							item.id === data.id ? { ...item, favorited: true } : item
+						) ?? [],
+				}))
+				return { previousContent }
+			},
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			},
+		})
+	)
+	const unfavoriteContent = useMutation(
+		trpc.content.unfavorite.mutationOptions({
+			onMutate: async (data, context) => {
+				const listContent = trpc.content.list.queryKey()
+				await context.client.cancelQueries({ queryKey: listContent })
+				const previousContent = context.client.getQueryData(listContent)
+				context.client.setQueryData(listContent, (old) => ({
+					...old!,
+					content:
+						old!.content.map((item) =>
+							item.id === data.id ? { ...item, favorited: false } : item
+						) ?? [],
+				}))
+				return { previousContent }
+			},
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			},
+		})
+	)
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
@@ -75,6 +142,37 @@ export function ContentTable({
 					)
 				},
 			}),
+			columnHelper.accessor("favorited", {
+				header: (info) =>
+					info.column.getIsSorted() === "asc" ? (
+						<IconStar size={20} />
+					) : info.column.getIsSorted() === "desc" ? (
+						<IconStarFilled className="fill-[#f8de1f]" size={20} />
+					) : (
+						<IconStarFilled size={20} />
+					),
+				cell: (info) => (
+					<ActionIcon
+						size="sm"
+						onClick={async (e) => {
+							if (!info.getValue()) {
+								await favoriteContent.mutateAsync({ id: info.row.original.id })
+							} else {
+								await unfavoriteContent.mutateAsync({ id: info.row.original.id })
+							}
+						}}
+						variant="transparent"
+					>
+						{favoriteContent.isPending || unfavoriteContent.isPending ? (
+							<IconLoader2 className="animate-spin" />
+						) : info.getValue() ? (
+							<IconStarFilled className="fill-[#f8de1f] content-favorite stroke-2 hover:stroke-black stroke-transparent" />
+						) : (
+							<IconStar className="content-not-favorite" />
+						)}
+					</ActionIcon>
+				),
+			}),
 			columnHelper.accessor("title", {
 				header: "Name",
 				filterFn: "fuzzy",
@@ -86,7 +184,7 @@ export function ContentTable({
 						const host = new URL(item.url).hostname
 						return (
 							<div className="flex items-center gap-2">
-								<IconLink className="shrink-0" stroke={1.5} />
+								<FileTypeIcon fileType={FileType.Link} size={22} strokeWidth={1.5} />
 								<Anchor
 									c="black"
 									className="font-semibold m-0 truncate max-w-[30ch]"
@@ -104,12 +202,19 @@ export function ContentTable({
 						const size = formatBytes(
 							data.objectMetadata.get(info.row.original.id)?.ContentLength ?? 0
 						)
+						const fileType = data.objectMetadata.get(info.row.original.id)?.Metadata?.filetype as
+							| FileType
+							| undefined
 						return (
 							<div className="flex items-center gap-2">
 								{downloadingItemId === item.id ? (
-									<IconLoader2 className="shrink-0 animate-spin" stroke={1.5} />
+									<IconLoader2 className="shrink-0 animate-spin" stroke={2} />
 								) : (
-									<IconFile className="shrink-0" stroke={1.5} />
+									<FileTypeIcon
+										fileType={fileType ?? FileType.Unknown}
+										size={22}
+										strokeWidth={1.5}
+									/>
 								)}
 								<button
 									className="font-semibold m-0 truncate max-w-[30ch] hover:underline p-0 border-none bg-transparent text-base cursor-pointer"
@@ -178,9 +283,9 @@ export function ContentTable({
 			columnHelper.display({
 				id: "actions",
 				cell: (info) => (
-					<>
+					<Flex className="content-actions" gap="2px" justify="flex-end">
 						<ActionIcon
-							variant="white"
+							variant="transparent"
 							size="sm"
 							onClick={(e) => {
 								openEditDialog(info.row.original)
@@ -190,7 +295,7 @@ export function ContentTable({
 						</ActionIcon>
 						{info.row.original.type === "Object" && (
 							<ActionIcon
-								variant="white"
+								variant="transparent"
 								size="sm"
 								onClick={(e) => {
 									openFileEditDialog(info.row.original)
@@ -199,7 +304,7 @@ export function ContentTable({
 								<IconFilePencil />
 							</ActionIcon>
 						)}
-					</>
+					</Flex>
 				),
 			}),
 		],
@@ -224,6 +329,16 @@ export function ContentTable({
 		filterFns: {
 			fuzzy: fuzzyFilter,
 		},
+		initialState: {
+			sorting: [
+				{
+					id: "title",
+					desc: false,
+				},
+			],
+		},
+		enableSortingRemoval: false,
+		enableMultiSort: true,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		onRowSelectionChange: setRowSelection,
@@ -249,8 +364,8 @@ export function ContentTable({
 
 	return (
 		<>
-			<Flex align="center" justify="space-between" gap="md">
-				<h2 className="mt-6 mb-4 text-xl font-semibold">Content</h2>
+			<Flex align="center" justify="space-between" gap="md" mt="xl" mb="sm">
+				<Title order={3}>Your Content ({data.content.length})</Title>
 
 				<Flex gap="sm">
 					<Button
@@ -296,11 +411,12 @@ export function ContentTable({
 										{header.isPlaceholder
 											? null
 											: flexRender(header.column.columnDef.header, header.getContext())}
-										{header.column.getIsSorted() === "asc" ? (
-											<IconSortAscending2 className="inline" size={20} />
-										) : header.column.getIsSorted() === "desc" ? (
-											<IconSortDescending2 className="inline" size={20} />
-										) : null}
+										{header.column.id !== "favorited" &&
+											(header.column.getIsSorted() === "asc" ? (
+												<IconSortAscending2 className="inline" size={20} />
+											) : header.column.getIsSorted() === "desc" ? (
+												<IconSortDescending2 className="inline" size={20} />
+											) : null)}
 									</Group>
 								</Table.Th>
 							))}
@@ -310,7 +426,11 @@ export function ContentTable({
 				<Table.Tbody>
 					{table.getRowModel().rows.map((row) => {
 						return (
-							<Table.Tr key={row.id} bg={row.getIsSelected() ? "fuchsia.0" : undefined}>
+							<Table.Tr
+								key={row.id}
+								bg={row.getIsSelected() ? "fuchsia.0" : undefined}
+								className="content-row"
+							>
 								{row.getVisibleCells().map((cell) => {
 									return (
 										<Table.Td key={cell.id}>
