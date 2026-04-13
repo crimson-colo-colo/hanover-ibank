@@ -8,11 +8,11 @@ import {
 	Group,
 	Kbd,
 	Modal,
+	SegmentedControl,
 	Table,
 	Text,
 	TextInput,
 	Title,
-	SegmentedControl,
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
