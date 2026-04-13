@@ -18,6 +18,14 @@ export const EmployeeRole = {
 export type EmployeeRole = (typeof EmployeeRole)[keyof typeof EmployeeRole]
 
 
+export const TagCategory = {
+  DocumentType: 'DocumentType',
+  ContentType: 'ContentType'
+} as const
+
+export type TagCategory = (typeof TagCategory)[keyof typeof TagCategory]
+
+
 export const ContentStatus = {
   Incomplete: 'Incomplete',
   UnderReview: 'UnderReview',

@@ -27,3 +27,13 @@ export type Employee = Prisma.EmployeeModel
  * 
  */
 export type Content = Prisma.ContentModel
+/**
+ * Model ContentTag
+ * 
+ */
+export type ContentTag = Prisma.ContentTagModel
+/**
+ * Model ContentTagsOnContent
+ * 
+ */
+export type ContentTagsOnContent = Prisma.ContentTagsOnContentModel

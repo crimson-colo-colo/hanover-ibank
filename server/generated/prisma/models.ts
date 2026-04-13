@@ -10,4 +10,6 @@
  */
 export type * from './models/Employee.js'
 export type * from './models/Content.js'
+export type * from './models/ContentTag.js'
+export type * from './models/ContentTagsOnContent.js'
 export type * from './commonInputTypes.js'

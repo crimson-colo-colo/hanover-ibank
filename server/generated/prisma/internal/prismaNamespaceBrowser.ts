@@ -52,7 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Employee: 'Employee',
-  Content: 'Content'
+  Content: 'Content',
+  ContentTag: 'ContentTag',
+  ContentTagsOnContent: 'ContentTagsOnContent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -83,8 +85,6 @@ export const ContentScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  documentType: 'documentType',
-  type: 'type',
   status: 'status',
   createdAt: 'createdAt',
   lastModifiedDate: 'lastModifiedDate',
@@ -96,6 +96,23 @@ export const ContentScalarFieldEnum = {
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
+
+
+export const ContentTagScalarFieldEnum = {
+  name: 'name',
+  category: 'category'
+} as const
+
+export type ContentTagScalarFieldEnum = (typeof ContentTagScalarFieldEnum)[keyof typeof ContentTagScalarFieldEnum]
+
+
+export const ContentTagsOnContentScalarFieldEnum = {
+  contentID: 'contentID',
+  tagCategory: 'tagCategory',
+  tagName: 'tagName'
+} as const
+
+export type ContentTagsOnContentScalarFieldEnum = (typeof ContentTagsOnContentScalarFieldEnum)[keyof typeof ContentTagsOnContentScalarFieldEnum]
 
 
 export const SortOrder = {

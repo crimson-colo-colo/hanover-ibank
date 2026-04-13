@@ -385,7 +385,9 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Employee: 'Employee',
-  Content: 'Content'
+  Content: 'Content',
+  ContentTag: 'ContentTag',
+  ContentTagsOnContent: 'ContentTagsOnContent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "employee" | "content"
+    modelProps: "employee" | "content" | "contentTag" | "contentTagsOnContent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -553,6 +555,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ContentTag: {
+      payload: Prisma.$ContentTagPayload<ExtArgs>
+      fields: Prisma.ContentTagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentTagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentTagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentTagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentTagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>
+        }
+        findMany: {
+          args: Prisma.ContentTagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>[]
+        }
+        create: {
+          args: Prisma.ContentTagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>
+        }
+        createMany: {
+          args: Prisma.ContentTagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentTagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentTagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>
+        }
+        update: {
+          args: Prisma.ContentTagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentTagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentTagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentTagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentTagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentTagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentTag>
+        }
+        groupBy: {
+          args: Prisma.ContentTagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentTagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentTagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentTagCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContentTagsOnContent: {
+      payload: Prisma.$ContentTagsOnContentPayload<ExtArgs>
+      fields: Prisma.ContentTagsOnContentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentTagsOnContentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentTagsOnContentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentTagsOnContentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentTagsOnContentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>
+        }
+        findMany: {
+          args: Prisma.ContentTagsOnContentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>[]
+        }
+        create: {
+          args: Prisma.ContentTagsOnContentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>
+        }
+        createMany: {
+          args: Prisma.ContentTagsOnContentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentTagsOnContentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentTagsOnContentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>
+        }
+        update: {
+          args: Prisma.ContentTagsOnContentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentTagsOnContentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentTagsOnContentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentTagsOnContentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentTagsOnContentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentTagsOnContentPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentTagsOnContentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentTagsOnContent>
+        }
+        groupBy: {
+          args: Prisma.ContentTagsOnContentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentTagsOnContentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentTagsOnContentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentTagsOnContentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -604,8 +754,6 @@ export const ContentScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  documentType: 'documentType',
-  type: 'type',
   status: 'status',
   createdAt: 'createdAt',
   lastModifiedDate: 'lastModifiedDate',
@@ -617,6 +765,23 @@ export const ContentScalarFieldEnum = {
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
+
+
+export const ContentTagScalarFieldEnum = {
+  name: 'name',
+  category: 'category'
+} as const
+
+export type ContentTagScalarFieldEnum = (typeof ContentTagScalarFieldEnum)[keyof typeof ContentTagScalarFieldEnum]
+
+
+export const ContentTagsOnContentScalarFieldEnum = {
+  contentID: 'contentID',
+  tagCategory: 'tagCategory',
+  tagName: 'tagName'
+} as const
+
+export type ContentTagsOnContentScalarFieldEnum = (typeof ContentTagsOnContentScalarFieldEnum)[keyof typeof ContentTagsOnContentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -678,34 +843,6 @@ export type ListEnumEmployeeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
- * Reference to a field of type 'DocumentType'
- */
-export type EnumDocumentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentType'>
-    
-
-
-/**
- * Reference to a field of type 'DocumentType[]'
- */
-export type ListEnumDocumentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentType[]'>
-    
-
-
-/**
- * Reference to a field of type 'ContentType'
- */
-export type EnumContentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentType'>
-    
-
-
-/**
- * Reference to a field of type 'ContentType[]'
- */
-export type ListEnumContentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentType[]'>
-    
-
-
-/**
  * Reference to a field of type 'ContentStatus'
  */
 export type EnumContentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentStatus'>
@@ -730,6 +867,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TagCategory'
+ */
+export type EnumTagCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TagCategory'>
+    
+
+
+/**
+ * Reference to a field of type 'TagCategory[]'
+ */
+export type ListEnumTagCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TagCategory[]'>
     
 
 
@@ -843,6 +994,8 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   employee?: Prisma.EmployeeOmit
   content?: Prisma.ContentOmit
+  contentTag?: Prisma.ContentTagOmit
+  contentTagsOnContent?: Prisma.ContentTagsOnContentOmit
 }
 
 /* Types for Logging */

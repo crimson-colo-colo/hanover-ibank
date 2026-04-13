@@ -56,10 +56,13 @@ main()
 async function main() {
 	await prisma.$connect()
 
-	const [employees, content] = await Promise.all([prisma.employee.count(), prisma.content.count()])
-	if (employees > 0 || content > 0) {
+	const [employees, tempContent] = await Promise.all([
+		prisma.employee.count(),
+		prisma.content.count(),
+	])
+	if (employees > 0 || tempContent > 0) {
 		process.stdout.write(
-			`⚠️ \x1b[33mDatabase already has data (employee: ${employees}, content: ${content}. Continuing will erase existing data and cannot be undone. Really continue? [y/N] \x1b[0m`
+			`⚠️ \x1b[33mDatabase already has data (employee: ${employees}, content: ${tempContent}. Continuing will erase existing data and cannot be undone. Really continue? [y/N] \x1b[0m`
 		)
 		const answer = await new Promise<string>((resolve) => {
 			process.stdin.setEncoding("utf-8")
@@ -77,7 +80,11 @@ async function main() {
 
 	console.log("🌱 Seeding database...")
 
-	await prisma.$transaction([prisma.content.deleteMany(), prisma.employee.deleteMany()])
+	await prisma.$transaction([
+		prisma.content.deleteMany(),
+		prisma.employee.deleteMany(),
+		prisma.contentTag.deleteMany(),
+	])
 
 	// admins: admin, mjordan, wharper
 	// underwriter: emp1
@@ -171,116 +178,117 @@ async function main() {
 
 	console.log(`Created ${employeeData.length} employee rows`)
 
+	// ===== Content Tags =====
+	const contentTags = await prisma.contentTag.createManyAndReturn({
+		data: [
+			// Document Type
+			{
+				name: "Workflow",
+				category: "DocumentType",
+			},
+			{
+				name: "Reference",
+				category: "DocumentType",
+			},
+			{
+				name: "Object",
+				category: "ContentType",
+			},
+			{
+				name: "Link",
+				category: "ContentType",
+			},
+		],
+	})
+
 	const contentData = [
 		...[
 			{
 				title: "Risk Meter",
 				description: "",
-				type: ContentType.Link,
 				url: "https://riskmeter.corelogic.com/",
 				lastModifiedDate: new Date("2026-03-27"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Image Editor",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.adobe.com/express/feature/image/editor",
 				lastModifiedDate: new Date("2025-10-26"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Underwriter Workstation",
 				description: "",
-				type: ContentType.Link,
 				url: "https://drive.google.com/drive/my-drive",
 				lastModifiedDate: new Date("2025-07-13"),
 				expirationDate: new Date("2026-06-15"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Document Signing",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.docusign.com/",
 				lastModifiedDate: new Date("2025-11-01"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Desktop Management Tool",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.teamviewer.com/en-us/",
 				lastModifiedDate: new Date("2025-09-15"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Process Automation Tool",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.flowforma.com/",
 				lastModifiedDate: new Date("2025-08-20"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Knowledge Base",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.genre.com/us/knowledge?filters=article-type:publication,genre-languages:en&page=1&facet=all",
 				lastModifiedDate: new Date("2025-10-05"),
 				expirationDate: new Date("2026-10-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Image Processing System",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.adobe.com/express/feature/image/editor",
 				lastModifiedDate: new Date("2025-07-30"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Flood Information",
 				description: "",
-				type: ContentType.Link,
 				url: "https://msc.fema.gov/portal/home",
 				lastModifiedDate: new Date("2025-09-10"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "OSHA Regulations",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.osha.gov/laws-regs",
 				lastModifiedDate: new Date("2025-11-20"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Pennsylvania Schedule Rating Plan",
 				description: "",
-				type: ContentType.Link,
 				url: "https://pcrb.com/industry-reports/schedule-rating-plan/",
 				lastModifiedDate: new Date("2025-08-05"),
 				expirationDate: new Date("2026-10-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Incomplete,
 			},
 		].map((content) => ({
@@ -292,97 +300,77 @@ async function main() {
 			{
 				title: "Kentucky Tax Law",
 				description: "",
-				type: ContentType.Link,
 				url: "https://revenue.ky.gov/Get-Help/pages/research-tax-laws.aspx",
 				lastModifiedDate: new Date("2026-02-04"),
 				expirationDate: new Date("2026-04-15"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Oregon Tax Law",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.oregon.gov/dor/pages/rules-laws.aspx",
 				lastModifiedDate: new Date("2025-12-12"),
 				expirationDate: new Date("2026-04-15"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "States on Hold",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.policygenius.com/homeowners-insurance/home-insurance-availability-guide-states-crisis/",
 				lastModifiedDate: new Date("2025-11-15"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Error Lookup Tool",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.google.com/",
 				lastModifiedDate: new Date("2025-10-01"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Workflow Management Platform",
 				description: "",
-				type: ContentType.Link,
 				url: "https://monday.com/",
 				lastModifiedDate: new Date("2025-09-20"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Claim Search",
 				description: "",
-				type: ContentType.Link,
 				url: "https://claimsearch.iso.com/index.asp",
 				lastModifiedDate: new Date("2025-08-10"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "Business Analyst Guide",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.iiba.org/career-resources/a-business-analysis-professionals-foundation-for-success/babok/",
 				lastModifiedDate: new Date("2025-07-01"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "State Research Guides",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.namic.org/compliance/50-state-research-guides/",
 				lastModifiedDate: new Date("2025-11-05"),
 				expirationDate: new Date("2026-10-01"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "Policy Tracking Software",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.agencybloc.com/",
 				lastModifiedDate: new Date("2025-10-15"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "Latest Insurance News",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.insurancejournal.com/",
 				lastModifiedDate: new Date("2025-09-05"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 			},
 		].map((content) => ({
 			...content,
@@ -391,7 +379,7 @@ async function main() {
 		})),
 	] satisfies Prisma.ContentCreateManyInput[]
 
-	await prisma.content.createMany({ data: contentData })
+	const urlContent = await prisma.content.createManyAndReturn({ data: contentData })
 
 	console.log(`Created ${contentData.length} content rows`)
 
@@ -425,20 +413,54 @@ async function main() {
 		ids.set(path.basename(filename), id)
 	}
 
-	await prisma.content.createMany({
+	const fileContent = await prisma.content.createManyAndReturn({
 		data: [
 			...ids.entries().map(
 				([filename, id]) =>
 					({
 						title: filename,
-						type: ContentType.Object,
 						ownerId: nextUndewriter(),
-						documentType: DocumentType.Reference,
 						expirationDate: new Date("2026-12-31"),
 						objectId: id,
 						intendedAudience: [EmployeeRole.Underwriter, EmployeeRole.BusinessAnalyst],
 					}) satisfies Prisma.ContentCreateManyInput
 			),
+		],
+	})
+
+	await prisma.contentTagsOnContent.createMany({
+		data: [
+			...fileContent.flatMap((cont: Prisma.ContentModel) => {
+				const contentID = cont.id
+				return [
+					{
+						tagCategory: "DocumentType",
+						tagName: "Reference",
+						contentID: contentID,
+					},
+					{
+						contentID,
+						tagName: "Object",
+						tagCategory: "ContentType",
+					},
+				] satisfies Prisma.ContentTagsOnContentCreateManyInput[]
+			}),
+
+			...urlContent.flatMap((cont) => {
+				const contentID = cont.id
+				return [
+					{
+						tagCategory: "DocumentType",
+						tagName: "Reference",
+						contentID: contentID,
+					},
+					{
+						contentID,
+						tagName: "Link",
+						tagCategory: "ContentType",
+					},
+				] satisfies Prisma.ContentTagsOnContentCreateManyInput[]
+			}),
 		],
 	})
 

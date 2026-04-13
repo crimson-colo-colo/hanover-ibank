@@ -20,22 +20,46 @@ model Employee {
 }
 
 model Content {
-  id               String        @id @default(cuid())
+  id               String         @id @default(cuid())
   title            String
   description      String?
-  documentType     DocumentType
-  type             ContentType
-  status           ContentStatus @default(Incomplete)
-  createdAt        DateTime      @default(now())
-  lastModifiedDate DateTime      @updatedAt
+  status           ContentStatus  @default(Incomplete)
+  createdAt        DateTime       @default(now())
+  lastModifiedDate DateTime       @updatedAt
   expirationDate   DateTime
   /// S3 Object ID
   objectId         String?
   /// URL for links
   url              String?
   ownerId          String
-  owner            Employee      @relation(fields: [ownerId], references: [id])
+  owner            Employee       @relation(fields: [ownerId], references: [id])
   intendedAudience EmployeeRole[]
+
+  tags ContentTagsOnContent[]
+}
+
+model ContentTag {
+  name     String // Incomplete
+  category TagCategory
+
+  contents ContentTagsOnContent[]
+
+  @@id([category, name])
+}
+
+model ContentTagsOnContent {
+  content     Content     @relation(fields: [contentID], references: [id])
+  contentID   String
+  tag         ContentTag  @relation(fields: [tagCategory, tagName], references: [category, name])
+  tagCategory TagCategory
+  tagName     String
+
+  @@id([contentID, tagCategory, tagName])
+}
+
+enum TagCategory {
+  DocumentType
+  ContentType
 }
 
 // new to confirm status being just placeholders
@@ -43,14 +67,4 @@ enum ContentStatus {
   Incomplete
   UnderReview
   Complete
-}
-
-enum DocumentType {
-  Workflow
-  Reference
-}
-
-enum ContentType {
-  Object
-  Link
 }

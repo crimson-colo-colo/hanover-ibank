@@ -24,13 +24,11 @@
 	},
 	"dependencies": {
 		"@auth0/auth0-api-js": "^1.4.0",
-		"@mantine/dates": "^9.0.0",
 		"@prisma/adapter-pg": "^7.6.0",
 		"@prisma/client": "^7.6.0",
 		"@t3-oss/env-core": "^0.13.11",
 		"@trpc/server": "^11.16.0",
 		"auth0": "^5.5.0",
-		"dayjs": "^1.11.20",
 		"express": "^5.2.1",
 		"express-oauth2-jwt-bearer": "^1.7.4",
 		"fflate": "^0.8.2",
@@ -43,6 +41,8 @@
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
+		"@mantine/dates": "^9.0.0",
+		"dayjs": "^1.11.20",
 		"@auth0/auth0-react": "^2.16.1",
 		"@auth0/auth0-spa-js": "^2.18.3",
 		"@biomejs/biome": "2.4.6",
