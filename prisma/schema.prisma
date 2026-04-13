@@ -14,28 +14,37 @@ enum EmployeeRole {
 }
 
 model Employee {
-  id        String       @id
-  role      EmployeeRole
-  content   Content[]
+  id       String            @id
+  role     EmployeeRole
+  content  Content[]
+  favorite FavoriteContent[]
 }
 
 model Content {
-  id               String        @id @default(cuid())
+  id               String            @id @default(cuid())
   title            String
   description      String?
   documentType     DocumentType
   type             ContentType
-  status           ContentStatus @default(Incomplete)
-  createdAt        DateTime      @default(now())
-  lastModifiedDate DateTime      @updatedAt
+  status           ContentStatus     @default(Incomplete)
+  createdAt        DateTime          @default(now())
+  lastModifiedDate DateTime          @updatedAt
   expirationDate   DateTime
   /// S3 Object ID
   objectId         String?
   /// URL for links
   url              String?
   ownerId          String
-  owner            Employee      @relation(fields: [ownerId], references: [id])
+  owner            Employee          @relation(fields: [ownerId], references: [id])
   intendedAudience EmployeeRole[]
+  favoritedBy      FavoriteContent[]
+}
+
+model FavoriteContent {
+  content    Content  @relation(fields: [contentId], references: [id])
+  contentId  String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  employeeId String
 }
 
 // new to confirm status being just placeholders
