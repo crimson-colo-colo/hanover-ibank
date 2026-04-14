@@ -19,6 +19,7 @@ import { notifications } from "@mantine/notifications"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
+	IconCloudUpload,
 	IconFilePencil,
 	IconLoader2,
 	IconPencil,
@@ -27,7 +28,6 @@ import {
 	IconStar,
 	IconStarFilled,
 	IconTrash,
-	IconCloudUpload,
 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import {
@@ -390,7 +390,7 @@ export function ContentTable({
 						leftSection={<IconCloudUpload size={16} stroke={1.5} />}
 						onClick={openCreateModal}
 					>
-						Create Content
+						Create content
 					</Button>
 
 					<Button
