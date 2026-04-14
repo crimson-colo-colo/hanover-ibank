@@ -73,6 +73,7 @@ export function FavoriteContentCard({
 			p="28"
 			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
 			onClick={ () => {
+				openFilePreview(item)
 				// setDownloadingItemId(item.id)
 				// try {
 				// 	const { url } = await trpcClient.content.download.query({ id: item.id })
