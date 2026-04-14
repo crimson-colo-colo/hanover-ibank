@@ -28,6 +28,7 @@ function Index() {
 					variant="light"
 					color="sky"
 					title="Info"
+					bdrs="lg"
 					icon={icon}
 					styles={{ icon: { width: 50, height: 50 }, title: { fontSize: "24px" } }}
 					withCloseButton
