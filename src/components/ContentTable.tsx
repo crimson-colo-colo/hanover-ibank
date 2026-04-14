@@ -44,7 +44,7 @@ import { Avatar } from "@/components/Avatar.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
-import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
 
 export function ContentTable({
@@ -65,7 +65,6 @@ export function ContentTable({
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
 	const [globalFilter, setGlobalFilter] = useState("")
-	const [downloadingItemId, setDownloadingItemId] = useState<string | null>(null)
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
 	const deleteContent = useMutation(
@@ -215,15 +214,7 @@ export function ContentTable({
 							| undefined
 						return (
 							<div className="flex items-center gap-2">
-								{downloadingItemId === item.id ? (
-									<IconLoader2 className="shrink-0 animate-spin" stroke={2} />
-								) : (
-									<FileTypeIcon
-										fileType={fileType ?? FileType.Unknown}
-										size={22}
-										strokeWidth={1.5}
-									/>
-								)}
+								<FileTypeIcon fileType={fileType ?? FileType.Unknown} size={22} strokeWidth={1.5} />
 								<button
 									className="font-semibold m-0 truncate max-w-[30ch] hover:underline p-0 border-none bg-transparent text-base cursor-pointer"
 									title={item.title}
