@@ -7,12 +7,11 @@ import {
 	Drawer,
 	Group,
 	Image,
-	localStorageColorSchemeManager,
-	MantineProvider,
 	Menu,
 	NavLink,
 	ScrollArea,
 	Text,
+	useMantineColorScheme,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
@@ -28,7 +27,6 @@ import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
-import { theme } from "@/theme.ts"
 
 function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
 	const location = useLocation()
@@ -58,10 +56,10 @@ function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean
 }
 
 function DrawerNavLinks({
-	isLoading,
-	isAdmin,
-	closeDrawer,
-}: {
+							isLoading,
+							isAdmin,
+							closeDrawer,
+						}: {
 	isLoading: boolean
 	isAdmin: boolean | undefined
 	closeDrawer: () => void
@@ -161,12 +159,10 @@ export function Navigation() {
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
 
-	const colorSchemeManager = localStorageColorSchemeManager({
-		key: "mantine-color-scheme",
-	})
+	const { colorScheme } = useMantineColorScheme()
 
 	return (
-		<MantineProvider theme={theme} colorSchemeManager={colorSchemeManager}>
+		<header className={`h-14 mb-30 border-b ${colorScheme === "dark" ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300"}`}>
 			<Container size="1120px" className="h-full flex justify-between items-center">
 				<Group hiddenFrom="xs">
 					<Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
@@ -210,7 +206,7 @@ export function Navigation() {
 									</div>
 								</Button>
 							</Menu.Target>
-							<Menu.Dropdown>
+							<Menu.Dropdown className="shadow-sm">
 								<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
 									Profile
 								</Menu.Item>
@@ -257,7 +253,7 @@ export function Navigation() {
 				</ScrollArea>
 				<DrawerUserMenu />
 			</Drawer>
-		</MantineProvider>
+		</header>
 	)
 }
 export default Navigation
