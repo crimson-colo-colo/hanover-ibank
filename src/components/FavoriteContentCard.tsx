@@ -11,7 +11,6 @@ import { useMutation } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-	import type {ContentListItem, ContentList} from "../../server/routers/content.ts";
 
 function isTruncated(e: HTMLElement) {
 	const temp = e.cloneNode(true) as HTMLElement
@@ -34,19 +33,19 @@ function isTruncated(e: HTMLElement) {
 }
 
 export function FavoriteContentCard({
-										contentId,
 										contentUrl,
+										contentId,
 										contentType,
 										fileName,
-										openFilePreview,
-										item
+										onViewDetails,
+
+
 									}: {
 	contentId: string,
 	contentUrl: string | null,
 	contentType: FileType,
 	fileName: string,
-	openFilePreview: (info: ContentListItem) => (void),
-	item: ContentListItem
+	onViewDetails: () => void
 }) {
 	const titleRef = useRef<HTMLParagraphElement>(null)
 	const [titleTruncated, setTitleTruncated] = useState(false)
@@ -72,18 +71,6 @@ export function FavoriteContentCard({
 			target="_blank"
 			p="28"
 			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
-			onClick={ () => {
-				openFilePreview(item)
-				// setDownloadingItemId(item.id)
-				// try {
-				// 	const { url } = await trpcClient.content.download.query({ id: item.id })
-				// 	window.open(url, "_blank")
-				// } finally {
-				// 	setDownloadingItemId(null)
-				// }
-
-			}}
-
 		>
 			<Card.Section>
 				<Flex justify="space-between" align="center" gap="sm">
@@ -109,16 +96,14 @@ export function FavoriteContentCard({
 								}
 								onClick={() => unfavoriteContent.mutate({ id: contentId })}
 							>
-								Unfavorite
+					filePreviewOpen			Unfavorite
 							</Menu.Item>
 							{contentType === FileType.Link ? (
 								<Menu.Item
 									leftSection={<IconCircleArrowUpRight size={20} />}
-									onClick={async () => {
-										openFilePreview(item)
-										//todo: open modal preview
-
-
+									onClick={(e) => {
+										e.preventDefault()
+										onViewDetails()
 									}}
 								>View Details
 								</Menu.Item>

@@ -36,7 +36,7 @@ function RoleDashboard() {
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
 
 
-	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
+	const [selectedContent, setSelectedContent] = useState<ContentListItem  |null>(null)
 	const updateContent = useMutation(
 		trpc.content.update.mutationOptions({
 			onSuccess() {
@@ -96,11 +96,13 @@ function RoleDashboard() {
 											? FileType.Link
 											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									}
-									item={item}
-									openFilePreview={(file) => {
-										//setSelectedContent(file)
-										//openFilePreviewModal()
-									}} // fixme: stuff
+
+									onViewDetails={()=>(
+
+
+										openFilePreviewModal()
+
+										)}
 								/>
 							)
 						})
