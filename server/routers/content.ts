@@ -197,8 +197,12 @@ export const contentRouter = router({
 				})
 			}
 
-			const isAdmin = user.role === "Admin"
-			const isOwner = content.checkedOutById === user.id
+			const user = await db.employee.findUnique({
+				where: {id: opts.ctx.auth.sub}
+			})
+
+			const isAdmin = user?.role === "Admin"
+			const isOwner = content.checkedOutById === user?.id
 
 			if (content.checkedOutById && !isOwner && !isAdmin) {
 				throw new TRPCError({
