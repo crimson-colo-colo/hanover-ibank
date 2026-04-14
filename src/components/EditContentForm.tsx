@@ -1,23 +1,13 @@
-import {
-	Button,
-	Group,
-	InputDescription,
-	InputLabel,
-	MultiSelect,
-	Select,
-	TextInput,
-} from "@mantine/core"
+import { Button, Group, InputDescription, InputLabel, Select, TextInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
-import { ContentStatus, DocumentType, EmployeeRole } from "@prisma/browser.ts"
+import { ContentStatus, TagCategory } from "@prisma/browser.ts"
 import { IconDeviceFloppy } from "@tabler/icons-react"
 import z from "zod"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
-import {
-	contentStatusDisplayName,
-	documentTypeDisplayName,
-	employeeRoleDisplayName,
-} from "@/lib/enums.ts"
+import { ContentTagsInput } from "@/components/ContentTagsInput.tsx"
+import { LabelWithTooltip } from "@/components/FormComponents.tsx"
+import { contentStatusDisplayName } from "@/lib/enums.ts"
 
 interface EditContentModalProps {
 	content: z.infer<typeof schema>
@@ -29,24 +19,27 @@ const schema = z.object({
 	id: z.string(),
 	title: z.string(),
 	ownerId: z.string(),
-	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))),
 	lastModifiedDate: z.iso.date(),
 	expirationDate: z.iso.date(),
-	documentType: z.enum(Object.values(DocumentType)),
 	status: z.enum(Object.values(ContentStatus)),
+	tags: z.array(
+		z.object({
+			category: z.enum(Object.values(TagCategory)),
+			name: z.string().min(1).max(50),
+		})
+	),
 })
 
 export function EditContentForm({ content, ownerEmail, onSubmit }: EditContentModalProps) {
-	const form = useForm({
+	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {
 			id: content.id,
 			title: content.title,
 			ownerId: content.ownerId,
-			intendedAudience: content.intendedAudience,
 			lastModifiedDate: content.lastModifiedDate,
 			expirationDate: content.expirationDate,
-			documentType: content.documentType,
 			status: content.status,
+			tags: content.tags,
 		},
 		validate: schemaResolver(schema, { sync: true }),
 		transformValues: schema.parse,
@@ -60,20 +53,6 @@ export function EditContentForm({ content, ownerEmail, onSubmit }: EditContentMo
 				required
 				key={form.key("title")}
 				{...form.getInputProps("title")}
-			/>
-
-			<MultiSelect
-				mt="sm"
-				label="Intended Audience"
-				description="Select the employee roles that are the intended audience for this content. This is used to help route the content to the appropriate people."
-				placeholder="Select..."
-				data={Object.values(EmployeeRole).map((role) => ({
-					value: role,
-					label: employeeRoleDisplayName[role],
-				}))}
-				required
-				key={form.key("intendedAudience")}
-				{...form.getInputProps("intendedAudience")}
 			/>
 
 			<InputLabel mt="sm" required>
@@ -106,20 +85,6 @@ export function EditContentForm({ content, ownerEmail, onSubmit }: EditContentMo
 
 			<Select
 				mt="sm"
-				label="Content Category"
-				description="Select the category that best describes this content."
-				placeholder="Select..."
-				data={Object.values(DocumentType).map((type) => ({
-					value: type,
-					label: documentTypeDisplayName[type],
-				}))}
-				required
-				key={form.key("documentType")}
-				{...form.getInputProps("documentType")}
-			/>
-
-			<Select
-				mt="sm"
 				label="Document Status"
 				description="Select the current lifecycle status of this content."
 				placeholder="Select..."
@@ -130,6 +95,19 @@ export function EditContentForm({ content, ownerEmail, onSubmit }: EditContentMo
 				required
 				key={form.key("status")}
 				{...form.getInputProps("status")}
+			/>
+
+			<InputLabel mt="sm">
+				<LabelWithTooltip
+					tooltip="Add tags to help categorize this content. You can select from existing tags or create new ones."
+					required
+				>
+					Content Tags
+				</LabelWithTooltip>
+			</InputLabel>
+			<ContentTagsInput
+				value={form.getValues().tags}
+				onChange={(tags) => form.setFieldValue("tags", tags)}
 			/>
 
 			<Group mt="md" justify="flex-end">

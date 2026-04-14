@@ -4,7 +4,6 @@ import {
 	FileInput,
 	Group,
 	InputLabel,
-	MultiSelect,
 	SegmentedControl,
 	Select,
 	TextInput,
@@ -13,30 +12,30 @@ import {
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
-import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
+import { ContentStatus, ContentType, TagCategory } from "@prisma/browser.ts"
 import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
 import z from "zod"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
+import { ContentTagsInput } from "@/components/ContentTagsInput.tsx"
 import { LabelWithTooltip } from "@/components/FormComponents.tsx"
-import {
-	contentStatusDisplayName,
-	contentTypeDisplayName,
-	documentTypeDisplayName,
-	employeeRoleDisplayName,
-} from "@/lib/enums.ts"
+import { contentStatusDisplayName, contentTypeDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
 	ownerId: z.string().max(320),
-	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))).min(1),
 	lastModifiedDate: z.iso.date(),
 	expirationDate: z.iso.date(),
-	documentType: z.enum(Object.values(DocumentType)),
-	documentStatus: z.enum(Object.values(ContentStatus)),
+	tags: z.array(
+		z.object({
+			category: z.enum(Object.values(TagCategory)),
+			name: z.string().min(1).max(50),
+		})
+	),
+	contentStatus: z.enum(Object.values(ContentStatus)),
 })
 
 const linkSchema = baseSchema.extend({
@@ -61,11 +60,12 @@ export function CreateContentForm() {
 			url: "",
 			file: undefined!,
 			ownerId: auth0.user?.sub || "",
-			intendedAudience: [],
 			lastModifiedDate: format(new Date(), "yyyy-MM-dd"),
 			expirationDate: undefined!,
-			documentType: "" as DocumentType,
-			documentStatus: "" as ContentStatus,
+			tags: [],
+			contentStatus: "" as ContentStatus,
+			// intendedAudience: [],
+			// documentType: "" as DocumentType,
 		} as z.input<typeof schema>,
 		validate: schemaResolver(schema, { sync: true }),
 		transformValues: schema.parse,
@@ -180,7 +180,7 @@ export function CreateContentForm() {
 				{...form.getInputProps("name")}
 			/>
 
-			<MultiSelect
+			{/* <MultiSelect
 				mt="sm"
 				withAsterisk={false}
 				label={
@@ -199,7 +199,7 @@ export function CreateContentForm() {
 				required
 				key={form.key("intendedAudience")}
 				{...form.getInputProps("intendedAudience")}
-			/>
+			/> */}
 
 			<InputLabel mt="sm">
 				<LabelWithTooltip tooltip="Search for the owner of this content by name or email." required>
@@ -245,29 +245,8 @@ export function CreateContentForm() {
 				mt="sm"
 				withAsterisk={false}
 				label={
-					<LabelWithTooltip
-						tooltip="Select the category that best describes this content."
-						required
-					>
-						Content Category
-					</LabelWithTooltip>
-				}
-				placeholder="Select..."
-				data={Object.values(DocumentType).map((type) => ({
-					value: type,
-					label: documentTypeDisplayName[type],
-				}))}
-				required
-				key={form.key("documentType")}
-				{...form.getInputProps("documentType")}
-			/>
-
-			<Select
-				mt="sm"
-				withAsterisk={false}
-				label={
 					<LabelWithTooltip tooltip="Select the current lifecycle status of this content." required>
-						Document Status
+						Content Status
 					</LabelWithTooltip>
 				}
 				placeholder="Select..."
@@ -276,11 +255,24 @@ export function CreateContentForm() {
 					label: contentStatusDisplayName[status],
 				}))}
 				required
-				key={form.key("documentStatus")}
-				{...form.getInputProps("documentStatus")}
+				key={form.key("contentStatus")}
+				{...form.getInputProps("contentStatus")}
 			/>
 
-			<Group justify="flex-end" mt="lg">
+			<InputLabel mt="sm">
+				<LabelWithTooltip
+					tooltip="Add tags to help categorize this content. You can select from existing tags or create new ones."
+					required
+				>
+					Content Tags
+				</LabelWithTooltip>
+			</InputLabel>
+			<ContentTagsInput
+				value={form.getValues().tags}
+				onChange={(tags) => form.setFieldValue("tags", tags)}
+			/>
+
+			<Group justify="flex-end" mt="md">
 				<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/dashboard" })}>
 					Cancel
 				</Button>
