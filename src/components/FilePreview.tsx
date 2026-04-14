@@ -70,12 +70,12 @@ export function FilePreviewProvider({
 		fileType === FileType.Powerpoint
 	) {
 		contentDisplay = (
-			<ScrollArea className="h-full flex flex-col justify-center flex-1 min-h-0 items-center relative">
+			<ScrollArea className="relative flex flex-col items-center justify-center flex-1 w-full h-full min-h-0">
 				<Document
 					file={preview?.url}
 					options={options}
 					onLoadSuccess={onLoadSuccess}
-					className="w-full bg-transparent flex flex-col gap-4 items-center"
+					className="flex flex-col items-center w-full gap-4 bg-transparent"
 				>
 					{new Array(numPages).fill(0).map((_, index) => (
 						<Page
@@ -89,7 +89,7 @@ export function FilePreviewProvider({
 		)
 	} else if (fileType === FileType.Plaintext) {
 		contentDisplay = plaintextContent?.text ? (
-			<ScrollArea className="h-full w-full bg-white p-4 rounded-md">
+			<ScrollArea className="w-full h-full p-4 bg-white rounded-md">
 				<pre className="whitespace-pre-wrap">{plaintextContent.text}</pre>
 			</ScrollArea>
 		) : (
@@ -102,7 +102,7 @@ export function FilePreviewProvider({
 			value={{
 				controls: null,
 				preview: (
-					<div className="h-full flex flex-col justify-center flex-1 min-h-0 items-center relative">
+					<div className="relative flex flex-col items-center justify-center flex-1 h-full min-w-0 min-h-0 shrink">
 						{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
 						{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
 						<div className="absolute inset-0" onClick={closeViewer}></div>

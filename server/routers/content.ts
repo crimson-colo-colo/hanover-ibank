@@ -253,6 +253,80 @@ export const contentRouter = router({
 			})
 			return updated
 		}),
+	updateOwner: authProcedure
+		.input(z.object({ id: z.string(), ownerId: z.string() }))
+		.mutation(async (opts) => {
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					ownerId: opts.input.ownerId,
+				},
+			})
+		}),
+	updateStatus: authProcedure
+		.input(z.object({ id: z.string(), status: z.enum(Object.values(ContentStatus)) }))
+		.mutation(async (opts) => {
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					status: opts.input.status,
+				},
+			})
+		}),
+	updateTags: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				tags: z.array(
+					z.object({
+						category: z.enum(Object.values(TagCategory)),
+						name: z.string().min(1).max(50),
+					})
+				),
+			})
+		)
+		.mutation(async (opts) => {
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					tags: {
+						connectOrCreate: opts.input.tags.map((tag) => ({
+							where: {
+								contentId_tagCategory_tagName: {
+									contentId: opts.input.id,
+									tagCategory: tag.category,
+									tagName: tag.name,
+								},
+							},
+							create: {
+								contentId: opts.input.id,
+								tag: {
+									connectOrCreate: {
+										where: {
+											category_name: {
+												category: tag.category,
+												name: tag.name,
+											},
+										},
+										create: {
+											category: tag.category,
+											name: tag.name,
+										},
+									},
+								},
+							},
+						})),
+						deleteMany: {
+							contentId: opts.input.id,
+							NOT: opts.input.tags.map((tag) => ({
+								tagCategory: tag.category,
+								tagName: tag.name,
+							})),
+						},
+					},
+				},
+			})
+		}),
 
 	download: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
 		const content = await db.content.findUnique({

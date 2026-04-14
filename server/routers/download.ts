@@ -1,12 +1,12 @@
 import assert from "node:assert"
 import { Readable } from "node:stream"
+import { type FileType, fileTypeToMime } from "@shared/filetype.ts"
 import express, { type Request, type Response } from "express"
 import * as jose from "jose"
 import z from "zod"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import { bucketName, s3 } from "../s3.ts"
-import {type FileType, fileTypeToMime} from "@shared/filetype.ts";
 
 export const contentDownloadRouter = express.Router()
 
@@ -16,7 +16,9 @@ export const DownloadTokenPayload = z.object({
 })
 
 contentDownloadRouter.get("/content/download", async (req: Request, res: Response) => {
-	const query = z.object({ token: z.string(), download: z.boolean().optional() }).safeParse(req.query)
+	const query = z
+		.object({ token: z.string(), download: z.boolean().optional() })
+		.safeParse(req.query)
 	if (!query.success) {
 		return res.status(400).json({ error: "Token is required" })
 	}
@@ -55,13 +57,14 @@ contentDownloadRouter.get("/content/download", async (req: Request, res: Respons
 		Bucket: bucketName,
 		Key: content.objectId!,
 	})
-	const contentType = object.ContentType && object.ContentType !== "application/octet-stream"
-		? object.ContentType
-		: fileTypeToMime[object.Metadata?.filetype as FileType] ?? "application/octet-stream"
+	const contentType =
+		fileTypeToMime[object.Metadata?.filetype as FileType] ?? "application/octet-stream"
 	res.setHeader("Content-Type", contentType)
 
-	res.setHeader("Content-Disposition", `${query.data.download ?? false ? "attachment" : "inline"}; filename="${content.title}"`) // todo: make it both inline and attachment
-	if (object.ContentType && object.Metadata && object.Metadata) res.setHeader("Content-Type", contentType)
+	res.setHeader("Content-Disposition", `attachment; filename="${content.title}"`)
+	if (object.ContentType && object.Metadata && object.Metadata) {
+		res.setHeader("Content-Type", contentType)
+	}
 	console.log(object)
 	assert(object.Body, "S3 object body is undefined")
 	assert(object.Body instanceof Readable, "S3 object body is not a stream.Readable")
