@@ -97,7 +97,7 @@ function RoleDashboard() {
 											? FileType.Link
 											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									}
-									openFilePreview={()=>()}
+									openFilePreview={(i)=>()}
 								/>
 							)
 						})
