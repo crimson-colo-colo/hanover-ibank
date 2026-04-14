@@ -71,21 +71,6 @@ export function ContentTable({
 	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
 	const deleteContent = useMutation(
 		trpc.content.delete.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content: old!.content.filter((item) => !data.ids.includes(item.id)) ?? [],
-				}))
-				return { previousContent }
-			},
-			onError: (err, data, onMutateResult, context) => {
-				if (onMutateResult) {
-					context.client.setQueryData(trpc.content.list.queryKey(), onMutateResult.previousContent)
-				}
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
@@ -490,9 +475,9 @@ export function ContentTable({
 					<Button
 						color="red"
 						loading={deleteContent.isPending}
-						onClick={() => {
+						onClick={async () => {
 							const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
-							deleteContent.mutate(
+							await deleteContent.mutateAsync(
 								{ ids: idsToDelete },
 								{
 									onSuccess: () => {
@@ -501,7 +486,6 @@ export function ContentTable({
 										table.options.data = table.options.data.filter(
 											(item) => !idsToDelete.includes(item.id)
 										)
-										queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 										notifications.show({
 											title: "Content deleted",
 											message: "The selected content has been deleted successfully.",
