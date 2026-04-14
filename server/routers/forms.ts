@@ -2,12 +2,7 @@ import { v4 as uuidv4 } from "uuid"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
-import {
-	ContentStatus,
-	ContentType,
-	DocumentType,
-	EmployeeRole,
-} from "../generated/prisma/browser.ts"
+import { ContentType, EmployeeRole, TagCategory } from "../generated/prisma/browser.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -16,11 +11,14 @@ import { authProcedure, publicProcedure, router } from "../trpc.ts"
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
 	ownerId: z.string().max(320),
-	intendedAudience: z.array(z.enum(Object.values(EmployeeRole))).min(1),
 	lastModifiedDate: z.iso.date(),
 	expirationDate: z.iso.date(),
-	documentType: z.enum(Object.values(DocumentType)),
-	documentStatus: z.enum(Object.values(ContentStatus)),
+	tags: z.array(
+		z.object({
+			category: z.enum(Object.values(TagCategory)),
+			name: z.string().min(1).max(50),
+		})
+	),
 })
 
 const linkSchema = baseSchema.extend({
@@ -54,18 +52,32 @@ export const formsRouter = router({
 		const content = await db.content.create({
 			data: {
 				title: opts.input.name,
-				documentType: opts.input.documentType,
 				type: opts.input.contentType,
-				status: opts.input.documentStatus,
 				lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
 				expirationDate: isoDateToTimestamp(opts.input.expirationDate),
 				ownerId: opts.input.ownerId,
-				intendedAudience: opts.input.intendedAudience,
 				url: opts.input.contentType === ContentType.Link ? opts.input.url : undefined,
 				objectId: objectId,
+				tags: {
+					create: opts.input.tags.map((tag) => ({
+						tag: {
+							connectOrCreate: {
+								where: {
+									category_name: {
+										category: tag.category,
+										name: tag.name,
+									},
+								},
+								create: {
+									category: tag.category,
+									name: tag.name,
+								},
+							},
+						},
+					})),
+				},
 			},
 		})
-		console.log(content)
 		return content
 	}),
 	searchUsers: authProcedure

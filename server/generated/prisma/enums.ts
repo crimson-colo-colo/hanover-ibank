@@ -18,6 +18,15 @@ export const EmployeeRole = {
 export type EmployeeRole = (typeof EmployeeRole)[keyof typeof EmployeeRole]
 
 
+export const TagCategory = {
+  DocumentType: 'DocumentType',
+  IntendedAudience: 'IntendedAudience',
+  Custom: 'Custom'
+} as const
+
+export type TagCategory = (typeof TagCategory)[keyof typeof TagCategory]
+
+
 export const ContentStatus = {
   Incomplete: 'Incomplete',
   UnderReview: 'UnderReview',
@@ -25,14 +34,6 @@ export const ContentStatus = {
 } as const
 
 export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus]
-
-
-export const DocumentType = {
-  Workflow: 'Workflow',
-  Reference: 'Reference'
-} as const
-
-export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
 
 
 export const ContentType = {

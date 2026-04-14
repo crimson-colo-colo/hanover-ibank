@@ -1,7 +1,6 @@
 import { Combobox, Flex, Image, InputBase, Paper, Stack, Text, useCombobox } from "@mantine/core"
 import type { UseFormReturnType } from "@mantine/form"
 import { useDebouncedValue } from "@mantine/hooks"
-import type { EmployeeRole } from "@prisma/browser.ts"
 import { IconLoader2 } from "@tabler/icons-react"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { useState } from "react"
@@ -12,17 +11,16 @@ export function ContentOwnerSelect({
 	form,
 	initialSearchValue,
 }: {
-	form: UseFormReturnType<{ ownerId: string; intendedAudience: EmployeeRole[] }>
+	form: UseFormReturnType<{ ownerId: string }>
 	initialSearchValue?: string
 }) {
 	const [searchValue, setSearchValue] = useState(initialSearchValue || "")
-	const roles = form.getValues().intendedAudience
 	const [debouncedSearchValue] = useDebouncedValue(searchValue, 300)
 	const searchResults = useQuery(
 		trpc.forms.searchUsers.queryOptions(
-			{ query: debouncedSearchValue, roles },
+			{ query: debouncedSearchValue, roles: [] },
 			{
-				enabled: !!debouncedSearchValue || roles.length > 0,
+				enabled: !!debouncedSearchValue,
 				placeholderData: keepPreviousData,
 			}
 		)

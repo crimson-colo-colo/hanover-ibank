@@ -151,6 +151,7 @@ function RoleDashboard() {
 						<EditContentForm
 							content={{
 								...editingItem,
+								tags: structuredClone(editingItem.tags),
 								expirationDate: editingItem.expirationDate.toISOString().split("T")[0],
 								lastModifiedDate: editingItem.lastModifiedDate.toISOString().split("T")[0],
 							}}
