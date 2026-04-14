@@ -7,7 +7,6 @@ import {
 	SegmentedControl,
 	Select,
 	TextInput,
-	Title,
 } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
@@ -15,7 +14,6 @@ import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, TagCategory } from "@prisma/browser.ts"
 import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
-import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
 import z from "zod"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
@@ -50,7 +48,11 @@ const fileSchema = baseSchema.extend({
 
 const schema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
 
-export function CreateContentForm() {
+interface Props {
+	onSuccess: () => void
+}
+
+export function CreateContentForm({ onSuccess }: Props) {
 	const auth0 = useAuth0()
 	const createContent = useMutation(trpc.forms.createContent.mutationOptions())
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
@@ -70,7 +72,6 @@ export function CreateContentForm() {
 		validate: schemaResolver(schema, { sync: true }),
 		transformValues: schema.parse,
 	})
-	const navigate = useNavigate()
 
 	async function onSubmit(values: z.infer<typeof schema>) {
 		await createContent.mutateAsync({
@@ -82,12 +83,12 @@ export function CreateContentForm() {
 						: undefined!,
 			},
 		})
-		navigate({ to: "/dashboard" })
 		notifications.show({
 			title: "Content created",
 			message: "The content has been successfully created.",
 			color: "emerald",
 		})
+		onSuccess()
 	}
 
 	form.watch("contentType", (ctx) => {
@@ -108,11 +109,7 @@ export function CreateContentForm() {
 	})
 
 	return (
-		<form className="max-w-[50ch] mx-auto" onSubmit={form.onSubmit(onSubmit)}>
-			<Title order={2} mb="md">
-				Create New Content
-			</Title>
-
+		<form onSubmit={form.onSubmit(onSubmit)}>
 			<LabelWithTooltip
 				tooltip="Choose whether this content is a file upload or an external link."
 				required
@@ -272,8 +269,8 @@ export function CreateContentForm() {
 				onChange={(tags) => form.setFieldValue("tags", tags)}
 			/>
 
-			<Group justify="flex-end" mt="md">
-				<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/dashboard" })}>
+			<Group justify="flex-end" mt="lg">
+				<Button variant="subtle" color="gray" onClick={onSuccess}>
 					Cancel
 				</Button>
 				<Button

@@ -82,3 +82,7 @@ button[aria-label="Open TanStack Devtools"] {
 {
     visibility: visible;
 }
+
+html.color-scheme-transitioning * {
+    transition: background-color 0.3s ease, color 0.2s ease, border-color 0.3s ease !important;
+}
