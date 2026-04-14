@@ -167,6 +167,40 @@ export const contentRouter = router({
 			return updated
 		}),
 
+	updateLastModifiedDate: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				lastModifiedDate: z.iso.date(),
+			})
+		)
+		.mutation(async (opts) => {
+			const updated = await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
+				},
+			})
+			return updated
+		}),
+
+	updateExpirationDate: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				expirationDate: z.iso.date(),
+			})
+		)
+		.mutation(async (opts) => {
+			const updated = await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					expirationDate: isoDateToTimestamp(opts.input.expirationDate),
+				},
+			})
+			return updated
+		}),
+
 	download: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },

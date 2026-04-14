@@ -48,13 +48,15 @@ export function PreviewModal({
 
 	const titleRef = useRef<HTMLInputElement>(null)
 
-	function onFieldEdit(field: EditableField, value: string) {
+	async function onFieldEdit(field: EditableField, value: string) {
 		notifications.show({
 			title: "field edited",
 			message: `edited ${field} to ${value}`,
 		})
 		setEditingField(null)
-		updateTitle.mutate({ id: content.id, title: value })
+		if (field === "title") {
+			await updateTitle.mutateAsync({ id: content.id, title: value })
+		}
 	}
 
 	const form = useForm({
@@ -108,14 +110,13 @@ export function PreviewModal({
 										setEditingField={setEditingField}
 										onFieldEdit={onFieldEdit}
 										ref={titleRef}
-										contentId={content.id}
 									/>
 								</Title>
 								<Popover
 									shadow="md"
 									opened={editingField === "owner"}
 									onDismiss={() => {
-										onFieldEdit("owner", form.getValues().ownerId, content.id)
+										onFieldEdit("owner", form.getValues().ownerId)
 									}}
 									closeOnClickOutside
 									withArrow
@@ -144,7 +145,6 @@ export function PreviewModal({
 									editingField={editingField}
 									setEditingField={setEditingField}
 									onFieldEdit={onFieldEdit}
-									contentId={content.id}
 								/>
 								<EditableDateField
 									field="expirationDate"
@@ -153,7 +153,6 @@ export function PreviewModal({
 									editingField={editingField}
 									setEditingField={setEditingField}
 									onFieldEdit={onFieldEdit}
-									contentId={content.id}
 								/>
 							</Stack>
 						</ScrollArea>
@@ -171,15 +170,13 @@ function EditableTextField({
 	setEditingField,
 	onFieldEdit,
 	ref,
-	contentId,
 }: {
 	value: string
 	field: NonNullable<EditableField>
 	editingField: EditableField
 	setEditingField: (field: EditableField) => void
-	onFieldEdit: (field: NonNullable<EditableField>, value: string, contentId: string) => void
+	onFieldEdit: (field: NonNullable<EditableField>, value: string) => void
 	ref: React.RefObject<HTMLInputElement | null>
-	contentId: string
 }) {
 	return editingField !== field ? (
 		<>
@@ -193,11 +190,11 @@ function EditableTextField({
 			ref={ref}
 			defaultValue={value}
 			onBlur={(e) => {
-				onFieldEdit(field, e.target.value, contentId)
+				onFieldEdit(field, e.target.value)
 			}}
 			onKeyDown={(e) => {
 				if (e.key === "Enter") {
-					onFieldEdit(field, ref.current?.value ?? "", contentId)
+					onFieldEdit(field, ref.current?.value ?? "")
 				}
 			}}
 			className="max-w-none w-full px-1 py-1 border-none bg-gray-50"
@@ -212,15 +209,13 @@ function EditableDateField({
 	editingField,
 	setEditingField,
 	onFieldEdit,
-	contentId,
 }: {
 	field: Extract<NonNullable<EditableField>, "lastModifiedDate" | "expirationDate">
 	label: string
 	value: Date
 	editingField: EditableField
 	setEditingField: (field: EditableField) => void
-	onFieldEdit: (field: NonNullable<EditableField>, value: string, contentId: string) => void
-	contentId: string
+	onFieldEdit: (field: NonNullable<EditableField>, value: string) => void
 }) {
 	return (
 		<Popover
@@ -250,7 +245,7 @@ function EditableDateField({
 					defaultDate={new UTCDate(value)}
 					onChange={(date) => {
 						if (date) {
-							onFieldEdit(field, new UTCDate(date).toISOString(), contentId)
+							onFieldEdit(field, new UTCDate(date).toISOString())
 						}
 					}}
 				/>
