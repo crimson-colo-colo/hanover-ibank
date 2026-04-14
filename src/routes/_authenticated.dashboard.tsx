@@ -34,6 +34,7 @@ function RoleDashboard() {
 		useDisclosure(false)
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
 
+	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
 	const updateContent = useMutation(
 		trpc.content.update.mutationOptions({
 			onSuccess() {
@@ -93,7 +94,7 @@ function RoleDashboard() {
 											? FileType.Link
 											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									}
-									openFilePreview={openFilePreview}
+									openFilePreview={openFilePreviewModal}
 								/>
 							)
 						})
@@ -195,16 +196,17 @@ function RoleDashboard() {
 						</Dropzone>
 					)}
 				</Modal>
-				<Modal opened={filePreviewOpen} onClose={closeFilePreview} title={"Viewing Uploaded File"}
-					   overlayProps={{
-						   backgroundOpacity: 0.55,
-						   blur: 3,
-					   }}
-						size= "80%" >
-					<Text mb="md">
-						Updating <b>{editingItem?.title}</b> with a new copy/version. This will replace the
-						existing file but keep the same metadata.
-					</Text>
+				<Modal
+					opened={filePreviewOpen}
+					onClose={closeFilePreview}
+					title={selectedContent?.title ?? "Viewing Uploaded File"}
+					overlayProps={{
+						backgroundOpacity: 0.55,
+						blur: 3,
+					}}
+					size="80%"
+				>
+					<FileViewer />
 				</Modal>
 			</div>
 		</main>
