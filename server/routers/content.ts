@@ -198,7 +198,7 @@ export const contentRouter = router({
 			}
 
 			const user = await db.employee.findUnique({
-				where: {id: opts.ctx.auth.sub}
+				where: { id: opts.ctx.auth.sub },
 			})
 
 			const isAdmin = user?.role === "Admin"
@@ -299,29 +299,42 @@ export const contentRouter = router({
 			objectMetadata: new Map(metadata),
 		}
 	}),
-	checkIn: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
-		//verify user
+	checkOut: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const user = await db.employee.findUnique({
 			where: {
 				id: opts.ctx.auth.sub,
 			},
 		})
 
-		if (!user) throw new Error("No user found.")
+		if (!user) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "User not found",
+			})
+		}
 
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },
 		})
 
 		if (!content) {
-			throw new Error("Content does not exist")
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Content not found",
+			})
 		}
 
 		if (!content.intendedAudience.includes(user.role)) {
-			throw new Error("User not in the intended audience")
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "User cannot check out content not intended for their role",
+			})
 		}
 		if (content.checkedOutById !== null) {
-			throw new Error("Content already checked out")
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Content is already checked out",
+			})
 		}
 
 		const updated = await db.content.update({
@@ -330,25 +343,41 @@ export const contentRouter = router({
 		})
 		return updated
 	}),
-	checkOut: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+	checkIn: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const user = await db.employee.findUnique({
 			where: {
 				id: opts.ctx.auth.sub,
 			},
 		})
 		if (!user) {
-			throw new Error("No user found.")
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "User not found",
+			})
 		}
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },
 		})
 
 		if (!content) {
-			throw new Error("Content does not exist")
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Content not found",
+			})
 		}
 
 		if (content.checkedOutById === null) {
-			throw new Error("Content not checked out")
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Content not checked out",
+			})
+		}
+
+		if (content.checkedOutById !== user.id && user.role !== EmployeeRole.Admin) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "User cannot check in content checked out by another user",
+			})
 		}
 
 		const updated = await db.content.update({
