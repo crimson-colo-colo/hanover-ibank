@@ -17,7 +17,6 @@ import { FileViewer } from "@/components/FileViewer.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
-import DocViewer, { DocViewerRenderers } from "@iamjariwala/react-doc-viewer";
 import "@iamjariwala/react-doc-viewer/dist/index.css";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({

@@ -1,7 +1,8 @@
-import { Stack, Text, Title } from "@mantine/core"
+import { Stack, Text, Title, SimpleGrid } from "@mantine/core"
 import type { ContentListItem } from "../../server/routers/content.ts"
 import {useQuery} from "@tanstack/react-query";
 import {trpc} from "@/lib/trpc.ts";
+
 import DocViewer, {
 	DocViewerRenderers,
 	PDFRenderer,
@@ -23,35 +24,47 @@ export function FileViewer({ content }: { content: ContentListItem }) {
 	// https://react-pdf.org/components#pdfviewer
 	return (
 
-		<Stack gap="sm">
-			{fileURL.isSuccess && document !== undefined?
-				<DocViewer
-				documents={document}
-				pluginRenderers={DocViewerRenderers}
-				//style={{ height: "80vh"	}}
-			/>
-				:
-				<Text>Failed to fetch</Text>
-			}
-			<Title order={3}>{content.title} </Title>
+		<SimpleGrid cols={2} spacing="xs">
+			<div>
+				{fileURL.isSuccess && document !== undefined?
+					<DocViewer
+						documents={document}
+						pluginRenderers={DocViewerRenderers}
+						//style={{ height: "80vh"	}}
+					/>
+					:
+					<Text>Failed to fetch</Text>
+				}
 
-			<Text>
-				<b>ID:</b> {content.id}
-			</Text>
+			</div>
+			<div>
+				<Stack gap="sm">
 
-			<Text>
-				<b>Type:</b>
-				{content.type}
-			</Text>
-			<Text>
-				<b>Owner: </b>
-				{content.owner.name}
-			</Text>
-			<Text>
-				<b>Status: </b>
-				{content.status}
-			</Text>
-		</Stack>
+					<Title order={3}>{content.title} </Title>
+
+					<Text>
+						<b>ID:</b> {content.id}
+					</Text>
+
+					<Text>
+						<b>Type:</b>
+						{content.type}
+					</Text>
+					<Text>
+						<b>Owner: </b>
+						{content.owner.name}
+					</Text>
+					<Text>
+						<b>Status: </b>
+						{content.status}
+					</Text>
+				</Stack>
+
+			</div>
+
+		</SimpleGrid>
+
+
 
 	)
 }
