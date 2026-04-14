@@ -115,7 +115,8 @@ export function FavoriteContentCard({
 								<Menu.Item
 									leftSection={<IconCircleArrowUpRight size={20} />}
 									onClick={async () => {
-										openFilePreview(contentUrl)
+										openFilePreview(item)
+										//todo: open modal preview
 
 
 									}}
