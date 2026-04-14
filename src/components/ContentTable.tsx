@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react"
 import { UTCDate } from "@date-fns/utc"
 import {
 	ActionIcon,
@@ -20,6 +21,7 @@ import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconFilePencil,
+	IconIdBadge2,
 	IconLoader2,
 	IconPencil,
 	IconSortAscending2,
@@ -60,6 +62,7 @@ export function ContentTable({
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
 }) {
+	const auth0 = useAuth0()
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
 	const [globalFilter, setGlobalFilter] = useState("")
@@ -122,6 +125,46 @@ export function ContentTable({
 						old!.content.map((item) =>
 							item.id === data.id ? { ...item, favorited: false } : item
 						) ?? [],
+				}))
+				return { previousContent }
+			},
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			},
+		})
+	)
+	const checkOutContent = useMutation(
+		trpc.content.checkOut.mutationOptions({
+			onMutate: async (data, context) => {
+				const listContent = trpc.content.list.queryKey()
+				await context.client.cancelQueries({ queryKey: listContent })
+				const previousContent = context.client.getQueryData(listContent)
+				context.client.setQueryData(listContent, (old) => ({
+					...old!,
+					content: old!.content.map((item) =>
+						item.id === data.id ? { ...item, checkedOutBy: auth0.user!.id } : item
+					),
+				}))
+				return { previousContent }
+			},
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			},
+		})
+	)
+	const checkInContent = useMutation(
+		trpc.content.checkIn.mutationOptions({
+			onMutate: async (data, context) => {
+				const listContent = trpc.content.list.queryKey()
+				await context.client.cancelQueries({ queryKey: listContent })
+				const previousContent = context.client.getQueryData(listContent)
+				context.client.setQueryData(listContent, (old) => ({
+					...old!,
+					content: old!.content.map((item) =>
+						item.id === data.id ? { ...item, checkedOutBy: null } : item
+					),
 				}))
 				return { previousContent }
 			},
@@ -310,6 +353,15 @@ export function ContentTable({
 								<IconFilePencil />
 							</ActionIcon>
 						)}
+						<ActionIcon
+							variant="transparent"
+							size="sm"
+							onClick={async (e) => {
+								await checkOutContent.mutateAsync({ id: info.row.original.id })
+							}}
+						>
+							<IconIdBadge2 />
+						</ActionIcon>
 					</Flex>
 				),
 			}),
