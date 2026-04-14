@@ -15,6 +15,7 @@ import { EditContentForm } from "@/components/EditContentForm.tsx"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
+import type { ContentListItem } from "../../server/routers/content.ts"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -24,9 +25,7 @@ function RoleDashboard() {
 	const auth0 = useAuth0()
 	const [contentFilter, setContentFilter] = useState<ContentFilter>(ContentFilter.Own)
 	const content = useQuery(trpc.content.list.queryOptions({ filter: contentFilter }))
-	const [editingItem, setEditingItem] = useState<
-		NonNullable<(typeof content)["data"]>["content"][number] | null
-	>(null)
+	const [editingItem, setEditingItem] = useState<ContentListItem | null>(null)
 	const [editDialogOpen, { open: openEditDialog, close: closeEditDialog }] = useDisclosure(false)
 	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
 		useDisclosure(false)
@@ -127,6 +126,7 @@ function RoleDashboard() {
 						<EditContentForm
 							content={{
 								...editingItem,
+								tags: structuredClone(editingItem.tags),
 								expirationDate: editingItem.expirationDate.toISOString().split("T")[0],
 								lastModifiedDate: editingItem.lastModifiedDate.toISOString().split("T")[0],
 							}}
