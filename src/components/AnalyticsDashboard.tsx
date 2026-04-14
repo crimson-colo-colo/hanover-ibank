@@ -1,5 +1,5 @@
 import { AreaChart, BarChart } from "@mantine/charts"
-import { Avatar, Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { FolderOpen, PencilSimple, SignIn, UploadSimple } from "@phosphor-icons/react"
 export function AnalyticsDashboard() {
 	const uploadData = [
