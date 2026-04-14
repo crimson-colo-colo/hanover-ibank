@@ -2,9 +2,9 @@ import { adminRouter } from "./routers/admin.ts"
 import { cliRouter } from "./routers/cli.ts"
 import { contentRouter } from "./routers/content.ts"
 import { formsRouter } from "./routers/forms.ts"
+import { previewRouter } from "./routers/preview.ts"
 import { userRouter } from "./routers/user.ts"
 import { router } from "./trpc.ts"
-import { viewRouter} from "./routers/view.ts"
 
 export type AppRouter = typeof appRouter
 export const appRouter = router({
@@ -13,5 +13,5 @@ export const appRouter = router({
 	forms: formsRouter,
 	admin: adminRouter,
 	user: userRouter,
-	view: viewRouter
+	preview: previewRouter,
 })

@@ -255,7 +255,18 @@ export const contentRouter = router({
 		})
 		return unfavorite
 	}),
-	listFavorites: authProcedure.query(async (opts) => {
+	listFavorites: authProcedure.query(async (opts): Promise<ContentList> => {
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
+		if (!user?.role) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "user does not exist",
+			})
+		}
 		const data = await db.content.findMany({
 			where: {
 				favoritedBy: {
@@ -263,6 +274,9 @@ export const contentRouter = router({
 						employeeId: opts.ctx.auth.sub,
 					},
 				},
+			},
+			include: {
+				owner: true,
 			},
 		})
 
@@ -278,8 +292,29 @@ export const contentRouter = router({
 				)
 		)
 
+		const users = await auth0Management.users.list()
+
 		return {
-			content: data,
+			role: user.role,
+			content: data.map((content) => {
+				const owner = users.data.find((u) => u.user_id === content.ownerId) ?? {
+					name: "Unknown User",
+					email: "unknown",
+					username: "unknown",
+					avatarUrl: "",
+				}
+				return {
+					...content,
+					owner: {
+						...content.owner,
+						name: owner.name ?? owner.nickname ?? owner.username!,
+						email: owner.email!,
+						username: owner.username!,
+						avatarUrl: owner.picture || getGravatarUrl(owner.email!),
+					} satisfies ContentListItem["owner"],
+					favorited: true,
+				} as ContentListItem
+			}),
 			objectMetadata: new Map(metadata),
 		}
 	}),

@@ -1,23 +1,24 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { UTCDate } from "@date-fns/utc"
+import { ContentTable } from "@/components/ContentTable.tsx"
+import { EditContentForm } from "@/components/EditContentForm.tsx"
+import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
+import { PreviewModal } from "@/components/PreviewModal.tsx"
+import { employeeRoleDisplayName } from "@/lib/enums.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
+import "@iamjariwala/react-doc-viewer/dist/index.css"
 import { Modal, SimpleGrid, Text, Title } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { ContentType } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import { IconFileUpload } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
-import { ContentTable } from "@/components/ContentTable.tsx"
-import { EditContentForm } from "@/components/EditContentForm.tsx"
-import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
-import { FileViewer } from "@/components/FileViewer.tsx"
-import { employeeRoleDisplayName } from "@/lib/enums.ts"
-import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
-import "@iamjariwala/react-doc-viewer/dist/index.css";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -31,12 +32,19 @@ function RoleDashboard() {
 	const [editDialogOpen, { open: openEditDialog, close: closeEditDialog }] = useDisclosure(false)
 	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
 		useDisclosure(false)
-	const [filePreviewOpen, { open: openFilePreviewModal, close: closeFilePreview }] =
+	const [filePreviewOpen, { open: openFilePreviewModal, close: _closeFilePreview }] =
 		useDisclosure(false)
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
 
+	function closeFilePreview() {
+		setSelectedContent(null)
+		setSelectedContentFileType(null)
+		_closeFilePreview()
+	}
 
-	const [selectedContent, setSelectedContent] = useState<ContentListItem  |null>(null)
+	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
+	const [selectedContentFileType, setSelectedContentFileType] = useState<FileType | null>(null)
+
 	const updateContent = useMutation(
 		trpc.content.update.mutationOptions({
 			onSuccess() {
@@ -89,20 +97,19 @@ function RoleDashboard() {
 								<FavoriteContentCard
 									fileName={item.title}
 									key={item.id}
-									contentUrl={item.url}
 									contentId={item.id}
+									contentUrl={item.type === ContentType.Link ? item.url : null}
 									contentType={
 										item.type === "Link"
 											? FileType.Link
 											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									}
-
-									onViewDetails={()=>(
-
-
+									item={item}
+									openFilePreview={(file, type) => {
+										setSelectedContent(file)
+										setSelectedContentFileType(type)
 										openFilePreviewModal()
-
-										)}
+									}}
 								/>
 							)
 						})
@@ -131,8 +138,9 @@ function RoleDashboard() {
 							}}
 							filter={contentFilter}
 							changeFilter={setContentFilter}
-							openFilePreview={(file) => {
+							openFilePreview={(file, type) => {
 								setSelectedContent(file)
+								setSelectedContentFileType(type)
 								openFilePreviewModal()
 							}}
 						/>
@@ -205,21 +213,21 @@ function RoleDashboard() {
 						</Dropzone>
 					)}
 				</Modal>
-				<Modal
+				<Modal.Root
 					opened={filePreviewOpen}
 					onClose={closeFilePreview}
-					title={selectedContent?.title ?? "Viewing Uploaded File"}
-					overlayProps={{
-						backgroundOpacity: 0.55,
-						blur: 3,
-					}}
-					size="80%"
+					fullScreen
+					transitionProps={{ transition: "fade", duration: 200 }}
 				>
-					{selectedContent?
-					<FileViewer content={selectedContent} />
-						: <Text>No content selected</Text>
-					}
-				</Modal>
+					<Modal.Overlay backgroundOpacity={0.55} blur={3} />
+					{selectedContent && selectedContentFileType && (
+						<PreviewModal
+							closeFilePreview={closeFilePreview}
+							content={selectedContent}
+							fileType={selectedContentFileType}
+						/>
+					)}
+				</Modal.Root>
 			</div>
 		</main>
 	)

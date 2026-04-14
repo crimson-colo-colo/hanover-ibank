@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
+import type { ContentListItem } from "../../server/routers/content.ts"
 
 function isTruncated(e: HTMLElement) {
 	const temp = e.cloneNode(true) as HTMLElement
@@ -33,19 +34,19 @@ function isTruncated(e: HTMLElement) {
 }
 
 export function FavoriteContentCard({
-										contentUrl,
-										contentId,
-										contentType,
-										fileName,
-										onViewDetails,
-
-
-									}: {
-	contentId: string,
-	contentUrl: string | null,
-	contentType: FileType,
-	fileName: string,
-	onViewDetails: () => void
+	contentId,
+	contentUrl,
+	contentType,
+	fileName,
+	openFilePreview,
+	item,
+}: {
+	contentId: string
+	contentUrl: string | null
+	contentType: FileType
+	fileName: string
+	openFilePreview: (info: ContentListItem, type: FileType) => void
+	item: ContentListItem
 }) {
 	const titleRef = useRef<HTMLParagraphElement>(null)
 	const [titleTruncated, setTitleTruncated] = useState(false)
@@ -71,6 +72,11 @@ export function FavoriteContentCard({
 			target="_blank"
 			p="28"
 			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
+			onClick={() => {
+				if (contentType !== FileType.Link) {
+					openFilePreview(item, contentType)
+				}
+			}}
 		>
 			<Card.Section>
 				<Flex justify="space-between" align="center" gap="sm">
@@ -81,7 +87,13 @@ export function FavoriteContentCard({
 					</Tooltip>
 					<Menu position="bottom-end">
 						<Menu.Target>
-							<ActionIcon onClick={(e) => e.preventDefault()} variant="subtle">
+							<ActionIcon
+								onClick={(e) => {
+									e.preventDefault()
+									e.stopPropagation()
+								}}
+								variant="subtle"
+							>
 								<IconDotsVertical size={20} />
 							</ActionIcon>
 						</Menu.Target>
@@ -96,16 +108,16 @@ export function FavoriteContentCard({
 								}
 								onClick={() => unfavoriteContent.mutate({ id: contentId })}
 							>
-					filePreviewOpen			Unfavorite
+								Unfavorite
 							</Menu.Item>
 							{contentType === FileType.Link ? (
 								<Menu.Item
 									leftSection={<IconCircleArrowUpRight size={20} />}
-									onClick={(e) => {
-										e.preventDefault()
-										onViewDetails()
+									onClick={async () => {
+										openFilePreview(item, contentType)
 									}}
-								>View Details
+								>
+									View Details
 								</Menu.Item>
 							) : (
 								<Menu.Item
