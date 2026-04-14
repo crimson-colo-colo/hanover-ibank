@@ -1,4 +1,5 @@
 import { UTCDate } from "@date-fns/utc"
+
 import {
 	ActionIcon,
 	Flex,
@@ -15,10 +16,12 @@ import { useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { FileType } from "@shared/filetype.ts"
 import { IconCalendar, IconPencil, IconUser } from "@tabler/icons-react"
+import { useMutation } from "@tanstack/react-query"
 import { useRef, useState } from "react"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 type EditableField = "title" | "owner" | "lastModifiedDate" | "expirationDate" | null
@@ -42,6 +45,7 @@ export function PreviewModal({
 			})
 		}
 	}
+
 	const titleRef = useRef<HTMLInputElement>(null)
 
 	function onFieldEdit(field: EditableField, value: string) {
@@ -50,6 +54,7 @@ export function PreviewModal({
 			message: `edited ${field} to ${value}`,
 		})
 		setEditingField(null)
+		updateTitle.mutate({ id: content.id, title: value })
 	}
 
 	const form = useForm({
@@ -58,6 +63,16 @@ export function PreviewModal({
 			intendedAudience: [],
 		},
 	})
+
+	const updateTitle = useMutation(
+		trpc.content.updateTitle.mutationOptions({
+			onSuccess() {
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey(),
+				})
+			},
+		})
+	)
 
 	return (
 		<FilePreviewProvider
@@ -93,13 +108,14 @@ export function PreviewModal({
 										setEditingField={setEditingField}
 										onFieldEdit={onFieldEdit}
 										ref={titleRef}
+										contentId={content.id}
 									/>
 								</Title>
 								<Popover
 									shadow="md"
 									opened={editingField === "owner"}
 									onDismiss={() => {
-										onFieldEdit("owner", form.getValues().ownerId)
+										onFieldEdit("owner", form.getValues().ownerId, content.id)
 									}}
 									closeOnClickOutside
 									withArrow
@@ -128,6 +144,7 @@ export function PreviewModal({
 									editingField={editingField}
 									setEditingField={setEditingField}
 									onFieldEdit={onFieldEdit}
+									contentId={content.id}
 								/>
 								<EditableDateField
 									field="expirationDate"
@@ -136,6 +153,7 @@ export function PreviewModal({
 									editingField={editingField}
 									setEditingField={setEditingField}
 									onFieldEdit={onFieldEdit}
+									contentId={content.id}
 								/>
 							</Stack>
 						</ScrollArea>
@@ -153,13 +171,15 @@ function EditableTextField({
 	setEditingField,
 	onFieldEdit,
 	ref,
+	contentId,
 }: {
 	value: string
 	field: NonNullable<EditableField>
 	editingField: EditableField
 	setEditingField: (field: EditableField) => void
-	onFieldEdit: (field: NonNullable<EditableField>, value: string) => void
+	onFieldEdit: (field: NonNullable<EditableField>, value: string, contentId: string) => void
 	ref: React.RefObject<HTMLInputElement | null>
+	contentId: string
 }) {
 	return editingField !== field ? (
 		<>
@@ -173,11 +193,11 @@ function EditableTextField({
 			ref={ref}
 			defaultValue={value}
 			onBlur={(e) => {
-				onFieldEdit(field, e.target.value)
+				onFieldEdit(field, e.target.value, contentId)
 			}}
 			onKeyDown={(e) => {
 				if (e.key === "Enter") {
-					onFieldEdit(field, ref.current?.value ?? "")
+					onFieldEdit(field, ref.current?.value ?? "", contentId)
 				}
 			}}
 			className="max-w-none w-full px-1 py-1 border-none bg-gray-50"
@@ -192,13 +212,15 @@ function EditableDateField({
 	editingField,
 	setEditingField,
 	onFieldEdit,
+	contentId,
 }: {
 	field: Extract<NonNullable<EditableField>, "lastModifiedDate" | "expirationDate">
 	label: string
 	value: Date
 	editingField: EditableField
 	setEditingField: (field: EditableField) => void
-	onFieldEdit: (field: NonNullable<EditableField>, value: string) => void
+	onFieldEdit: (field: NonNullable<EditableField>, value: string, contentId: string) => void
+	contentId: string
 }) {
 	return (
 		<Popover
@@ -228,7 +250,7 @@ function EditableDateField({
 					defaultDate={new UTCDate(value)}
 					onChange={(date) => {
 						if (date) {
-							onFieldEdit(field, new UTCDate(date).toISOString())
+							onFieldEdit(field, new UTCDate(date).toISOString(), contentId)
 						}
 					}}
 				/>

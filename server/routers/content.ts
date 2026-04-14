@@ -150,6 +150,23 @@ export const contentRouter = router({
 			return updated
 		}),
 
+	updateTitle: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				title: z.string().min(3).max(250),
+			})
+		)
+		.mutation(async (opts) => {
+			const updated = await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					title: opts.input.title,
+				},
+			})
+			return updated
+		}),
+
 	download: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },
