@@ -27,6 +27,7 @@ import {
 	IconStar,
 	IconStarFilled,
 	IconTrash,
+	IconCloudUpload,
 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import {
@@ -46,6 +47,7 @@ import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
+import { CreateContentModal} from "@/components/CreateContentModal.tsx";
 
 export function ContentTable({
 	data,
@@ -65,6 +67,8 @@ export function ContentTable({
 	const [globalFilter, setGlobalFilter] = useState("")
 	const [downloadingItemId, setDownloadingItemId] = useState<string | null>(null)
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
+		useDisclosure(false)
+	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] =
 		useDisclosure(false)
 	const deleteContent = useMutation(
 		trpc.content.delete.mutationOptions({
@@ -384,6 +388,13 @@ export function ContentTable({
 					/>
 
 					<Button
+						leftSection={<IconCloudUpload size={16} stroke={1.5} />}
+						onClick={openCreateModal}
+					>
+						Create Content
+					</Button>
+
+					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"
 						disabled={Object.keys(rowSelection).length === 0}
@@ -465,6 +476,7 @@ export function ContentTable({
 					)}
 				</Table.Tbody>
 			</Table>
+			<CreateContentModal opened={createModalOpen} onClose={closeCreateModal} />
 			<Modal opened={deleteDialogOpen} onClose={closeDeleteDialog} title="Confirm Deletion">
 				<Text>Are you sure you want to delete the selected content?</Text>
 				<Flex mt="md" justify="flex-end" gap="sm">

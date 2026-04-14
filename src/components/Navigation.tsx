@@ -25,17 +25,24 @@ import {
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
+import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { trpc } from "@/lib/trpc.ts"
-import { CreateContentModal} from "@/components/CreateContentModal.tsx";
 
-function NavLinks({ isLoading, isAdmin, openUpload }: { isLoading: boolean; isAdmin: boolean | undefined; openUpload: () => void }) {
+function NavLinks({
+	isLoading,
+	isAdmin,
+	openUpload,
+}: {
+	isLoading: boolean
+	isAdmin: boolean | undefined
+	openUpload: () => void
+}) {
 	const location = useLocation()
 
 	return (
 		<>
 			{!isLoading && (
-				<Button
-					variant="subtle" onClick={openUpload}>
+				<Button variant="subtle" onClick={openUpload}>
 					Upload Content
 				</Button>
 			)}
@@ -180,7 +187,11 @@ export function Navigation() {
 						<span className="font-semibold font-display text-xl">iBank</span>
 					</Link>
 					{auth0.isAuthenticated && (
-						<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} openUpload={openUpload} />
+						<NavLinks
+							isLoading={isAdmin.isLoading}
+							isAdmin={isAdmin.data}
+							openUpload={openUpload}
+						/>
 					)}
 				</Group>
 
