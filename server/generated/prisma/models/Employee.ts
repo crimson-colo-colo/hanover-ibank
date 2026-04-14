@@ -160,6 +160,7 @@ export type EmployeeWhereInput = {
   role?: Prisma.EnumEmployeeRoleFilter<"Employee"> | $Enums.EmployeeRole
   content?: Prisma.ContentListRelationFilter
   favorite?: Prisma.FavoriteContentListRelationFilter
+  checkedOutContent?: Prisma.ContentListRelationFilter
 }
 
 export type EmployeeOrderByWithRelationInput = {
@@ -167,6 +168,7 @@ export type EmployeeOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   content?: Prisma.ContentOrderByRelationAggregateInput
   favorite?: Prisma.FavoriteContentOrderByRelationAggregateInput
+  checkedOutContent?: Prisma.ContentOrderByRelationAggregateInput
 }
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
@@ -177,6 +179,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumEmployeeRoleFilter<"Employee"> | $Enums.EmployeeRole
   content?: Prisma.ContentListRelationFilter
   favorite?: Prisma.FavoriteContentListRelationFilter
+  checkedOutContent?: Prisma.ContentListRelationFilter
 }, "id">
 
 export type EmployeeOrderByWithAggregationInput = {
@@ -200,6 +203,7 @@ export type EmployeeCreateInput = {
   role: $Enums.EmployeeRole
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
 }
 
 export type EmployeeUncheckedCreateInput = {
@@ -207,6 +211,7 @@ export type EmployeeUncheckedCreateInput = {
   role: $Enums.EmployeeRole
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
 }
 
 export type EmployeeUpdateInput = {
@@ -214,6 +219,7 @@ export type EmployeeUpdateInput = {
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
 }
 
 export type EmployeeUncheckedUpdateInput = {
@@ -221,6 +227,7 @@ export type EmployeeUncheckedUpdateInput = {
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
 }
 
 export type EmployeeCreateManyInput = {
@@ -258,6 +265,11 @@ export type EmployeeScalarRelationFilter = {
   isNot?: Prisma.EmployeeWhereInput
 }
 
+export type EmployeeNullableScalarRelationFilter = {
+  is?: Prisma.EmployeeWhereInput | null
+  isNot?: Prisma.EmployeeWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -272,12 +284,28 @@ export type EmployeeCreateNestedOneWithoutContentInput = {
   connect?: Prisma.EmployeeWhereUniqueInput
 }
 
+export type EmployeeCreateNestedOneWithoutCheckedOutContentInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutCheckedOutContentInput, Prisma.EmployeeUncheckedCreateWithoutCheckedOutContentInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutCheckedOutContentInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
 export type EmployeeUpdateOneRequiredWithoutContentNestedInput = {
   create?: Prisma.XOR<Prisma.EmployeeCreateWithoutContentInput, Prisma.EmployeeUncheckedCreateWithoutContentInput>
   connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutContentInput
   upsert?: Prisma.EmployeeUpsertWithoutContentInput
   connect?: Prisma.EmployeeWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutContentInput, Prisma.EmployeeUpdateWithoutContentInput>, Prisma.EmployeeUncheckedUpdateWithoutContentInput>
+}
+
+export type EmployeeUpdateOneWithoutCheckedOutContentNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutCheckedOutContentInput, Prisma.EmployeeUncheckedCreateWithoutCheckedOutContentInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutCheckedOutContentInput
+  upsert?: Prisma.EmployeeUpsertWithoutCheckedOutContentInput
+  disconnect?: Prisma.EmployeeWhereInput | boolean
+  delete?: Prisma.EmployeeWhereInput | boolean
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutCheckedOutContentInput, Prisma.EmployeeUpdateWithoutCheckedOutContentInput>, Prisma.EmployeeUncheckedUpdateWithoutCheckedOutContentInput>
 }
 
 export type EmployeeCreateNestedOneWithoutFavoriteInput = {
@@ -298,17 +326,38 @@ export type EmployeeCreateWithoutContentInput = {
   id: string
   role: $Enums.EmployeeRole
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
 }
 
 export type EmployeeUncheckedCreateWithoutContentInput = {
   id: string
   role: $Enums.EmployeeRole
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
 }
 
 export type EmployeeCreateOrConnectWithoutContentInput = {
   where: Prisma.EmployeeWhereUniqueInput
   create: Prisma.XOR<Prisma.EmployeeCreateWithoutContentInput, Prisma.EmployeeUncheckedCreateWithoutContentInput>
+}
+
+export type EmployeeCreateWithoutCheckedOutContentInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeCreateOrConnectWithoutCheckedOutContentInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutCheckedOutContentInput, Prisma.EmployeeUncheckedCreateWithoutCheckedOutContentInput>
 }
 
 export type EmployeeUpsertWithoutContentInput = {
@@ -326,11 +375,38 @@ export type EmployeeUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+}
+
+export type EmployeeUpsertWithoutCheckedOutContentInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutCheckedOutContentInput, Prisma.EmployeeUncheckedUpdateWithoutCheckedOutContentInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutCheckedOutContentInput, Prisma.EmployeeUncheckedCreateWithoutCheckedOutContentInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutCheckedOutContentInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutCheckedOutContentInput, Prisma.EmployeeUncheckedUpdateWithoutCheckedOutContentInput>
+}
+
+export type EmployeeUpdateWithoutCheckedOutContentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
@@ -338,12 +414,14 @@ export type EmployeeCreateWithoutFavoriteInput = {
   id: string
   role: $Enums.EmployeeRole
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
 }
 
 export type EmployeeUncheckedCreateWithoutFavoriteInput = {
   id: string
   role: $Enums.EmployeeRole
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
 }
 
 export type EmployeeCreateOrConnectWithoutFavoriteInput = {
@@ -366,12 +444,14 @@ export type EmployeeUpdateWithoutFavoriteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
 }
 
 
@@ -382,11 +462,13 @@ export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
 export type EmployeeCountOutputType = {
   content: number
   favorite: number
+  checkedOutContent: number
 }
 
 export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   content?: boolean | EmployeeCountOutputTypeCountContentArgs
   favorite?: boolean | EmployeeCountOutputTypeCountFavoriteArgs
+  checkedOutContent?: boolean | EmployeeCountOutputTypeCountCheckedOutContentArgs
 }
 
 /**
@@ -413,12 +495,20 @@ export type EmployeeCountOutputTypeCountFavoriteArgs<ExtArgs extends runtime.Typ
   where?: Prisma.FavoriteContentWhereInput
 }
 
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountCheckedOutContentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContentWhereInput
+}
+
 
 export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   role?: boolean
   content?: boolean | Prisma.Employee$contentArgs<ExtArgs>
   favorite?: boolean | Prisma.Employee$favoriteArgs<ExtArgs>
+  checkedOutContent?: boolean | Prisma.Employee$checkedOutContentArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -441,6 +531,7 @@ export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   content?: boolean | Prisma.Employee$contentArgs<ExtArgs>
   favorite?: boolean | Prisma.Employee$favoriteArgs<ExtArgs>
+  checkedOutContent?: boolean | Prisma.Employee$checkedOutContentArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -451,6 +542,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     content: Prisma.$ContentPayload<ExtArgs>[]
     favorite: Prisma.$FavoriteContentPayload<ExtArgs>[]
+    checkedOutContent: Prisma.$ContentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -851,6 +943,7 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   content<T extends Prisma.Employee$contentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$contentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favorite<T extends Prisma.Employee$favoriteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$favoriteArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  checkedOutContent<T extends Prisma.Employee$checkedOutContentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$checkedOutContentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1320,6 +1413,30 @@ export type Employee$favoriteArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.FavoriteContentScalarFieldEnum | Prisma.FavoriteContentScalarFieldEnum[]
+}
+
+/**
+ * Employee.checkedOutContent
+ */
+export type Employee$checkedOutContentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Content
+   */
+  select?: Prisma.ContentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Content
+   */
+  omit?: Prisma.ContentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentInclude<ExtArgs> | null
+  where?: Prisma.ContentWhereInput
+  orderBy?: Prisma.ContentOrderByWithRelationInput | Prisma.ContentOrderByWithRelationInput[]
+  cursor?: Prisma.ContentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContentScalarFieldEnum | Prisma.ContentScalarFieldEnum[]
 }
 
 /**
