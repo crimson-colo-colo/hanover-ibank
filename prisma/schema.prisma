@@ -34,7 +34,6 @@ model Content {
   url              String?
   ownerId          String
   owner            Employee               @relation(fields: [ownerId], references: [id])
-  intendedAudience EmployeeRole[]
   tags             ContentTagsOnContent[]
   favoritedBy      FavoriteContent[]
 }

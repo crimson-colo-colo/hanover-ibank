@@ -8,11 +8,10 @@ import { v4 as uuidv4 } from "uuid"
 import { auth0Management } from "../server/auth.ts"
 import {
 	ContentStatus,
-	ContentType,
-	DocumentType,
 	EmployeeRole,
 	type Prisma,
 	PrismaClient,
+	TagCategory,
 } from "../server/generated/prisma/client.ts"
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
 import { getFileTypeFromFile } from "../server/lib/filetype.ts"
@@ -184,20 +183,29 @@ async function main() {
 			// Document Type
 			{
 				name: "Workflow",
-				category: "DocumentType",
+				category: TagCategory.DocumentType,
 			},
 			{
 				name: "Reference",
-				category: "DocumentType",
+				category: TagCategory.DocumentType,
 			},
 			{
 				name: "Object",
-				category: "ContentType",
+				category: TagCategory.ContentType,
 			},
 			{
 				name: "Link",
-				category: "ContentType",
+				category: TagCategory.ContentType,
 			},
+			{
+				name: "Underwriter",
+				category: TagCategory.IntendedAudience,
+			},
+			{
+				name: "Business Analyst",
+				category: TagCategory.IntendedAudience,
+			},
+			//TODO: add custom tags
 		],
 	})
 
@@ -294,7 +302,6 @@ async function main() {
 		].map((content) => ({
 			...content,
 			ownerId: nextUndewriter(),
-			intendedAudience: [EmployeeRole.Underwriter],
 		})),
 		...[
 			{
@@ -375,7 +382,6 @@ async function main() {
 		].map((content) => ({
 			...content,
 			ownerId: nextAnalyst(),
-			intendedAudience: [EmployeeRole.BusinessAnalyst],
 		})),
 	] satisfies Prisma.ContentCreateManyInput[]
 
@@ -453,13 +459,10 @@ async function main() {
 		const isUnderwriter = Math.random() < 0.5
 		return {
 			title: filename,
-			type: ContentType.Object,
 			ownerId: isUnderwriter ? nextUndewriter() : nextAnalyst(),
 			lastModifiedDate,
 			expirationDate,
-			documentType: Math.random() < 0.5 ? DocumentType.Reference : DocumentType.Workflow,
 			objectId: id,
-			intendedAudience: [isUnderwriter ? EmployeeRole.Underwriter : EmployeeRole.BusinessAnalyst],
 		} satisfies Prisma.ContentCreateManyInput
 	})
 
@@ -477,36 +480,80 @@ async function main() {
 
 	await prisma.contentTagsOnContent.createMany({
 		data: [
-			...fileContentIds.flatMap(
-				(contentID) =>
-					[
-						{
-							tagCategory: "DocumentType",
-							tagName: "Reference",
-							contentID: contentID,
-						},
-						{
-							contentID,
-							tagName: "Object",
-							tagCategory: "ContentType",
-						},
-					] satisfies Prisma.ContentTagsOnContentCreateManyInput[]
-			),
-
-			...urlContent.flatMap((cont) => {
-				const contentID = cont.id
-				return [
-					{
-						tagCategory: "DocumentType",
-						tagName: "Reference",
-						contentID: contentID,
-					},
+			...fileContentIds.flatMap((contentID) => {
+				const list: Prisma.ContentTagsOnContentCreateManyInput[] = [
 					{
 						contentID,
-						tagName: "Link",
-						tagCategory: "ContentType",
+						tagName: "Object",
+						tagCategory: TagCategory.ContentType,
 					},
-				] satisfies Prisma.ContentTagsOnContentCreateManyInput[]
+				]
+				if (Math.random() < 0.5) {
+					list.push({
+						contentID,
+						tagName: "Reference",
+						tagCategory: TagCategory.DocumentType,
+					})
+				} else {
+					list.push({
+						contentID,
+						tagName: "Workflow",
+						tagCategory: TagCategory.DocumentType,
+					})
+				}
+				if (Math.random() < 0.5) {
+					list.push({
+						contentID,
+						tagName: "Business Analyst",
+						tagCategory: TagCategory.IntendedAudience,
+					})
+				} else {
+					list.push({
+						contentID,
+						tagName: "Underwriter",
+						tagCategory: TagCategory.IntendedAudience,
+					})
+				}
+				return list
+			}),
+
+			...urlContent.flatMap(({ id: contentID }) => {
+				const list: Prisma.ContentTagsOnContentCreateManyInput[] = [
+					{
+						contentID,
+						tagCategory: TagCategory.ContentType,
+						tagName: "Link",
+					},
+				]
+				if (Math.random() < 0.5) {
+					list.push({
+						contentID,
+						tagCategory: TagCategory.DocumentType,
+						tagName: "Reference",
+					})
+				} else {
+					list.push({
+						contentID,
+						tagCategory: TagCategory.DocumentType,
+						tagName: "Workflow",
+					})
+				}
+
+				if (Math.random() < 0.5) {
+					list.push({
+						contentID,
+						tagCategory: TagCategory.IntendedAudience,
+						tagName: "Underwriter",
+					})
+				} else {
+					list.push({
+						contentID,
+						tagCategory: TagCategory.IntendedAudience,
+						tagName: "Business Analyst",
+					})
+				}
+
+				return list
 			}),
 		],
 	})
