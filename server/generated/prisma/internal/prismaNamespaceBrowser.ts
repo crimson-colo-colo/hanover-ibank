@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Employee: 'Employee',
-  Content: 'Content'
+  Content: 'Content',
+  FavoriteContent: 'FavoriteContent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -96,6 +97,14 @@ export const ContentScalarFieldEnum = {
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
+
+
+export const FavoriteContentScalarFieldEnum = {
+  contentId: 'contentId',
+  employeeId: 'employeeId'
+} as const
+
+export type FavoriteContentScalarFieldEnum = (typeof FavoriteContentScalarFieldEnum)[keyof typeof FavoriteContentScalarFieldEnum]
 
 
 export const SortOrder = {

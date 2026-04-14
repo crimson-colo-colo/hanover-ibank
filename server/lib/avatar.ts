@@ -15,7 +15,7 @@ export function generateDefaultAvatar(name: string) {
 	const ctx = canvas.getContext("2d")
 	const hash = Number(fnv1a(name))
 	const colorKey = Object.keys(avatarColors)[hash % Object.keys(avatarColors).length]
-	ctx.fillStyle = avatarColors[colorKey][7]
+	ctx.fillStyle = avatarColors[colorKey][6]
 	ctx.fillRect(0, 0, 120, 120)
 	ctx.fillStyle = "white"
 	ctx.textAlign = "center"

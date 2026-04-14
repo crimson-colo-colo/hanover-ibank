@@ -1,4 +1,5 @@
 import type { HeadObjectOutput } from "@aws-sdk/client-s3"
+import { ContentFilter } from "@shared/enum.ts"
 import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
 import z from "zod"
@@ -6,6 +7,7 @@ import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import { ContentStatus, DocumentType, EmployeeRole } from "../generated/prisma/enums.ts"
+import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
@@ -20,6 +22,7 @@ export type ContentListItem = {
 		username: string
 		avatarUrl: string
 	}
+	favorited: boolean
 	ownerId: string
 	lastModifiedDate: Date
 	expirationDate: Date
@@ -44,71 +47,79 @@ export interface ContentList {
 }
 
 export const contentRouter = router({
-	list: authProcedure.query(async (opts): Promise<ContentList> => {
-		const user = await db.employee.findUnique({
-			where: {
-				id: opts.ctx.auth.sub,
-			},
-		})
-		if (!user?.role) {
-			throw new TRPCError({
-				code: "NOT_FOUND",
-				message: "user does not exist",
+	list: authProcedure
+		.input(z.object({ filter: z.enum(Object.values(ContentFilter)) }))
+		.query(async (opts): Promise<ContentList> => {
+			const user = await db.employee.findUnique({
+				where: {
+					id: opts.ctx.auth.sub,
+				},
 			})
-		}
-		const data = await db.content.findMany({
-			where:
-				user.role === EmployeeRole.Admin
-					? {
-							// no filters; fetch everything
-						}
-					: {
-							intendedAudience: {
-								has: user.role,
+			if (!user?.role) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "user does not exist",
+				})
+			}
+			const data = await db.content.findMany({
+				where:
+					user.role === EmployeeRole.Admin || opts.input.filter === ContentFilter.All
+						? {
+								// no filters; fetch everything
+							}
+						: {
+								intendedAudience: {
+									has: user.role,
+								},
 							},
+				include: {
+					owner: true,
+					favoritedBy: {
+						where: {
+							employeeId: opts.ctx.auth.sub,
 						},
-			include: {
-				owner: true,
-			},
-		})
+					},
+				},
+			})
 
-		const users = await auth0Management.users.list()
+			const users = await auth0Management.users.list()
 
-		const metadata = await Promise.all(
-			data
-				.filter((content) => content.type === "Object")
-				.map(
-					async (content) =>
-						[
-							content.id,
-							await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
-						] as const
-				)
-		)
+			const metadata = await Promise.all(
+				data
+					.filter((content) => content.type === "Object")
+					.map(
+						async (content) =>
+							[
+								content.id,
+								await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
+							] as const
+					)
+			)
 
-		return {
-			role: user.role,
-			content: data.map((content) => {
-				const owner = users.data.find((u) => u.user_id === content.ownerId) ?? {
-					name: "Unknown User",
-					email: "unknown",
-					username: "unknown",
-					avatarUrl: "",
-				}
-				return {
-					...content,
-					owner: {
-						...content.owner,
-						name: owner.name ?? owner.nickname ?? owner.username!,
-						email: owner.email!,
-						username: owner.username!,
-						avatarUrl: owner.picture || getGravatarUrl(owner.email!),
-					} satisfies ContentListItem["owner"],
-				} as ContentListItem
-			}),
-			objectMetadata: new Map(metadata),
-		}
-	}),
+			return {
+				role: user.role,
+				content: data.map((content) => {
+					const owner = users.data.find((u) => u.user_id === content.ownerId) ?? {
+						name: "Unknown User",
+						email: "unknown",
+						username: "unknown",
+						avatarUrl: "",
+					}
+					return {
+						...content,
+						favorited: content.favoritedBy.length > 0,
+						owner: {
+							...content.owner,
+							name: owner.name ?? owner.nickname ?? owner.username!,
+							email: owner.email!,
+							username: owner.username!,
+							avatarUrl: owner.picture || getGravatarUrl(owner.email!),
+						} satisfies ContentListItem["owner"],
+					} as ContentListItem
+				}),
+				objectMetadata: new Map(metadata),
+			}
+		}),
 
 	update: authProcedure
 		.input(
@@ -190,10 +201,15 @@ export const contentRouter = router({
 				})
 			}
 
+			const buffer = Buffer.from(opts.input.file, "base64")
+			const fileType = await getFileTypeFromFile(content.title, buffer)
 			await s3.putObject({
 				Bucket: bucketName,
 				Key: content.objectId!,
-				Body: Buffer.from(opts.input.file, "base64"),
+				Body: buffer,
+				Metadata: {
+					filetype: fileType,
+				},
 			})
 			await db.content.update({
 				where: { id: opts.input.id },
@@ -218,5 +234,53 @@ export const contentRouter = router({
 			}),
 			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
 		])
+	}),
+	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		const favorite = await db.favoriteContent.create({
+			data: {
+				contentId: opts.input.id,
+				employeeId: opts.ctx.auth.sub,
+			},
+		})
+		return favorite
+	}),
+	unfavorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		const unfavorite = await db.favoriteContent.delete({
+			where: {
+				contentId_employeeId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+		})
+		return unfavorite
+	}),
+	listFavorites: authProcedure.query(async (opts) => {
+		const data = await db.content.findMany({
+			where: {
+				favoritedBy: {
+					some: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
+			},
+		})
+
+		const metadata = await Promise.all(
+			data
+				.filter((content) => content.type === "Object")
+				.map(
+					async (content) =>
+						[
+							content.id,
+							await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
+						] as const
+				)
+		)
+
+		return {
+			content: data,
+			objectMetadata: new Map(metadata),
+		}
 	}),
 })
