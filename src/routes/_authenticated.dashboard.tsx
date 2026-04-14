@@ -17,6 +17,8 @@ import { FileViewer } from "@/components/FileViewer.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
+import DocViewer, { DocViewerRenderers } from "@iamjariwala/react-doc-viewer";
+import "@iamjariwala/react-doc-viewer/dist/index.css";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -33,6 +35,17 @@ function RoleDashboard() {
 	const [filePreviewOpen, { open: openFilePreviewModal, close: closeFilePreview }] =
 		useDisclosure(false)
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
+	const [previewFile, setPreviewFile] = useState<null | {
+		id: string
+		url: string
+		name: string
+		type: FileType
+	}>(null)
+
+	const docs = [
+		{ uri: "https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf" },
+		{ uri: "./prisma/seed-data/sample-pdf.pdf" },
+	];
 
 	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
 	const updateContent = useMutation(
@@ -123,7 +136,7 @@ function RoleDashboard() {
 							}}
 							filter={contentFilter}
 							changeFilter={setContentFilter}
-							openFilePreview={(item) => {
+							openFilePreview={(file) => {
 								setSelectedContent(item)
 								openFilePreviewModal()
 							}}
