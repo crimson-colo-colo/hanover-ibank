@@ -26,13 +26,7 @@ import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
 
-function NavLinks({
-	isLoading,
-	isAdmin,
-}: {
-	isLoading: boolean
-	isAdmin: boolean | undefined
-}) {
+function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
 	const location = useLocation()
 
 	return (
@@ -165,10 +159,7 @@ export function Navigation() {
 						<span className="font-semibold font-display text-xl">iBank</span>
 					</Link>
 					{auth0.isAuthenticated && (
-						<NavLinks
-							isLoading={isAdmin.isLoading}
-							isAdmin={isAdmin.data}
-						/>
+						<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} />
 					)}
 				</Group>
 

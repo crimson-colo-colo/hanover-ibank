@@ -42,12 +42,12 @@ import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
+import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
-import { CreateContentModal} from "@/components/CreateContentModal.tsx";
 
 export function ContentTable({
 	data,
@@ -68,8 +68,7 @@ export function ContentTable({
 	const [downloadingItemId, setDownloadingItemId] = useState<string | null>(null)
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
-	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] =
-		useDisclosure(false)
+	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
 	const deleteContent = useMutation(
 		trpc.content.delete.mutationOptions({
 			onMutate: async (data, context) => {

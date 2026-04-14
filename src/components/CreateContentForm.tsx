@@ -8,7 +8,6 @@ import {
 	SegmentedControl,
 	Select,
 	TextInput,
-	Title,
 } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
@@ -16,7 +15,6 @@ import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
 import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
-import { useNavigate } from "@tanstack/react-router"
 import { format } from "date-fns"
 import z from "zod"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
@@ -51,8 +49,8 @@ const fileSchema = baseSchema.extend({
 
 const schema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
 
-interface Props{
-	onSuccess: () => void,
+interface Props {
+	onSuccess: () => void
 }
 
 export function CreateContentForm({ onSuccess }: Props) {
