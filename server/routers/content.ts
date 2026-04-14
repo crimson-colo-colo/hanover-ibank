@@ -8,20 +8,22 @@ import { db } from "../database.ts"
 import { env } from "../env.ts"
 import { ContentStatus, DocumentType, EmployeeRole } from "../generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
-import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
+import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
-import { authProcedure, publicProcedure, router } from "../trpc.ts"
+import { authProcedure, router } from "../trpc.ts"
+
+type User = {
+	id: string
+	name: string
+	email: string
+	username: string
+}
 
 export type ContentListItem = {
 	id: string
 	title: string
-	readonly owner: {
-		id: string
-		name: string
-		email: string
-		username: string
-		avatarUrl: string
-	}
+	readonly owner: User
+	readonly checkedOutBy: User | null
 	favorited: boolean
 	ownerId: string
 	lastModifiedDate: Date
@@ -29,7 +31,6 @@ export type ContentListItem = {
 	documentType: DocumentType
 	status: ContentStatus
 	intendedAudience: EmployeeRole[]
-	checkedOutById: string
 } & (
 	| {
 			type: "Link"
@@ -101,22 +102,38 @@ export const contentRouter = router({
 			return {
 				role: user.role,
 				content: data.map((content) => {
-					const owner = users.data.find((u) => u.user_id === content.ownerId) ?? {
+					const unknownUser = {
 						name: "Unknown User",
 						email: "unknown",
 						username: "unknown",
 						avatarUrl: "",
+						nickname: null,
+						picture: null,
 					}
+					const owner = users.data.find((u) => u.user_id === content.ownerId) ?? unknownUser
+					const checkedOutByUser = content.checkedOutBy
+						? (users.data.find((u) => u.user_id === content.checkedOutById) ?? unknownUser)
+						: null
 					return {
 						...content,
 						favorited: content.favoritedBy.length > 0,
 						owner: {
-							...content.owner,
+							id: content.ownerId,
 							name: owner.name ?? owner.nickname ?? owner.username!,
 							email: owner.email!,
 							username: owner.username!,
-							avatarUrl: owner.picture || getGravatarUrl(owner.email!),
 						} satisfies ContentListItem["owner"],
+						checkedOutBy: checkedOutByUser
+							? ({
+									id: content.checkedOutById!,
+									name:
+										checkedOutByUser.name ??
+										checkedOutByUser.nickname ??
+										checkedOutByUser.username!,
+									email: checkedOutByUser.email!,
+									username: checkedOutByUser.username!,
+								} satisfies ContentListItem["checkedOutBy"])
+							: null,
 					} as ContentListItem
 				}),
 				objectMetadata: new Map(metadata),
