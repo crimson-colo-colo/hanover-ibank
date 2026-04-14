@@ -451,12 +451,17 @@ async function main() {
 		console.log(`Uploading file ${filename} (${id}) to S3...`)
 		const buffer = Buffer.from(content)
 		const fileType = await getFileTypeFromFile(filename, buffer)
+		const type = (await fileTypeFromBuffer(buffer))
+		let mimeType: { mimeType: string } | {} = {}
+		if (type) mimeType = {mimeType: type.mime}
 		await s3.putObject({
 			Bucket: bucketName,
 			Key: id,
 			Body: buffer,
+			ContentType: mimeFromFileType(fileType),
 			Metadata: {
 				filetype: fileType,
+				...mimeType
 			},
 		})
 		ids.set(path.basename(filename), id)

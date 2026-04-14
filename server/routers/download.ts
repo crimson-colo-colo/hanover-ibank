@@ -6,6 +6,7 @@ import z from "zod"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import { bucketName, s3 } from "../s3.ts"
+import {type FileType, fileTypeToMime} from "@shared/filetype.ts";
 
 export const contentDownloadRouter = express.Router()
 
@@ -15,7 +16,7 @@ export const DownloadTokenPayload = z.object({
 })
 
 contentDownloadRouter.get("/content/download", async (req: Request, res: Response) => {
-	const query = z.object({ token: z.string() }).safeParse(req.query)
+	const query = z.object({ token: z.string(), download: z.boolean().optional() }).safeParse(req.query)
 	if (!query.success) {
 		return res.status(400).json({ error: "Token is required" })
 	}

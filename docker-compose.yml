@@ -20,6 +20,10 @@ services:
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
+  gotenburg:
+    image: gotenberg/gotenberg:8
+    ports:
+      - "9002:9000"
 volumes:
   db_data:
   minio_data:

@@ -65,3 +65,8 @@ enum ContentType {
   Object
   Link
 }
+
+model CacheFile {
+  officeObjectId String?
+  pdfGute
+}

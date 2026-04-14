@@ -137,7 +137,7 @@ function RoleDashboard() {
 							filter={contentFilter}
 							changeFilter={setContentFilter}
 							openFilePreview={(file) => {
-								setSelectedContent(item)
+								setSelectedContent(file)
 								openFilePreviewModal()
 							}}
 						/>
@@ -220,7 +220,10 @@ function RoleDashboard() {
 					}}
 					size="80%"
 				>
-					<FileViewer />
+					{selectedContent?
+					<FileViewer content={selectedContent} />
+						: <Text>No content selected</Text>
+					}
 				</Modal>
 			</div>
 		</main>
