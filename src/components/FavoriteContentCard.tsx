@@ -34,18 +34,19 @@ function isTruncated(e: HTMLElement) {
 }
 
 export function FavoriteContentCard({
-	contentId,
-	contentUrl,
-	contentType,
-	fileName,
-	openFilePreview,
-}: {
-	contentId: string
-	contentUrl: string | null
-	contentType: FileType
-	fileName: string
-	openFilePreview: (info: string | null) =>(void)
-
+										contentId,
+										contentUrl,
+										contentType,
+										fileName,
+										openFilePreview,
+										item
+									}: {
+	contentId: string,
+	contentUrl: string | null,
+	contentType: FileType,
+	fileName: string,
+	openFilePreview: (info: ContentListItem) => (void),
+	item: ContentListItem
 }) {
 	const titleRef = useRef<HTMLParagraphElement>(null)
 	const [titleTruncated, setTitleTruncated] = useState(false)

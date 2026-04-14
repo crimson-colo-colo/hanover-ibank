@@ -60,7 +60,7 @@ contentDownloadRouter.get("/content/download", async (req: Request, res: Respons
 		: fileTypeToMime[object.Metadata?.filetype as FileType] ?? "application/octet-stream"
 	res.setHeader("Content-Type", contentType)
 
-	res.setHeader("Content-Disposition", `inline; filename="${content.title}"`) // todo: make it both inline and attachment
+	res.setHeader("Content-Disposition", `${query.data.download ?? false ? "attachment" : "inline"}; filename="${content.title}"`) // todo: make it both inline and attachment
 	if (object.ContentType && object.Metadata && object.Metadata) res.setHeader("Content-Type", contentType)
 	console.log(object)
 	assert(object.Body, "S3 object body is undefined")
