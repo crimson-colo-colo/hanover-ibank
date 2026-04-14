@@ -11,6 +11,7 @@ import {
 	NavLink,
 	ScrollArea,
 	Text,
+	useMantineColorScheme,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
@@ -158,8 +159,12 @@ export function Navigation() {
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
 
+	const { colorScheme } = useMantineColorScheme()
+
 	return (
-		<header className="h-14 mb-30 bg-gray-50 border-b border-gray-300">
+		<header
+			className={`h-14 mb-30 border-b ${colorScheme === "dark" ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300"}`}
+		>
 			<Container size="1120px" className="h-full flex justify-between items-center">
 				<Group hiddenFrom="xs">
 					<Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
@@ -189,7 +194,7 @@ export function Navigation() {
 					{auth0.isAuthenticated && auth0.user ? (
 						<Menu trigger="click" position="bottom-end">
 							<Menu.Target>
-								<Button variant="subtle" color="gray" p="0" className="hover:bg-gray-100 h-max">
+								<Button variant="subtle" color="gray" p="0" className="h-max">
 									<div className="gap-2 flex items-center px-2 py-1">
 										<div className="flex flex-col items-end">
 											<Text size="sm" fw={500}>
