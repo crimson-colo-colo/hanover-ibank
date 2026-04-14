@@ -8,7 +8,7 @@ interface Props {
 
 export function CreateContentModal({ opened, onClose }: Props) {
 	return (
-		<Modal opened={opened} onClose={onClose} title="Create New Content" size="lg">
+		<Modal opened={opened} onClose={onClose} title="Create New Content" size="md">
 			<CreateContentForm onSuccess={onClose} />
 		</Modal>
 	)
