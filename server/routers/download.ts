@@ -55,7 +55,14 @@ contentDownloadRouter.get("/content/download", async (req: Request, res: Respons
 		Bucket: bucketName,
 		Key: content.objectId!,
 	})
-	res.setHeader("Content-Disposition", `attachment; filename="${content.title}"`)
+	const contentType = object.ContentType && object.ContentType !== "application/octet-stream"
+		? object.ContentType
+		: fileTypeToMime[object.Metadata?.filetype as FileType] ?? "application/octet-stream"
+	res.setHeader("Content-Type", contentType)
+
+	res.setHeader("Content-Disposition", `inline; filename="${content.title}"`) // todo: make it both inline and attachment
+	if (object.ContentType && object.Metadata && object.Metadata) res.setHeader("Content-Type", contentType)
+	console.log(object)
 	assert(object.Body, "S3 object body is undefined")
 	assert(object.Body instanceof Readable, "S3 object body is not a stream.Readable")
 	object.Body.pipe(res)
