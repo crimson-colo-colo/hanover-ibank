@@ -24,6 +24,15 @@ export function FileViewer({ content }: { content: ContentListItem }) {
 	return (
 
 		<Stack gap="sm">
+			{fileURL.isSuccess && document !== undefined?
+				<DocViewer
+				documents={document}
+				pluginRenderers={DocViewerRenderers}
+				//style={{ height: "80vh"	}}
+			/>
+				:
+				<Text>Failed to fetch</Text>
+			}
 			<Title order={3}>{content.title} </Title>
 
 			<Text>
