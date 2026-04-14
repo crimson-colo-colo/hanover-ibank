@@ -19,7 +19,6 @@ import {
 	IconChevronRight,
 	IconHome,
 	IconLayoutSidebarLeftExpand,
-	IconPlus,
 	IconUser,
 	IconUsers,
 } from "@tabler/icons-react"
@@ -33,15 +32,6 @@ function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean
 
 	return (
 		<>
-			{!isLoading && (
-				<Button
-					component={Link}
-					variant={location.pathname === "/upload-content" ? "light" : "subtle"}
-					to="/upload-content"
-				>
-					Upload Content
-				</Button>
-			)}
 			{isAdmin && (
 				<Button
 					component={Link}
@@ -78,18 +68,6 @@ function DrawerNavLinks({
 				active={location.pathname === "/"}
 				onClick={closeDrawer}
 			/>
-			{!isLoading && (
-				<NavLink
-					component={Link}
-					to="/upload-content"
-					label="Upload Content"
-					variant="filled"
-					leftSection={<IconPlus size={16} />}
-					rightSection={<IconChevronRight size={12} />}
-					active={location.pathname === "/upload-content"}
-					onClick={closeDrawer}
-				/>
-			)}
 			{isAdmin && (
 				<NavLink
 					component={Link}

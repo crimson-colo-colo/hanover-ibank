@@ -19,6 +19,7 @@ import { notifications } from "@mantine/notifications"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
+	IconCloudUpload,
 	IconFilePencil,
 	IconLoader2,
 	IconPencil,
@@ -41,6 +42,7 @@ import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
+import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
@@ -66,6 +68,7 @@ export function ContentTable({
 	const [downloadingItemId, setDownloadingItemId] = useState<string | null>(null)
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
+	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
 	const deleteContent = useMutation(
 		trpc.content.delete.mutationOptions({
 			onMutate: async (data, context) => {
@@ -384,6 +387,13 @@ export function ContentTable({
 					/>
 
 					<Button
+						leftSection={<IconCloudUpload size={16} stroke={1.5} />}
+						onClick={openCreateModal}
+					>
+						Create content
+					</Button>
+
+					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"
 						disabled={Object.keys(rowSelection).length === 0}
@@ -465,6 +475,7 @@ export function ContentTable({
 					)}
 				</Table.Tbody>
 			</Table>
+			<CreateContentModal opened={createModalOpen} onClose={closeCreateModal} />
 			<Modal opened={deleteDialogOpen} onClose={closeDeleteDialog} title="Confirm Deletion">
 				<Text>Are you sure you want to delete the selected content?</Text>
 				<Flex mt="md" justify="flex-end" gap="sm">
