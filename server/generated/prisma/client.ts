@@ -51,3 +51,8 @@ export type Employee = Prisma.EmployeeModel
  * 
  */
 export type Content = Prisma.ContentModel
+/**
+ * Model FavoriteContent
+ * 
+ */
+export type FavoriteContent = Prisma.FavoriteContentModel

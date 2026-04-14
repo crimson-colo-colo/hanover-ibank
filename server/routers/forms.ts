@@ -8,6 +8,7 @@ import {
 	DocumentType,
 	EmployeeRole,
 } from "../generated/prisma/browser.ts"
+import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, publicProcedure, router } from "../trpc.ts"
@@ -38,11 +39,16 @@ export const formsRouter = router({
 	createContent: publicProcedure.input(contentFormSchema).mutation(async (opts) => {
 		let objectId: string | undefined
 		if (opts.input.contentType === ContentType.Object) {
+			const buffer = Buffer.from(opts.input.file, "base64")
 			objectId = uuidv4()
+			const fileType = await getFileTypeFromFile(opts.input.name, buffer)
 			await s3.putObject({
 				Bucket: bucketName,
 				Key: objectId,
-				Body: Buffer.from(opts.input.file, "base64"),
+				Body: buffer,
+				Metadata: {
+					filetype: fileType,
+				},
 			})
 		}
 		const content = await db.content.create({

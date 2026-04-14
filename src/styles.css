@@ -69,6 +69,20 @@ button[aria-label="Open TanStack Devtools"] {
     --spacing-xl: 2rem;
 }
 
+.content-not-favorite, .content-actions {
+    visibility: hidden;
+}
+
+.content-row:hover {
+    background-color: var(--mantine-color-gray-0);
+}
+
+.content-row:hover .content-not-favorite,
+.content-row:hover .content-actions
+{
+    visibility: visible;
+}
+
 html.color-scheme-transitioning * {
     transition: background-color 0.3s ease, color 0.2s ease, border-color 0.3s ease !important;
 }
