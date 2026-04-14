@@ -74,6 +74,7 @@ export const contentRouter = router({
 							},
 				include: {
 					owner: true,
+					checkedOutBy: true,
 					favoritedBy: {
 						where: {
 							employeeId: opts.ctx.auth.sub,
@@ -192,6 +193,16 @@ export const contentRouter = router({
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Content not found",
+				})
+			}
+
+			const isAdmin = user.role === "Admin"
+			const isOwner = content.checkedOutById === user.id
+
+			if (content.checkedOutById && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Content is checked out by another user",
 				})
 			}
 			if (content.type !== "Object") {
