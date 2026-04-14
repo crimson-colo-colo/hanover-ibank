@@ -18,34 +18,25 @@ import {
 	IconChevronRight,
 	IconHome,
 	IconLayoutSidebarLeftExpand,
-	IconPlus,
 	IconUser,
 	IconUsers,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
-import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { trpc } from "@/lib/trpc.ts"
 
 function NavLinks({
 	isLoading,
 	isAdmin,
-	openUpload,
 }: {
 	isLoading: boolean
 	isAdmin: boolean | undefined
-	openUpload: () => void
 }) {
 	const location = useLocation()
 
 	return (
 		<>
-			{!isLoading && (
-				<Button variant="subtle" onClick={openUpload}>
-					Upload Content
-				</Button>
-			)}
 			{isAdmin && (
 				<Button
 					component={Link}
@@ -82,18 +73,6 @@ function DrawerNavLinks({
 				active={location.pathname === "/"}
 				onClick={closeDrawer}
 			/>
-			{!isLoading && (
-				<NavLink
-					component={Link}
-					to="/upload-content"
-					label="Upload Content"
-					variant="filled"
-					leftSection={<IconPlus size={16} />}
-					rightSection={<IconChevronRight size={12} />}
-					active={location.pathname === "/upload-content"}
-					onClick={closeDrawer}
-				/>
-			)}
 			{isAdmin && (
 				<NavLink
 					component={Link}
@@ -162,7 +141,6 @@ export function Navigation() {
 	const auth0 = useAuth0()
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
-	const [uploadOpened, { open: openUpload, close: closeUpload }] = useDisclosure(false)
 
 	return (
 		<header className="h-14 mb-30 bg-gray-50 border-b border-gray-300">
@@ -190,7 +168,6 @@ export function Navigation() {
 						<NavLinks
 							isLoading={isAdmin.isLoading}
 							isAdmin={isAdmin.data}
-							openUpload={openUpload}
 						/>
 					)}
 				</Group>
@@ -260,7 +237,6 @@ export function Navigation() {
 				</ScrollArea>
 				<DrawerUserMenu />
 			</Drawer>
-			<CreateContentModal opened={uploadOpened} onClose={closeUpload} />
 		</header>
 	)
 }
