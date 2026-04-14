@@ -56,10 +56,10 @@ function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean
 }
 
 function DrawerNavLinks({
-							isLoading,
-							isAdmin,
-							closeDrawer,
-						}: {
+	isLoading,
+	isAdmin,
+	closeDrawer,
+}: {
 	isLoading: boolean
 	isAdmin: boolean | undefined
 	closeDrawer: () => void
@@ -162,7 +162,9 @@ export function Navigation() {
 	const { colorScheme } = useMantineColorScheme()
 
 	return (
-		<header className={`h-14 mb-30 border-b ${colorScheme === "dark" ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300"}`}>
+		<header
+			className={`h-14 mb-30 border-b ${colorScheme === "dark" ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300"}`}
+		>
 			<Container size="1120px" className="h-full flex justify-between items-center">
 				<Group hiddenFrom="xs">
 					<Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
