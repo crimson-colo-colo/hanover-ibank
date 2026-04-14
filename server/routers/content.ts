@@ -10,7 +10,7 @@ import { ContentStatus, DocumentType, EmployeeRole } from "../generated/prisma/e
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
-import { authProcedure, router } from "../trpc.ts"
+import { authProcedure, publicProcedure, router } from "../trpc.ts"
 
 export type ContentListItem = {
 	id: string
@@ -29,6 +29,7 @@ export type ContentListItem = {
 	documentType: DocumentType
 	status: ContentStatus
 	intendedAudience: EmployeeRole[]
+	checkedOutById: string
 } & (
 	| {
 			type: "Link"
@@ -293,5 +294,63 @@ export const contentRouter = router({
 			content: data,
 			objectMetadata: new Map(metadata),
 		}
+	}),
+	checkIn: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		//verify user
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
+
+		if (!user) throw new Error("No user found.")
+
+		const content = await db.content.findUnique({
+			where: { id: opts.input.id },
+		})
+
+		if (!content) {
+			throw new Error("Content does not exist")
+		}
+
+		if (!content.intendedAudience.includes(user.role)) {
+			throw new Error("User not in the intended audience")
+		}
+		if (content.checkedOutById !== null) {
+			throw new Error("Content already checked out")
+		}
+
+		const updated = await db.content.update({
+			where: { id: user.id },
+			data: { checkedOutById: user.id },
+		})
+		return updated
+	}),
+	checkOut: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
+		if (!user) {
+			throw new Error("No user found.")
+		}
+		const content = await db.content.findUnique({
+			where: { id: opts.input.id },
+		})
+
+		if (!content) {
+			throw new Error("Content does not exist")
+		}
+
+		if (content.checkedOutById === null) {
+			throw new Error("Content not checked out")
+		}
+
+		const updated = await db.content.update({
+			where: { id: user.id },
+			data: { checkedOutById: null },
+		})
+		return updated
 	}),
 })
