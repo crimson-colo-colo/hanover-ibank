@@ -17,6 +17,7 @@ import {
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
 import { getFileTypeFromFile } from "../server/lib/filetype.ts"
 import { bucketName, s3 } from "../server/s3.ts"
+import {fileTypeFromBuffer} from "file-type";
 
 const adapter = new PrismaPg({
 	connectionString: process.env.DATABASE_URL!,

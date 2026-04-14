@@ -12,6 +12,14 @@ import {useMemo} from "react";
 
 export function FileViewer({ content }: { content: ContentListItem }) {
 	const fileURL = useQuery(trpc.content.download.queryOptions({ id: content.id }))
+	const document = useMemo(() => {
+		if (fileURL.data)
+			return[{
+				uri: window.location.origin + fileURL.data.url
+			}]
+		else return []
+	}, [fileURL.data?.url]);
+	//console.log(fileURL)
 	// https://react-pdf.org/components#pdfviewer
 	return (
 
