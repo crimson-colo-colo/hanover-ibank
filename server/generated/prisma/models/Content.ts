@@ -28,9 +28,8 @@ export type ContentMinAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
-  documentType: $Enums.DocumentType | null
-  type: $Enums.ContentType | null
   status: $Enums.ContentStatus | null
+  type: $Enums.ContentType | null
   createdAt: Date | null
   lastModifiedDate: Date | null
   expirationDate: Date | null
@@ -43,9 +42,8 @@ export type ContentMaxAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
-  documentType: $Enums.DocumentType | null
-  type: $Enums.ContentType | null
   status: $Enums.ContentStatus | null
+  type: $Enums.ContentType | null
   createdAt: Date | null
   lastModifiedDate: Date | null
   expirationDate: Date | null
@@ -58,16 +56,14 @@ export type ContentCountAggregateOutputType = {
   id: number
   title: number
   description: number
-  documentType: number
-  type: number
   status: number
+  type: number
   createdAt: number
   lastModifiedDate: number
   expirationDate: number
   objectId: number
   url: number
   ownerId: number
-  intendedAudience: number
   _all: number
 }
 
@@ -76,9 +72,8 @@ export type ContentMinAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  documentType?: true
-  type?: true
   status?: true
+  type?: true
   createdAt?: true
   lastModifiedDate?: true
   expirationDate?: true
@@ -91,9 +86,8 @@ export type ContentMaxAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  documentType?: true
-  type?: true
   status?: true
+  type?: true
   createdAt?: true
   lastModifiedDate?: true
   expirationDate?: true
@@ -106,16 +100,14 @@ export type ContentCountAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  documentType?: true
-  type?: true
   status?: true
+  type?: true
   createdAt?: true
   lastModifiedDate?: true
   expirationDate?: true
   objectId?: true
   url?: true
   ownerId?: true
-  intendedAudience?: true
   _all?: true
 }
 
@@ -195,16 +187,14 @@ export type ContentGroupByOutputType = {
   id: string
   title: string
   description: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt: Date
   lastModifiedDate: Date
   expirationDate: Date
   objectId: string | null
   url: string | null
   ownerId: string
-  intendedAudience: $Enums.EmployeeRole[]
   _count: ContentCountAggregateOutputType | null
   _min: ContentMinAggregateOutputType | null
   _max: ContentMaxAggregateOutputType | null
@@ -232,17 +222,16 @@ export type ContentWhereInput = {
   id?: Prisma.StringFilter<"Content"> | string
   title?: Prisma.StringFilter<"Content"> | string
   description?: Prisma.StringNullableFilter<"Content"> | string | null
-  documentType?: Prisma.EnumDocumentTypeFilter<"Content"> | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFilter<"Content"> | $Enums.ContentType
   status?: Prisma.EnumContentStatusFilter<"Content"> | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFilter<"Content"> | $Enums.ContentType
   createdAt?: Prisma.DateTimeFilter<"Content"> | Date | string
   lastModifiedDate?: Prisma.DateTimeFilter<"Content"> | Date | string
   expirationDate?: Prisma.DateTimeFilter<"Content"> | Date | string
   objectId?: Prisma.StringNullableFilter<"Content"> | string | null
   url?: Prisma.StringNullableFilter<"Content"> | string | null
   ownerId?: Prisma.StringFilter<"Content"> | string
-  intendedAudience?: Prisma.EnumEmployeeRoleNullableListFilter<"Content">
   owner?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
+  tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
 }
 
@@ -250,17 +239,16 @@ export type ContentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
-  documentType?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastModifiedDate?: Prisma.SortOrder
   expirationDate?: Prisma.SortOrder
   objectId?: Prisma.SortOrderInput | Prisma.SortOrder
   url?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
-  intendedAudience?: Prisma.SortOrder
   owner?: Prisma.EmployeeOrderByWithRelationInput
+  tags?: Prisma.ContentTagOrderByRelationAggregateInput
   favoritedBy?: Prisma.FavoriteContentOrderByRelationAggregateInput
 }
 
@@ -271,17 +259,16 @@ export type ContentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ContentWhereInput | Prisma.ContentWhereInput[]
   title?: Prisma.StringFilter<"Content"> | string
   description?: Prisma.StringNullableFilter<"Content"> | string | null
-  documentType?: Prisma.EnumDocumentTypeFilter<"Content"> | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFilter<"Content"> | $Enums.ContentType
   status?: Prisma.EnumContentStatusFilter<"Content"> | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFilter<"Content"> | $Enums.ContentType
   createdAt?: Prisma.DateTimeFilter<"Content"> | Date | string
   lastModifiedDate?: Prisma.DateTimeFilter<"Content"> | Date | string
   expirationDate?: Prisma.DateTimeFilter<"Content"> | Date | string
   objectId?: Prisma.StringNullableFilter<"Content"> | string | null
   url?: Prisma.StringNullableFilter<"Content"> | string | null
   ownerId?: Prisma.StringFilter<"Content"> | string
-  intendedAudience?: Prisma.EnumEmployeeRoleNullableListFilter<"Content">
   owner?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
+  tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
 }, "id">
 
@@ -289,16 +276,14 @@ export type ContentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
-  documentType?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastModifiedDate?: Prisma.SortOrder
   expirationDate?: Prisma.SortOrder
   objectId?: Prisma.SortOrderInput | Prisma.SortOrder
   url?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
-  intendedAudience?: Prisma.SortOrder
   _count?: Prisma.ContentCountOrderByAggregateInput
   _max?: Prisma.ContentMaxOrderByAggregateInput
   _min?: Prisma.ContentMinOrderByAggregateInput
@@ -311,32 +296,29 @@ export type ContentScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Content"> | string
   title?: Prisma.StringWithAggregatesFilter<"Content"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Content"> | string | null
-  documentType?: Prisma.EnumDocumentTypeWithAggregatesFilter<"Content"> | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeWithAggregatesFilter<"Content"> | $Enums.ContentType
   status?: Prisma.EnumContentStatusWithAggregatesFilter<"Content"> | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeWithAggregatesFilter<"Content"> | $Enums.ContentType
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Content"> | Date | string
   lastModifiedDate?: Prisma.DateTimeWithAggregatesFilter<"Content"> | Date | string
   expirationDate?: Prisma.DateTimeWithAggregatesFilter<"Content"> | Date | string
   objectId?: Prisma.StringNullableWithAggregatesFilter<"Content"> | string | null
   url?: Prisma.StringNullableWithAggregatesFilter<"Content"> | string | null
   ownerId?: Prisma.StringWithAggregatesFilter<"Content"> | string
-  intendedAudience?: Prisma.EnumEmployeeRoleNullableListFilter<"Content">
 }
 
 export type ContentCreateInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
 }
 
@@ -344,16 +326,15 @@ export type ContentUncheckedCreateInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
   ownerId: string
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
 
@@ -361,16 +342,15 @@ export type ContentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
 }
 
@@ -378,16 +358,15 @@ export type ContentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
 
@@ -395,47 +374,41 @@ export type ContentCreateManyInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
   ownerId: string
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
 }
 
 export type ContentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
 }
 
 export type ContentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
 }
 
 export type ContentListRelationFilter = {
@@ -448,37 +421,26 @@ export type ContentOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type EnumEmployeeRoleNullableListFilter<$PrismaModel = never> = {
-  equals?: $Enums.EmployeeRole[] | Prisma.ListEnumEmployeeRoleFieldRefInput<$PrismaModel> | null
-  has?: $Enums.EmployeeRole | Prisma.EnumEmployeeRoleFieldRefInput<$PrismaModel> | null
-  hasEvery?: $Enums.EmployeeRole[] | Prisma.ListEnumEmployeeRoleFieldRefInput<$PrismaModel>
-  hasSome?: $Enums.EmployeeRole[] | Prisma.ListEnumEmployeeRoleFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
-}
-
 export type ContentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  documentType?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastModifiedDate?: Prisma.SortOrder
   expirationDate?: Prisma.SortOrder
   objectId?: Prisma.SortOrder
   url?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
-  intendedAudience?: Prisma.SortOrder
 }
 
 export type ContentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  documentType?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastModifiedDate?: Prisma.SortOrder
   expirationDate?: Prisma.SortOrder
@@ -491,9 +453,8 @@ export type ContentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  documentType?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   lastModifiedDate?: Prisma.SortOrder
   expirationDate?: Prisma.SortOrder
@@ -549,33 +510,34 @@ export type ContentUncheckedUpdateManyWithoutOwnerNestedInput = {
   deleteMany?: Prisma.ContentScalarWhereInput | Prisma.ContentScalarWhereInput[]
 }
 
-export type ContentCreateintendedAudienceInput = {
-  set: $Enums.EmployeeRole[]
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
-}
-
-export type EnumDocumentTypeFieldUpdateOperationsInput = {
-  set?: $Enums.DocumentType
-}
-
-export type EnumContentTypeFieldUpdateOperationsInput = {
-  set?: $Enums.ContentType
 }
 
 export type EnumContentStatusFieldUpdateOperationsInput = {
   set?: $Enums.ContentStatus
 }
 
+export type EnumContentTypeFieldUpdateOperationsInput = {
+  set?: $Enums.ContentType
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type ContentUpdateintendedAudienceInput = {
-  set?: $Enums.EmployeeRole[]
-  push?: $Enums.EmployeeRole | $Enums.EmployeeRole[]
+export type ContentCreateNestedOneWithoutTagsInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutTagsInput, Prisma.ContentUncheckedCreateWithoutTagsInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutTagsInput
+  connect?: Prisma.ContentWhereUniqueInput
+}
+
+export type ContentUpdateOneRequiredWithoutTagsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutTagsInput, Prisma.ContentUncheckedCreateWithoutTagsInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutTagsInput
+  upsert?: Prisma.ContentUpsertWithoutTagsInput
+  connect?: Prisma.ContentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutTagsInput, Prisma.ContentUpdateWithoutTagsInput>, Prisma.ContentUncheckedUpdateWithoutTagsInput>
 }
 
 export type ContentCreateNestedOneWithoutFavoritedByInput = {
@@ -596,15 +558,14 @@ export type ContentCreateWithoutOwnerInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
 }
 
@@ -612,15 +573,14 @@ export type ContentUncheckedCreateWithoutOwnerInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
 
@@ -657,48 +617,120 @@ export type ContentScalarWhereInput = {
   id?: Prisma.StringFilter<"Content"> | string
   title?: Prisma.StringFilter<"Content"> | string
   description?: Prisma.StringNullableFilter<"Content"> | string | null
-  documentType?: Prisma.EnumDocumentTypeFilter<"Content"> | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFilter<"Content"> | $Enums.ContentType
   status?: Prisma.EnumContentStatusFilter<"Content"> | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFilter<"Content"> | $Enums.ContentType
   createdAt?: Prisma.DateTimeFilter<"Content"> | Date | string
   lastModifiedDate?: Prisma.DateTimeFilter<"Content"> | Date | string
   expirationDate?: Prisma.DateTimeFilter<"Content"> | Date | string
   objectId?: Prisma.StringNullableFilter<"Content"> | string | null
   url?: Prisma.StringNullableFilter<"Content"> | string | null
   ownerId?: Prisma.StringFilter<"Content"> | string
-  intendedAudience?: Prisma.EnumEmployeeRoleNullableListFilter<"Content">
 }
 
-export type ContentCreateWithoutFavoritedByInput = {
+export type ContentCreateWithoutTagsInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
 }
 
-export type ContentUncheckedCreateWithoutFavoritedByInput = {
+export type ContentUncheckedCreateWithoutTagsInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
   ownerId: string
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+}
+
+export type ContentCreateOrConnectWithoutTagsInput = {
+  where: Prisma.ContentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentCreateWithoutTagsInput, Prisma.ContentUncheckedCreateWithoutTagsInput>
+}
+
+export type ContentUpsertWithoutTagsInput = {
+  update: Prisma.XOR<Prisma.ContentUpdateWithoutTagsInput, Prisma.ContentUncheckedUpdateWithoutTagsInput>
+  create: Prisma.XOR<Prisma.ContentCreateWithoutTagsInput, Prisma.ContentUncheckedCreateWithoutTagsInput>
+  where?: Prisma.ContentWhereInput
+}
+
+export type ContentUpdateToOneWithWhereWithoutTagsInput = {
+  where?: Prisma.ContentWhereInput
+  data: Prisma.XOR<Prisma.ContentUpdateWithoutTagsInput, Prisma.ContentUncheckedUpdateWithoutTagsInput>
+}
+
+export type ContentUpdateWithoutTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
+}
+
+export type ContentUncheckedUpdateWithoutTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+}
+
+export type ContentCreateWithoutFavoritedByInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  lastModifiedDate?: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
+}
+
+export type ContentUncheckedCreateWithoutFavoritedByInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  lastModifiedDate?: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  ownerId: string
+  tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutFavoritedByInput = {
@@ -721,62 +753,57 @@ export type ContentUpdateWithoutFavoritedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutFavoritedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyOwnerInput = {
   id?: string
   title: string
   description?: string | null
-  documentType: $Enums.DocumentType
-  type: $Enums.ContentType
   status?: $Enums.ContentStatus
+  type: $Enums.ContentType
   createdAt?: Date | string
   lastModifiedDate?: Date | string
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
-  intendedAudience?: Prisma.ContentCreateintendedAudienceInput | $Enums.EmployeeRole[]
 }
 
 export type ContentUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
 }
 
@@ -784,15 +811,14 @@ export type ContentUncheckedUpdateWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
+  tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
 
@@ -800,15 +826,13 @@ export type ContentUncheckedUpdateManyWithoutOwnerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  documentType?: Prisma.EnumDocumentTypeFieldUpdateOperationsInput | $Enums.DocumentType
-  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  intendedAudience?: Prisma.ContentUpdateintendedAudienceInput | $Enums.EmployeeRole[]
 }
 
 
@@ -817,10 +841,12 @@ export type ContentUncheckedUpdateManyWithoutOwnerInput = {
  */
 
 export type ContentCountOutputType = {
+  tags: number
   favoritedBy: number
 }
 
 export type ContentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tags?: boolean | ContentCountOutputTypeCountTagsArgs
   favoritedBy?: boolean | ContentCountOutputTypeCountFavoritedByArgs
 }
 
@@ -837,6 +863,13 @@ export type ContentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
 /**
  * ContentCountOutputType without action
  */
+export type ContentCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContentTagWhereInput
+}
+
+/**
+ * ContentCountOutputType without action
+ */
 export type ContentCountOutputTypeCountFavoritedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FavoriteContentWhereInput
 }
@@ -846,17 +879,16 @@ export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   title?: boolean
   description?: boolean
-  documentType?: boolean
-  type?: boolean
   status?: boolean
+  type?: boolean
   createdAt?: boolean
   lastModifiedDate?: boolean
   expirationDate?: boolean
   objectId?: boolean
   url?: boolean
   ownerId?: boolean
-  intendedAudience?: boolean
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
   favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
@@ -865,16 +897,14 @@ export type ContentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   title?: boolean
   description?: boolean
-  documentType?: boolean
-  type?: boolean
   status?: boolean
+  type?: boolean
   createdAt?: boolean
   lastModifiedDate?: boolean
   expirationDate?: boolean
   objectId?: boolean
   url?: boolean
   ownerId?: boolean
-  intendedAudience?: boolean
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
 
@@ -882,16 +912,14 @@ export type ContentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   title?: boolean
   description?: boolean
-  documentType?: boolean
-  type?: boolean
   status?: boolean
+  type?: boolean
   createdAt?: boolean
   lastModifiedDate?: boolean
   expirationDate?: boolean
   objectId?: boolean
   url?: boolean
   ownerId?: boolean
-  intendedAudience?: boolean
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
 
@@ -899,21 +927,20 @@ export type ContentSelectScalar = {
   id?: boolean
   title?: boolean
   description?: boolean
-  documentType?: boolean
-  type?: boolean
   status?: boolean
+  type?: boolean
   createdAt?: boolean
   lastModifiedDate?: boolean
   expirationDate?: boolean
   objectId?: boolean
   url?: boolean
   ownerId?: boolean
-  intendedAudience?: boolean
 }
 
-export type ContentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "documentType" | "type" | "status" | "createdAt" | "lastModifiedDate" | "expirationDate" | "objectId" | "url" | "ownerId" | "intendedAudience", ExtArgs["result"]["content"]>
+export type ContentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "type" | "createdAt" | "lastModifiedDate" | "expirationDate" | "objectId" | "url" | "ownerId", ExtArgs["result"]["content"]>
 export type ContentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
   favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -928,15 +955,15 @@ export type $ContentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Content"
   objects: {
     owner: Prisma.$EmployeePayload<ExtArgs>
+    tags: Prisma.$ContentTagPayload<ExtArgs>[]
     favoritedBy: Prisma.$FavoriteContentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
     description: string | null
-    documentType: $Enums.DocumentType
-    type: $Enums.ContentType
     status: $Enums.ContentStatus
+    type: $Enums.ContentType
     createdAt: Date
     lastModifiedDate: Date
     expirationDate: Date
@@ -949,7 +976,6 @@ export type $ContentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
      */
     url: string | null
     ownerId: string
-    intendedAudience: $Enums.EmployeeRole[]
   }, ExtArgs["result"]["content"]>
   composites: {}
 }
@@ -1345,6 +1371,7 @@ readonly fields: ContentFieldRefs;
 export interface Prisma__ContentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.EmployeeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmployeeDefaultArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  tags<T extends Prisma.Content$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favoritedBy<T extends Prisma.Content$favoritedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$favoritedByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1378,16 +1405,14 @@ export interface ContentFieldRefs {
   readonly id: Prisma.FieldRef<"Content", 'String'>
   readonly title: Prisma.FieldRef<"Content", 'String'>
   readonly description: Prisma.FieldRef<"Content", 'String'>
-  readonly documentType: Prisma.FieldRef<"Content", 'DocumentType'>
-  readonly type: Prisma.FieldRef<"Content", 'ContentType'>
   readonly status: Prisma.FieldRef<"Content", 'ContentStatus'>
+  readonly type: Prisma.FieldRef<"Content", 'ContentType'>
   readonly createdAt: Prisma.FieldRef<"Content", 'DateTime'>
   readonly lastModifiedDate: Prisma.FieldRef<"Content", 'DateTime'>
   readonly expirationDate: Prisma.FieldRef<"Content", 'DateTime'>
   readonly objectId: Prisma.FieldRef<"Content", 'String'>
   readonly url: Prisma.FieldRef<"Content", 'String'>
   readonly ownerId: Prisma.FieldRef<"Content", 'String'>
-  readonly intendedAudience: Prisma.FieldRef<"Content", 'EmployeeRole[]'>
 }
     
 
@@ -1786,6 +1811,30 @@ export type ContentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Contents to delete.
    */
   limit?: number
+}
+
+/**
+ * Content.tags
+ */
+export type Content$tagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContentTag
+   */
+  select?: Prisma.ContentTagSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContentTag
+   */
+  omit?: Prisma.ContentTagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentTagInclude<ExtArgs> | null
+  where?: Prisma.ContentTagWhereInput
+  orderBy?: Prisma.ContentTagOrderByWithRelationInput | Prisma.ContentTagOrderByWithRelationInput[]
+  cursor?: Prisma.ContentTagWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContentTagScalarFieldEnum | Prisma.ContentTagScalarFieldEnum[]
 }
 
 /**
