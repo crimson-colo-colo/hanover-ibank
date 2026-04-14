@@ -71,21 +71,6 @@ export function ContentTable({
 		useDisclosure(false)
 	const deleteContent = useMutation(
 		trpc.content.delete.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content: old!.content.filter((item) => !data.ids.includes(item.id)) ?? [],
-				}))
-				return { previousContent }
-			},
-			onError: (err, data, onMutateResult, context) => {
-				if (onMutateResult) {
-					context.client.setQueryData(trpc.content.list.queryKey(), onMutateResult.previousContent)
-				}
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
@@ -94,19 +79,6 @@ export function ContentTable({
 	)
 	const favoriteContent = useMutation(
 		trpc.content.favorite.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content:
-						old!.content.map((item) =>
-							item.id === data.id ? { ...item, favorited: true } : item
-						) ?? [],
-				}))
-				return { previousContent }
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
@@ -115,19 +87,6 @@ export function ContentTable({
 	)
 	const unfavoriteContent = useMutation(
 		trpc.content.unfavorite.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content:
-						old!.content.map((item) =>
-							item.id === data.id ? { ...item, favorited: false } : item
-						) ?? [],
-				}))
-				return { previousContent }
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
@@ -136,41 +95,15 @@ export function ContentTable({
 	)
 	const checkOutContent = useMutation(
 		trpc.content.checkOut.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content: old!.content.map((item) =>
-						item.id === data.id ? { ...item, checkedOutBy: auth0.user!.id } : item
-					),
-				}))
-				return { previousContent }
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
 			},
 		})
 	)
 	const checkInContent = useMutation(
 		trpc.content.checkIn.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content: old!.content.map((item) =>
-						item.id === data.id ? { ...item, checkedOutBy: null } : item
-					),
-				}))
-				return { previousContent }
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
 			},
 		})
 	)
@@ -356,8 +289,12 @@ export function ContentTable({
 						<ActionIcon
 							variant="transparent"
 							size="sm"
-							onClick={async (e) => {
-								await checkOutContent.mutateAsync({ id: info.row.original.id })
+							onClick={async () => {
+								if (!info.getValue()) {
+									await checkOutContent.mutateAsync({ id: info.row.original.id })
+								} else {
+									await checkInContent.mutateAsync({ id: info.row.original.id })
+								}
 							}}
 						>
 							<IconIdBadge2 />

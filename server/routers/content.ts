@@ -432,7 +432,7 @@ export const contentRouter = router({
 		}
 
 		const updated = await db.content.update({
-			where: { id: user.id },
+			where: { id: opts.input.id },
 			data: { checkedOutById: user.id },
 		})
 		return updated
@@ -475,7 +475,7 @@ export const contentRouter = router({
 		}
 
 		const updated = await db.content.update({
-			where: { id: user.id },
+			where: { id: opts.input.id },
 			data: { checkedOutById: null },
 		})
 		return updated

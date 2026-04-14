@@ -88,6 +88,7 @@ export const ContentScalarFieldEnum = {
   type: 'type',
   status: 'status',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   lastModifiedDate: 'lastModifiedDate',
   expirationDate: 'expirationDate',
   objectId: 'objectId',

@@ -29,7 +29,8 @@ model Content {
   type             ContentType
   status           ContentStatus     @default(Incomplete)
   createdAt        DateTime          @default(now())
-  lastModifiedDate DateTime          @updatedAt
+  updatedAt        DateTime          @updatedAt
+  lastModifiedDate DateTime
   expirationDate   DateTime
   /// S3 Object ID
   objectId         String?
