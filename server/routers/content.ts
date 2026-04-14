@@ -6,7 +6,13 @@ import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
-import { ContentStatus, DocumentType, EmployeeRole } from "../generated/prisma/enums.ts"
+import type { Tag } from "../generated/prisma/client.ts"
+import {
+	ContentStatus,
+	type ContentType,
+	EmployeeRole,
+	TagCategory,
+} from "../generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -28,16 +34,18 @@ export type ContentListItem = {
 	ownerId: string
 	lastModifiedDate: Date
 	expirationDate: Date
-	documentType: DocumentType
 	status: ContentStatus
-	intendedAudience: EmployeeRole[]
+	tags: {
+		category: TagCategory
+		name: string
+	}[]
 } & (
 	| {
-			type: "Link"
+			type: (typeof ContentType)["Link"]
 			url: string
 	  }
 	| {
-			type: "Object"
+			type: (typeof ContentType)["Object"]
 			objectId: string
 	  }
 )
@@ -70,8 +78,11 @@ export const contentRouter = router({
 								// no filters; fetch everything
 							}
 						: {
-								intendedAudience: {
-									has: user.role,
+								tags: {
+									some: {
+										tagCategory: TagCategory.IntendedAudience,
+										tagName: user.role,
+									},
 								},
 							},
 				include: {
@@ -82,6 +93,7 @@ export const contentRouter = router({
 							employeeId: opts.ctx.auth.sub,
 						},
 					},
+					tags: true,
 				},
 			})
 
@@ -134,6 +146,10 @@ export const contentRouter = router({
 									username: checkedOutByUser.username!,
 								} satisfies ContentListItem["checkedOutBy"])
 							: null,
+						tags: content.tags.map((tag) => ({
+							category: tag.tagCategory,
+							name: tag.tagName,
+						})),
 					} as ContentListItem
 				}),
 				objectMetadata: new Map(metadata),
@@ -146,11 +162,15 @@ export const contentRouter = router({
 				id: z.string(),
 				title: z.string().min(3).max(250),
 				ownerId: z.string(),
-				intendedAudience: z.array(z.enum(Object.values(EmployeeRole))).min(1),
 				lastModifiedDate: z.iso.date(),
 				expirationDate: z.iso.date(),
-				documentType: z.enum(Object.values(DocumentType)),
 				status: z.enum(Object.values(ContentStatus)),
+				tags: z.array(
+					z.object({
+						category: z.enum(Object.values(TagCategory)),
+						name: z.string().min(1).max(50),
+					})
+				),
 			})
 		)
 		.mutation(async (opts) => {
@@ -159,11 +179,44 @@ export const contentRouter = router({
 				data: {
 					title: opts.input.title,
 					owner: { connect: { id: opts.input.ownerId } },
-					intendedAudience: opts.input.intendedAudience,
 					lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
 					expirationDate: isoDateToTimestamp(opts.input.expirationDate),
-					documentType: opts.input.documentType,
 					status: opts.input.status,
+					tags: {
+						connectOrCreate: opts.input.tags.map((tag) => ({
+							where: {
+								contentId_tagCategory_tagName: {
+									contentId: opts.input.id,
+									tagCategory: tag.category,
+									tagName: tag.name,
+								},
+							},
+							create: {
+								contentId: opts.input.id,
+								tag: {
+									connectOrCreate: {
+										where: {
+											category_name: {
+												category: tag.category,
+												name: tag.name,
+											},
+										},
+										create: {
+											category: tag.category,
+											name: tag.name,
+										},
+									},
+								},
+							},
+						})),
+						deleteMany: {
+							contentId: opts.input.id,
+							NOT: opts.input.tags.map((tag) => ({
+								tagCategory: tag.category,
+								tagName: tag.name,
+							})),
+						},
+					},
 				},
 			})
 			return updated
@@ -206,6 +259,9 @@ export const contentRouter = router({
 		.mutation(async (opts) => {
 			const content = await db.content.findUnique({
 				where: { id: opts.input.id },
+				include: {
+					tags: true,
+				},
 			})
 			if (!content) {
 				throw new TRPCError({
@@ -229,6 +285,9 @@ export const contentRouter = router({
 			const isOwner = content.checkedOutById === user.id
 			const isCheckedOutByAnotherUser =
 				content.checkedOutById !== null && content.checkedOutById !== user.id
+			const isIntendedAudience = content.tags.some(
+				(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+			)
 
 			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
 				throw new TRPCError({
@@ -236,7 +295,8 @@ export const contentRouter = router({
 					message: "Content is checked out by another user",
 				})
 			}
-			if (!content.intendedAudience.includes(user.role) && !isOwner && !isAdmin) {
+
+			if (!isIntendedAudience && !isOwner && !isAdmin) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "User cannot edit content not intended for their role",
@@ -277,6 +337,9 @@ export const contentRouter = router({
 		.mutation(async (opts) => {
 			const content = await db.content.findUnique({
 				where: { id: opts.input.id },
+				include: {
+					tags: true,
+				},
 			})
 			if (!content) {
 				throw new TRPCError({
@@ -300,6 +363,9 @@ export const contentRouter = router({
 			const isOwner = content.checkedOutById === user.id
 			const isCheckedOutByAnotherUser =
 				content.checkedOutById !== null && content.checkedOutById !== user.id
+			const isIntendedAudience = content.tags.some(
+				(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+			)
 
 			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
 				throw new TRPCError({
@@ -307,7 +373,7 @@ export const contentRouter = router({
 					message: "Content is checked out by another user",
 				})
 			}
-			if (!content.intendedAudience.includes(user.role) && !isOwner && !isAdmin) {
+			if (!isIntendedAudience && !isOwner && !isAdmin) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "User cannot edit content not intended for their role",
@@ -409,6 +475,9 @@ export const contentRouter = router({
 
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },
+			include: {
+				tags: true,
+			},
 		})
 
 		if (!content) {
@@ -418,7 +487,10 @@ export const contentRouter = router({
 			})
 		}
 
-		if (!content.intendedAudience.includes(user.role)) {
+		const isIntendedAudience = content.tags.some(
+			(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+		)
+		if (!isIntendedAudience) {
 			throw new TRPCError({
 				code: "FORBIDDEN",
 				message: "User cannot check out content not intended for their role",
@@ -479,5 +551,16 @@ export const contentRouter = router({
 			data: { checkedOutById: null },
 		})
 		return updated
+	}),
+
+	listTagsByCategory: authProcedure.query(async (opts) => {
+		const tags: Record<string, Tag[]> = {}
+		for (const tag of await db.tag.findMany()) {
+			if (!tags[tag.category]) {
+				tags[tag.category] = []
+			}
+			tags[tag.category].push(tag)
+		}
+		return tags
 	}),
 })

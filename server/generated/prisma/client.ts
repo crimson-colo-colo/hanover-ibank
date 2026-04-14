@@ -52,6 +52,16 @@ export type Employee = Prisma.EmployeeModel
  */
 export type Content = Prisma.ContentModel
 /**
+ * Model Tag
+ * 
+ */
+export type Tag = Prisma.TagModel
+/**
+ * Model ContentTag
+ * 
+ */
+export type ContentTag = Prisma.ContentTagModel
+/**
  * Model FavoriteContent
  * 
  */

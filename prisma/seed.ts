@@ -9,10 +9,10 @@ import { auth0Management } from "../server/auth.ts"
 import {
 	ContentStatus,
 	ContentType,
-	DocumentType,
 	EmployeeRole,
 	type Prisma,
 	PrismaClient,
+	TagCategory,
 } from "../server/generated/prisma/client.ts"
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
 import { getFileTypeFromFile } from "../server/lib/filetype.ts"
@@ -36,10 +36,13 @@ main()
 async function main() {
 	await prisma.$connect()
 
-	const [employees, content] = await Promise.all([prisma.employee.count(), prisma.content.count()])
-	if (employees > 0 || content > 0) {
+	const [employees, tempContent] = await Promise.all([
+		prisma.employee.count(),
+		prisma.content.count(),
+	])
+	if (employees > 0 || tempContent > 0) {
 		process.stdout.write(
-			`⚠️ \x1b[33mDatabase already has data (employee: ${employees}, content: ${content}. Continuing will erase existing data and cannot be undone. Really continue? [y/N] \x1b[0m`
+			`⚠️ \x1b[33mDatabase already has data (employee: ${employees}, content: ${tempContent}. Continuing will erase existing data and cannot be undone. Really continue? [y/N] \x1b[0m`
 		)
 		const answer = await new Promise<string>((resolve) => {
 			process.stdin.setEncoding("utf-8")
@@ -57,7 +60,11 @@ async function main() {
 
 	console.log("🌱 Seeding database...")
 
-	await prisma.$transaction([prisma.content.deleteMany(), prisma.employee.deleteMany()])
+	await prisma.$transaction([
+		prisma.content.deleteMany(),
+		prisma.employee.deleteMany(),
+		prisma.contentTag.deleteMany(),
+	])
 
 	const objects = await s3.listObjectsV2({ Bucket: bucketName, MaxKeys: 1000 })
 	if (objects.Contents && objects.Contents.length > 0) {
@@ -171,237 +178,212 @@ async function main() {
 
 	console.log(`Created ${employeeData.length} employee rows`)
 
+	// ===== Content Tags =====
+	await prisma.tag.createManyAndReturn({
+		data: [
+			// Document Type
+			{
+				name: "Workflow",
+				category: TagCategory.DocumentType,
+			},
+			{
+				name: "Reference",
+				category: TagCategory.DocumentType,
+			},
+			{
+				name: "Underwriter",
+				category: TagCategory.IntendedAudience,
+			},
+			{
+				name: "Business Analyst",
+				category: TagCategory.IntendedAudience,
+			},
+			//TODO: add custom tags
+		],
+	})
+
 	const contentData = [
 		...[
 			{
 				title: "Risk Meter",
 				description: "",
-				type: ContentType.Link,
 				url: "https://riskmeter.corelogic.com/",
 				lastModifiedDate: new Date("2026-03-27"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Image Editor",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.adobe.com/express/feature/image/editor",
 				lastModifiedDate: new Date("2025-10-26"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Underwriter Workstation",
 				description: "",
-				type: ContentType.Link,
 				url: "https://drive.google.com/drive/my-drive",
 				lastModifiedDate: new Date("2025-07-13"),
 				expirationDate: new Date("2026-06-15"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Document Signing",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.docusign.com/",
 				lastModifiedDate: new Date("2025-11-01"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Desktop Management Tool",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.teamviewer.com/en-us/",
 				lastModifiedDate: new Date("2025-09-15"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Process Automation Tool",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.flowforma.com/",
 				lastModifiedDate: new Date("2025-08-20"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Knowledge Base",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.genre.com/us/knowledge?filters=article-type:publication,genre-languages:en&page=1&facet=all",
 				lastModifiedDate: new Date("2025-10-05"),
 				expirationDate: new Date("2026-10-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Image Processing System",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.adobe.com/express/feature/image/editor",
 				lastModifiedDate: new Date("2025-07-30"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Workflow,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Flood Information",
 				description: "",
-				type: ContentType.Link,
 				url: "https://msc.fema.gov/portal/home",
 				lastModifiedDate: new Date("2025-09-10"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "OSHA Regulations",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.osha.gov/laws-regs",
 				lastModifiedDate: new Date("2025-11-20"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Pennsylvania Schedule Rating Plan",
 				description: "",
-				type: ContentType.Link,
 				url: "https://pcrb.com/industry-reports/schedule-rating-plan/",
 				lastModifiedDate: new Date("2025-08-05"),
 				expirationDate: new Date("2026-10-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Incomplete,
 			},
 		].map((content) => ({
 			...content,
+			type: ContentType.Link,
 			ownerId: nextUndewriter(),
-			intendedAudience: [EmployeeRole.Underwriter],
 		})),
 		...[
 			{
 				title: "Kentucky Tax Law",
 				description: "",
-				type: ContentType.Link,
 				url: "https://revenue.ky.gov/Get-Help/pages/research-tax-laws.aspx",
 				lastModifiedDate: new Date("2026-02-04"),
 				expirationDate: new Date("2026-04-15"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Oregon Tax Law",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.oregon.gov/dor/pages/rules-laws.aspx",
 				lastModifiedDate: new Date("2025-12-12"),
 				expirationDate: new Date("2026-04-15"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "States on Hold",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.policygenius.com/homeowners-insurance/home-insurance-availability-guide-states-crisis/",
 				lastModifiedDate: new Date("2025-11-15"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.UnderReview,
 			},
 			{
 				title: "Error Lookup Tool",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.google.com/",
 				lastModifiedDate: new Date("2025-10-01"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Incomplete,
 			},
 			{
 				title: "Workflow Management Platform",
 				description: "",
-				type: ContentType.Link,
 				url: "https://monday.com/",
 				lastModifiedDate: new Date("2025-09-20"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 				status: ContentStatus.Complete,
 			},
 			{
 				title: "Claim Search",
 				description: "",
-				type: ContentType.Link,
 				url: "https://claimsearch.iso.com/index.asp",
 				lastModifiedDate: new Date("2025-08-10"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "Business Analyst Guide",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.iiba.org/career-resources/a-business-analysis-professionals-foundation-for-success/babok/",
 				lastModifiedDate: new Date("2025-07-01"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "State Research Guides",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.namic.org/compliance/50-state-research-guides/",
 				lastModifiedDate: new Date("2025-11-05"),
 				expirationDate: new Date("2026-10-01"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "Policy Tracking Software",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.agencybloc.com/",
 				lastModifiedDate: new Date("2025-10-15"),
 				expirationDate: new Date("2027-01-01"),
-				documentType: DocumentType.Reference,
 			},
 			{
 				title: "Latest Insurance News",
 				description: "",
-				type: ContentType.Link,
 				url: "https://www.insurancejournal.com/",
 				lastModifiedDate: new Date("2025-09-05"),
 				expirationDate: new Date("2026-12-31"),
-				documentType: DocumentType.Reference,
 			},
 		].map((content) => ({
 			...content,
+			type: ContentType.Link,
 			ownerId: nextAnalyst(),
-			intendedAudience: [EmployeeRole.BusinessAnalyst],
 		})),
 	] satisfies Prisma.ContentCreateManyInput[]
 
-	const contentDataIds = await Promise.all(
-		contentData.map((content) =>
-			prisma.content
-				.create({
-					data: content,
-					select: { id: true },
-				})
-				.then((res) => res.id)
-		)
-	)
-
+	const urlContent = await prisma.content.createManyAndReturn({
+		data: contentData,
+		select: { id: true },
+	})
 	console.log(`Created ${contentData.length} content rows`)
 
 	const baseDir = "./prisma/seed-data"
@@ -462,46 +444,103 @@ async function main() {
 		ids.set(path.basename(filename), id)
 	}
 
-	const fileContent = [
-		...ids.entries().map(([filename, id]) => {
-			const daysEditedAgo = Math.floor(Math.random() * 365)
-			const lastModifiedDate = new Date()
-			lastModifiedDate.setDate(lastModifiedDate.getDate() - daysEditedAgo)
-			const expiresInDays = 30 + Math.floor(Math.random() * 365)
-			const expirationDate = new Date()
-			expirationDate.setDate(expirationDate.getDate() + expiresInDays)
-			const underwriter = Math.random() < 0.5
-			const owner = underwriter ? nextUndewriter() : nextAnalyst()
-			return {
-				title: filename,
-				type: ContentType.Object,
-				ownerId: owner,
-				lastModifiedDate,
-				expirationDate,
-				documentType: Math.random() < 0.5 ? DocumentType.Reference : DocumentType.Workflow,
-				objectId: id,
-				intendedAudience: [underwriter ? EmployeeRole.Underwriter : EmployeeRole.BusinessAnalyst],
-			} satisfies Prisma.ContentCreateManyInput
-		}),
-	]
+	const fileContent = [...ids.entries()].map(([filename, id]) => {
+		const daysEditedAgo = Math.floor(Math.random() * 365)
+		const lastModifiedDate = new Date()
+		lastModifiedDate.setDate(lastModifiedDate.getDate() - daysEditedAgo)
+		const expiresInDays = 30 + Math.floor(Math.random() * 365)
+		const expirationDate = new Date()
+		expirationDate.setDate(expirationDate.getDate() + expiresInDays)
+		const isUnderwriter = Math.random() < 0.5
+		return {
+			title: filename,
+			ownerId: isUnderwriter ? nextUndewriter() : nextAnalyst(),
+			lastModifiedDate,
+			expirationDate,
+			objectId: id,
+			type: ContentType.Object,
+		} satisfies Prisma.ContentCreateManyInput
+	})
 
 	const contentByFileType = new Map<FileType, string[]>()
+	const fileContentIds: string[] = []
 	await Promise.all(
-		fileContent.map((content) =>
-			prisma.content
-				.create({
-					data: content,
-					select: { id: true },
-				})
-				.then((res) => {
-					const fileType = idToFileType.get(content.objectId!)!
-					if (!contentByFileType.has(fileType)) {
-						contentByFileType.set(fileType, [])
-					}
-					contentByFileType.get(fileType)!.push(res.id)
-				})
-		)
+		fileContent.map(async (content) => {
+			const res = await prisma.content.create({ data: content, select: { id: true } })
+			fileContentIds.push(res.id)
+			const fileType = idToFileType.get(content.objectId!)!
+			if (!contentByFileType.has(fileType)) contentByFileType.set(fileType, [])
+			contentByFileType.get(fileType)!.push(res.id)
+		})
 	)
+
+	await prisma.contentTag.createMany({
+		data: [
+			...fileContentIds.flatMap((contentId) => {
+				const list: Prisma.ContentTagCreateManyInput[] = []
+				if (Math.random() < 0.5) {
+					list.push({
+						contentId,
+						tagName: "Reference",
+						tagCategory: TagCategory.DocumentType,
+					})
+				} else {
+					list.push({
+						contentId,
+						tagName: "Workflow",
+						tagCategory: TagCategory.DocumentType,
+					})
+				}
+				if (Math.random() < 0.5) {
+					list.push({
+						contentId,
+						tagName: "Business Analyst",
+						tagCategory: TagCategory.IntendedAudience,
+					})
+				} else {
+					list.push({
+						contentId,
+						tagName: "Underwriter",
+						tagCategory: TagCategory.IntendedAudience,
+					})
+				}
+				return list
+			}),
+
+			...urlContent.flatMap(({ id: contentId }) => {
+				const list: Prisma.ContentTagCreateManyInput[] = []
+				if (Math.random() < 0.5) {
+					list.push({
+						contentId,
+						tagCategory: TagCategory.DocumentType,
+						tagName: "Reference",
+					})
+				} else {
+					list.push({
+						contentId,
+						tagCategory: TagCategory.DocumentType,
+						tagName: "Workflow",
+					})
+				}
+
+				if (Math.random() < 0.5) {
+					list.push({
+						contentId,
+						tagCategory: TagCategory.IntendedAudience,
+						tagName: "Underwriter",
+					})
+				} else {
+					list.push({
+						contentId,
+						tagCategory: TagCategory.IntendedAudience,
+						tagName: "Business Analyst",
+					})
+				}
+
+				return list
+			}),
+		],
+	})
 
 	console.log(
 		`Uploaded ${ids.size} files (${Object.entries(hanoverData).length} from Hanover Data.zip) to S3 and created content rows for them`
@@ -520,8 +559,8 @@ async function main() {
 	}
 
 	const thingsToFavorite = [
-		...contentDataIds.slice(0, 3),
-		...contentByFileType.entries().flatMap(([fileType, ids]) => ids.slice(0, 1)),
+		...urlContent.slice(0, 3).map((c) => c.id),
+		...[...contentByFileType.values()].flatMap((ids) => ids.slice(0, 1)),
 	]
 
 	await Promise.all(

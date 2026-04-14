@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Employee: 'Employee',
   Content: 'Content',
+  Tag: 'Tag',
+  ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent'
 } as const
 
@@ -84,9 +86,8 @@ export const ContentScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  documentType: 'documentType',
-  type: 'type',
   status: 'status',
+  type: 'type',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   lastModifiedDate: 'lastModifiedDate',
@@ -94,11 +95,27 @@ export const ContentScalarFieldEnum = {
   objectId: 'objectId',
   url: 'url',
   ownerId: 'ownerId',
-  intendedAudience: 'intendedAudience',
   checkedOutById: 'checkedOutById'
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
+
+
+export const TagScalarFieldEnum = {
+  name: 'name',
+  category: 'category'
+} as const
+
+export type TagScalarFieldEnum = (typeof TagScalarFieldEnum)[keyof typeof TagScalarFieldEnum]
+
+
+export const ContentTagScalarFieldEnum = {
+  contentId: 'contentId',
+  tagCategory: 'tagCategory',
+  tagName: 'tagName'
+} as const
+
+export type ContentTagScalarFieldEnum = (typeof ContentTagScalarFieldEnum)[keyof typeof ContentTagScalarFieldEnum]
 
 
 export const FavoriteContentScalarFieldEnum = {

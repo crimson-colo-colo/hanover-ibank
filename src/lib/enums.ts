@@ -1,14 +1,9 @@
-import type { ContentStatus, ContentType, DocumentType, EmployeeRole } from "@prisma/browser.ts"
+import type { ContentStatus, ContentType, EmployeeRole, TagCategory } from "@prisma/browser.ts"
 
 export const employeeRoleDisplayName: Record<EmployeeRole, string> = {
 	BusinessAnalyst: "Business Analyst",
 	Underwriter: "Underwriter",
 	Admin: "Admin",
-}
-
-export const documentTypeDisplayName: Record<DocumentType, string> = {
-	Workflow: "Workflow Content",
-	Reference: "Reference Content",
 }
 
 export const contentStatusDisplayName: Record<ContentStatus, string> = {
@@ -20,4 +15,10 @@ export const contentStatusDisplayName: Record<ContentStatus, string> = {
 export const contentTypeDisplayName: Record<ContentType, string> = {
 	Link: "URL",
 	Object: "File",
+}
+
+export const tagCategoryDisplayName: Record<TagCategory, string> = {
+	IntendedAudience: "Intended Audience",
+	DocumentType: "Document Type",
+	Custom: "Custom",
 }
