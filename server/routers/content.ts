@@ -14,20 +14,22 @@ import {
 	TagCategory,
 } from "../generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
-import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
+import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
+
+type User = {
+	id: string
+	name: string
+	email: string
+	username: string
+}
 
 export type ContentListItem = {
 	id: string
 	title: string
-	readonly owner: {
-		id: string
-		name: string
-		email: string
-		username: string
-		avatarUrl: string
-	}
+	readonly owner: User
+	readonly checkedOutBy: User | null
 	favorited: boolean
 	ownerId: string
 	lastModifiedDate: Date
@@ -85,6 +87,7 @@ export const contentRouter = router({
 							},
 				include: {
 					owner: true,
+					checkedOutBy: true,
 					favoritedBy: {
 						where: {
 							employeeId: opts.ctx.auth.sub,
@@ -111,22 +114,38 @@ export const contentRouter = router({
 			return {
 				role: user.role,
 				content: data.map((content) => {
-					const owner = users.data.find((u) => u.user_id === content.ownerId) ?? {
+					const unknownUser = {
 						name: "Unknown User",
 						email: "unknown",
 						username: "unknown",
 						avatarUrl: "",
+						nickname: null,
+						picture: null,
 					}
+					const owner = users.data.find((u) => u.user_id === content.ownerId) ?? unknownUser
+					const checkedOutByUser = content.checkedOutBy
+						? (users.data.find((u) => u.user_id === content.checkedOutById) ?? unknownUser)
+						: null
 					return {
 						...content,
 						favorited: content.favoritedBy.length > 0,
 						owner: {
-							...content.owner,
+							id: content.ownerId,
 							name: owner.name ?? owner.nickname ?? owner.username!,
 							email: owner.email!,
 							username: owner.username!,
-							avatarUrl: owner.picture || getGravatarUrl(owner.email!),
 						} satisfies ContentListItem["owner"],
+						checkedOutBy: checkedOutByUser
+							? ({
+									id: content.checkedOutById!,
+									name:
+										checkedOutByUser.name ??
+										checkedOutByUser.nickname ??
+										checkedOutByUser.username!,
+									email: checkedOutByUser.email!,
+									username: checkedOutByUser.username!,
+								} satisfies ContentListItem["checkedOutBy"])
+							: null,
 						tags: content.tags.map((tag) => ({
 							category: tag.tagCategory,
 							name: tag.tagName,
@@ -365,11 +384,47 @@ export const contentRouter = router({
 		.mutation(async (opts) => {
 			const content = await db.content.findUnique({
 				where: { id: opts.input.id },
+				include: {
+					tags: true,
+				},
 			})
 			if (!content) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Content not found",
+				})
+			}
+
+			const user = await db.employee.findUnique({
+				where: { id: opts.ctx.auth.sub },
+			})
+
+			if (!user) {
+				throw new TRPCError({
+					code: "UNAUTHORIZED",
+					message: "User not found",
+				})
+			}
+
+			const isAdmin = user.role === "Admin"
+			const isOwner = content.checkedOutById === user.id
+			const isCheckedOutByAnotherUser =
+				content.checkedOutById !== null && content.checkedOutById !== user.id
+			const isIntendedAudience = content.tags.some(
+				(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+			)
+
+			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Content is checked out by another user",
+				})
+			}
+
+			if (!isIntendedAudience && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "User cannot edit content not intended for their role",
 				})
 			}
 			if (content.type !== "Object") {
@@ -392,6 +447,74 @@ export const contentRouter = router({
 			await db.content.update({
 				where: { id: opts.input.id },
 				data: {
+					lastModifiedDate: new Date(),
+				},
+			})
+		}),
+
+	updateLink: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				url: z.url(),
+			})
+		)
+		.mutation(async (opts) => {
+			const content = await db.content.findUnique({
+				where: { id: opts.input.id },
+				include: {
+					tags: true,
+				},
+			})
+			if (!content) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Content not found",
+				})
+			}
+
+			const user = await db.employee.findUnique({
+				where: { id: opts.ctx.auth.sub },
+			})
+
+			if (!user) {
+				throw new TRPCError({
+					code: "UNAUTHORIZED",
+					message: "User not found",
+				})
+			}
+
+			const isAdmin = user.role === "Admin"
+			const isOwner = content.checkedOutById === user.id
+			const isCheckedOutByAnotherUser =
+				content.checkedOutById !== null && content.checkedOutById !== user.id
+			const isIntendedAudience = content.tags.some(
+				(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+			)
+
+			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Content is checked out by another user",
+				})
+			}
+			if (!isIntendedAudience && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "User cannot edit content not intended for their role",
+				})
+			}
+			if (content.type !== "Link") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Content is not a link",
+				})
+			}
+
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					url: opts.input.url,
 					lastModifiedDate: new Date(),
 				},
 			})
@@ -501,6 +624,100 @@ export const contentRouter = router({
 			objectMetadata: new Map(metadata),
 		}
 	}),
+	checkOut: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
+
+		if (!user) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "User not found",
+			})
+		}
+
+		const content = await db.content.findUnique({
+			where: { id: opts.input.id },
+			include: {
+				tags: true,
+			},
+		})
+
+		if (!content) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Content not found",
+			})
+		}
+
+		const isIntendedAudience = content.tags.some(
+			(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+		)
+		if (!isIntendedAudience) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "User cannot check out content not intended for their role",
+			})
+		}
+		if (content.checkedOutById !== null) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Content is already checked out",
+			})
+		}
+
+		const updated = await db.content.update({
+			where: { id: opts.input.id },
+			data: { checkedOutById: user.id },
+		})
+		return updated
+	}),
+	checkIn: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
+		if (!user) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "User not found",
+			})
+		}
+		const content = await db.content.findUnique({
+			where: { id: opts.input.id },
+		})
+
+		if (!content) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Content not found",
+			})
+		}
+
+		if (content.checkedOutById === null) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Content not checked out",
+			})
+		}
+
+		if (content.checkedOutById !== user.id && user.role !== EmployeeRole.Admin) {
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "User cannot check in content checked out by another user",
+			})
+		}
+
+		const updated = await db.content.update({
+			where: { id: opts.input.id },
+			data: { checkedOutById: null },
+		})
+		return updated
+	}),
+
 	listTagsByCategory: authProcedure.query(async (opts) => {
 		const tags: Record<string, Tag[]> = {}
 		for (const tag of await db.tag.findMany()) {

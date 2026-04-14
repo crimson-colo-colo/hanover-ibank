@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react"
 import { UTCDate } from "@date-fns/utc"
 import {
 	ActionIcon,
@@ -21,6 +22,7 @@ import { FileType } from "@shared/filetype.ts"
 import {
 	IconCloudUpload,
 	IconFilePencil,
+	IconIdBadge2,
 	IconLoader2,
 	IconPencil,
 	IconSortAscending2,
@@ -64,6 +66,7 @@ export function ContentTable({
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
 }) {
+	const auth0 = useAuth0()
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
 	const [globalFilter, setGlobalFilter] = useState("")
@@ -91,6 +94,20 @@ export function ContentTable({
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			},
+		})
+	)
+	const checkOutContent = useMutation(
+		trpc.content.checkOut.mutationOptions({
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+			},
+		})
+	)
+	const checkInContent = useMutation(
+		trpc.content.checkIn.mutationOptions({
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 			},
 		})
 	)
@@ -259,6 +276,19 @@ export function ContentTable({
 								<IconFilePencil />
 							</ActionIcon>
 						)}
+						<ActionIcon
+							variant="transparent"
+							size="sm"
+							onClick={async () => {
+								if (!info.getValue()) {
+									await checkOutContent.mutateAsync({ id: info.row.original.id })
+								} else {
+									await checkInContent.mutateAsync({ id: info.row.original.id })
+								}
+							}}
+						>
+							<IconIdBadge2 />
+						</ActionIcon>
 					</Flex>
 				),
 			}),
