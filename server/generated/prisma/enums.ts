@@ -20,7 +20,6 @@ export type EmployeeRole = (typeof EmployeeRole)[keyof typeof EmployeeRole]
 
 export const TagCategory = {
   DocumentType: 'DocumentType',
-  ContentType: 'ContentType',
   IntendedAudience: 'IntendedAudience',
   Custom: 'Custom'
 } as const
@@ -35,3 +34,11 @@ export const ContentStatus = {
 } as const
 
 export type ContentStatus = (typeof ContentStatus)[keyof typeof ContentStatus]
+
+
+export const ContentType = {
+  Object: 'Object',
+  Link: 'Link'
+} as const
+
+export type ContentType = (typeof ContentType)[keyof typeof ContentType]

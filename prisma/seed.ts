@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid"
 import { auth0Management } from "../server/auth.ts"
 import {
 	ContentStatus,
+	ContentType,
 	EmployeeRole,
 	type Prisma,
 	PrismaClient,
@@ -178,7 +179,7 @@ async function main() {
 	console.log(`Created ${employeeData.length} employee rows`)
 
 	// ===== Content Tags =====
-	await prisma.contentTag.createManyAndReturn({
+	await prisma.tag.createManyAndReturn({
 		data: [
 			// Document Type
 			{
@@ -188,14 +189,6 @@ async function main() {
 			{
 				name: "Reference",
 				category: TagCategory.DocumentType,
-			},
-			{
-				name: "Object",
-				category: TagCategory.ContentType,
-			},
-			{
-				name: "Link",
-				category: TagCategory.ContentType,
 			},
 			{
 				name: "Underwriter",
@@ -301,6 +294,7 @@ async function main() {
 			},
 		].map((content) => ({
 			...content,
+			type: ContentType.Link,
 			ownerId: nextUndewriter(),
 		})),
 		...[
@@ -381,6 +375,7 @@ async function main() {
 			},
 		].map((content) => ({
 			...content,
+			type: ContentType.Link,
 			ownerId: nextAnalyst(),
 		})),
 	] satisfies Prisma.ContentCreateManyInput[]
@@ -463,6 +458,7 @@ async function main() {
 			lastModifiedDate,
 			expirationDate,
 			objectId: id,
+			type: ContentType.Object,
 		} satisfies Prisma.ContentCreateManyInput
 	})
 
@@ -478,38 +474,32 @@ async function main() {
 		})
 	)
 
-	await prisma.contentTagsOnContent.createMany({
+	await prisma.contentTag.createMany({
 		data: [
-			...fileContentIds.flatMap((contentID) => {
-				const list: Prisma.ContentTagsOnContentCreateManyInput[] = [
-					{
-						contentID,
-						tagName: "Object",
-						tagCategory: TagCategory.ContentType,
-					},
-				]
+			...fileContentIds.flatMap((contentId) => {
+				const list: Prisma.ContentTagCreateManyInput[] = []
 				if (Math.random() < 0.5) {
 					list.push({
-						contentID,
+						contentId,
 						tagName: "Reference",
 						tagCategory: TagCategory.DocumentType,
 					})
 				} else {
 					list.push({
-						contentID,
+						contentId,
 						tagName: "Workflow",
 						tagCategory: TagCategory.DocumentType,
 					})
 				}
 				if (Math.random() < 0.5) {
 					list.push({
-						contentID,
+						contentId,
 						tagName: "Business Analyst",
 						tagCategory: TagCategory.IntendedAudience,
 					})
 				} else {
 					list.push({
-						contentID,
+						contentId,
 						tagName: "Underwriter",
 						tagCategory: TagCategory.IntendedAudience,
 					})
@@ -517,23 +507,17 @@ async function main() {
 				return list
 			}),
 
-			...urlContent.flatMap(({ id: contentID }) => {
-				const list: Prisma.ContentTagsOnContentCreateManyInput[] = [
-					{
-						contentID,
-						tagCategory: TagCategory.ContentType,
-						tagName: "Link",
-					},
-				]
+			...urlContent.flatMap(({ id: contentId }) => {
+				const list: Prisma.ContentTagCreateManyInput[] = []
 				if (Math.random() < 0.5) {
 					list.push({
-						contentID,
+						contentId,
 						tagCategory: TagCategory.DocumentType,
 						tagName: "Reference",
 					})
 				} else {
 					list.push({
-						contentID,
+						contentId,
 						tagCategory: TagCategory.DocumentType,
 						tagName: "Workflow",
 					})
@@ -541,13 +525,13 @@ async function main() {
 
 				if (Math.random() < 0.5) {
 					list.push({
-						contentID,
+						contentId,
 						tagCategory: TagCategory.IntendedAudience,
 						tagName: "Underwriter",
 					})
 				} else {
 					list.push({
-						contentID,
+						contentId,
 						tagCategory: TagCategory.IntendedAudience,
 						tagName: "Business Analyst",
 					})

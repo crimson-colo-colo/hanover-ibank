@@ -25,35 +25,41 @@ export type AggregateContentTag = {
 }
 
 export type ContentTagMinAggregateOutputType = {
-  name: string | null
-  category: $Enums.TagCategory | null
+  contentId: string | null
+  tagCategory: $Enums.TagCategory | null
+  tagName: string | null
 }
 
 export type ContentTagMaxAggregateOutputType = {
-  name: string | null
-  category: $Enums.TagCategory | null
+  contentId: string | null
+  tagCategory: $Enums.TagCategory | null
+  tagName: string | null
 }
 
 export type ContentTagCountAggregateOutputType = {
-  name: number
-  category: number
+  contentId: number
+  tagCategory: number
+  tagName: number
   _all: number
 }
 
 
 export type ContentTagMinAggregateInputType = {
-  name?: true
-  category?: true
+  contentId?: true
+  tagCategory?: true
+  tagName?: true
 }
 
 export type ContentTagMaxAggregateInputType = {
-  name?: true
-  category?: true
+  contentId?: true
+  tagCategory?: true
+  tagName?: true
 }
 
 export type ContentTagCountAggregateInputType = {
-  name?: true
-  category?: true
+  contentId?: true
+  tagCategory?: true
+  tagName?: true
   _all?: true
 }
 
@@ -130,8 +136,9 @@ export type ContentTagGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 export type ContentTagGroupByOutputType = {
-  name: string
-  category: $Enums.TagCategory
+  contentId: string
+  tagCategory: $Enums.TagCategory
+  tagName: string
   _count: ContentTagCountAggregateOutputType | null
   _min: ContentTagMinAggregateOutputType | null
   _max: ContentTagMaxAggregateOutputType | null
@@ -156,30 +163,37 @@ export type ContentTagWhereInput = {
   AND?: Prisma.ContentTagWhereInput | Prisma.ContentTagWhereInput[]
   OR?: Prisma.ContentTagWhereInput[]
   NOT?: Prisma.ContentTagWhereInput | Prisma.ContentTagWhereInput[]
-  name?: Prisma.StringFilter<"ContentTag"> | string
-  category?: Prisma.EnumTagCategoryFilter<"ContentTag"> | $Enums.TagCategory
-  contents?: Prisma.ContentTagsOnContentListRelationFilter
+  contentId?: Prisma.StringFilter<"ContentTag"> | string
+  tagCategory?: Prisma.EnumTagCategoryFilter<"ContentTag"> | $Enums.TagCategory
+  tagName?: Prisma.StringFilter<"ContentTag"> | string
+  content?: Prisma.XOR<Prisma.ContentScalarRelationFilter, Prisma.ContentWhereInput>
+  tag?: Prisma.XOR<Prisma.TagScalarRelationFilter, Prisma.TagWhereInput>
 }
 
 export type ContentTagOrderByWithRelationInput = {
-  name?: Prisma.SortOrder
-  category?: Prisma.SortOrder
-  contents?: Prisma.ContentTagsOnContentOrderByRelationAggregateInput
+  contentId?: Prisma.SortOrder
+  tagCategory?: Prisma.SortOrder
+  tagName?: Prisma.SortOrder
+  content?: Prisma.ContentOrderByWithRelationInput
+  tag?: Prisma.TagOrderByWithRelationInput
 }
 
 export type ContentTagWhereUniqueInput = Prisma.AtLeast<{
-  category_name?: Prisma.ContentTagCategoryNameCompoundUniqueInput
+  contentId_tagCategory_tagName?: Prisma.ContentTagContentIdTagCategoryTagNameCompoundUniqueInput
   AND?: Prisma.ContentTagWhereInput | Prisma.ContentTagWhereInput[]
   OR?: Prisma.ContentTagWhereInput[]
   NOT?: Prisma.ContentTagWhereInput | Prisma.ContentTagWhereInput[]
-  name?: Prisma.StringFilter<"ContentTag"> | string
-  category?: Prisma.EnumTagCategoryFilter<"ContentTag"> | $Enums.TagCategory
-  contents?: Prisma.ContentTagsOnContentListRelationFilter
-}, "category_name">
+  contentId?: Prisma.StringFilter<"ContentTag"> | string
+  tagCategory?: Prisma.EnumTagCategoryFilter<"ContentTag"> | $Enums.TagCategory
+  tagName?: Prisma.StringFilter<"ContentTag"> | string
+  content?: Prisma.XOR<Prisma.ContentScalarRelationFilter, Prisma.ContentWhereInput>
+  tag?: Prisma.XOR<Prisma.TagScalarRelationFilter, Prisma.TagWhereInput>
+}, "contentId_tagCategory_tagName">
 
 export type ContentTagOrderByWithAggregationInput = {
-  name?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  contentId?: Prisma.SortOrder
+  tagCategory?: Prisma.SortOrder
+  tagName?: Prisma.SortOrder
   _count?: Prisma.ContentTagCountOrderByAggregateInput
   _max?: Prisma.ContentTagMaxOrderByAggregateInput
   _min?: Prisma.ContentTagMinOrderByAggregateInput
@@ -189,197 +203,336 @@ export type ContentTagScalarWhereWithAggregatesInput = {
   AND?: Prisma.ContentTagScalarWhereWithAggregatesInput | Prisma.ContentTagScalarWhereWithAggregatesInput[]
   OR?: Prisma.ContentTagScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ContentTagScalarWhereWithAggregatesInput | Prisma.ContentTagScalarWhereWithAggregatesInput[]
-  name?: Prisma.StringWithAggregatesFilter<"ContentTag"> | string
-  category?: Prisma.EnumTagCategoryWithAggregatesFilter<"ContentTag"> | $Enums.TagCategory
+  contentId?: Prisma.StringWithAggregatesFilter<"ContentTag"> | string
+  tagCategory?: Prisma.EnumTagCategoryWithAggregatesFilter<"ContentTag"> | $Enums.TagCategory
+  tagName?: Prisma.StringWithAggregatesFilter<"ContentTag"> | string
 }
 
 export type ContentTagCreateInput = {
-  name: string
-  category: $Enums.TagCategory
-  contents?: Prisma.ContentTagsOnContentCreateNestedManyWithoutTagInput
+  content: Prisma.ContentCreateNestedOneWithoutTagsInput
+  tag: Prisma.TagCreateNestedOneWithoutContentsInput
 }
 
 export type ContentTagUncheckedCreateInput = {
-  name: string
-  category: $Enums.TagCategory
-  contents?: Prisma.ContentTagsOnContentUncheckedCreateNestedManyWithoutTagInput
+  contentId: string
+  tagCategory: $Enums.TagCategory
+  tagName: string
 }
 
 export type ContentTagUpdateInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
-  contents?: Prisma.ContentTagsOnContentUpdateManyWithoutTagNestedInput
+  content?: Prisma.ContentUpdateOneRequiredWithoutTagsNestedInput
+  tag?: Prisma.TagUpdateOneRequiredWithoutContentsNestedInput
 }
 
 export type ContentTagUncheckedUpdateInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
-  contents?: Prisma.ContentTagsOnContentUncheckedUpdateManyWithoutTagNestedInput
+  contentId?: Prisma.StringFieldUpdateOperationsInput | string
+  tagCategory?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+  tagName?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ContentTagCreateManyInput = {
-  name: string
-  category: $Enums.TagCategory
+  contentId: string
+  tagCategory: $Enums.TagCategory
+  tagName: string
 }
 
 export type ContentTagUpdateManyMutationInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+
 }
 
 export type ContentTagUncheckedUpdateManyInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+  contentId?: Prisma.StringFieldUpdateOperationsInput | string
+  tagCategory?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+  tagName?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type ContentTagCategoryNameCompoundUniqueInput = {
-  category: $Enums.TagCategory
-  name: string
+export type ContentTagListRelationFilter = {
+  every?: Prisma.ContentTagWhereInput
+  some?: Prisma.ContentTagWhereInput
+  none?: Prisma.ContentTagWhereInput
+}
+
+export type ContentTagOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type ContentTagContentIdTagCategoryTagNameCompoundUniqueInput = {
+  contentId: string
+  tagCategory: $Enums.TagCategory
+  tagName: string
 }
 
 export type ContentTagCountOrderByAggregateInput = {
-  name?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  contentId?: Prisma.SortOrder
+  tagCategory?: Prisma.SortOrder
+  tagName?: Prisma.SortOrder
 }
 
 export type ContentTagMaxOrderByAggregateInput = {
-  name?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  contentId?: Prisma.SortOrder
+  tagCategory?: Prisma.SortOrder
+  tagName?: Prisma.SortOrder
 }
 
 export type ContentTagMinOrderByAggregateInput = {
-  name?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  contentId?: Prisma.SortOrder
+  tagCategory?: Prisma.SortOrder
+  tagName?: Prisma.SortOrder
 }
 
-export type ContentTagScalarRelationFilter = {
-  is?: Prisma.ContentTagWhereInput
-  isNot?: Prisma.ContentTagWhereInput
+export type ContentTagCreateNestedManyWithoutContentInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutContentInput, Prisma.ContentTagUncheckedCreateWithoutContentInput> | Prisma.ContentTagCreateWithoutContentInput[] | Prisma.ContentTagUncheckedCreateWithoutContentInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutContentInput | Prisma.ContentTagCreateOrConnectWithoutContentInput[]
+  createMany?: Prisma.ContentTagCreateManyContentInputEnvelope
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
 }
 
-export type EnumTagCategoryFieldUpdateOperationsInput = {
-  set?: $Enums.TagCategory
+export type ContentTagUncheckedCreateNestedManyWithoutContentInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutContentInput, Prisma.ContentTagUncheckedCreateWithoutContentInput> | Prisma.ContentTagCreateWithoutContentInput[] | Prisma.ContentTagUncheckedCreateWithoutContentInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutContentInput | Prisma.ContentTagCreateOrConnectWithoutContentInput[]
+  createMany?: Prisma.ContentTagCreateManyContentInputEnvelope
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
 }
 
-export type ContentTagCreateNestedOneWithoutContentsInput = {
-  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutContentsInput, Prisma.ContentTagUncheckedCreateWithoutContentsInput>
-  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutContentsInput
-  connect?: Prisma.ContentTagWhereUniqueInput
+export type ContentTagUpdateManyWithoutContentNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutContentInput, Prisma.ContentTagUncheckedCreateWithoutContentInput> | Prisma.ContentTagCreateWithoutContentInput[] | Prisma.ContentTagUncheckedCreateWithoutContentInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutContentInput | Prisma.ContentTagCreateOrConnectWithoutContentInput[]
+  upsert?: Prisma.ContentTagUpsertWithWhereUniqueWithoutContentInput | Prisma.ContentTagUpsertWithWhereUniqueWithoutContentInput[]
+  createMany?: Prisma.ContentTagCreateManyContentInputEnvelope
+  set?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  disconnect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  delete?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  update?: Prisma.ContentTagUpdateWithWhereUniqueWithoutContentInput | Prisma.ContentTagUpdateWithWhereUniqueWithoutContentInput[]
+  updateMany?: Prisma.ContentTagUpdateManyWithWhereWithoutContentInput | Prisma.ContentTagUpdateManyWithWhereWithoutContentInput[]
+  deleteMany?: Prisma.ContentTagScalarWhereInput | Prisma.ContentTagScalarWhereInput[]
 }
 
-export type ContentTagUpdateOneRequiredWithoutContentsNestedInput = {
-  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutContentsInput, Prisma.ContentTagUncheckedCreateWithoutContentsInput>
-  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutContentsInput
-  upsert?: Prisma.ContentTagUpsertWithoutContentsInput
-  connect?: Prisma.ContentTagWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ContentTagUpdateToOneWithWhereWithoutContentsInput, Prisma.ContentTagUpdateWithoutContentsInput>, Prisma.ContentTagUncheckedUpdateWithoutContentsInput>
+export type ContentTagUncheckedUpdateManyWithoutContentNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutContentInput, Prisma.ContentTagUncheckedCreateWithoutContentInput> | Prisma.ContentTagCreateWithoutContentInput[] | Prisma.ContentTagUncheckedCreateWithoutContentInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutContentInput | Prisma.ContentTagCreateOrConnectWithoutContentInput[]
+  upsert?: Prisma.ContentTagUpsertWithWhereUniqueWithoutContentInput | Prisma.ContentTagUpsertWithWhereUniqueWithoutContentInput[]
+  createMany?: Prisma.ContentTagCreateManyContentInputEnvelope
+  set?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  disconnect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  delete?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  update?: Prisma.ContentTagUpdateWithWhereUniqueWithoutContentInput | Prisma.ContentTagUpdateWithWhereUniqueWithoutContentInput[]
+  updateMany?: Prisma.ContentTagUpdateManyWithWhereWithoutContentInput | Prisma.ContentTagUpdateManyWithWhereWithoutContentInput[]
+  deleteMany?: Prisma.ContentTagScalarWhereInput | Prisma.ContentTagScalarWhereInput[]
 }
 
-export type ContentTagCreateWithoutContentsInput = {
-  name: string
-  category: $Enums.TagCategory
+export type ContentTagCreateNestedManyWithoutTagInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutTagInput, Prisma.ContentTagUncheckedCreateWithoutTagInput> | Prisma.ContentTagCreateWithoutTagInput[] | Prisma.ContentTagUncheckedCreateWithoutTagInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutTagInput | Prisma.ContentTagCreateOrConnectWithoutTagInput[]
+  createMany?: Prisma.ContentTagCreateManyTagInputEnvelope
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
 }
 
-export type ContentTagUncheckedCreateWithoutContentsInput = {
-  name: string
-  category: $Enums.TagCategory
+export type ContentTagUncheckedCreateNestedManyWithoutTagInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutTagInput, Prisma.ContentTagUncheckedCreateWithoutTagInput> | Prisma.ContentTagCreateWithoutTagInput[] | Prisma.ContentTagUncheckedCreateWithoutTagInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutTagInput | Prisma.ContentTagCreateOrConnectWithoutTagInput[]
+  createMany?: Prisma.ContentTagCreateManyTagInputEnvelope
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
 }
 
-export type ContentTagCreateOrConnectWithoutContentsInput = {
+export type ContentTagUpdateManyWithoutTagNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutTagInput, Prisma.ContentTagUncheckedCreateWithoutTagInput> | Prisma.ContentTagCreateWithoutTagInput[] | Prisma.ContentTagUncheckedCreateWithoutTagInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutTagInput | Prisma.ContentTagCreateOrConnectWithoutTagInput[]
+  upsert?: Prisma.ContentTagUpsertWithWhereUniqueWithoutTagInput | Prisma.ContentTagUpsertWithWhereUniqueWithoutTagInput[]
+  createMany?: Prisma.ContentTagCreateManyTagInputEnvelope
+  set?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  disconnect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  delete?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  update?: Prisma.ContentTagUpdateWithWhereUniqueWithoutTagInput | Prisma.ContentTagUpdateWithWhereUniqueWithoutTagInput[]
+  updateMany?: Prisma.ContentTagUpdateManyWithWhereWithoutTagInput | Prisma.ContentTagUpdateManyWithWhereWithoutTagInput[]
+  deleteMany?: Prisma.ContentTagScalarWhereInput | Prisma.ContentTagScalarWhereInput[]
+}
+
+export type ContentTagUncheckedUpdateManyWithoutTagNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentTagCreateWithoutTagInput, Prisma.ContentTagUncheckedCreateWithoutTagInput> | Prisma.ContentTagCreateWithoutTagInput[] | Prisma.ContentTagUncheckedCreateWithoutTagInput[]
+  connectOrCreate?: Prisma.ContentTagCreateOrConnectWithoutTagInput | Prisma.ContentTagCreateOrConnectWithoutTagInput[]
+  upsert?: Prisma.ContentTagUpsertWithWhereUniqueWithoutTagInput | Prisma.ContentTagUpsertWithWhereUniqueWithoutTagInput[]
+  createMany?: Prisma.ContentTagCreateManyTagInputEnvelope
+  set?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  disconnect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  delete?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  connect?: Prisma.ContentTagWhereUniqueInput | Prisma.ContentTagWhereUniqueInput[]
+  update?: Prisma.ContentTagUpdateWithWhereUniqueWithoutTagInput | Prisma.ContentTagUpdateWithWhereUniqueWithoutTagInput[]
+  updateMany?: Prisma.ContentTagUpdateManyWithWhereWithoutTagInput | Prisma.ContentTagUpdateManyWithWhereWithoutTagInput[]
+  deleteMany?: Prisma.ContentTagScalarWhereInput | Prisma.ContentTagScalarWhereInput[]
+}
+
+export type ContentTagCreateWithoutContentInput = {
+  tag: Prisma.TagCreateNestedOneWithoutContentsInput
+}
+
+export type ContentTagUncheckedCreateWithoutContentInput = {
+  tagCategory: $Enums.TagCategory
+  tagName: string
+}
+
+export type ContentTagCreateOrConnectWithoutContentInput = {
   where: Prisma.ContentTagWhereUniqueInput
-  create: Prisma.XOR<Prisma.ContentTagCreateWithoutContentsInput, Prisma.ContentTagUncheckedCreateWithoutContentsInput>
+  create: Prisma.XOR<Prisma.ContentTagCreateWithoutContentInput, Prisma.ContentTagUncheckedCreateWithoutContentInput>
 }
 
-export type ContentTagUpsertWithoutContentsInput = {
-  update: Prisma.XOR<Prisma.ContentTagUpdateWithoutContentsInput, Prisma.ContentTagUncheckedUpdateWithoutContentsInput>
-  create: Prisma.XOR<Prisma.ContentTagCreateWithoutContentsInput, Prisma.ContentTagUncheckedCreateWithoutContentsInput>
-  where?: Prisma.ContentTagWhereInput
+export type ContentTagCreateManyContentInputEnvelope = {
+  data: Prisma.ContentTagCreateManyContentInput | Prisma.ContentTagCreateManyContentInput[]
+  skipDuplicates?: boolean
 }
 
-export type ContentTagUpdateToOneWithWhereWithoutContentsInput = {
-  where?: Prisma.ContentTagWhereInput
-  data: Prisma.XOR<Prisma.ContentTagUpdateWithoutContentsInput, Prisma.ContentTagUncheckedUpdateWithoutContentsInput>
+export type ContentTagUpsertWithWhereUniqueWithoutContentInput = {
+  where: Prisma.ContentTagWhereUniqueInput
+  update: Prisma.XOR<Prisma.ContentTagUpdateWithoutContentInput, Prisma.ContentTagUncheckedUpdateWithoutContentInput>
+  create: Prisma.XOR<Prisma.ContentTagCreateWithoutContentInput, Prisma.ContentTagUncheckedCreateWithoutContentInput>
 }
 
-export type ContentTagUpdateWithoutContentsInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+export type ContentTagUpdateWithWhereUniqueWithoutContentInput = {
+  where: Prisma.ContentTagWhereUniqueInput
+  data: Prisma.XOR<Prisma.ContentTagUpdateWithoutContentInput, Prisma.ContentTagUncheckedUpdateWithoutContentInput>
 }
 
-export type ContentTagUncheckedUpdateWithoutContentsInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+export type ContentTagUpdateManyWithWhereWithoutContentInput = {
+  where: Prisma.ContentTagScalarWhereInput
+  data: Prisma.XOR<Prisma.ContentTagUpdateManyMutationInput, Prisma.ContentTagUncheckedUpdateManyWithoutContentInput>
 }
 
-
-/**
- * Count Type ContentTagCountOutputType
- */
-
-export type ContentTagCountOutputType = {
-  contents: number
+export type ContentTagScalarWhereInput = {
+  AND?: Prisma.ContentTagScalarWhereInput | Prisma.ContentTagScalarWhereInput[]
+  OR?: Prisma.ContentTagScalarWhereInput[]
+  NOT?: Prisma.ContentTagScalarWhereInput | Prisma.ContentTagScalarWhereInput[]
+  contentId?: Prisma.StringFilter<"ContentTag"> | string
+  tagCategory?: Prisma.EnumTagCategoryFilter<"ContentTag"> | $Enums.TagCategory
+  tagName?: Prisma.StringFilter<"ContentTag"> | string
 }
 
-export type ContentTagCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  contents?: boolean | ContentTagCountOutputTypeCountContentsArgs
+export type ContentTagCreateWithoutTagInput = {
+  content: Prisma.ContentCreateNestedOneWithoutTagsInput
 }
 
-/**
- * ContentTagCountOutputType without action
- */
-export type ContentTagCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ContentTagCountOutputType
-   */
-  select?: Prisma.ContentTagCountOutputTypeSelect<ExtArgs> | null
+export type ContentTagUncheckedCreateWithoutTagInput = {
+  contentId: string
 }
 
-/**
- * ContentTagCountOutputType without action
- */
-export type ContentTagCountOutputTypeCountContentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ContentTagsOnContentWhereInput
+export type ContentTagCreateOrConnectWithoutTagInput = {
+  where: Prisma.ContentTagWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentTagCreateWithoutTagInput, Prisma.ContentTagUncheckedCreateWithoutTagInput>
 }
+
+export type ContentTagCreateManyTagInputEnvelope = {
+  data: Prisma.ContentTagCreateManyTagInput | Prisma.ContentTagCreateManyTagInput[]
+  skipDuplicates?: boolean
+}
+
+export type ContentTagUpsertWithWhereUniqueWithoutTagInput = {
+  where: Prisma.ContentTagWhereUniqueInput
+  update: Prisma.XOR<Prisma.ContentTagUpdateWithoutTagInput, Prisma.ContentTagUncheckedUpdateWithoutTagInput>
+  create: Prisma.XOR<Prisma.ContentTagCreateWithoutTagInput, Prisma.ContentTagUncheckedCreateWithoutTagInput>
+}
+
+export type ContentTagUpdateWithWhereUniqueWithoutTagInput = {
+  where: Prisma.ContentTagWhereUniqueInput
+  data: Prisma.XOR<Prisma.ContentTagUpdateWithoutTagInput, Prisma.ContentTagUncheckedUpdateWithoutTagInput>
+}
+
+export type ContentTagUpdateManyWithWhereWithoutTagInput = {
+  where: Prisma.ContentTagScalarWhereInput
+  data: Prisma.XOR<Prisma.ContentTagUpdateManyMutationInput, Prisma.ContentTagUncheckedUpdateManyWithoutTagInput>
+}
+
+export type ContentTagCreateManyContentInput = {
+  tagCategory: $Enums.TagCategory
+  tagName: string
+}
+
+export type ContentTagUpdateWithoutContentInput = {
+  tag?: Prisma.TagUpdateOneRequiredWithoutContentsNestedInput
+}
+
+export type ContentTagUncheckedUpdateWithoutContentInput = {
+  tagCategory?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+  tagName?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type ContentTagUncheckedUpdateManyWithoutContentInput = {
+  tagCategory?: Prisma.EnumTagCategoryFieldUpdateOperationsInput | $Enums.TagCategory
+  tagName?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type ContentTagCreateManyTagInput = {
+  contentId: string
+}
+
+export type ContentTagUpdateWithoutTagInput = {
+  content?: Prisma.ContentUpdateOneRequiredWithoutTagsNestedInput
+}
+
+export type ContentTagUncheckedUpdateWithoutTagInput = {
+  contentId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type ContentTagUncheckedUpdateManyWithoutTagInput = {
+  contentId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
 
 
 export type ContentTagSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  name?: boolean
-  category?: boolean
-  contents?: boolean | Prisma.ContentTag$contentsArgs<ExtArgs>
-  _count?: boolean | Prisma.ContentTagCountOutputTypeDefaultArgs<ExtArgs>
+  contentId?: boolean
+  tagCategory?: boolean
+  tagName?: boolean
+  content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contentTag"]>
 
 export type ContentTagSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  name?: boolean
-  category?: boolean
+  contentId?: boolean
+  tagCategory?: boolean
+  tagName?: boolean
+  content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contentTag"]>
 
 export type ContentTagSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  name?: boolean
-  category?: boolean
+  contentId?: boolean
+  tagCategory?: boolean
+  tagName?: boolean
+  content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contentTag"]>
 
 export type ContentTagSelectScalar = {
-  name?: boolean
-  category?: boolean
+  contentId?: boolean
+  tagCategory?: boolean
+  tagName?: boolean
 }
 
-export type ContentTagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"name" | "category", ExtArgs["result"]["contentTag"]>
+export type ContentTagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"contentId" | "tagCategory" | "tagName", ExtArgs["result"]["contentTag"]>
 export type ContentTagInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  contents?: boolean | Prisma.ContentTag$contentsArgs<ExtArgs>
-  _count?: boolean | Prisma.ContentTagCountOutputTypeDefaultArgs<ExtArgs>
+  content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
 }
-export type ContentTagIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ContentTagIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ContentTagIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
+}
+export type ContentTagIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
+  tag?: boolean | Prisma.TagDefaultArgs<ExtArgs>
+}
 
 export type $ContentTagPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ContentTag"
   objects: {
-    contents: Prisma.$ContentTagsOnContentPayload<ExtArgs>[]
+    content: Prisma.$ContentPayload<ExtArgs>
+    tag: Prisma.$TagPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    name: string
-    category: $Enums.TagCategory
+    contentId: string
+    tagCategory: $Enums.TagCategory
+    tagName: string
   }, ExtArgs["result"]["contentTag"]>
   composites: {}
 }
@@ -463,8 +616,8 @@ export interface ContentTagDelegate<ExtArgs extends runtime.Types.Extensions.Int
    * // Get first 10 ContentTags
    * const contentTags = await prisma.contentTag.findMany({ take: 10 })
    * 
-   * // Only select the `name`
-   * const contentTagWithNameOnly = await prisma.contentTag.findMany({ select: { name: true } })
+   * // Only select the `contentId`
+   * const contentTagWithContentIdOnly = await prisma.contentTag.findMany({ select: { contentId: true } })
    * 
    */
   findMany<T extends ContentTagFindManyArgs>(args?: Prisma.SelectSubset<T, ContentTagFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -508,9 +661,9 @@ export interface ContentTagDelegate<ExtArgs extends runtime.Types.Extensions.Int
    *   ]
    * })
    * 
-   * // Create many ContentTags and only return the `name`
-   * const contentTagWithNameOnly = await prisma.contentTag.createManyAndReturn({
-   *   select: { name: true },
+   * // Create many ContentTags and only return the `contentId`
+   * const contentTagWithContentIdOnly = await prisma.contentTag.createManyAndReturn({
+   *   select: { contentId: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -599,9 +752,9 @@ export interface ContentTagDelegate<ExtArgs extends runtime.Types.Extensions.Int
    *   ]
    * })
    * 
-   * // Update zero or more ContentTags and only return the `name`
-   * const contentTagWithNameOnly = await prisma.contentTag.updateManyAndReturn({
-   *   select: { name: true },
+   * // Update zero or more ContentTags and only return the `contentId`
+   * const contentTagWithContentIdOnly = await prisma.contentTag.updateManyAndReturn({
+   *   select: { contentId: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -774,7 +927,8 @@ readonly fields: ContentTagFieldRefs;
  */
 export interface Prisma__ContentTagClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  contents<T extends Prisma.ContentTag$contentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ContentTag$contentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTagsOnContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  content<T extends Prisma.ContentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ContentDefaultArgs<ExtArgs>>): Prisma.Prisma__ContentClient<runtime.Types.Result.GetResult<Prisma.$ContentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  tag<T extends Prisma.TagDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TagDefaultArgs<ExtArgs>>): Prisma.Prisma__TagClient<runtime.Types.Result.GetResult<Prisma.$TagPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -804,8 +958,9 @@ export interface Prisma__ContentTagClient<T, Null = never, ExtArgs extends runti
  * Fields of the ContentTag model
  */
 export interface ContentTagFieldRefs {
-  readonly name: Prisma.FieldRef<"ContentTag", 'String'>
-  readonly category: Prisma.FieldRef<"ContentTag", 'TagCategory'>
+  readonly contentId: Prisma.FieldRef<"ContentTag", 'String'>
+  readonly tagCategory: Prisma.FieldRef<"ContentTag", 'TagCategory'>
+  readonly tagName: Prisma.FieldRef<"ContentTag", 'String'>
 }
     
 
@@ -1060,6 +1215,10 @@ export type ContentTagCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    */
   data: Prisma.ContentTagCreateManyInput | Prisma.ContentTagCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentTagIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1130,6 +1289,10 @@ export type ContentTagUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * Limit how many ContentTags to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentTagIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1196,30 +1359,6 @@ export type ContentTagDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many ContentTags to delete.
    */
   limit?: number
-}
-
-/**
- * ContentTag.contents
- */
-export type ContentTag$contentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ContentTagsOnContent
-   */
-  select?: Prisma.ContentTagsOnContentSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ContentTagsOnContent
-   */
-  omit?: Prisma.ContentTagsOnContentOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ContentTagsOnContentInclude<ExtArgs> | null
-  where?: Prisma.ContentTagsOnContentWhereInput
-  orderBy?: Prisma.ContentTagsOnContentOrderByWithRelationInput | Prisma.ContentTagsOnContentOrderByWithRelationInput[]
-  cursor?: Prisma.ContentTagsOnContentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ContentTagsOnContentScalarFieldEnum | Prisma.ContentTagsOnContentScalarFieldEnum[]
 }
 
 /**

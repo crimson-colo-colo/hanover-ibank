@@ -21,47 +21,47 @@ model Employee {
 }
 
 model Content {
-  id               String                 @id @default(cuid())
+  id               String            @id @default(cuid())
   title            String
   description      String?
-  status           ContentStatus          @default(Incomplete)
-  createdAt        DateTime               @default(now())
-  lastModifiedDate DateTime               @updatedAt
+  status           ContentStatus     @default(Incomplete)
+  type             ContentType
+  createdAt        DateTime          @default(now())
+  lastModifiedDate DateTime          @updatedAt
   expirationDate   DateTime
   /// S3 Object ID
   objectId         String?
   /// URL for links
   url              String?
   ownerId          String
-  owner            Employee               @relation(fields: [ownerId], references: [id])
-  tags             ContentTagsOnContent[]
+  owner            Employee          @relation(fields: [ownerId], references: [id])
+  tags             ContentTag[]
   favoritedBy      FavoriteContent[]
 }
 
-model ContentTag {
+model Tag {
   name     String
   category TagCategory
 
-  contents ContentTagsOnContent[]
+  contents ContentTag[]
 
   @@id([category, name])
 }
 
-model ContentTagsOnContent {
-  content     Content     @relation(fields: [contentID], references: [id])
-  contentID   String
-  tag         ContentTag  @relation(fields: [tagCategory, tagName], references: [category, name])
+model ContentTag {
+  content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId   String
+  tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
   tagCategory TagCategory
   tagName     String
 
-  @@id([contentID, tagCategory, tagName])
+  @@id([contentId, tagCategory, tagName])
 }
 
 enum TagCategory {
-  DocumentType //Workflow or Reference
-  ContentType //Object or Link
-  IntendedAudience //Underwriter or Business Analyst
-  Custom //Custom tag created by user
+  DocumentType // Workflow or Reference
+  IntendedAudience // Underwriter or Business Analyst
+  Custom // Custom tag created by user
 }
 
 model FavoriteContent {
@@ -77,4 +77,9 @@ enum ContentStatus {
   Incomplete
   UnderReview
   Complete
+}
+
+enum ContentType {
+  Object
+  Link
 }
