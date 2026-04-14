@@ -17,7 +17,8 @@ import { FileType } from "@shared/filetype.ts"
 import { IconCalendar, IconPencil, IconUser } from "@tabler/icons-react"
 import { useRef, useState } from "react"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
-import { FileViewer } from "@/components/FileViewer.tsx"
+import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
+import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 type EditableField = "title" | "owner" | "lastModifiedDate" | "expirationDate" | null
@@ -59,82 +60,89 @@ export function PreviewModal({
 	})
 
 	return (
-		<Modal.Content bg="transparent" p="xl" className="h-screen flex flex-col w-full gap-lg">
-			<Modal.Header bdrs="md">
-				<Modal.Title fw="bold">{content.title}</Modal.Title>
-				<Modal.CloseButton />
-			</Modal.Header>
-			<Flex gap="lg" className="flex-1 min-h-0 overflow-hidden">
-				{content && (
-					<FileViewer
-						content={content}
-						fileType={fileType ?? FileType.Unknown}
-						closeViewer={closeFilePreview}
-					/>
-				)}
-				<Paper w="400px" className="h-full min-h-0 border-gray-300">
-					<ScrollArea className="h-full" px="md">
-						<Stack gap="md" py="md">
-							<Title
-								order={4}
-								className="metadata-field flex items-center gap-2 leading-tight px-1"
-							>
-								<EditableTextField
-									field="title"
-									value={content.title}
+		<FilePreviewProvider
+			content={content}
+			fileType={fileType ?? FileType.Unknown}
+			closeViewer={closeFilePreview}
+		>
+			<Modal.Content bg="transparent" p="xl" className="h-screen flex flex-col w-full gap-lg">
+				{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
+				{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
+				<div className="absolute inset-0" onClick={closeFilePreview} />
+				<Modal.Header bdrs="md">
+					<Flex gap="sm" align="center">
+						<FileTypeIcon fileType={fileType} />
+						<Modal.Title className="font-display font-semibold">{content.title}</Modal.Title>
+						<FilePreviewControls />
+					</Flex>
+					<Modal.CloseButton />
+				</Modal.Header>
+				<Flex gap="lg" className="flex-1 min-h-0 overflow-hidden">
+					<FilePreview />
+					<Paper w="400px" className="h-full min-h-0 border-gray-300">
+						<ScrollArea className="h-full" px="md">
+							<Stack gap="md" py="md">
+								<Title
+									order={4}
+									className="metadata-field flex items-center gap-2 leading-tight px-1"
+								>
+									<EditableTextField
+										field="title"
+										value={content.title}
+										editingField={editingField}
+										setEditingField={setEditingField}
+										onFieldEdit={onFieldEdit}
+										ref={titleRef}
+									/>
+								</Title>
+								<Popover
+									shadow="md"
+									opened={editingField === "owner"}
+									onDismiss={() => {
+										onFieldEdit("owner", form.getValues().ownerId)
+									}}
+									closeOnClickOutside
+									withArrow
+								>
+									<Popover.Target>
+										<Text className="flex items-center gap-2 metadata-field text-gray-600">
+											<IconUser className="text-gray-800" />
+											Owned by <span className="text-gray-800">{content.owner.name}</span>
+											<ActionIcon
+												className="metadata-edit"
+												variant="subtle"
+												onClick={() => setEditingField("owner")}
+											>
+												<IconPencil />
+											</ActionIcon>
+										</Text>
+									</Popover.Target>
+									<Popover.Dropdown w="300px">
+										<ContentOwnerSelect form={form} initialSearchValue={content.owner.email} />
+									</Popover.Dropdown>
+								</Popover>
+								<EditableDateField
+									field="lastModifiedDate"
+									label="Last modified"
+									value={content.lastModifiedDate}
 									editingField={editingField}
 									setEditingField={setEditingField}
 									onFieldEdit={onFieldEdit}
-									ref={titleRef}
 								/>
-							</Title>
-							<Popover
-								shadow="md"
-								opened={editingField === "owner"}
-								onDismiss={() => {
-									onFieldEdit("owner", form.getValues().ownerId)
-								}}
-								closeOnClickOutside
-								withArrow
-							>
-								<Popover.Target>
-									<Text className="flex items-center gap-2 metadata-field text-gray-600">
-										<IconUser className="text-gray-800" />
-										Owned by <span className="text-gray-800">{content.owner.name}</span>
-										<ActionIcon
-											className="metadata-edit"
-											variant="subtle"
-											onClick={() => setEditingField("owner")}
-										>
-											<IconPencil />
-										</ActionIcon>
-									</Text>
-								</Popover.Target>
-								<Popover.Dropdown w="300px">
-									<ContentOwnerSelect form={form} initialSearchValue={content.owner.email} />
-								</Popover.Dropdown>
-							</Popover>
-							<EditableDateField
-								field="lastModifiedDate"
-								label="Last Modifed"
-								value={content.lastModifiedDate}
-								editingField={editingField}
-								setEditingField={setEditingField}
-								onFieldEdit={onFieldEdit}
-							/>
-							<EditableDateField
-								field="expirationDate"
-								label="Expires"
-								value={content.expirationDate}
-								editingField={editingField}
-								setEditingField={setEditingField}
-								onFieldEdit={onFieldEdit}
-							/>
-						</Stack>
-					</ScrollArea>
-				</Paper>
-			</Flex>
-		</Modal.Content>
+								<EditableDateField
+									field="expirationDate"
+									label="Expires"
+									value={content.expirationDate}
+									editingField={editingField}
+									setEditingField={setEditingField}
+									onFieldEdit={onFieldEdit}
+								/>
+							</Stack>
+						</ScrollArea>
+					</Paper>
+				</Flex>
+			</Modal.Content>
+		</FilePreviewProvider>
 	)
 }
 

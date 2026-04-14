@@ -4,7 +4,7 @@ import { Image, ScrollArea } from "@mantine/core"
 import { FileType } from "@shared/filetype.ts"
 import { useQuery } from "@tanstack/react-query"
 import worker from "pdfjs-dist/build/pdf.worker.min.mjs?url"
-import { useState } from "react"
+import { createContext, useContext, useState } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
@@ -17,14 +17,23 @@ const options = {
 	cMapUrl: "/cmaps/",
 }
 
-export function FileViewer({
+interface FilePreviewContext {
+	controls: React.ReactNode
+	preview: React.ReactNode
+}
+
+const FilePreviewContext = createContext<FilePreviewContext | null>(null)
+
+export function FilePreviewProvider({
 	content,
 	fileType,
 	closeViewer,
+	children,
 }: {
 	content: ContentListItem
 	fileType: FileType
 	closeViewer: () => void
+	children: React.ReactNode
 }) {
 	const { data: preview } = useQuery(trpc.preview.getContentUrl.queryOptions({ id: content.id }))
 	const { data: plaintextContent } = useQuery(
@@ -73,7 +82,6 @@ export function FileViewer({
 							// biome-ignore lint/suspicious/noArrayIndexKey: foo
 							key={index}
 							pageNumber={index + 1}
-							canvasBackground="transparent"
 						/>
 					))}
 				</Document>
@@ -90,11 +98,40 @@ export function FileViewer({
 	}
 
 	return (
-		<div className="h-full flex flex-col justify-center flex-1 min-h-0 items-center relative">
-			{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
-			{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
-			<div className="absolute inset-0" onClick={closeViewer}></div>
-			{contentDisplay}
-		</div>
+		<FilePreviewContext.Provider
+			value={{
+				controls: null,
+				preview: (
+					<div className="h-full flex flex-col justify-center flex-1 min-h-0 items-center relative">
+						{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
+						{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
+						<div className="absolute inset-0" onClick={closeViewer}></div>
+						{contentDisplay}
+					</div>
+				),
+			}}
+		>
+			{children}
+		</FilePreviewContext.Provider>
 	)
+}
+
+export function FilePreviewControls() {
+	const filePreviewContext = useContext(FilePreviewContext)
+
+	if (!filePreviewContext) {
+		throw new Error("FilePreviewControls must be used within a FilePreviewProvider")
+	}
+
+	return <>{filePreviewContext.controls}</>
+}
+
+export function FilePreview() {
+	const filePreviewContext = useContext(FilePreviewContext)
+
+	if (!filePreviewContext) {
+		throw new Error("FilePreview must be used within a FilePreviewProvider")
+	}
+
+	return <>{filePreviewContext.preview}</>
 }
