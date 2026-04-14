@@ -1,6 +1,6 @@
 import { AreaChart, BarChart } from "@mantine/charts"
-import { Grid, Paper, Stack, Text, Title } from "@mantine/core"
-
+import { Avatar, Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import { FolderOpen, PencilSimple, SignIn, UploadSimple } from "@phosphor-icons/react"
 export function AnalyticsDashboard() {
 	const uploadData = [
 		{ month: "Jan", Files: 2, Links: 4 },
@@ -23,6 +23,7 @@ export function AnalyticsDashboard() {
 	const mostActive = uploadData.reduce((max, m) =>
 		m.Files + m.Links > max.Files + max.Links ? m : max
 	)
+	const userAvatar = <Avatar src="/avatar/${userId}" alt="User name" size="lg" radius="xl" />
 
 	const fileTypes = [
 		{ name: "DOCX", Amount: 15 },
@@ -37,6 +38,7 @@ export function AnalyticsDashboard() {
 		{ label: "Files", value: totalFiles },
 		{ label: "Links", value: totalLinks },
 		{ label: "Top Month", value: mostActive.month },
+		{ label: "Top User", value: userAvatar },
 	]
 
 	return (
@@ -45,7 +47,7 @@ export function AnalyticsDashboard() {
 
 			<Grid>
 				{metrics.map((m) => (
-					<Grid.Col key={m.label} span={3}>
+					<Grid.Col key={m.label} span={{ base: 12, sm: 6, md: 4, lg: 2 }}>
 						<Paper withBorder p="md" radius="md">
 							<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
 								{m.label}
@@ -59,10 +61,10 @@ export function AnalyticsDashboard() {
 			</Grid>
 
 			<Grid>
-				<Grid.Col span={12}>
-					<Paper withBorder p="md" radius="md">
+				<Grid.Col span={{ base: 12, md: 7 }}>
+					<Paper withBorder p="md" radius="md" h="100%">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-							Uploads over time
+							Uploads Over Time
 						</Text>
 						<AreaChart
 							h={220}
@@ -76,13 +78,59 @@ export function AnalyticsDashboard() {
 						/>
 					</Paper>
 				</Grid.Col>
+
+				<Grid.Col span={{ base: 12, md: 5 }}>
+					<Paper withBorder p="md" radius="md" h="100%">
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							Recent User Activity
+						</Text>
+
+						<Timeline active={3} bulletSize={24} lineWidth={2}>
+							<Timeline.Item bullet={<SignIn size={12} />} title="User logged in">
+								<Text size="sm" c="dimmed">
+									Michael Jordan signed into the dashboard
+								</Text>
+								<Text size="xs" mt={4}>
+									9:00 AM
+								</Text>
+							</Timeline.Item>
+
+							<Timeline.Item bullet={<FolderOpen size={12} />} title="File accessed">
+								<Text size="sm" c="dimmed">
+									Opened Quarterly_Report.pdf
+								</Text>
+								<Text size="xs" mt={4}>
+									9:12 AM
+								</Text>
+							</Timeline.Item>
+
+							<Timeline.Item bullet={<PencilSimple size={12} />} title="File edited">
+								<Text size="sm" c="dimmed">
+									Updated Budget_Plan.xlsx
+								</Text>
+								<Text size="xs" mt={4}>
+									9:25 AM
+								</Text>
+							</Timeline.Item>
+
+							<Timeline.Item bullet={<UploadSimple size={12} />} title="File uploaded">
+								<Text size="sm" c="dimmed">
+									Uploaded DesignMockup.png
+								</Text>
+								<Text size="xs" mt={4}>
+									9:40 AM
+								</Text>
+							</Timeline.Item>
+						</Timeline>
+					</Paper>
+				</Grid.Col>
 			</Grid>
 
 			<Grid>
 				<Grid.Col span={12}>
 					<Paper withBorder p="md" radius="md">
-						<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
-							Storage Data
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							File Types
 						</Text>
 						<BarChart
 							h={300}
