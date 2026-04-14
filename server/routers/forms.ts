@@ -104,6 +104,54 @@ export const formsRouter = router({
 			})
 		}),
 
-	checkIn: publicProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {}),
-	checkOut: publicProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {}),
+	checkIn: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+		//fuck off webstorm
+		//verify user
+		const user = await ctx.session?.user
+
+		if (!user) throw new Error("No user found.")
+		const content = await db.content.findUnique({
+			where: { id: input.id },
+		})
+
+		if (!content) {
+			throw new Error("Content does not exist")
+		}
+
+		if (!content.intendedAudience.includes(user.role)) {
+			throw new Error("User not in the intended audience")
+		}
+		if (content.checkedOutById) {
+			throw new Error("Content already checked out")
+		}
+
+		const updated = await db.content.update({
+			where: { id: input.id },
+			data: { checkedOutById: user.id },
+		})
+		return updated
+	}),
+	checkOut: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+		const user = await ctx.session?.user
+		if (!user) {
+			throw new Error("No user found.")
+		}
+		const content = await db.content.findUnique({
+			where: { id: input.id },
+		})
+
+		if (!content) {
+			throw new Error("Content does not exist")
+		}
+
+		if (!content.checkedOutById) {
+			throw new Error("Content not checked out")
+		}
+
+		const updated = await db.content.update({
+			where: { id: input.id },
+			data: { checkedOutById: null },
+		})
+		return updated
+	}),
 })
