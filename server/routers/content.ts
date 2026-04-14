@@ -218,13 +218,28 @@ export const contentRouter = router({
 				where: { id: opts.ctx.auth.sub },
 			})
 
-			const isAdmin = user?.role === "Admin"
-			const isOwner = content.checkedOutById === user?.id
+			if (!user) {
+				throw new TRPCError({
+					code: "UNAUTHORIZED",
+					message: "User not found",
+				})
+			}
 
-			if (content.checkedOutById && !isOwner && !isAdmin) {
+			const isAdmin = user.role === "Admin"
+			const isOwner = content.checkedOutById === user.id
+			const isCheckedOutByAnotherUser =
+				content.checkedOutById !== null && content.checkedOutById !== user.id
+
+			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "Content is checked out by another user",
+				})
+			}
+			if (!content.intendedAudience.includes(user.role) && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "User cannot edit content not intended for their role",
 				})
 			}
 			if (content.type !== "Object") {
@@ -247,6 +262,68 @@ export const contentRouter = router({
 			await db.content.update({
 				where: { id: opts.input.id },
 				data: {
+					lastModifiedDate: new Date(),
+				},
+			})
+		}),
+
+	updateLink: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				url: z.url(),
+			})
+		)
+		.mutation(async (opts) => {
+			const content = await db.content.findUnique({
+				where: { id: opts.input.id },
+			})
+			if (!content) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Content not found",
+				})
+			}
+
+			const user = await db.employee.findUnique({
+				where: { id: opts.ctx.auth.sub },
+			})
+
+			if (!user) {
+				throw new TRPCError({
+					code: "UNAUTHORIZED",
+					message: "User not found",
+				})
+			}
+
+			const isAdmin = user.role === "Admin"
+			const isOwner = content.checkedOutById === user.id
+			const isCheckedOutByAnotherUser =
+				content.checkedOutById !== null && content.checkedOutById !== user.id
+
+			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Content is checked out by another user",
+				})
+			}
+			if (!content.intendedAudience.includes(user.role) && !isOwner && !isAdmin) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "User cannot edit content not intended for their role",
+				})
+			}
+			if (content.type !== "Link") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Content is not a link",
+				})
+			}
+
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					url: opts.input.url,
 					lastModifiedDate: new Date(),
 				},
 			})
