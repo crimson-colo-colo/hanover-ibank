@@ -1,5 +1,5 @@
 import type { Auth0ContextInterface, User } from "@auth0/auth0-react"
-import { AppShell, MantineProvider, localStorageColorSchemeManager } from "@mantine/core"
+import { AppShell, localStorageColorSchemeManager, MantineProvider } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import { DevSupport } from "@react-buddy/ide-toolbox"
 import { TanStackDevtools } from "@tanstack/react-devtools"
