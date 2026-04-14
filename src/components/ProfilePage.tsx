@@ -2,15 +2,14 @@ import { useAuth0 } from "@auth0/auth0-react"
 import { Button, Group, Loader, Stack, TextInput, Title } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
-import { IconCamera, IconDeviceFloppy } from "@tabler/icons-react"
+import { IconCamera, IconDeviceFloppy, IconMoon, IconSun } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useRef } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
-import { IconMoon, IconSun } from "@tabler/icons-react"
-import { useColorScheme } from "@/lib/useColorScheme.ts";
+import { useColorScheme } from "@/lib/useColorScheme.ts"
 
 const schema = z.object({
 	name: z.string().min(3).max(100),
@@ -98,7 +97,6 @@ export function ProfilePage() {
 
 	return (
 		<Stack maw={480} mx="auto" mt="md" gap="xl">
-
 			<Group justify="space-between" align="center">
 				<Title order={2}>Profile</Title>
 				<Button
@@ -106,9 +104,11 @@ export function ProfilePage() {
 					color="gray"
 					onClick={toggleColorScheme}
 					leftSection={
-					colorScheme === "dark"
-						? <IconSun size={16} stroke={1.5} />
-						: <IconMoon size={16} stroke={1.5} />
+						colorScheme === "dark" ? (
+							<IconSun size={16} stroke={1.5} />
+						) : (
+							<IconMoon size={16} stroke={1.5} />
+						)
 					}
 				>
 					{colorScheme === "dark" ? "Light mode" : "Dark mode"}
