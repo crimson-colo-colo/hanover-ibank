@@ -104,14 +104,17 @@ export const formsRouter = router({
 			})
 		}),
 
-	checkIn: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
-		//fuck off webstorm
+	checkIn: publicProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		//verify user
-		const user = await ctx.session?.user
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
 
 		if (!user) throw new Error("No user found.")
 		const content = await db.content.findUnique({
-			where: { id: input.id },
+			where: { id: user.id },
 		})
 
 		if (!content) {
@@ -126,18 +129,22 @@ export const formsRouter = router({
 		}
 
 		const updated = await db.content.update({
-			where: { id: input.id },
+			where: { id: user.id },
 			data: { checkedOutById: user.id },
 		})
 		return updated
 	}),
-	checkOut: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
-		const user = await ctx.session?.user
+	checkOut: publicProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
 		if (!user) {
 			throw new Error("No user found.")
 		}
 		const content = await db.content.findUnique({
-			where: { id: input.id },
+			where: { id: user.id },
 		})
 
 		if (!content) {
@@ -149,7 +156,7 @@ export const formsRouter = router({
 		}
 
 		const updated = await db.content.update({
-			where: { id: input.id },
+			where: { id: user.id },
 			data: { checkedOutById: null },
 		})
 		return updated
