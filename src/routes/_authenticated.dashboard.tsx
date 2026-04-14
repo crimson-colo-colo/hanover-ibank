@@ -13,8 +13,10 @@ import { useState } from "react"
 import { ContentTable } from "@/components/ContentTable.tsx"
 import { EditContentForm } from "@/components/EditContentForm.tsx"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
+import { FileViewer } from "@/components/FileViewer.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
+import type { ContentListItem } from "../../server/routers/content.ts"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -24,13 +26,11 @@ function RoleDashboard() {
 	const auth0 = useAuth0()
 	const [contentFilter, setContentFilter] = useState<ContentFilter>(ContentFilter.Own)
 	const content = useQuery(trpc.content.list.queryOptions({ filter: contentFilter }))
-	const [editingItem, setEditingItem] = useState<
-		NonNullable<(typeof content)["data"]>["content"][number] | null
-	>(null)
+	const [editingItem, setEditingItem] = useState<ContentListItem | null>(null)
 	const [editDialogOpen, { open: openEditDialog, close: closeEditDialog }] = useDisclosure(false)
 	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
 		useDisclosure(false)
-	const [filePreviewOpen, { open: openFilePreview, close: closeFilePreview }] =
+	const [filePreviewOpen, { open: openFilePreviewModal, close: closeFilePreview }] =
 		useDisclosure(false)
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
 
@@ -123,8 +123,9 @@ function RoleDashboard() {
 							}}
 							filter={contentFilter}
 							changeFilter={setContentFilter}
-							openFilePreview={(item) =>{
-									openFilePreview()
+							openFilePreview={(item) => {
+								setSelectedContent(item)
+								openFilePreviewModal()
 							}}
 						/>
 					)}
