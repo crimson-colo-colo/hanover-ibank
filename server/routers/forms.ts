@@ -1,4 +1,3 @@
-import { useMutation } from "@tanstack/react-query"
 import { v4 as uuidv4 } from "uuid"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
@@ -13,7 +12,6 @@ import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, publicProcedure, router } from "../trpc.ts"
-import { userRouter } from "./user.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
