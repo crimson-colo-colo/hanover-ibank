@@ -35,19 +35,9 @@ function RoleDashboard() {
 	const [filePreviewOpen, { open: openFilePreviewModal, close: closeFilePreview }] =
 		useDisclosure(false)
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
-	const [previewFile, setPreviewFile] = useState<null | {
-		id: string
-		url: string
-		name: string
-		type: FileType
-	}>(null)
 
-	const docs = [
-		{ uri: "https://www.rd.usda.gov/sites/default/files/pdf-sample_0.pdf" },
-		{ uri: "./prisma/seed-data/sample-pdf.pdf" },
-	];
 
-	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
+	const [selectedContent, setSelectedContent] = useState<ContentListItem |string| null>(null)
 	const updateContent = useMutation(
 		trpc.content.update.mutationOptions({
 			onSuccess() {
@@ -107,7 +97,7 @@ function RoleDashboard() {
 											? FileType.Link
 											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									}
-									openFilePreview={openFilePreviewModal}
+									openFilePreview={()=>()}
 								/>
 							)
 						})

@@ -38,13 +38,13 @@ export function FavoriteContentCard({
 	contentUrl,
 	contentType,
 	fileName,
-	openFilePreview
+	openFilePreview,
 }: {
 	contentId: string
 	contentUrl: string | null
 	contentType: FileType
 	fileName: string
-	openFilePreview: (item: ContentListItem) => void
+	openFilePreview: (info: string | null) =>(void)
 
 }) {
 	const titleRef = useRef<HTMLParagraphElement>(null)
@@ -71,7 +71,17 @@ export function FavoriteContentCard({
 			target="_blank"
 			p="28"
 			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
-			onClick={async () => {openFilePreview()}}
+			onClick={ () => {
+				// setDownloadingItemId(item.id)
+				// try {
+				// 	const { url } = await trpcClient.content.download.query({ id: item.id })
+				// 	window.open(url, "_blank")
+				// } finally {
+				// 	setDownloadingItemId(null)
+				// }
+
+			}}
+
 		>
 			<Card.Section>
 				<Flex justify="space-between" align="center" gap="sm">
@@ -102,9 +112,12 @@ export function FavoriteContentCard({
 							{contentType === FileType.Link ? (
 								<Menu.Item
 									leftSection={<IconCircleArrowUpRight size={20} />}
-									// TODO: open preview panel
-								>
-									View Details
+									onClick={async () => {
+										openFilePreview(contentUrl)
+
+
+									}}
+								>View Details
 								</Menu.Item>
 							) : (
 								<Menu.Item

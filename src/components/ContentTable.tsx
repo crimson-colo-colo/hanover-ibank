@@ -236,7 +236,7 @@ export function ContentTable({
 										// 	setDownloadingItemId(null)
 										// }
 
-										openFilePreview(info.row.original)
+										openFilePreview(item)
 									}}
 								>
 									{item.title}
