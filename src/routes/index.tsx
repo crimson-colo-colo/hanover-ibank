@@ -1,7 +1,7 @@
 import { Alert, Button, Text, Title } from "@mantine/core"
-import { IconInfoCircleFilled } from '@tabler/icons-react'
+import { IconInfoCircleFilled } from "@tabler/icons-react"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
-import { useState } from 'react'
+import { useState } from "react"
 import office from "@/assets/office.png"
 
 export const Route = createFileRoute("/")({
@@ -18,15 +18,23 @@ export const Route = createFileRoute("/")({
 
 function Index() {
 	const { auth0 } = Route.useRouteContext()
-	const icon = <IconInfoCircleFilled className="fill-sky-600" size={50}/>;
-	const [visible, setVisible] = useState(true);
+	const icon = <IconInfoCircleFilled className="fill-sky-600" size={50} />
+	const [visible, setVisible] = useState(true)
 
 	return (
 		<main>
 			{visible && (
-				<Alert variant="light" color="sky" title="Info" icon={icon} styles={{icon : {width: 50, height: 50}, title: {fontSize : '24px'}}} withCloseButton onClose={() => setVisible(false)}>
-					This website has been created for <strong> WPI's CS 3733 Software Engineering </strong> as a class project and
-					is <strong>NOT</strong> in use by Hanover Insurance.
+				<Alert
+					variant="light"
+					color="sky"
+					title="Info"
+					icon={icon}
+					styles={{ icon: { width: 50, height: 50 }, title: { fontSize: "24px" } }}
+					withCloseButton
+					onClose={() => setVisible(false)}
+				>
+					This website has been created for <strong> WPI's CS 3733 Software Engineering </strong> as
+					a class project and is <strong>NOT</strong> in use by Hanover Insurance.
 				</Alert>
 			)}
 			<header
