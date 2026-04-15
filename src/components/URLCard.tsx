@@ -1,5 +1,6 @@
-import { Card, Center, Image, Skeleton, Text } from "@mantine/core"
+import { Image, Paper, Skeleton, Text } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
+import clsx from "clsx"
 import type { OgObject } from "open-graph-scraper/types"
 import { useMemo } from "react"
 import imageNotFound from "@/assets/image-not-found.png"
@@ -26,7 +27,7 @@ export function URLCard({ url }: { url: string }) {
 	}
 
 	const og = useMemo(() => {
-		if (opengraph.isLoading || !opengraph.data)
+		if (opengraph.isFetching || !opengraph.data)
 			return {
 				title: null,
 				description: null,
@@ -40,53 +41,70 @@ export function URLCard({ url }: { url: string }) {
 				logo: null,
 			}
 		return extractOGData(opengraph.data.response)
-	}, [opengraph.isLoading, opengraph.data])
+	}, [opengraph.isFetching, opengraph.data])
 
 	return (
-		<Card shadow="md" padding="lg" style={{ maxWidth: 600 }}>
+		<Paper shadow="sm" p="xl" maw="800" className="flex gap-xl z-1 w-full flex-col @xl:flex-row">
 			{og ? (
 				<>
-					{og.image !== undefined ? (
-						<Card.Section my="sm">
-							<Center>
-								{og.image === null ? (
-									<Image mah={300} maw={300} src={imageNotFound} />
-								) : (
-									<Image
-										mah={300}
-										maw={300}
-										radius="xl"
-										fit="contain"
-										src={og.image}
-										fallbackSrc={imageNotFound}
-									/>
-								)}
-							</Center>
-						</Card.Section>
-					) : null}
-					{og.title !== undefined ? (
-						<Card.Section my="sm">
-							<Skeleton visible={og.title === null}>
-								<Center>
-									<Text p={"md"} size={"lg"} fw={600}>
-										{og.title ?? "Bad stuff idk you shouldn't see this."}
+					{opengraph.isFetching ? (
+						<Skeleton height="200px" width="200px" className="rounded-lg size-50 shrink-0" />
+					) : og.image == null ? (
+						<Image
+							unstyled
+							height="200"
+							width="200"
+							className="object-cover rounded-lg size-50 shrink-0"
+							src={imageNotFound}
+						/>
+					) : (
+						<Image
+							unstyled
+							height="200"
+							width="200"
+							alt=""
+							className="object-cover rounded-lg size-50 shrink-0"
+							src={og.image}
+							fallbackSrc={imageNotFound}
+						/>
+					)}
+					<div className="flex-1 grow flex flex-col gap-md">
+						<a
+							className="hover:underline text-inherit no-underline"
+							href={url}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{opengraph.isFetching ? (
+								<Skeleton>
+									<Text size="lg" fw={600}>
+										{"watermelon ".repeat(5)}
 									</Text>
-								</Center>
+								</Skeleton>
+							) : (
+								<Text
+									size="lg"
+									fw={600}
+									className={clsx("line-clamp-2", og.title ? "" : "truncate")}
+								>
+									{og.title ?? url}
+								</Text>
+							)}
+						</a>
+						{opengraph.isFetching ? (
+							<Skeleton>
+								<Text>{"watermelon ".repeat(15)}</Text>
 							</Skeleton>
-						</Card.Section>
-					) : null}
-					{og.description !== undefined ? (
-						<Card.Section>
-							<Center>
-								<Text p={"md"}>{og.description ?? null}</Text>
-							</Center>
-						</Card.Section>
-					) : null}
-					{}
+						) : og.description ? (
+							<Text className="whitespace-pre-wrap">{og.description}</Text>
+						) : (
+							<Text c="dimmed">No description available</Text>
+						)}
+					</div>
 				</>
 			) : (
-				<Text>Couldn't fetch link preview.</Text>
+				<Text c="dimmed">Link preview unavailable</Text>
 			)}
-		</Card>
+		</Paper>
 	)
 }

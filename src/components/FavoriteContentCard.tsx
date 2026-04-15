@@ -1,4 +1,5 @@
 import { ActionIcon, Card, Divider, Flex, Menu, Text, Tooltip } from "@mantine/core"
+import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconCircleArrowUpRight,
@@ -39,9 +40,16 @@ export function FavoriteContentCard({
 	}, [titleRef])
 	const unfavoriteContent = useMutation(
 		trpc.content.unfavorite.mutationOptions({
-			onSuccess() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			async onSuccess() {
+				await Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+					}),
+					queryClient.invalidateQueries({
+						queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+					}),
+					queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
+				])
 			},
 		})
 	)

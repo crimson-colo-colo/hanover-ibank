@@ -186,7 +186,7 @@ export function Navigation() {
 						<span className="text-xl font-semibold font-display">iBank</span>
 					</Link>
 					{auth0.isAuthenticated && (
-						<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} />
+						<NavLinks isLoading={isAdmin.isFetching} isAdmin={isAdmin.data} />
 					)}
 				</Group>
 
@@ -251,7 +251,7 @@ export function Navigation() {
 				<ScrollArea className="flex-1">
 					<Divider mb="sm" />
 					<DrawerNavLinks
-						isLoading={isAdmin.isLoading}
+						isLoading={isAdmin.isFetching}
 						isAdmin={isAdmin.data}
 						closeDrawer={close}
 					/>

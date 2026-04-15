@@ -193,11 +193,11 @@ async function main() {
 				category: TagCategory.DocumentType,
 			},
 			{
-				name: "Underwriter",
+				name: EmployeeRole.Underwriter,
 				category: TagCategory.IntendedAudience,
 			},
 			{
-				name: "Business Analyst",
+				name: EmployeeRole.BusinessAnalyst,
 				category: TagCategory.IntendedAudience,
 			},
 			//TODO: add custom tags

@@ -24,7 +24,6 @@ import {
 	IconCloudUpload,
 	IconDownload,
 	IconFilePencil,
-	IconIdBadge2,
 	IconLoader2,
 	IconSortAscending2,
 	IconSortDescending2,
@@ -75,44 +74,22 @@ export function ContentTable({
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
 	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
-	const deleteContent = useMutation(
-		trpc.content.delete.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
-			},
-		})
-	)
-	const favoriteContent = useMutation(
-		trpc.content.favorite.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
-			},
-		})
-	)
-	const unfavoriteContent = useMutation(
-		trpc.content.unfavorite.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
-			},
-		})
-	)
-	const checkOutContent = useMutation(
-		trpc.content.checkOut.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-			},
-		})
-	)
-	const checkInContent = useMutation(
-		trpc.content.checkIn.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-			},
-		})
-	)
+	const options = {
+		async onSettled() {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+				}),
+				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
+			])
+		},
+	}
+	const deleteContent = useMutation(trpc.content.delete.mutationOptions(options))
+	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(options))
+	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
@@ -256,6 +233,18 @@ export function ContentTable({
 				id: "actions",
 				cell: (info) => (
 					<Flex className="content-actions" gap="2px" justify="flex-end">
+						{info.row.original.type === "Object" && (
+							<ActionIcon
+								variant="subtle"
+								size="sm"
+								onClick={(e) => {
+									openFileEditDialog(info.row.original)
+								}}
+							>
+								<IconFilePencil />
+							</ActionIcon>
+						)}
+
 						{info.row.original.type === "Link" ? (
 							<ActionIcon
 								variant="transparent"
@@ -282,31 +271,6 @@ export function ContentTable({
 								<IconDownload />
 							</ActionIcon>
 						)}
-
-						{info.row.original.type === "Object" && (
-							<ActionIcon
-								variant="subtle"
-								size="sm"
-								onClick={(e) => {
-									openFileEditDialog(info.row.original)
-								}}
-							>
-								<IconFilePencil />
-							</ActionIcon>
-						)}
-						<ActionIcon
-							variant="transparent"
-							size="sm"
-							onClick={async () => {
-								if (!info.getValue()) {
-									await checkOutContent.mutateAsync({ id: info.row.original.id })
-								} else {
-									await checkInContent.mutateAsync({ id: info.row.original.id })
-								}
-							}}
-						>
-							<IconIdBadge2 />
-						</ActionIcon>
 					</Flex>
 				),
 			}),
