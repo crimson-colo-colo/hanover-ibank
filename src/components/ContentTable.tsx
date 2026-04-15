@@ -21,6 +21,7 @@ import { FileType } from "@shared/filetype.ts"
 import {
 	IconCloudUpload,
 	IconFilePencil,
+	IconIdBadge2,
 	IconLoader2,
 	IconPencil,
 	IconSortAscending2,
@@ -46,26 +47,29 @@ import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
-import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
 
 export function ContentTable({
+	loading,
 	data,
 	openEditDialog,
 	openFileEditDialog,
+	openFilePreview,
 	filter,
 	changeFilter,
 }: {
+	loading: boolean
 	data: ContentList
 	openEditDialog: (item: ContentListItem) => void
 	openFileEditDialog: (item: ContentListItem) => void
+	openFilePreview: (item: ContentListItem, type: FileType) => void
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
 }) {
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
 	const [globalFilter, setGlobalFilter] = useState("")
-	const [downloadingItemId, setDownloadingItemId] = useState<string | null>(null)
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
 	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
@@ -79,19 +83,6 @@ export function ContentTable({
 	)
 	const favoriteContent = useMutation(
 		trpc.content.favorite.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content:
-						old!.content.map((item) =>
-							item.id === data.id ? { ...item, favorited: true } : item
-						) ?? [],
-				}))
-				return { previousContent }
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
@@ -100,22 +91,23 @@ export function ContentTable({
 	)
 	const unfavoriteContent = useMutation(
 		trpc.content.unfavorite.mutationOptions({
-			onMutate: async (data, context) => {
-				const listContent = trpc.content.list.queryKey()
-				await context.client.cancelQueries({ queryKey: listContent })
-				const previousContent = context.client.getQueryData(listContent)
-				context.client.setQueryData(listContent, (old) => ({
-					...old!,
-					content:
-						old!.content.map((item) =>
-							item.id === data.id ? { ...item, favorited: false } : item
-						) ?? [],
-				}))
-				return { previousContent }
-			},
 			onSettled() {
 				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			},
+		})
+	)
+	const checkOutContent = useMutation(
+		trpc.content.checkOut.mutationOptions({
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
+			},
+		})
+	)
+	const checkInContent = useMutation(
+		trpc.content.checkIn.mutationOptions({
+			onSettled() {
+				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
 			},
 		})
 	)
@@ -192,35 +184,17 @@ export function ContentTable({
 								</span>
 							</div>
 						)
-					} else {
-						const size = formatBytes(
-							data.objectMetadata.get(info.row.original.id)?.ContentLength ?? 0
-						)
-						const fileType = data.objectMetadata.get(info.row.original.id)?.Metadata?.filetype as
-							| FileType
-							| undefined
+					} else if (item.type === "Object") {
+						const size = formatBytes(item.object.ContentLength ?? 0)
+						const fileType = item.object.Metadata?.filetype as FileType | undefined
 						return (
 							<div className="flex items-center gap-2">
-								{downloadingItemId === item.id ? (
-									<IconLoader2 className="shrink-0 animate-spin" stroke={2} />
-								) : (
-									<FileTypeIcon
-										fileType={fileType ?? FileType.Unknown}
-										size={22}
-										strokeWidth={1.5}
-									/>
-								)}
+								<FileTypeIcon fileType={fileType ?? FileType.Unknown} size={22} strokeWidth={1.5} />
 								<button
 									className="font-semibold m-0 truncate max-w-[30ch] hover:underline p-0 border-none bg-transparent text-base cursor-pointer"
 									title={item.title}
 									onClick={async () => {
-										setDownloadingItemId(item.id)
-										try {
-											const { url } = await trpcClient.content.download.query({ id: item.id })
-											window.open(url, "_blank")
-										} finally {
-											setDownloadingItemId(null)
-										}
+										openFilePreview(item, fileType ?? FileType.Unknown)
 									}}
 								>
 									{item.title}
@@ -246,7 +220,7 @@ export function ContentTable({
 							width={24}
 							height={24}
 							radius="100%"
-							className="shrink-0 w-6 h-6"
+							className="w-6 h-6 shrink-0"
 						/>
 						<span className="truncate" title={info.getValue().email}>
 							{info.getValue().name}
@@ -298,6 +272,19 @@ export function ContentTable({
 								<IconFilePencil />
 							</ActionIcon>
 						)}
+						<ActionIcon
+							variant="transparent"
+							size="sm"
+							onClick={async () => {
+								if (!info.getValue()) {
+									await checkOutContent.mutateAsync({ id: info.row.original.id })
+								} else {
+									await checkInContent.mutateAsync({ id: info.row.original.id })
+								}
+							}}
+						>
+							<IconIdBadge2 />
+						</ActionIcon>
 					</Flex>
 				),
 			}),
@@ -359,7 +346,10 @@ export function ContentTable({
 	return (
 		<>
 			<Flex align="center" justify="space-between" gap="md" mt="xl" mb="sm">
-				<Title order={3}>Your Content ({data.content.length})</Title>
+				<Title order={3} className="flex items-center gap-4">
+					<span>Your Content ({data.content.length})</span>
+					{loading && <IconLoader2 size={20} className="animate-spin" />}
+				</Title>
 
 				<Flex gap="sm">
 					<SegmentedControl
@@ -453,7 +443,7 @@ export function ContentTable({
 					})}
 					{table.getRowModel().rows.length === 0 && (
 						<Table.Tr>
-							<Table.Td colSpan={columns.length} className="text-center py-4">
+							<Table.Td colSpan={columns.length} className="py-4 text-center">
 								<Text c="gray">Nothing found :(</Text>
 							</Table.Td>
 						</Table.Tr>

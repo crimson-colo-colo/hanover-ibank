@@ -89,11 +89,13 @@ export const ContentScalarFieldEnum = {
   status: 'status',
   type: 'type',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   lastModifiedDate: 'lastModifiedDate',
   expirationDate: 'expirationDate',
   objectId: 'objectId',
   url: 'url',
-  ownerId: 'ownerId'
+  ownerId: 'ownerId',
+  checkedOutById: 'checkedOutById'
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]

@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import {
+	ActionIcon,
 	Burger,
 	Button,
 	Container,
@@ -11,7 +12,6 @@ import {
 	NavLink,
 	ScrollArea,
 	Text,
-	useMantineColorScheme,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
@@ -20,6 +20,8 @@ import {
 	IconChevronRight,
 	IconHome,
 	IconLayoutSidebarLeftExpand,
+	IconMoon,
+	IconSun,
 	IconUser,
 	IconUsers,
 } from "@tabler/icons-react"
@@ -27,6 +29,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
+import { useColorScheme } from "@/lib/useColorScheme.ts"
 
 function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
 	const location = useLocation()
@@ -121,7 +124,7 @@ function DrawerUserMenu() {
 					className="border-t border-t-gray-200 hover:bg-gray-100 h-max"
 					justify="start"
 				>
-					<div className="gap-2 flex items-center px-2 py-1">
+					<div className="flex items-center gap-2 px-2 py-1">
 						<Image
 							h={32}
 							bdrs="100%"
@@ -158,31 +161,29 @@ export function Navigation() {
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
 
-	const { colorScheme } = useMantineColorScheme()
+	const { colorScheme, toggleColorScheme } = useColorScheme()
 
 	return (
-		<header
-			className={`h-14 mb-30 border-b ${colorScheme === "dark" ? "bg-gray-900 border-gray-700" : "bg-gray-50 border-gray-300"}`}
-		>
-			<Container size="1120px" className="h-full flex justify-between items-center">
+		<header className="border-b border-gray-300 h-14 mb-30 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+			<Container size="1120px" className="flex items-center justify-between h-full">
 				<Group hiddenFrom="xs">
 					<Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
 					<Link
 						to="/"
-						className="mr-4 gap-2 flex items-center no-underline active:text-primary-hover"
+						className="flex items-center gap-2 mr-4 no-underline active:text-primary-hover"
 					>
 						<IconBuildingBank />
-						<span className="font-semibold font-display text-xl">iBank</span>
+						<span className="text-xl font-semibold font-display">iBank</span>
 					</Link>
 				</Group>
 
 				<Group gap={5} visibleFrom="xs">
 					<Link
 						to="/"
-						className="mr-4 gap-2 flex items-center no-underline active:text-primary-hover"
+						className="flex items-center gap-2 mr-4 no-underline active:text-primary-hover"
 					>
 						<IconBuildingBank />
-						<span className="font-semibold font-display text-xl">iBank</span>
+						<span className="text-xl font-semibold font-display">iBank</span>
 					</Link>
 					{auth0.isAuthenticated && (
 						<NavLinks isLoading={isAdmin.isLoading} isAdmin={isAdmin.data} />
@@ -190,11 +191,14 @@ export function Navigation() {
 				</Group>
 
 				<Group>
+					<ActionIcon onClick={toggleColorScheme} variant="subtle">
+						{colorScheme === "dark" ? <IconSun /> : <IconMoon />}
+					</ActionIcon>
 					{auth0.isAuthenticated && auth0.user ? (
 						<Menu trigger="click" position="bottom-end">
 							<Menu.Target>
 								<Button variant="subtle" color="gray" p="0" className="h-max">
-									<div className="gap-2 flex items-center px-2 py-1">
+									<div className="flex items-center gap-2 px-2 py-1">
 										<div className="flex flex-col items-end">
 											<Text size="sm" fw={500}>
 												{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
@@ -232,9 +236,9 @@ export function Navigation() {
 				size="100%"
 				padding={0}
 				title={
-					<span className="gap-2 flex items-center text-fuchsia-800">
+					<span className="flex items-center gap-2 text-fuchsia-800">
 						<IconBuildingBank />
-						<span className="font-semibold font-display text-xl">iBank</span>
+						<span className="text-xl font-semibold font-display">iBank</span>
 					</span>
 				}
 				hiddenFrom="xs"

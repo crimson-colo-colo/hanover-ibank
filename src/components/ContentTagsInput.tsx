@@ -2,12 +2,15 @@ import { Group, Pill, TagsInput } from "@mantine/core"
 import { type Tag, TagCategory } from "@prisma/browser.ts"
 import { useQuery } from "@tanstack/react-query"
 import { tagCategoryDisplayName } from "@/lib/enums.ts"
+import { stringifyTag, unstringifyTag } from "@/lib/tags.ts"
 import { trpc } from "@/lib/trpc.ts"
 
 export function ContentTagsInput({
+	enabled = true,
 	value,
 	onChange,
 }: {
+	enabled?: boolean
 	value: Tag[]
 	onChange: (tags: Tag[]) => void
 }) {
@@ -15,6 +18,8 @@ export function ContentTagsInput({
 
 	return (
 		<TagsInput
+			className="content-tags-input"
+			disabled={!enabled}
 			value={value.map((tag) => stringifyTag(tag))}
 			onChange={(values) => {
 				const tags = values.map((value) => unstringifyTag(value))
@@ -31,7 +36,7 @@ export function ContentTagsInput({
 			renderPill={({ option, onRemove }) => {
 				const { category, name } = unstringifyTag(option.value as string)
 				return (
-					<Pill withRemoveButton onRemove={onRemove}>
+					<Pill withRemoveButton onRemove={onRemove} disabled={!enabled}>
 						{category === TagCategory.Custom
 							? name
 							: `${tagCategoryDisplayName[category as TagCategory]}: ${name}`}
@@ -40,21 +45,4 @@ export function ContentTagsInput({
 			}}
 		/>
 	)
-}
-
-function stringifyTag(tag: Tag) {
-	return `${tag.category}:${tag.name}`
-}
-
-function unstringifyTag(value: string): Tag {
-	if (!value.includes(":")) {
-		return { category: TagCategory.Custom, name: value } as Tag
-	}
-	const colon = value.indexOf(":")
-	const category = value.substring(0, colon)
-	const name = value.substring(colon + 1)
-	if (!Object.values(TagCategory).includes(category as TagCategory)) {
-		return { category: TagCategory.Custom, name: value } as Tag
-	}
-	return { category: category as TagCategory, name }
 }
