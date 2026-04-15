@@ -1,15 +1,12 @@
-import { useAuth0 } from "@auth0/auth0-react"
 import {
 	ActionIcon,
 	Alert,
 	Button,
-	Dialog,
 	Flex,
 	Menu,
 	Modal,
 	Paper,
 	Popover,
-	PopoverTarget,
 	Stack,
 	Text,
 	Title,
@@ -74,8 +71,6 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
 	const checkInContent = useMutation(trpc.content.checkIn.mutationOptions(options))
 	const checkOutContent = useMutation(trpc.content.checkOut.mutationOptions(options))
-	const updateFile = useMutation(trpc.content.updateFile.mutationOptions(options))
-	const updateLink = useMutation(trpc.content.updateLink.mutationOptions(options))
 
 	const isIntendedAudience = content.tags.some(
 		(tag) => tag.category === TagCategory.IntendedAudience && tag.name === profile?.role
