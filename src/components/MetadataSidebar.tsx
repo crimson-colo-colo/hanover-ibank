@@ -1,15 +1,12 @@
-import { useAuth0 } from "@auth0/auth0-react"
 import {
 	ActionIcon,
 	Alert,
 	Button,
-	Dialog,
 	Flex,
 	Menu,
 	Modal,
 	Paper,
 	Popover,
-	PopoverTarget,
 	Stack,
 	Text,
 	Title,
@@ -74,8 +71,6 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
 	const checkInContent = useMutation(trpc.content.checkIn.mutationOptions(options))
 	const checkOutContent = useMutation(trpc.content.checkOut.mutationOptions(options))
-	const updateFile = useMutation(trpc.content.updateFile.mutationOptions(options))
-	const updateLink = useMutation(trpc.content.updateLink.mutationOptions(options))
 
 	const isIntendedAudience = content.tags.some(
 		(tag) => tag.category === TagCategory.IntendedAudience && tag.name === profile?.role
@@ -122,9 +117,15 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 		} else if (field === "owner") {
 			await updateOwner.mutateAsync({ id: content.id, ownerId: value })
 		} else if (field === "lastModifiedDate") {
-			await updateLastModifiedDate.mutateAsync({ id: content.id, lastModifiedDate: value })
+			await updateLastModifiedDate.mutateAsync({
+				id: content.id,
+				lastModifiedDate: value.split("T")[0],
+			})
 		} else if (field === "expirationDate") {
-			await updateExpirationDate.mutateAsync({ id: content.id, expirationDate: value })
+			await updateExpirationDate.mutateAsync({
+				id: content.id,
+				expirationDate: value.split("T")[0],
+			})
 		} else if (field === "status") {
 			await updateStatus.mutateAsync({ id: content.id, status: value as ContentStatus })
 		} else if (field === "tags") {
