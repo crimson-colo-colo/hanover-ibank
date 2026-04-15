@@ -1,15 +1,16 @@
 import { trpc } from "@/lib/trpc.ts"
 import "@iamjariwala/react-doc-viewer/dist/index.css"
-import { Image, ScrollArea } from "@mantine/core"
+import { ActionIcon, Flex, Image, ScrollArea } from "@mantine/core"
 import { FileType } from "@shared/filetype.ts"
+import { IconZoomIn, IconZoomOut } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import worker from "pdfjs-dist/build/pdf.worker.min.mjs?url"
-import { createContext, useContext, useState } from "react"
-import { Document, Page, pdfjs } from "react-pdf"
+import { createContext, useContext, useRef, useState } from "react"
+import { Document, type LinkService, Page, pdfjs } from "react-pdf"
 import type { ContentListItem } from "../../server/routers/content.ts"
-
 import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
+import type { ScrollPageIntoViewArgs } from "react-pdf/dist/shared/types.js"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(worker, import.meta.url).toString()
 
@@ -35,7 +36,9 @@ export function FilePreviewProvider({
 	closeViewer: () => void
 	children: React.ReactNode
 }) {
-	const { data: preview } = useQuery(trpc.preview.getContentUrl.queryOptions({ id: content.id }))
+	const { data: contentPreview } = useQuery(
+		trpc.preview.getContentUrl.queryOptions({ id: content.id })
+	)
 	const { data: plaintextContent } = useQuery(
 		trpc.preview.getPlaintextContent.queryOptions(
 			{ id: content.id },
@@ -44,24 +47,36 @@ export function FilePreviewProvider({
 	)
 
 	const [numPages, setNumPages] = useState<number>()
+	const [scale, setScale] = useState(1)
+
+	const scales = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
 
 	function onLoadSuccess({ numPages }: { numPages: number }): void {
 		setNumPages(numPages)
 	}
 
-	let contentDisplay: React.ReactNode
+	const documentRef = useRef<{
+		linkService: React.RefObject<LinkService>
+		pages: React.RefObject<HTMLDivElement[]>
+		viewer: React.RefObject<{
+			scrollPageIntoView: (args: ScrollPageIntoViewArgs) => void
+		}>
+	}>(null)
+
+	let controls: React.ReactNode
+	let preview: React.ReactNode
 
 	if (fileType === FileType.Image) {
-		contentDisplay = <Image src={preview?.url} alt={content.title} />
+		preview = <Image src={contentPreview?.url} alt={content.title} />
 	} else if (fileType === FileType.Audio) {
-		contentDisplay = (
+		preview = (
 			// biome-ignore lint/a11y/useMediaCaption: user generated content
-			<audio controls src={preview?.url} className="max-w-200"></audio>
+			<audio controls src={contentPreview?.url} className="w-full max-w-200"></audio>
 		)
 	} else if (fileType === FileType.Video) {
-		contentDisplay = (
+		preview = (
 			// biome-ignore lint/a11y/useMediaCaption: user generated content
-			<video controls src={preview?.url} className="w-full"></video>
+			<video controls src={contentPreview?.url} className="w-full"></video>
 		)
 	} else if (
 		fileType === FileType.Pdf ||
@@ -69,26 +84,50 @@ export function FilePreviewProvider({
 		fileType === FileType.Excel ||
 		fileType === FileType.Powerpoint
 	) {
-		contentDisplay = (
-			<ScrollArea className="relative flex flex-col items-center justify-center flex-1 w-full h-full min-h-0">
+		controls = (
+			<Flex gap={8} align="center" className="mb-4">
+				<ActionIcon
+					variant="subtle"
+					onClick={() => setScale((prev) => scales[Math.max(0, scales.indexOf(prev) - 1)])}
+				>
+					<IconZoomOut />
+				</ActionIcon>
+				<span>{Math.round(scale * 100)}%</span>
+				<ActionIcon
+					variant="subtle"
+					onClick={() =>
+						setScale((prev) => scales[Math.min(scales.length - 1, scales.indexOf(prev) + 1)])
+					}
+				>
+					<IconZoomIn />
+				</ActionIcon>
+			</Flex>
+		)
+		preview = (
+			<ScrollArea
+				className="relative flex flex-col items-center justify-center flex-1 h-full max-w-full min-w-0 min-h-0"
+				offsetScrollbars="y"
+			>
 				<Document
-					file={preview?.url}
+					file={contentPreview?.url}
 					options={options}
 					onLoadSuccess={onLoadSuccess}
-					className="flex flex-col items-center w-full gap-4 bg-transparent"
+					className="flex flex-col items-center gap-4"
+					ref={documentRef}
 				>
 					{new Array(numPages).fill(0).map((_, index) => (
 						<Page
 							// biome-ignore lint/suspicious/noArrayIndexKey: foo
 							key={index}
 							pageNumber={index + 1}
+							scale={scale}
 						/>
 					))}
 				</Document>
 			</ScrollArea>
 		)
 	} else if (fileType === FileType.Plaintext) {
-		contentDisplay = plaintextContent?.text ? (
+		preview = plaintextContent?.text ? (
 			<ScrollArea className="w-full h-full p-4 bg-white rounded-md">
 				<pre className="whitespace-pre-wrap">{plaintextContent.text}</pre>
 			</ScrollArea>
@@ -100,13 +139,13 @@ export function FilePreviewProvider({
 	return (
 		<FilePreviewContext.Provider
 			value={{
-				controls: null,
+				controls: controls,
 				preview: (
 					<div className="relative flex flex-col items-center justify-center flex-1 h-full min-w-0 min-h-0 shrink">
 						{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
 						{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
 						<div className="absolute inset-0" onClick={closeViewer}></div>
-						{contentDisplay}
+						{preview}
 					</div>
 				),
 			}}

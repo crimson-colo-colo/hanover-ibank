@@ -11,7 +11,7 @@ import { Modal, SimpleGrid, Text, Title } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { ContentType } from "@prisma/browser.ts"
+import { ContentType, type EmployeeRole } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import { IconFileUpload } from "@tabler/icons-react"
@@ -67,12 +67,12 @@ function RoleDashboard() {
 
 	return (
 		<main>
-			<header className="w-full bg-primary text-white p-4 rounded-lg">
+			<header className="w-full p-4 text-white rounded-lg bg-primary">
 				<Title>
 					Welcome,{" "}
 					{auth0.user?.name ?? auth0.user?.nickname ?? auth0.user?.preferred_username ?? "User"}
 				</Title>
-				<small className="uppercase tracking-wider text-gray-200 font-semibold mb-3">
+				<small className="mb-3 font-semibold tracking-wider text-gray-200 uppercase">
 					{content.data ? employeeRoleDisplayName[content.data.role] : ""}
 				</small>
 			</header>
@@ -119,15 +119,18 @@ function RoleDashboard() {
 
 			<div>
 				<section>
-					{content.isLoading ? (
-						<p>Loading content...</p>
-					) : content.isError ? (
+					{content.isError ? (
 						<p className="text-red-500">Failed to load content: {content.error.message}</p>
-					) : content.data?.content.length === 0 ? (
-						<p>No content available.</p>
 					) : (
 						<ContentTable
-							data={content.data!}
+							loading={content.isLoading}
+							data={
+								content.data ?? {
+									content: [],
+									objectMetadata: new Map(),
+									role: "Employee" as EmployeeRole,
+								}
+							}
 							openEditDialog={(item) => {
 								setEditingItem(item)
 								openEditDialog()
@@ -205,7 +208,7 @@ function RoleDashboard() {
 							}}
 							className="bg-gray-50 hover:bg-gray-100"
 						>
-							<div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4 p-12">
+							<div className="flex flex-col items-center justify-center h-full gap-4 p-12 text-gray-500">
 								<IconFileUpload size={48} className="" stroke={1} />
 								<Text className="text-center">
 									Drag and drop a file here, or click to select a file
@@ -222,11 +225,7 @@ function RoleDashboard() {
 				>
 					<Modal.Overlay backgroundOpacity={0.55} blur={3} />
 					{selectedContent && selectedContentFileType && (
-						<PreviewModal
-							closeFilePreview={closeFilePreview}
-							content={selectedContent}
-							fileType={selectedContentFileType}
-						/>
+						<PreviewModal closeFilePreview={closeFilePreview} contentId={selectedContent.id} />
 					)}
 				</Modal.Root>
 			</div>

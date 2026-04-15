@@ -3,7 +3,7 @@ import { colors } from "@shared/colors.ts"
 
 type ColorIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
 
-type ExtraColors = "black" | "white" | "transparent" | "dimmed"
+type ExtraColors = "black" | "white" | "transparent" | "dimmed" | "bright"
 
 declare module "@mantine/core" {
 	interface MantineThemeColorsOverride {

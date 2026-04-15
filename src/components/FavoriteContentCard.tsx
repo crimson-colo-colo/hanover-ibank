@@ -10,28 +10,9 @@ import {
 import { useMutation } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { isTruncated } from "@/lib/isTruncated.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
-
-function isTruncated(e: HTMLElement) {
-	const temp = e.cloneNode(true) as HTMLElement
-
-	temp.style.position = "fixed"
-	temp.style.overflow = "visible"
-	temp.style.whiteSpace = "nowrap"
-	temp.style.visibility = "hidden"
-
-	e.parentElement!.appendChild(temp)
-
-	try {
-		const fullWidth = temp.getBoundingClientRect().width
-		const displayWidth = e.getBoundingClientRect().width
-
-		return fullWidth > displayWidth
-	} finally {
-		temp.remove()
-	}
-}
 
 export function FavoriteContentCard({
 	contentId,
@@ -71,7 +52,7 @@ export function FavoriteContentCard({
 			rel="noopener noreferrer"
 			target="_blank"
 			p="28"
-			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
+			className="transition duration-75 cursor-pointer bg-gray-light hover:bg-gray-light-hover hover:shadow-sm"
 			onClick={() => {
 				if (contentType !== FileType.Link) {
 					openFilePreview(item, contentType)
@@ -134,7 +115,7 @@ export function FavoriteContentCard({
 					</Menu>
 				</Flex>
 			</Card.Section>
-			<Card.Section bg="white" bdrs="md" mt="xs">
+			<Card.Section className="bg-white dark:bg-gray-950" bdrs="md" mt="xs">
 				<Flex justify="center" align="center" h={120}>
 					<FileTypeIcon fileType={contentType} size={40} strokeWidth={1.5} />
 				</Flex>

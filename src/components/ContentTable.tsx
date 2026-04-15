@@ -1,4 +1,3 @@
-import { useAuth0 } from "@auth0/auth0-react"
 import { UTCDate } from "@date-fns/utc"
 import {
 	ActionIcon,
@@ -52,6 +51,7 @@ import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
 
 export function ContentTable({
+	loading,
 	data,
 	openEditDialog,
 	openFileEditDialog,
@@ -59,6 +59,7 @@ export function ContentTable({
 	filter,
 	changeFilter,
 }: {
+	loading: boolean
 	data: ContentList
 	openEditDialog: (item: ContentListItem) => void
 	openFileEditDialog: (item: ContentListItem) => void
@@ -66,7 +67,6 @@ export function ContentTable({
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
 }) {
-	const auth0 = useAuth0()
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
 	const [globalFilter, setGlobalFilter] = useState("")
@@ -224,7 +224,7 @@ export function ContentTable({
 							width={24}
 							height={24}
 							radius="100%"
-							className="shrink-0 w-6 h-6"
+							className="w-6 h-6 shrink-0"
 						/>
 						<span className="truncate" title={info.getValue().email}>
 							{info.getValue().name}
@@ -350,7 +350,10 @@ export function ContentTable({
 	return (
 		<>
 			<Flex align="center" justify="space-between" gap="md" mt="xl" mb="sm">
-				<Title order={3}>Your Content ({data.content.length})</Title>
+				<Title order={3} className="flex items-center gap-4">
+					<span>Your Content ({data.content.length})</span>
+					{loading && <IconLoader2 size={20} className="animate-spin" />}
+				</Title>
 
 				<Flex gap="sm">
 					<SegmentedControl
@@ -444,7 +447,7 @@ export function ContentTable({
 					})}
 					{table.getRowModel().rows.length === 0 && (
 						<Table.Tr>
-							<Table.Td colSpan={columns.length} className="text-center py-4">
+							<Table.Td colSpan={columns.length} className="py-4 text-center">
 								<Text c="gray">Nothing found :(</Text>
 							</Table.Td>
 						</Table.Tr>
