@@ -1,6 +1,22 @@
-import { ActionIcon, Button, Flex, Menu, Paper, Popover, Stack, Text, Title } from "@mantine/core"
+import { useAuth0 } from "@auth0/auth0-react"
+import {
+	ActionIcon,
+	Alert,
+	Button,
+	Dialog,
+	Flex,
+	Menu,
+	Modal,
+	Paper,
+	Popover,
+	PopoverTarget,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core"
 import { useForm } from "@mantine/form"
-import type { ContentStatus } from "@prisma/browser.ts"
+import { useDisclosure } from "@mantine/hooks"
+import { type ContentStatus, EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import {
 	IconCheck,
 	IconDownload,
@@ -13,7 +29,7 @@ import {
 	IconTrash,
 	IconUser,
 } from "@tabler/icons-react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import { ContentTagsInput } from "@/components/ContentTagsInput.tsx"
@@ -33,6 +49,7 @@ export type EditableField =
 	| "tags"
 
 export function MetadataSidebar({ content }: { content: ContentListItem }) {
+	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
 	const [editingField, _setEditingField] = useState<EditableField | null>(null)
 	const options = {
 		onSuccess() {
@@ -55,6 +72,30 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 	const updateTags = useMutation(trpc.content.updateTags.mutationOptions(options))
 	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(options))
 	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
+	const checkInContent = useMutation(trpc.content.checkIn.mutationOptions(options))
+	const checkOutContent = useMutation(trpc.content.checkOut.mutationOptions(options))
+	const updateFile = useMutation(trpc.content.updateFile.mutationOptions(options))
+	const updateLink = useMutation(trpc.content.updateLink.mutationOptions(options))
+
+	const isIntendedAudience = content.tags.some(
+		(tag) => tag.category === TagCategory.IntendedAudience && tag.name === profile?.role
+	)
+	const isCheckedOutByOther = content.checkedOutBy && content.checkedOutBy.id !== profile?.id
+
+	const canEdit =
+		!isCheckedOutByOther && (isIntendedAudience || profile?.role === EmployeeRole.Admin)
+	const canCheckOut =
+		!content.checkedOutBy && (isIntendedAudience || profile?.role === EmployeeRole.Admin)
+	const canCheckIn =
+		content.checkedOutBy?.id === profile?.id || profile?.role === EmployeeRole.Admin
+
+	const isCheckInOverride =
+		content.checkedOutBy?.id !== profile?.id && profile?.role === EmployeeRole.Admin
+
+	const [confirmCheckoutOpen, { open: openConfirmCheckout, close: closeConfirmCheckout }] =
+		useDisclosure(false)
+	const [confirmCheckinOpen, { open: openConfirmCheckin, close: closeConfirmCheckin }] =
+		useDisclosure(false)
 
 	const titleRef = useRef<HTMLInputElement>(null)
 	const statusRef = useRef<HTMLInputElement>(null)
@@ -113,8 +154,10 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 					<Title
 						order={4}
 						className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
+						data-enabled={canEdit}
 					>
 						<EditableTextField
+							enabled={canEdit}
 							field="title"
 							value={content.title}
 							editingField={editingField}
@@ -142,8 +185,39 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 						)}
 					</ActionIcon>
 				</Flex>
+				{content.checkedOutBy && (
+					<>
+						<Alert
+							title={
+								<Flex align="center" gap="xs">
+									<IconIdBadge2 />
+									Checked out
+								</Flex>
+							}
+						>
+							{content.checkedOutBy.id === profile?.id ? (
+								<>
+									You have this content checked out for editing. Check it back in when you're done
+									to allow others to edit it.
+								</>
+							) : (
+								<>
+									Checked out by <strong>{content.checkedOutBy.name}</strong> (
+									{content.checkedOutBy.email}). Only they can edit the content until it's checked
+									back in.
+								</>
+							)}
+						</Alert>
+						{canCheckIn && (
+							<Button fullWidth leftSection={<IconIdBadge2 />} onClick={openConfirmCheckin}>
+								{isCheckInOverride ? "Force check in" : "Check in"}
+							</Button>
+						)}
+					</>
+				)}
 				<Popover
 					shadow="md"
+					data-enabled={canEdit}
 					opened={editingField === "owner"}
 					onDismiss={() => {
 						onFieldEdit("owner", form.getValues().ownerId)
@@ -170,6 +244,7 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 					</Popover.Dropdown>
 				</Popover>
 				<EditableDateField
+					enabled={canEdit}
 					field="lastModifiedDate"
 					label="Last modified"
 					value={content.lastModifiedDate}
@@ -178,6 +253,7 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 					onFieldEdit={onFieldEdit}
 				/>
 				<EditableDateField
+					enabled={canEdit}
 					field="expirationDate"
 					label="Expires"
 					value={content.expirationDate}
@@ -192,7 +268,10 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 					shadow="sm"
 				>
 					<Menu.Target>
-						<div className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field">
+						<div
+							className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field"
+							data-enabled={canEdit}
+						>
 							<IconProgress />
 							<span className="text-gray-600">Status</span>
 							<span>{contentStatusDisplayName[content.status]}</span>
@@ -200,6 +279,7 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 								className="metadata-edit"
 								variant="subtle"
 								onClick={() => setEditingField("status")}
+								disabled={!canEdit}
 							>
 								<IconPencil />
 							</ActionIcon>
@@ -234,18 +314,59 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 						<span className="text-gray-600">Tags</span>
 					</Text>
 					<ContentTagsInput
+						enabled={canEdit}
 						value={content.tags}
 						onChange={(tags) => {
 							onFieldEdit("tags", stringifyTagList(tags))
 						}}
 					/>
 				</div>
-				{!content.checkedOutBy ? (
-					<Button fullWidth variant="light" leftSection={<IconIdBadge2 />}>
-						Check out
-					</Button>
+				{content.checkedOutBy ? null : canCheckOut ? (
+					<Popover
+						shadow="sm"
+						opened={confirmCheckoutOpen}
+						onClose={closeConfirmCheckout}
+						withArrow
+					>
+						<Popover.Target>
+							<Button
+								fullWidth
+								variant="light"
+								leftSection={<IconIdBadge2 />}
+								onClick={openConfirmCheckout}
+							>
+								Check out
+							</Button>
+						</Popover.Target>
+						<Popover.Dropdown className="max-w-80">
+							<Text>Checking out this content will lock it for editing by other users.</Text>
+							<Flex gap="md" justify="flex-end" mt="md">
+								<Button
+									variant="subtle"
+									color="gray"
+									onClick={closeConfirmCheckout}
+									disabled={checkOutContent.isPending}
+								>
+									Cancel
+								</Button>
+								<Button
+									loading={checkOutContent.isPending}
+									onClick={async () => {
+										await checkOutContent.mutateAsync({ id: content.id })
+										closeConfirmCheckout()
+									}}
+									leftSection={<IconIdBadge2 />}
+								>
+									Check out
+								</Button>
+							</Flex>
+						</Popover.Dropdown>
+					</Popover>
 				) : (
-					<Text className="text-sm text-gray-600">Checked out by {content.checkedOutBy.name}</Text>
+					<Alert>
+						Not checked out. Only users in the intended audience or admins can check out this
+						content for editing.
+					</Alert>
 				)}
 
 				<div className="grow" />
@@ -260,6 +381,31 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 					</ActionIcon>
 				</Flex>
 			</Stack>
+			<Modal opened={confirmCheckinOpen} onClose={closeConfirmCheckin} title="Confirm check in">
+				<Text>
+					Ready to check this content back in? Others will be able to edit it once it's checked in.
+				</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={closeConfirmCheckin}
+						disabled={checkInContent.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={checkInContent.isPending}
+						onClick={async () => {
+							await checkInContent.mutateAsync({ id: content.id })
+							closeConfirmCheckin()
+						}}
+						leftSection={<IconIdBadge2 />}
+					>
+						Check in
+					</Button>
+				</Flex>
+			</Modal>
 		</Paper>
 	)
 }

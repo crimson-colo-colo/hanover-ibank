@@ -110,7 +110,7 @@ button[aria-label='Open TanStack Devtools'] {
 .metadata-edit {
     visibility: hidden;
 }
-.metadata-field:hover .metadata-edit {
+.metadata-field[data-enabled=true]:hover .metadata-edit {
     visibility: visible;
 }
 
@@ -119,4 +119,8 @@ html.color-scheme-transitioning * {
         background-color 0.3s ease,
         color 0.2s ease,
         border-color 0.3s ease !important;
+}
+
+.content-tags-input [data-disabled=true] .mantine-TagsInput-input {
+    @apply bg-white;
 }

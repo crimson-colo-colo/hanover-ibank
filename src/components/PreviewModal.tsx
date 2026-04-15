@@ -1,7 +1,7 @@
 import { Button, Flex, Modal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
-import { IconInfoCircle } from "@tabler/icons-react"
+import { IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
@@ -40,8 +40,11 @@ export function PreviewModal({
 				<Modal.Header bdrs="md" px="lg" className="z-1">
 					<Flex gap="sm" align="center">
 						<FileTypeIcon fileType={fileType} />
-						<Modal.Title className="font-semibold font-display">{content.title}</Modal.Title>
+						<Modal.Title className="text-lg font-semibold font-display">
+							{content.title}
+						</Modal.Title>
 						<FilePreviewControls />
+						{contentQuery.isLoading && <IconLoader2 className="animate-spin" />}
 					</Flex>
 					<Flex gap="md" align="center">
 						<Button

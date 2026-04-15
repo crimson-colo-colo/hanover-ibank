@@ -5,6 +5,7 @@ import { IconCalendar, IconPencil } from "@tabler/icons-react"
 import type { EditableField } from "@/components/MetadataSidebar.tsx"
 
 export function EditableDateField({
+	enabled,
 	field,
 	label,
 	value,
@@ -12,6 +13,7 @@ export function EditableDateField({
 	setEditingField,
 	onFieldEdit,
 }: {
+	enabled: boolean
 	field: "lastModifiedDate" | "expirationDate"
 	label: string
 	value: Date
@@ -29,7 +31,10 @@ export function EditableDateField({
 			withArrow
 		>
 			<Popover.Target>
-				<Text className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field">
+				<Text
+					className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field"
+					data-enabled={enabled}
+				>
 					<IconCalendar />
 					<span className="text-gray-600">{label}</span>
 					<span>{new UTCDate(value).toDateString()}</span>
@@ -37,6 +42,7 @@ export function EditableDateField({
 						className="metadata-edit"
 						variant="subtle"
 						onClick={() => setEditingField(field)}
+						disabled={!enabled}
 					>
 						<IconPencil />
 					</ActionIcon>
