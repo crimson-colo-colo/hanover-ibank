@@ -222,6 +222,130 @@ export const contentRouter = router({
 			return updated
 		}),
 
+	updateTitle: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				title: z.string().min(3).max(250),
+			})
+		)
+		.mutation(async (opts) => {
+			const updated = await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					title: opts.input.title,
+				},
+			})
+			return updated
+		}),
+
+	updateLastModifiedDate: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				lastModifiedDate: z.iso.date(),
+			})
+		)
+		.mutation(async (opts) => {
+			const updated = await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
+				},
+			})
+			return updated
+		}),
+
+	updateExpirationDate: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				expirationDate: z.iso.date(),
+			})
+		)
+		.mutation(async (opts) => {
+			const updated = await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					expirationDate: isoDateToTimestamp(opts.input.expirationDate),
+				},
+			})
+			return updated
+		}),
+	updateOwner: authProcedure
+		.input(z.object({ id: z.string(), ownerId: z.string() }))
+		.mutation(async (opts) => {
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					ownerId: opts.input.ownerId,
+				},
+			})
+		}),
+	updateStatus: authProcedure
+		.input(z.object({ id: z.string(), status: z.enum(Object.values(ContentStatus)) }))
+		.mutation(async (opts) => {
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					status: opts.input.status,
+				},
+			})
+		}),
+	updateTags: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+				tags: z.array(
+					z.object({
+						category: z.enum(Object.values(TagCategory)),
+						name: z.string().min(1).max(50),
+					})
+				),
+			})
+		)
+		.mutation(async (opts) => {
+			await db.content.update({
+				where: { id: opts.input.id },
+				data: {
+					tags: {
+						connectOrCreate: opts.input.tags.map((tag) => ({
+							where: {
+								contentId_tagCategory_tagName: {
+									contentId: opts.input.id,
+									tagCategory: tag.category,
+									tagName: tag.name,
+								},
+							},
+							create: {
+								tag: {
+									connectOrCreate: {
+										where: {
+											category_name: {
+												category: tag.category,
+												name: tag.name,
+											},
+										},
+										create: {
+											category: tag.category,
+											name: tag.name,
+										},
+									},
+								},
+							},
+						})),
+						deleteMany: {
+							contentId: opts.input.id,
+							NOT: opts.input.tags.map((tag) => ({
+								tagCategory: tag.category,
+								tagName: tag.name,
+							})),
+						},
+					},
+				},
+			})
+		}),
+
 	download: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },
@@ -412,11 +536,18 @@ export const contentRouter = router({
 		])
 	}),
 	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
-		const favorite = await db.favoriteContent.create({
-			data: {
+		const favorite = await db.favoriteContent.upsert({
+			where: {
+				contentId_employeeId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+			create: {
 				contentId: opts.input.id,
 				employeeId: opts.ctx.auth.sub,
 			},
+			update: {},
 		})
 		return favorite
 	}),
@@ -431,7 +562,18 @@ export const contentRouter = router({
 		})
 		return unfavorite
 	}),
-	listFavorites: authProcedure.query(async (opts) => {
+	listFavorites: authProcedure.query(async (opts): Promise<ContentList> => {
+		const user = await db.employee.findUnique({
+			where: {
+				id: opts.ctx.auth.sub,
+			},
+		})
+		if (!user?.role) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "user does not exist",
+			})
+		}
 		const data = await db.content.findMany({
 			where: {
 				favoritedBy: {
@@ -439,6 +581,11 @@ export const contentRouter = router({
 						employeeId: opts.ctx.auth.sub,
 					},
 				},
+			},
+			include: {
+				owner: true,
+				tags: true,
+				checkedOutBy: true,
 			},
 		})
 
@@ -454,8 +601,44 @@ export const contentRouter = router({
 				)
 		)
 
+		const users = await auth0Management.users.list()
+
 		return {
-			content: data,
+			role: user.role,
+			content: data.map((content) => {
+				const unknownUser = {
+					name: "Unknown User",
+					email: "unknown",
+					username: "unknown",
+					avatarUrl: "",
+				}
+				const owner = users.data.find((u) => u.user_id === content.ownerId) ?? unknownUser
+				const checkedOutByUser = content.checkedOutBy
+					? (users.data.find((u) => u.user_id === content.checkedOutById) ?? unknownUser)
+					: null
+				return {
+					...content,
+					owner: {
+						...content.owner,
+						name: owner.name ?? owner.username!,
+						email: owner.email!,
+						username: owner.username!,
+					} satisfies ContentListItem["owner"],
+					checkedOutBy: checkedOutByUser
+						? ({
+								id: content.checkedOutById!,
+								name: checkedOutByUser.name ?? checkedOutByUser.username!,
+								email: checkedOutByUser.email!,
+								username: checkedOutByUser.username!,
+							} satisfies ContentListItem["checkedOutBy"])
+						: null,
+					favorited: true,
+					tags: content.tags.map((tag) => ({
+						category: tag.tagCategory,
+						name: tag.tagName,
+					})),
+				} as ContentListItem
+			}),
 			objectMetadata: new Map(metadata),
 		}
 	}),
@@ -562,5 +745,74 @@ export const contentRouter = router({
 			tags[tag.category].push(tag)
 		}
 		return tags
+	}),
+
+	get: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
+		const content = await db.content.findUnique({
+			where: { id: opts.input.id },
+			include: {
+				owner: true,
+				checkedOutBy: true,
+				favoritedBy: {
+					where: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
+				tags: true,
+			},
+		})
+
+		if (!content) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Content not found",
+			})
+		}
+
+		const users = await auth0Management.users.list()
+
+		const objectMetadata =
+			content.type === "Object"
+				? await s3.headObject({ Bucket: bucketName, Key: content.objectId! })
+				: null
+
+		const unknownUser = {
+			name: "Unknown User",
+			email: "unknown",
+			username: "unknown",
+			avatarUrl: "",
+		}
+		const owner = users.data.find((u) => u.user_id === content.ownerId) ?? unknownUser
+		const checkedOutByUser = content.checkedOutBy
+			? (users.data.find((u) => u.user_id === content.checkedOutById) ?? unknownUser)
+			: null
+
+		const contentItem = {
+			...content,
+			favorited: content.favoritedBy.length > 0,
+			owner: {
+				id: content.ownerId,
+				name: owner.name ?? owner.username!,
+				email: owner.email!,
+				username: owner.username!,
+			} satisfies ContentListItem["owner"],
+			checkedOutBy: checkedOutByUser
+				? ({
+						id: content.checkedOutById!,
+						name: checkedOutByUser.name ?? checkedOutByUser.username!,
+						email: checkedOutByUser.email!,
+						username: checkedOutByUser.username!,
+					} satisfies ContentListItem["checkedOutBy"])
+				: null,
+			tags: content.tags.map((tag) => ({
+				category: tag.tagCategory,
+				name: tag.tagName,
+			})),
+		} as ContentListItem
+
+		return {
+			content: contentItem,
+			objectMetadata: objectMetadata,
+		}
 	}),
 })

@@ -20,6 +20,7 @@ export const env = createEnv({
 		AUTH0_TENANT: z.string(),
 		AUTH0_MANAGEMENT_CLIENT_ID: z.string(),
 		AUTH0_MANAGEMENT_CLIENT_SECRET: z.string(),
+		GOTENBERG_URL: z.url(),
 	},
 	runtimeEnv: process.env,
 })

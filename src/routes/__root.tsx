@@ -39,7 +39,7 @@ function RootComponent() {
 							<Navigation />
 						</AppShell.Header>
 						{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
-						<AppShell.Main className="max-w-280 mx-auto">
+						<AppShell.Main className="mx-auto max-w-280">
 							<Outlet />
 						</AppShell.Main>
 					</AppShell>

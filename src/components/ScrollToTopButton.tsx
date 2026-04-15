@@ -40,7 +40,7 @@ export function ScrollToTopButton({
 						position: "fixed",
 						bottom: "1.5rem",
 						right: "1.5rem",
-						zIndex: 9999,
+						zIndex: 10,
 					}}
 				>
 					Back to top

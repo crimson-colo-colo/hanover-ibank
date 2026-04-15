@@ -10,38 +10,24 @@ import {
 import { useMutation } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { isTruncated } from "@/lib/isTruncated.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-
-function isTruncated(e: HTMLElement) {
-	const temp = e.cloneNode(true) as HTMLElement
-
-	temp.style.position = "fixed"
-	temp.style.overflow = "visible"
-	temp.style.whiteSpace = "nowrap"
-	temp.style.visibility = "hidden"
-
-	e.parentElement!.appendChild(temp)
-
-	try {
-		const fullWidth = temp.getBoundingClientRect().width
-		const displayWidth = e.getBoundingClientRect().width
-
-		return fullWidth > displayWidth
-	} finally {
-		temp.remove()
-	}
-}
+import type { ContentListItem } from "../../server/routers/content.ts"
 
 export function FavoriteContentCard({
 	contentId,
 	contentUrl,
 	contentType,
 	fileName,
+	openFilePreview,
+	item,
 }: {
 	contentId: string
 	contentUrl: string | null
 	contentType: FileType
 	fileName: string
+	openFilePreview: (info: ContentListItem, type: FileType) => void
+	item: ContentListItem
 }) {
 	const titleRef = useRef<HTMLParagraphElement>(null)
 	const [titleTruncated, setTitleTruncated] = useState(false)
@@ -66,7 +52,12 @@ export function FavoriteContentCard({
 			rel="noopener noreferrer"
 			target="_blank"
 			p="28"
-			className="bg-gray-50 hover:bg-gray-100 hover:shadow-sm transition duration-75 cursor-pointer"
+			className="transition duration-75 cursor-pointer bg-gray-light hover:bg-gray-light-hover hover:shadow-sm"
+			onClick={() => {
+				if (contentType !== FileType.Link) {
+					openFilePreview(item, contentType)
+				}
+			}}
 		>
 			<Card.Section>
 				<Flex justify="space-between" align="center" gap="sm">
@@ -77,7 +68,13 @@ export function FavoriteContentCard({
 					</Tooltip>
 					<Menu position="bottom-end">
 						<Menu.Target>
-							<ActionIcon onClick={(e) => e.preventDefault()} variant="subtle">
+							<ActionIcon
+								onClick={(e) => {
+									e.preventDefault()
+									e.stopPropagation()
+								}}
+								variant="subtle"
+							>
 								<IconDotsVertical size={20} />
 							</ActionIcon>
 						</Menu.Target>
@@ -97,7 +94,9 @@ export function FavoriteContentCard({
 							{contentType === FileType.Link ? (
 								<Menu.Item
 									leftSection={<IconCircleArrowUpRight size={20} />}
-									// TODO: open preview panel
+									onClick={async () => {
+										openFilePreview(item, contentType)
+									}}
 								>
 									View Details
 								</Menu.Item>
@@ -116,7 +115,7 @@ export function FavoriteContentCard({
 					</Menu>
 				</Flex>
 			</Card.Section>
-			<Card.Section bg="white" bdrs="md" mt="xs">
+			<Card.Section className="bg-white dark:bg-gray-950" bdrs="md" mt="xs">
 				<Flex justify="center" align="center" h={120}>
 					<FileTypeIcon fileType={contentType} size={40} strokeWidth={1.5} />
 				</Flex>

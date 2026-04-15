@@ -1,4 +1,4 @@
-import { Combobox, Group, Image, InputBase, Paper, Stack, Text, useCombobox } from "@mantine/core"
+import { Combobox, Flex, Image, InputBase, Paper, Stack, Text, useCombobox } from "@mantine/core"
 import type { UseFormReturnType } from "@mantine/form"
 import { useDebouncedValue } from "@mantine/hooks"
 import { IconLoader2 } from "@tabler/icons-react"
@@ -33,8 +33,8 @@ export function ContentOwnerSelect({
 
 	const options = (searchResults.data ?? []).map((user) => (
 		<Combobox.Option value={user.id} key={user.id}>
-			<Group>
-				<Image src={user.picture} radius="100%" h={40} w={40} />
+			<Flex gap="md">
+				<Image src={`/avatar/${user.id}`} radius="100%" h={40} w={40} />
 				<Stack gap={0}>
 					<Text size="sm" fw={500}>
 						{user.name}
@@ -43,7 +43,7 @@ export function ContentOwnerSelect({
 						{user.email} · {employeeRoleDisplayName[user.role]}
 					</Text>
 				</Stack>
-			</Group>
+			</Flex>
 		</Combobox.Option>
 	))
 
@@ -95,8 +95,8 @@ export function ContentOwnerSelect({
 			</Combobox>
 			{selectedUser && (
 				<Paper p="sm" bd="1px solid gray.3" mt="xs">
-					<Group>
-						<Image src={selectedUser.picture} radius="100%" h={40} w={40} />
+					<Flex gap="md">
+						<Image src={`/avatar/${selectedUser.id}`} radius="100%" h={40} w={40} />
 						<Stack gap={0} justify="center">
 							<Text size="sm" fw={500}>
 								{selectedUser.name}
@@ -105,7 +105,7 @@ export function ContentOwnerSelect({
 								{selectedUser.email} · {employeeRoleDisplayName[selectedUser.role]}
 							</Text>
 						</Stack>
-					</Group>
+					</Flex>
 				</Paper>
 			)}
 		</>
