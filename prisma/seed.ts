@@ -503,13 +503,13 @@ async function main() {
 				if (Math.random() < 0.5) {
 					list.push({
 						contentId,
-						tagName: "Business Analyst",
+						tagName: EmployeeRole.BusinessAnalyst,
 						tagCategory: TagCategory.IntendedAudience,
 					})
 				} else {
 					list.push({
 						contentId,
-						tagName: "Underwriter",
+						tagName: EmployeeRole.Underwriter,
 						tagCategory: TagCategory.IntendedAudience,
 					})
 				}
@@ -536,13 +536,13 @@ async function main() {
 					list.push({
 						contentId,
 						tagCategory: TagCategory.IntendedAudience,
-						tagName: "Underwriter",
+						tagName: EmployeeRole.Underwriter,
 					})
 				} else {
 					list.push({
 						contentId,
 						tagCategory: TagCategory.IntendedAudience,
-						tagName: "Business Analyst",
+						tagName: EmployeeRole.BusinessAnalyst,
 					})
 				}
 
