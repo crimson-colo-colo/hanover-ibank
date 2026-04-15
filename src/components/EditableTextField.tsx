@@ -50,7 +50,7 @@ export function EditableTextField({
 					onFieldEdit(field, ref.current?.value ?? "")
 				}
 			}}
-			className="w-full px-1 py-1 border-none max-w-none bg-gray-50"
+			className="w-full px-1 py-1 border-none max-w-none bg-gray-50 dark:bg-gray-900"
 		/>
 	)
 }

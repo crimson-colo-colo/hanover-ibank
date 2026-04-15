@@ -1,24 +1,16 @@
-import {
-	ActionIcon,
-	Flex,
-	Menu,
-	Paper,
-	Popover,
-	ScrollArea,
-	Stack,
-	Text,
-	Title,
-} from "@mantine/core"
+import { ActionIcon, Button, Flex, Menu, Paper, Popover, Stack, Text, Title } from "@mantine/core"
 import { useForm } from "@mantine/form"
-import { notifications } from "@mantine/notifications"
 import type { ContentStatus } from "@prisma/browser.ts"
 import {
 	IconCheck,
+	IconDownload,
+	IconIdBadge2,
 	IconPencil,
 	IconProgress,
 	IconStar,
 	IconStarFilled,
 	IconTag,
+	IconTrash,
 	IconUser,
 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
@@ -83,10 +75,6 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 
 	async function onFieldEdit(field: EditableField, value: string) {
 		if (!content) return
-		notifications.show({
-			title: "field edited",
-			message: `edited ${field} to ${value}`,
-		})
 		setEditingField(null)
 		if (field === "title") {
 			await updateTitle.mutateAsync({ id: content.id, title: value })
@@ -119,140 +107,159 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 	}, [content])
 
 	return (
-		<Paper w="350px" className="h-full min-h-0 shrink-0">
-			<ScrollArea className="h-full" px="md">
-				<Stack gap="md" py="md">
-					<Flex gap="sm" justify="space-between">
-						<Title
-							order={4}
-							className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
-						>
-							<EditableTextField
-								field="title"
-								value={content.title}
-								editingField={editingField}
-								setEditingField={setEditingField}
-								onFieldEdit={onFieldEdit}
-								ref={titleRef}
-							/>
-						</Title>
-						<ActionIcon
-							variant="transparent"
-							loading={favoriteContent.isPending || unfavoriteContent.isPending}
-							onClick={async (e) => {
-								if (content.favorited) {
-									await unfavoriteContent.mutateAsync({ id: content.id })
-								} else {
-									await favoriteContent.mutateAsync({ id: content.id })
-								}
-							}}
-						>
-							{content.favorited ? (
-								<IconStarFilled className="fill-[#f8de1f]" size={20} />
-							) : (
-								<IconStar />
-							)}
-						</ActionIcon>
-					</Flex>
-					<Popover
-						shadow="md"
-						opened={editingField === "owner"}
-						onDismiss={() => {
-							onFieldEdit("owner", form.getValues().ownerId)
-						}}
-						closeOnClickOutside
-						withArrow
+		<Paper w="350px" className="h-full min-h-0 shrink-0" p="md">
+			<Stack gap="md" className="h-full">
+				<Flex gap="sm" justify="space-between">
+					<Title
+						order={4}
+						className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
 					>
-						<Popover.Target>
-							<Text className="flex items-center gap-2 text-gray-600 metadata-field">
-								<IconUser className="text-gray-800" />
-								Owned by <span className="text-gray-800">{content.owner.name}</span>
-								<ActionIcon
-									className="metadata-edit"
-									variant="subtle"
-									onClick={() => setEditingField("owner")}
-								>
-									<IconPencil />
-								</ActionIcon>
-							</Text>
-						</Popover.Target>
-						<Popover.Dropdown w="300px">
-							<ContentOwnerSelect form={form} initialSearchValue={content.owner.email} />
-						</Popover.Dropdown>
-					</Popover>
-					<EditableDateField
-						field="lastModifiedDate"
-						label="Last modified"
-						value={content.lastModifiedDate}
-						editingField={editingField}
-						setEditingField={setEditingField}
-						onFieldEdit={onFieldEdit}
-					/>
-					<EditableDateField
-						field="expirationDate"
-						label="Expires"
-						value={content.expirationDate}
-						editingField={editingField}
-						setEditingField={setEditingField}
-						onFieldEdit={onFieldEdit}
-					/>
-					<Menu
-						opened={editingField === "status"}
-						onDismiss={() => setEditingField(null)}
-						withArrow
-						shadow="sm"
-					>
-						<Menu.Target>
-							<div className="flex items-center gap-2 text-gray-600 metadata-field">
-								<IconProgress className="text-gray-800" />
-								Status{" "}
-								<span className="text-gray-800">{contentStatusDisplayName[content.status]}</span>
-								<ActionIcon
-									className="metadata-edit"
-									variant="subtle"
-									onClick={() => setEditingField("status")}
-								>
-									<IconPencil />
-								</ActionIcon>
-							</div>
-						</Menu.Target>
-						<Menu.Dropdown>
-							{Object.entries(contentStatusDisplayName).map(([key, display]) => (
-								<Menu.Item
-									key={key}
-									px="sm"
-									className="cursor-pointer hover:bg-gray-200"
-									onClick={() => {
-										onFieldEdit("status", key)
-										setEditingField(null)
-									}}
-									leftSection={
-										content.status === key ? (
-											<IconCheck className="text-gray-800" size={16} />
-										) : (
-											<div className="w-4" />
-										)
-									}
-								>
-									{display}
-								</Menu.Item>
-							))}
-						</Menu.Dropdown>
-					</Menu>
-					<div>
-						<Text className="flex items-center gap-2 mb-2 text-gray-600 metadata-field">
-							<IconTag className="text-gray-800" />
-							<span>Tags</span>
-						</Text>
-						<ContentTagsInput
-							value={content.tags}
-							onChange={(tags) => {
-								onFieldEdit("tags", stringifyTagList(tags))
-							}}
+						<EditableTextField
+							field="title"
+							value={content.title}
+							editingField={editingField}
+							setEditingField={setEditingField}
+							onFieldEdit={onFieldEdit}
+							ref={titleRef}
 						/>
-					</div>
-				</Stack>
-			</ScrollArea>
+					</Title>
+
+					<ActionIcon
+						variant="transparent"
+						loading={favoriteContent.isPending || unfavoriteContent.isPending}
+						onClick={async (e) => {
+							if (content.favorited) {
+								await unfavoriteContent.mutateAsync({ id: content.id })
+							} else {
+								await favoriteContent.mutateAsync({ id: content.id })
+							}
+						}}
+					>
+						{content.favorited ? (
+							<IconStarFilled className="fill-[#f8de1f]" size={20} />
+						) : (
+							<IconStar />
+						)}
+					</ActionIcon>
+				</Flex>
+				<Popover
+					shadow="md"
+					opened={editingField === "owner"}
+					onDismiss={() => {
+						onFieldEdit("owner", form.getValues().ownerId)
+					}}
+					closeOnClickOutside
+					withArrow
+				>
+					<Popover.Target>
+						<Text className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field">
+							<IconUser />
+							<span className="text-gray-600">Owned by</span>
+							<span>{content.owner.name}</span>
+							<ActionIcon
+								className="metadata-edit"
+								variant="subtle"
+								onClick={() => setEditingField("owner")}
+							>
+								<IconPencil />
+							</ActionIcon>
+						</Text>
+					</Popover.Target>
+					<Popover.Dropdown w="300px">
+						<ContentOwnerSelect form={form} initialSearchValue={content.owner.email} />
+					</Popover.Dropdown>
+				</Popover>
+				<EditableDateField
+					field="lastModifiedDate"
+					label="Last modified"
+					value={content.lastModifiedDate}
+					editingField={editingField}
+					setEditingField={setEditingField}
+					onFieldEdit={onFieldEdit}
+				/>
+				<EditableDateField
+					field="expirationDate"
+					label="Expires"
+					value={content.expirationDate}
+					editingField={editingField}
+					setEditingField={setEditingField}
+					onFieldEdit={onFieldEdit}
+				/>
+				<Menu
+					opened={editingField === "status"}
+					onDismiss={() => setEditingField(null)}
+					withArrow
+					shadow="sm"
+				>
+					<Menu.Target>
+						<div className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field">
+							<IconProgress />
+							<span className="text-gray-600">Status</span>
+							<span>{contentStatusDisplayName[content.status]}</span>
+							<ActionIcon
+								className="metadata-edit"
+								variant="subtle"
+								onClick={() => setEditingField("status")}
+							>
+								<IconPencil />
+							</ActionIcon>
+						</div>
+					</Menu.Target>
+					<Menu.Dropdown>
+						{Object.entries(contentStatusDisplayName).map(([key, display]) => (
+							<Menu.Item
+								key={key}
+								px="sm"
+								className="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-950"
+								onClick={() => {
+									onFieldEdit("status", key)
+									setEditingField(null)
+								}}
+								leftSection={
+									content.status === key ? (
+										<IconCheck className="text-gray-800 dark:text-gray-600" size={16} />
+									) : (
+										<div className="w-4" />
+									)
+								}
+							>
+								{display}
+							</Menu.Item>
+						))}
+					</Menu.Dropdown>
+				</Menu>
+				<div>
+					<Text className="flex items-center gap-2 mb-2 text-gray-800 dark:text-gray-300 metadata-field">
+						<IconTag />
+						<span className="text-gray-600">Tags</span>
+					</Text>
+					<ContentTagsInput
+						value={content.tags}
+						onChange={(tags) => {
+							onFieldEdit("tags", stringifyTagList(tags))
+						}}
+					/>
+				</div>
+				{!content.checkedOutBy ? (
+					<Button fullWidth variant="light" leftSection={<IconIdBadge2 />}>
+						Check out
+					</Button>
+				) : (
+					<Text className="text-sm text-gray-600">Checked out by {content.checkedOutBy.name}</Text>
+				)}
+
+				<div className="grow" />
+
+				<Flex gap="sm">
+					<Button fullWidth leftSection={<IconDownload />}>
+						Download
+					</Button>
+
+					<ActionIcon variant="light" color="red" size="lg">
+						<IconTrash />
+					</ActionIcon>
+				</Flex>
+			</Stack>
 		</Paper>
 	)
 }

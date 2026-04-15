@@ -29,9 +29,10 @@ export function EditableDateField({
 			withArrow
 		>
 			<Popover.Target>
-				<Text className="flex items-center gap-2 text-gray-600 metadata-field">
-					<IconCalendar className="text-gray-800" />
-					{label} <span className="text-gray-800">{new UTCDate(value).toDateString()}</span>
+				<Text className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field">
+					<IconCalendar />
+					<span className="text-gray-600">{label}</span>
+					<span>{new UTCDate(value).toDateString()}</span>
 					<ActionIcon
 						className="metadata-edit"
 						variant="subtle"

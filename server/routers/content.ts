@@ -318,7 +318,6 @@ export const contentRouter = router({
 								},
 							},
 							create: {
-								contentId: opts.input.id,
 								tag: {
 									connectOrCreate: {
 										where: {

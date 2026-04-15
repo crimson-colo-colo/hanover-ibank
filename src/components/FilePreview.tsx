@@ -2,15 +2,23 @@ import { trpc } from "@/lib/trpc.ts"
 import "@iamjariwala/react-doc-viewer/dist/index.css"
 import { ActionIcon, Flex, Image, ScrollArea } from "@mantine/core"
 import { FileType } from "@shared/filetype.ts"
-import { IconZoomIn, IconZoomOut } from "@tabler/icons-react"
+import {
+	IconChevronDown,
+	IconChevronUp,
+	IconLoader2,
+	IconZoomIn,
+	IconZoomOut,
+} from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import worker from "pdfjs-dist/build/pdf.worker.min.mjs?url"
 import { createContext, useContext, useRef, useState } from "react"
 import { Document, type LinkService, Page, pdfjs } from "react-pdf"
-import type { ContentListItem } from "../../server/routers/content.ts"
 import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
+import type { HeadObjectCommandOutput } from "@aws-sdk/client-s3"
 import type { ScrollPageIntoViewArgs } from "react-pdf/dist/shared/types.js"
+import { formatBytes } from "@/lib/content.ts"
+import type { ContentListItem } from "../../server/routers/content.ts"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(worker, import.meta.url).toString()
 
@@ -28,11 +36,13 @@ const FilePreviewContext = createContext<FilePreviewContext | null>(null)
 export function FilePreviewProvider({
 	content,
 	fileType,
+	objectMetadata,
 	closeViewer,
 	children,
 }: {
 	content: ContentListItem
 	fileType: FileType
+	objectMetadata: HeadObjectCommandOutput | null | undefined
 	closeViewer: () => void
 	children: React.ReactNode
 }) {
@@ -48,6 +58,7 @@ export function FilePreviewProvider({
 
 	const [numPages, setNumPages] = useState<number>()
 	const [scale, setScale] = useState(1)
+	const [currentPage, setCurrentPage] = useState(1)
 
 	const scales = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
 
@@ -62,6 +73,27 @@ export function FilePreviewProvider({
 			scrollPageIntoView: (args: ScrollPageIntoViewArgs) => void
 		}>
 	}>(null)
+	const scrollRef = useRef<HTMLDivElement>(null)
+
+	function onScroll(pos: { x: number; y: number }) {
+		if (!documentRef.current) {
+			return
+		}
+
+		const { pages } = documentRef.current
+		if (!pages.current) {
+			return
+		}
+
+		// Find the page whose top is closest to the current scroll position
+		const pageTops = pages.current.map((page) => page.offsetTop)
+		const closestPageIndex = pageTops.reduce((closestIndex, pageTop, index) => {
+			const closestPageTop = pageTops[closestIndex]
+			return Math.abs(pageTop - pos.y) < Math.abs(closestPageTop - pos.y) ? index : closestIndex
+		}, 0)
+
+		setCurrentPage(closestPageIndex + 1)
+	}
 
 	let controls: React.ReactNode
 	let preview: React.ReactNode
@@ -78,6 +110,16 @@ export function FilePreviewProvider({
 			// biome-ignore lint/a11y/useMediaCaption: user generated content
 			<video controls src={contentPreview?.url} className="w-full"></video>
 		)
+	} else if (fileType === FileType.Plaintext) {
+		preview = plaintextContent?.text ? (
+			<ScrollArea className="w-full h-full p-4 bg-white rounded-md dark:bg-[#242424]">
+				<pre className="whitespace-pre-wrap">{plaintextContent.text}</pre>
+			</ScrollArea>
+		) : (
+			<div className="w-full h-full flex items-center justify-center p-4 bg-white rounded-md dark:bg-[#242424]">
+				<IconLoader2 className="animate-spin" size={48} />
+			</div>
+		)
 	} else if (
 		fileType === FileType.Pdf ||
 		fileType === FileType.WordDocument ||
@@ -85,28 +127,60 @@ export function FilePreviewProvider({
 		fileType === FileType.Powerpoint
 	) {
 		controls = (
-			<Flex gap={8} align="center" className="mb-4">
-				<ActionIcon
-					variant="subtle"
-					onClick={() => setScale((prev) => scales[Math.max(0, scales.indexOf(prev) - 1)])}
-				>
-					<IconZoomOut />
-				</ActionIcon>
-				<span>{Math.round(scale * 100)}%</span>
-				<ActionIcon
-					variant="subtle"
-					onClick={() =>
-						setScale((prev) => scales[Math.min(scales.length - 1, scales.indexOf(prev) + 1)])
-					}
-				>
-					<IconZoomIn />
-				</ActionIcon>
-			</Flex>
+			<>
+				<Flex align="center" className="gap-3">
+					<ActionIcon
+						variant="transparent"
+						onClick={() => setScale((prev) => scales[Math.max(0, scales.indexOf(prev) - 1)])}
+					>
+						<IconZoomOut />
+					</ActionIcon>
+					<span className="w-10 text-right">{Math.round(scale * 100)}%</span>
+					<ActionIcon
+						variant="transparent"
+						onClick={() =>
+							setScale((prev) => scales[Math.min(scales.length - 1, scales.indexOf(prev) + 1)])
+						}
+					>
+						<IconZoomIn />
+					</ActionIcon>
+				</Flex>
+
+				{numPages && (
+					<Flex align="center" className="gap-3">
+						<ActionIcon
+							variant="transparent"
+							onClick={() => {
+								documentRef.current?.viewer.current?.scrollPageIntoView({
+									pageNumber: currentPage - 1,
+								})
+							}}
+						>
+							<IconChevronUp />
+						</ActionIcon>
+						<div>
+							Page {currentPage} of {numPages}
+						</div>
+						<ActionIcon
+							variant="transparent"
+							onClick={() => {
+								documentRef.current?.viewer.current?.scrollPageIntoView({
+									pageNumber: currentPage + 1,
+								})
+							}}
+						>
+							<IconChevronDown />
+						</ActionIcon>
+					</Flex>
+				)}
+			</>
 		)
 		preview = (
 			<ScrollArea
 				className="relative flex flex-col items-center justify-center flex-1 h-full max-w-full min-w-0 min-h-0"
 				offsetScrollbars="y"
+				viewportRef={scrollRef}
+				onScrollPositionChange={onScroll}
 			>
 				<Document
 					file={contentPreview?.url}
@@ -126,20 +200,22 @@ export function FilePreviewProvider({
 				</Document>
 			</ScrollArea>
 		)
-	} else if (fileType === FileType.Plaintext) {
-		preview = plaintextContent?.text ? (
-			<ScrollArea className="w-full h-full p-4 bg-white rounded-md">
-				<pre className="whitespace-pre-wrap">{plaintextContent.text}</pre>
-			</ScrollArea>
-		) : (
-			<p>Unable to preview this file type.</p>
-		)
 	}
 
 	return (
 		<FilePreviewContext.Provider
 			value={{
-				controls: controls,
+				controls: (
+					<Flex align="center" className="gap-8 ml-4">
+						{objectMetadata && (
+							<span className="mr-4 text-gray-600">
+								{formatBytes(objectMetadata.ContentLength!)}
+							</span>
+						)}
+
+						{controls}
+					</Flex>
+				),
 				preview: (
 					<div className="relative flex flex-col items-center justify-center flex-1 h-full min-w-0 min-h-0 shrink">
 						{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}

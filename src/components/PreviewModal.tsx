@@ -1,5 +1,7 @@
-import { Flex, Modal } from "@mantine/core"
+import { Button, Flex, Modal } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
+import { IconInfoCircle } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
@@ -14,6 +16,7 @@ export function PreviewModal({
 	contentId: string
 }) {
 	const contentQuery = useQuery(trpc.content.get.queryOptions({ id: contentId }))
+	const [sidebarOpen, { open: openSidebar, close: closeSidebar }] = useDisclosure(true)
 
 	const content = contentQuery.data?.content
 	const fileType =
@@ -27,23 +30,39 @@ export function PreviewModal({
 		<FilePreviewProvider
 			content={content}
 			fileType={fileType ?? FileType.Unknown}
+			objectMetadata={contentQuery.data?.objectMetadata}
 			closeViewer={closeFilePreview}
 		>
 			<Modal.Content bg="transparent" p="xl" className="flex flex-col w-full h-screen gap-lg">
 				{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
 				{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
-				<div className="absolute inset-0" onClick={closeFilePreview} />
-				<Modal.Header bdrs="md">
+				<div className="absolute inset-0 z-0" onClick={closeFilePreview} />
+				<Modal.Header bdrs="md" px="lg" className="z-1">
 					<Flex gap="sm" align="center">
 						<FileTypeIcon fileType={fileType} />
 						<Modal.Title className="font-semibold font-display">{content.title}</Modal.Title>
 						<FilePreviewControls />
 					</Flex>
-					<Modal.CloseButton />
+					<Flex gap="md" align="center">
+						<Button
+							variant="light"
+							onClick={() => {
+								if (sidebarOpen) {
+									closeSidebar()
+								} else {
+									openSidebar()
+								}
+							}}
+							leftSection={<IconInfoCircle />}
+						>
+							Details
+						</Button>
+						<Modal.CloseButton size="lg" />
+					</Flex>
 				</Modal.Header>
-				<Flex gap="lg" className="flex-1 min-h-0 overflow-hidden">
+				<Flex gap="lg" className="flex-1 min-h-0 overflow-hidden z-1">
 					<FilePreview />
-					<MetadataSidebar content={content} />
+					{sidebarOpen && <MetadataSidebar content={content} />}
 				</Flex>
 			</Modal.Content>
 		</FilePreviewProvider>
