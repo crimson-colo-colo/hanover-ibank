@@ -16,10 +16,13 @@ import {
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { ContentType } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
+	IconCircleArrowUpRight,
 	IconCloudUpload,
+	IconDownload,
 	IconFilePencil,
 	IconIdBadge2,
 	IconLoader2,
@@ -28,8 +31,6 @@ import {
 	IconStar,
 	IconStarFilled,
 	IconTrash,
-	IconCircleArrowUpRight,
-	IconDownload
 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import {
@@ -50,7 +51,6 @@ import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
-import {ContentType} from "@prisma/browser.ts";
 
 export function ContentTable({
 	loading,
@@ -177,7 +177,9 @@ export function ContentTable({
 									c="var(--mantine-color-bright)"
 									className="font-semibold m-0 truncate max-w-[30ch]"
 									title={item.title}
-									onClick={ async () => {openFilePreview(item, FileType.Link)}}
+									onClick={async () => {
+										openFilePreview(item, FileType.Link)
+									}}
 								>
 									{item.title}
 								</Anchor>
@@ -275,9 +277,10 @@ export function ContentTable({
 								variant="transparent"
 								size="sm"
 								onClick={async (e) => {
-									const {url} = await trpcClient.content.download.query({id: info.row.original.id})
+									const { url } = await trpcClient.content.download.query({
+										id: info.row.original.id,
+									})
 									window.open(url, "_blank", "noopener")
-
 								}}
 							>
 								<IconDownload />

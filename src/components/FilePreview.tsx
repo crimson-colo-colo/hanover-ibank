@@ -1,6 +1,6 @@
 import { trpc } from "@/lib/trpc.ts"
 import "@iamjariwala/react-doc-viewer/dist/index.css"
-import { ActionIcon, Card, Flex, Image, ScrollArea, Text } from "@mantine/core"
+import { ActionIcon, Flex, Image, ScrollArea } from "@mantine/core"
 import { FileType } from "@shared/filetype.ts"
 import { IconZoomIn, IconZoomOut } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
@@ -11,7 +11,7 @@ import type { ContentListItem } from "../../server/routers/content.ts"
 import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
 import type { ScrollPageIntoViewArgs } from "react-pdf/dist/shared/types.js"
-import {URLCard} from "@/components/URLCard.tsx";
+import { URLCard } from "@/components/URLCard.tsx"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(worker, import.meta.url).toString()
 
@@ -68,11 +68,8 @@ export function FilePreviewProvider({
 	let preview: React.ReactNode
 
 	if (content.type === "Link") {
-		preview = (
-			<URLCard url={content.url} />
-		)
-	}
-	else if (fileType === FileType.Image) {
+		preview = <URLCard url={content.url} />
+	} else if (fileType === FileType.Image) {
 		preview = <Image src={contentPreview?.url} alt={content.title} />
 	} else if (fileType === FileType.Audio) {
 		preview = (

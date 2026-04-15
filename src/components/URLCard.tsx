@@ -2,7 +2,6 @@ import {useQuery} from "@tanstack/react-query"
 import {trpc} from "@/lib/trpc.ts";
 import {Card, Image, Text, Skeleton, Center} from "@mantine/core"
 import {useMemo} from "react";
-import {IconLink} from "@tabler/icons-react"
 
 export function URLCard({url}: { url: string }) {
     const opengraph = useQuery(trpc.opengraph.getGraphResponse.queryOptions({url: url}))
