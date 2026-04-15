@@ -1,13 +1,12 @@
+import { AreaChart, BarChart } from "@mantine/charts"
+import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
 import { createFileRoute } from "@tanstack/react-router"
-import { Grid, Paper, Stack, Text, Timeline, Title} from "@mantine/core";
-import {AreaChart, BarChart} from "@mantine/charts";
-import {IconFolderOpen, IconPencil, IconUpload, IconUserKey} from "@tabler/icons-react";
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
 export function AnalyticsDashboard() {
-
 	const uploadData = [
 		{ month: "Jan", Files: 2, Links: 4 },
 		{ month: "Feb", Files: 1, Links: 5 },
