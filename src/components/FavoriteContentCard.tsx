@@ -1,9 +1,11 @@
-import { ActionIcon, Card, Flex, Menu, Text, Tooltip } from "@mantine/core"
+import { ActionIcon, Card, Divider, Flex, Menu, Text, Tooltip } from "@mantine/core"
+import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconCircleArrowUpRight,
 	IconDotsVertical,
 	IconDownload,
+	IconInfoCircle,
 	IconLoader2,
 	IconStarFilled,
 } from "@tabler/icons-react"
@@ -38,25 +40,34 @@ export function FavoriteContentCard({
 	}, [titleRef])
 	const unfavoriteContent = useMutation(
 		trpc.content.unfavorite.mutationOptions({
-			onSuccess() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
+			async onSuccess() {
+				await Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+					}),
+					queryClient.invalidateQueries({
+						queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+					}),
+					queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
+				])
 			},
 		})
 	)
 
 	return (
 		<Card
-			component={contentUrl ? "a" : undefined}
-			href={contentUrl ?? undefined}
+			// component={contentUrl ? "a" : undefined}
+			//href={contentUrl ?? undefined}
 			rel="noopener noreferrer"
-			target="_blank"
+			//target="_blank"
 			p="28"
 			className="transition duration-75 cursor-pointer bg-gray-light hover:bg-gray-light-hover hover:shadow-sm"
 			onClick={() => {
-				if (contentType !== FileType.Link) {
-					openFilePreview(item, contentType)
-				}
+				openFilePreview(item, contentType)
+				/*
+                if (contentType !== FileType.Link) {
+                    openFilePreview(item, contentType)
+                }*/
 			}}
 		>
 			<Card.Section>
@@ -78,7 +89,7 @@ export function FavoriteContentCard({
 								<IconDotsVertical size={20} />
 							</ActionIcon>
 						</Menu.Target>
-						<Menu.Dropdown className="shadow-sm">
+						<Menu.Dropdown className="shadow-sm" onClick={(e) => e.stopPropagation()}>
 							<Menu.Item
 								leftSection={
 									unfavoriteContent.isPending ? (
@@ -87,23 +98,34 @@ export function FavoriteContentCard({
 										<IconStarFilled className="fill-[#f8de1f]" size={20} />
 									)
 								}
-								onClick={() => unfavoriteContent.mutate({ id: contentId })}
+								onClick={(e) => {
+									unfavoriteContent.mutate({ id: contentId })
+								}}
 							>
 								Unfavorite
+							</Menu.Item>
+							<Divider mt="xs" mb="xs" />
+							<Menu.Item
+								leftSection={<IconInfoCircle size={20} />}
+								onClick={async (e) => {
+									openFilePreview(item, contentType)
+								}}
+							>
+								Open Preview
 							</Menu.Item>
 							{contentType === FileType.Link ? (
 								<Menu.Item
 									leftSection={<IconCircleArrowUpRight size={20} />}
-									onClick={async () => {
-										openFilePreview(item, contentType)
+									onClick={(e) => {
+										if (item.type === "Link") window.open(item.url)
 									}}
 								>
-									View Details
+									Open Link
 								</Menu.Item>
 							) : (
 								<Menu.Item
 									leftSection={<IconDownload size={20} />}
-									onClick={async () => {
+									onClick={async (e) => {
 										const { url } = await trpcClient.content.download.query({ id: contentId })
 										window.open(url, "_blank", "noopener")
 									}}

@@ -8,7 +8,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useRef } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
-import { trpc } from "@/lib/trpc.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
 const schema = z.object({
@@ -25,8 +25,24 @@ export function ProfilePage() {
 
 	const profileQuery = useQuery(trpc.user.getProfile.queryOptions())
 
-	const updateProfile = useMutation(trpc.user.updateProfile.mutationOptions())
-	const uploadAvatar = useMutation(trpc.user.uploadAvatar.mutationOptions())
+	const updateProfile = useMutation(
+		trpc.user.updateProfile.mutationOptions({
+			async onSuccess() {
+				await queryClient.invalidateQueries({
+					queryKey: trpc.user.getAvatarUrl.queryKey({ userId: user!.sub! }),
+				})
+			},
+		})
+	)
+	const uploadAvatar = useMutation(
+		trpc.user.uploadAvatar.mutationOptions({
+			async onSuccess() {
+				await queryClient.invalidateQueries({
+					queryKey: trpc.user.getAvatarUrl.queryKey({ userId: user!.sub! }),
+				})
+			},
+		})
+	)
 
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {

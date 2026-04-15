@@ -413,9 +413,11 @@ export const contentRouter = router({
 			const isOwner = content.checkedOutById === user.id
 			const isCheckedOutByAnotherUser =
 				content.checkedOutById !== null && content.checkedOutById !== user.id
-			const isIntendedAudience = content.tags.some(
-				(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
-			)
+			const isIntendedAudience =
+				content.tags.some((tag) => tag.tagCategory === TagCategory.IntendedAudience) &&
+				content.tags.some(
+					(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+				)
 
 			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
 				throw new TRPCError({
@@ -491,9 +493,11 @@ export const contentRouter = router({
 			const isOwner = content.checkedOutById === user.id
 			const isCheckedOutByAnotherUser =
 				content.checkedOutById !== null && content.checkedOutById !== user.id
-			const isIntendedAudience = content.tags.some(
-				(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
-			)
+			const isIntendedAudience =
+				content.tags.some((tag) => tag.tagCategory === TagCategory.IntendedAudience) &&
+				content.tags.some(
+					(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
+				)
 
 			if (isCheckedOutByAnotherUser && !isOwner && !isAdmin) {
 				throw new TRPCError({

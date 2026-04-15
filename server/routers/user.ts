@@ -85,4 +85,21 @@ export const userRouter = router({
 				},
 			})
 		}),
+	getAvatarUrl: authProcedure.input(z.object({ userId: z.string() })).query(async (opts) => {
+		let object: { ETag?: string }
+		try {
+			object = await s3.headObject({
+				Bucket: bucketName,
+				Key: `avatar/${opts.input.userId}.png`,
+			})
+		} catch {
+			const avatar = generateDefaultAvatar(opts.input.userId)
+			object = await s3.putObject({
+				Bucket: bucketName,
+				Key: `avatar/${opts.input.userId}.png`,
+				Body: avatar,
+			})
+		}
+		return `/avatar/${opts.input.userId}?${(object.ETag ?? Date.now().toString()).replace(/"/g, "")}`
+	}),
 })

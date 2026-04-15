@@ -9,10 +9,10 @@ import { MetadataSidebar } from "@/components/MetadataSidebar.tsx"
 import { trpc } from "@/lib/trpc.ts"
 
 export function PreviewModal({
-	closeFilePreview,
+	closePreview,
 	contentId,
 }: {
-	closeFilePreview: () => void
+	closePreview: () => void
 	contentId: string
 }) {
 	const contentQuery = useQuery(trpc.content.get.queryOptions({ id: contentId }))
@@ -30,12 +30,12 @@ export function PreviewModal({
 		<FilePreviewProvider
 			content={content}
 			fileType={fileType ?? FileType.Unknown}
-			closeViewer={closeFilePreview}
+			closeViewer={closePreview}
 		>
 			<Modal.Content bg="transparent" p="xl" className="flex flex-col w-full h-screen gap-lg">
 				{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
 				{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
-				<div className="absolute inset-0 z-0" onClick={closeFilePreview} />
+				<div className="absolute inset-0 z-0" onClick={closePreview} />
 				<Modal.Header bdrs="md" px="lg" className="z-1">
 					<Flex gap="sm" align="center">
 						<FileTypeIcon fileType={fileType} />
@@ -43,7 +43,7 @@ export function PreviewModal({
 							{content.title}
 						</Modal.Title>
 						<FilePreviewControls />
-						{contentQuery.isLoading && <IconLoader2 className="animate-spin" />}
+						{contentQuery.isFetching && <IconLoader2 className="animate-spin" />}
 					</Flex>
 					<Flex gap="md" align="center">
 						<Button
@@ -64,7 +64,7 @@ export function PreviewModal({
 				</Modal.Header>
 				<Flex gap="lg" className="flex-1 min-h-0 overflow-hidden z-1">
 					<FilePreview />
-					{sidebarOpen && <MetadataSidebar content={content} />}
+					{sidebarOpen && <MetadataSidebar content={content} closePreview={closePreview} />}
 				</Flex>
 			</Modal.Content>
 		</FilePreviewProvider>

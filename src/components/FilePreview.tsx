@@ -17,6 +17,7 @@ import { trpc } from "@/lib/trpc.ts"
 import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
 import type { ScrollPageIntoViewArgs } from "react-pdf/dist/shared/types.js"
+import { URLCard } from "@/components/URLCard.tsx"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(worker, import.meta.url).toString()
@@ -95,8 +96,16 @@ export function FilePreviewProvider({
 	let controls: React.ReactNode
 	let preview: React.ReactNode
 
-	if (fileType === FileType.Image) {
-		preview = <Image src={contentPreview?.url} alt={content.title} />
+	if (content.type === "Link") {
+		preview = <URLCard url={content.url} />
+	} else if (fileType === FileType.Image) {
+		preview = (
+			<Image
+				src={contentPreview?.url}
+				alt={content.title}
+				className="object-contain w-full h-full"
+			/>
+		)
 	} else if (fileType === FileType.Audio) {
 		preview = (
 			// biome-ignore lint/a11y/useMediaCaption: user generated content
@@ -214,10 +223,10 @@ export function FilePreviewProvider({
 					</Flex>
 				),
 				preview: (
-					<div className="relative flex flex-col items-center justify-center flex-1 h-full min-w-0 min-h-0 shrink">
+					<div className="relative flex flex-col items-center justify-center flex-1 h-full min-w-0 min-h-0 shrink @container">
 						{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
 						{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
-						<div className="absolute inset-0" onClick={closeViewer}></div>
+						<div className="absolute inset-0 z-0" onClick={closeViewer}></div>
 						{preview}
 					</div>
 				),

@@ -104,7 +104,7 @@ export function CreateContentForm({ onSuccess }: Props) {
 		if (ctx.value === undefined) {
 			form.setFieldValue("name", "")
 		} else {
-			form.setFieldValue("name", ctx.value.name.substring(0, ctx.value.name.lastIndexOf(".")))
+			form.setFieldValue("name", ctx.value.name)
 		}
 	})
 

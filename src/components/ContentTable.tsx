@@ -16,14 +16,15 @@ import {
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { ContentType } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
+	IconCircleArrowUpRight,
 	IconCloudUpload,
+	IconDownload,
 	IconFilePencil,
-	IconIdBadge2,
 	IconLoader2,
-	IconPencil,
 	IconSortAscending2,
 	IconSortDescending2,
 	IconStar,
@@ -47,7 +48,7 @@ import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
-import { queryClient, trpc } from "@/lib/trpc.ts"
+import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
 
 export function ContentTable({
@@ -73,44 +74,22 @@ export function ContentTable({
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
 	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
-	const deleteContent = useMutation(
-		trpc.content.delete.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
-			},
-		})
-	)
-	const favoriteContent = useMutation(
-		trpc.content.favorite.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
-			},
-		})
-	)
-	const unfavoriteContent = useMutation(
-		trpc.content.unfavorite.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() })
-			},
-		})
-	)
-	const checkOutContent = useMutation(
-		trpc.content.checkOut.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-			},
-		})
-	)
-	const checkInContent = useMutation(
-		trpc.content.checkIn.mutationOptions({
-			onSettled() {
-				queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-			},
-		})
-	)
+	const options = {
+		async onSettled() {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+				}),
+				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
+			])
+		},
+	}
+	const deleteContent = useMutation(trpc.content.delete.mutationOptions(options))
+	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(options))
+	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
@@ -175,7 +154,9 @@ export function ContentTable({
 									c="var(--mantine-color-bright)"
 									className="font-semibold m-0 truncate max-w-[30ch]"
 									title={item.title}
-									href={item.url}
+									onClick={async () => {
+										openFilePreview(item, FileType.Link)
+									}}
 								>
 									{item.title}
 								</Anchor>
@@ -252,15 +233,6 @@ export function ContentTable({
 				id: "actions",
 				cell: (info) => (
 					<Flex className="content-actions" gap="2px" justify="flex-end">
-						<ActionIcon
-							variant="subtle"
-							size="sm"
-							onClick={(e) => {
-								openEditDialog(info.row.original)
-							}}
-						>
-							<IconPencil />
-						</ActionIcon>
 						{info.row.original.type === "Object" && (
 							<ActionIcon
 								variant="subtle"
@@ -272,19 +244,33 @@ export function ContentTable({
 								<IconFilePencil />
 							</ActionIcon>
 						)}
-						<ActionIcon
-							variant="transparent"
-							size="sm"
-							onClick={async () => {
-								if (!info.getValue()) {
-									await checkOutContent.mutateAsync({ id: info.row.original.id })
-								} else {
-									await checkInContent.mutateAsync({ id: info.row.original.id })
-								}
-							}}
-						>
-							<IconIdBadge2 />
-						</ActionIcon>
+
+						{info.row.original.type === "Link" ? (
+							<ActionIcon
+								variant="transparent"
+								size="sm"
+								onClick={(e) => {
+									if (info.row.original.type === ContentType.Link) {
+										window.open(info.row.original.url)
+									}
+								}}
+							>
+								<IconCircleArrowUpRight />
+							</ActionIcon>
+						) : (
+							<ActionIcon
+								variant="transparent"
+								size="sm"
+								onClick={async (e) => {
+									const { url } = await trpcClient.content.download.query({
+										id: info.row.original.id,
+									})
+									window.open(url, "_blank", "noopener")
+								}}
+							>
+								<IconDownload />
+							</ActionIcon>
+						)}
 					</Flex>
 				),
 			}),

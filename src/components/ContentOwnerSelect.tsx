@@ -61,7 +61,7 @@ export function ContentOwnerSelect({
 				<Combobox.Target>
 					<InputBase
 						rightSection={
-							searchResults.isLoading ? <IconLoader2 size={18} /> : <Combobox.Chevron />
+							searchResults.isFetching ? <IconLoader2 size={18} /> : <Combobox.Chevron />
 						}
 						onChange={(event) => {
 							setSearchValue(event.currentTarget.value)
@@ -83,7 +83,7 @@ export function ContentOwnerSelect({
 
 				<Combobox.Dropdown>
 					<Combobox.Options>
-						{searchResults.isLoading ? (
+						{searchResults.isFetching ? (
 							<Combobox.Empty>Loading....</Combobox.Empty>
 						) : !options.length ? (
 							<Combobox.Empty>No results found</Combobox.Empty>

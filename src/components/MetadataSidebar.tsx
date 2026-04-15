@@ -13,9 +13,12 @@ import {
 } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { useDisclosure } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
 import { type ContentStatus, EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { ContentFilter } from "@shared/enum.ts"
 import {
 	IconCheck,
+	IconCircleArrowUpRight,
 	IconDownload,
 	IconIdBadge2,
 	IconPencil,
@@ -34,7 +37,7 @@ import { EditableDateField } from "@/components/EditableDateField.tsx"
 import { EditableTextField } from "@/components/EditableTextField.tsx"
 import { contentStatusDisplayName } from "@/lib/enums.ts"
 import { stringifyTagList, unstringifyTagList } from "@/lib/tags.ts"
-import { queryClient, trpc } from "@/lib/trpc.ts"
+import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 export type EditableField =
@@ -45,15 +48,28 @@ export type EditableField =
 	| "status"
 	| "tags"
 
-export function MetadataSidebar({ content }: { content: ContentListItem }) {
+export function MetadataSidebar({
+	content,
+	closePreview,
+}: {
+	content: ContentListItem
+	closePreview: () => void
+}) {
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
 	const [editingField, _setEditingField] = useState<EditableField | null>(null)
 	const options = {
-		onSuccess() {
-			queryClient.invalidateQueries({ queryKey: trpc.content.list.queryKey() })
-			queryClient.invalidateQueries({
-				queryKey: trpc.content.get.queryKey({ id: content.id }),
-			})
+		async onSuccess() {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.get.queryKey({ id: content.id }),
+				}),
+			])
 		},
 	}
 
@@ -71,10 +87,27 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
 	const checkInContent = useMutation(trpc.content.checkIn.mutationOptions(options))
 	const checkOutContent = useMutation(trpc.content.checkOut.mutationOptions(options))
-
-	const isIntendedAudience = content.tags.some(
-		(tag) => tag.category === TagCategory.IntendedAudience && tag.name === profile?.role
+	const deleteContent = useMutation(
+		trpc.content.delete.mutationOptions({
+			onSuccess() {
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+				})
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+				})
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.get.queryKey({ id: content.id }),
+				})
+			},
+		})
 	)
+
+	const isIntendedAudience =
+		content.tags.some((tag) => tag.category === TagCategory.IntendedAudience) &&
+		content.tags.some(
+			(tag) => tag.category === TagCategory.IntendedAudience && tag.name === profile?.role
+		)
 	const isCheckedOutByOther = content.checkedOutBy && content.checkedOutBy.id !== profile?.id
 
 	const canEdit =
@@ -90,6 +123,8 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 	const [confirmCheckoutOpen, { open: openConfirmCheckout, close: closeConfirmCheckout }] =
 		useDisclosure(false)
 	const [confirmCheckinOpen, { open: openConfirmCheckin, close: closeConfirmCheckin }] =
+		useDisclosure(false)
+	const [confirmDeleteOpen, { open: openConfirmDelete, close: closeConfirmDelete }] =
 		useDisclosure(false)
 
 	const titleRef = useRef<HTMLInputElement>(null)
@@ -373,11 +408,42 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 				<div className="grow" />
 
 				<Flex gap="sm">
-					<Button fullWidth leftSection={<IconDownload />}>
-						Download
-					</Button>
+					{content.type === "Link" ? (
+						<Button
+							component="a"
+							href={content.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							fullWidth
+							leftSection={<IconCircleArrowUpRight />}
+						>
+							Open Link
+						</Button>
+					) : (
+						<Button
+							fullWidth
+							leftSection={<IconDownload />}
+							onClick={async () => {
+								try {
+									const { url } = await trpcClient.content.download.query({ id: content.id })
+									window.open(url)
+								} catch (error) {
+									notifications.show({
+										title: "Download failed",
+										message:
+											error instanceof Error
+												? error.message
+												: "An unknown error occurred. Please try again.",
+										color: "red",
+									})
+								}
+							}}
+						>
+							Download
+						</Button>
+					)}
 
-					<ActionIcon variant="light" color="red" size="lg">
+					<ActionIcon variant="light" color="red" size="lg" onClick={openConfirmDelete}>
 						<IconTrash />
 					</ActionIcon>
 				</Flex>
@@ -404,6 +470,31 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 						leftSection={<IconIdBadge2 />}
 					>
 						Check in
+					</Button>
+				</Flex>
+			</Modal>
+			<Modal opened={confirmDeleteOpen} onClose={closeConfirmDelete} title="Confirm delete">
+				<Text>Are you sure you want to delete this content? This action cannot be undone.</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={closeConfirmDelete}
+						disabled={deleteContent.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={deleteContent.isPending}
+						onClick={async () => {
+							await deleteContent.mutateAsync({ ids: [content.id] })
+							closeConfirmDelete()
+							closePreview()
+						}}
+						leftSection={<IconTrash />}
+						color="red"
+					>
+						Delete
 					</Button>
 				</Flex>
 			</Modal>

@@ -1,13 +1,13 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { UTCDate } from "@date-fns/utc"
-import { Modal, SimpleGrid, Text, Title } from "@mantine/core"
+import { Alert, Modal, SimpleGrid, Text, Title } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { ContentType, type EmployeeRole } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
-import { IconFileUpload } from "@tabler/icons-react"
+import { IconAlertOctagon, IconFileUpload, IconLoader2 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
@@ -26,7 +26,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function RoleDashboard() {
 	const auth0 = useAuth0()
 	const [contentFilter, setContentFilter] = useState<ContentFilter>(ContentFilter.Own)
-	const content = useQuery(trpc.content.list.queryOptions({ filter: contentFilter }))
+	const ownContent = useQuery(trpc.content.list.queryOptions({ filter: ContentFilter.Own }))
+	const allContent = useQuery(trpc.content.list.queryOptions({ filter: ContentFilter.All }))
 	const [editingItem, setEditingItem] = useState<ContentListItem | null>(null)
 	const [editDialogOpen, { open: openEditDialog, close: closeEditDialog }] = useDisclosure(false)
 	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
@@ -44,25 +45,23 @@ function RoleDashboard() {
 	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
 	const [selectedContentFileType, setSelectedContentFileType] = useState<FileType | null>(null)
 
-	const updateContent = useMutation(
-		trpc.content.update.mutationOptions({
-			onSuccess() {
+	const options = {
+		async onSuccess() {
+			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: trpc.content.list.queryKey(),
-				})
-			},
-		})
-	)
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+				}),
+			])
+		},
+	}
 
-	const updateContentFile = useMutation(
-		trpc.content.updateFile.mutationOptions({
-			onSuccess() {
-				queryClient.invalidateQueries({
-					queryKey: trpc.content.list.queryKey(),
-				})
-			},
-		})
-	)
+	const updateContent = useMutation(trpc.content.update.mutationOptions(options))
+	const updateContentFile = useMutation(trpc.content.updateFile.mutationOptions(options))
+
+	const content = contentFilter === ContentFilter.Own ? ownContent : allContent
 
 	return (
 		<main>
@@ -77,18 +76,16 @@ function RoleDashboard() {
 			</header>
 
 			<div>
-				<Title order={3} className="mt-6 mb-4">
-					Your Favorites
+				<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
+					Your Favorites {favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
 				</Title>
 				<SimpleGrid minColWidth={250} spacing="md">
-					{favoriteContent.isLoading ? (
-						<p>Loading favorite content...</p>
-					) : favoriteContent.isError ? (
-						<p className="text-red-500">
+					{favoriteContent.isLoading ? null : favoriteContent.isError ? (
+						<Alert color="red" title="Failed to load favorite content" icon={<IconAlertOctagon />}>
 							Failed to load favorite content: {favoriteContent.error.message}
-						</p>
+						</Alert>
 					) : favoriteContent.data?.content.length === 0 ? (
-						<p>You have no favorite content.</p>
+						<Text c="dimmed">You haven't favorited any content yet.</Text>
 					) : (
 						favoriteContent.data!.content.map((item) => {
 							return (
@@ -118,10 +115,12 @@ function RoleDashboard() {
 			<div>
 				<section>
 					{content.isError ? (
-						<p className="text-red-500">Failed to load content: {content.error.message}</p>
+						<Alert color="red" title="Failed to load content" icon={<IconAlertOctagon />}>
+							Failed to load content: {content.error.message}
+						</Alert>
 					) : (
 						<ContentTable
-							loading={content.isLoading}
+							loading={content.isFetching}
 							data={
 								content.data ?? {
 									content: [],
@@ -223,7 +222,7 @@ function RoleDashboard() {
 				>
 					<Modal.Overlay backgroundOpacity={0.55} blur={3} />
 					{selectedContent && selectedContentFileType && (
-						<PreviewModal closeFilePreview={closeFilePreview} contentId={selectedContent.id} />
+						<PreviewModal closePreview={closeFilePreview} contentId={selectedContent.id} />
 					)}
 				</Modal.Root>
 			</div>
