@@ -61,9 +61,11 @@ async function main() {
 	console.log("🌱 Seeding database...")
 
 	await prisma.$transaction([
+		prisma.favoriteContent.deleteMany(),
+		prisma.contentTag.deleteMany(),
+		prisma.tag.deleteMany(),
 		prisma.content.deleteMany(),
 		prisma.employee.deleteMany(),
-		prisma.contentTag.deleteMany(),
 	])
 
 	const objects = await s3.listObjectsV2({ Bucket: bucketName, MaxKeys: 1000 })
@@ -102,7 +104,7 @@ async function main() {
 			role: EmployeeRole.BusinessAnalyst,
 		},
 		{
-			id: "auth0|69d57cf83f6e9b609fe8a92f",
+			id: "auth0|69d57cf83f6e9b609fe8a92f", //admin admin account
 			role: EmployeeRole.Admin,
 		},
 		{
@@ -452,6 +454,12 @@ async function main() {
 		const expirationDate = new Date()
 		expirationDate.setDate(expirationDate.getDate() + expiresInDays)
 		const isUnderwriter = Math.random() < 0.5
+		const status =
+			Math.random() < 0.33
+				? ContentStatus.Complete
+				: Math.random() < 0.5
+					? ContentStatus.Incomplete
+					: ContentStatus.UnderReview
 		return {
 			title: filename,
 			ownerId: isUnderwriter ? nextUndewriter() : nextAnalyst(),
@@ -459,6 +467,7 @@ async function main() {
 			expirationDate,
 			objectId: id,
 			type: ContentType.Object,
+			status: status,
 		} satisfies Prisma.ContentCreateManyInput
 	})
 

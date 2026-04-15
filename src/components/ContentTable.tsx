@@ -188,13 +188,9 @@ export function ContentTable({
 								</span>
 							</div>
 						)
-					} else {
-						const size = formatBytes(
-							data.objectMetadata.get(info.row.original.id)?.ContentLength ?? 0
-						)
-						const fileType = data.objectMetadata.get(info.row.original.id)?.Metadata?.filetype as
-							| FileType
-							| undefined
+					} else if (item.type === "Object") {
+						const size = formatBytes(item.object.ContentLength ?? 0)
+						const fileType = item.object.Metadata?.filetype as FileType | undefined
 						return (
 							<div className="flex items-center gap-2">
 								<FileTypeIcon fileType={fileType ?? FileType.Unknown} size={22} strokeWidth={1.5} />

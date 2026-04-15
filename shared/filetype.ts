@@ -12,14 +12,14 @@ export const FileType = {
 	Unknown: "unknown",
 } as const
 export const fileTypeToMime: Record<FileType, string> = {
-	pdf:       "application/pdf",
-	docx:      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-	pptx:      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-	xlsx:      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	pdf: "application/pdf",
+	docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+	xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 	plaintext: "text/plain",
-	image:     "image/png",
-	audio:     "audio/mpeg",
-	video:     "video/mp4",
-	link:      "text/html",
-	unknown:   "application/octet-stream",
+	image: "image/png",
+	audio: "audio/mpeg",
+	video: "video/mp4",
+	link: "text/html",
+	unknown: "application/octet-stream",
 }

@@ -1,10 +1,11 @@
 @layer theme, base, mantine, components, utilities;
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities);
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
 @import '@mantine/core/styles.layer.css';
 @import '@mantine/dates/styles.layer.css';
 @import '@mantine/notifications/styles.layer.css';
 @import '@mantine/dropzone/styles.layer.css';
+@import '@mantine/charts/styles.layer.css';
 @import '@fontsource/miranda-sans/400.css';
 @import '@fontsource/miranda-sans/500.css';
 @import '@fontsource/miranda-sans/600.css';
@@ -110,7 +111,7 @@ button[aria-label='Open TanStack Devtools'] {
 .metadata-edit {
     visibility: hidden;
 }
-.metadata-field:hover .metadata-edit {
+.metadata-field[data-enabled=true]:hover .metadata-edit {
     visibility: visible;
 }
 
@@ -119,4 +120,8 @@ html.color-scheme-transitioning * {
         background-color 0.3s ease,
         color 0.2s ease,
         border-color 0.3s ease !important;
+}
+
+.content-tags-input [data-disabled=true] .mantine-TagsInput-input {
+    @apply bg-white;
 }

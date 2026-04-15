@@ -5,6 +5,7 @@ import type { EditableField } from "@/components/MetadataSidebar.tsx"
 import { isTruncated } from "@/lib/isTruncated.ts"
 
 export function EditableTextField({
+	enabled,
 	value,
 	field,
 	editingField,
@@ -12,6 +13,7 @@ export function EditableTextField({
 	onFieldEdit,
 	ref,
 }: {
+	enabled: boolean
 	value: string
 	field: EditableField
 	editingField: EditableField | null
@@ -27,14 +29,19 @@ export function EditableTextField({
 		}
 	}, [contentRef])
 
-	return editingField !== field ? (
+	return editingField !== field || !enabled ? (
 		<>
 			<Tooltip label={value} withArrow disabled={!truncated || editingField === "title"}>
 				<span className="px-1 py-1 truncate metadata-content" ref={contentRef}>
 					{value}
 				</span>
 			</Tooltip>
-			<ActionIcon className="metadata-edit" variant="subtle" onClick={() => setEditingField(field)}>
+			<ActionIcon
+				className="metadata-edit"
+				variant="subtle"
+				onClick={() => setEditingField(field)}
+				disabled={!enabled}
+			>
 				<IconPencil />
 			</ActionIcon>
 		</>
@@ -50,7 +57,7 @@ export function EditableTextField({
 					onFieldEdit(field, ref.current?.value ?? "")
 				}
 			}}
-			className="w-full px-1 py-1 border-none max-w-none bg-gray-50"
+			className="w-full px-1 py-1 border-none max-w-none bg-gray-50 dark:bg-gray-900"
 		/>
 	)
 }

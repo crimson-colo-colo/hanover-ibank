@@ -16,6 +16,7 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import {
 	IconBuildingBank,
+	IconChartBar,
 	IconChevronRight,
 	IconHome,
 	IconLayoutSidebarLeftExpand,
@@ -36,13 +37,23 @@ function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean
 	return (
 		<>
 			{isAdmin && (
-				<Button
-					component={Link}
-					variant={location.pathname === "/admin/manage-users" ? "light" : "subtle"}
-					to="/admin/manage-users"
-				>
-					Manage Employees
-				</Button>
+				<div>
+					<Button
+						component={Link}
+						variant={location.pathname === "/admin/manage-users" ? "light" : "subtle"}
+						to="/admin/manage-users"
+					>
+						Manage Employees
+					</Button>
+
+					<Button
+						component={Link}
+						variant={location.pathname === "/admin/analytics" ? "light" : "subtle"}
+						to="/admin/analytics"
+					>
+						Analytics Dashboard
+					</Button>
+				</div>
 			)}
 		</>
 	)
@@ -69,6 +80,16 @@ function DrawerNavLinks({
 				leftSection={<IconHome size={16} />}
 				rightSection={<IconChevronRight size={12} />}
 				active={location.pathname === "/"}
+				onClick={closeDrawer}
+			/>
+			<NavLink
+				component={Link}
+				to="/analytics"
+				label="Analytics"
+				variant="filled"
+				leftSection={<IconChartBar size={16} />}
+				rightSection={<IconChevronRight size={12} />}
+				active={location.pathname === "/analytics"}
 				onClick={closeDrawer}
 			/>
 			{isAdmin && (

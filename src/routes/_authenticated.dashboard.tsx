@@ -1,12 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { UTCDate } from "@date-fns/utc"
-import { ContentTable } from "@/components/ContentTable.tsx"
-import { EditContentForm } from "@/components/EditContentForm.tsx"
-import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
-import { PreviewModal } from "@/components/PreviewModal.tsx"
-import { employeeRoleDisplayName } from "@/lib/enums.ts"
-import { queryClient, trpc } from "@/lib/trpc.ts"
-import "@iamjariwala/react-doc-viewer/dist/index.css"
 import { Modal, SimpleGrid, Text, Title } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useDisclosure } from "@mantine/hooks"
@@ -18,6 +11,12 @@ import { IconFileUpload } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
+import { ContentTable } from "@/components/ContentTable.tsx"
+import { EditContentForm } from "@/components/EditContentForm.tsx"
+import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
+import { PreviewModal } from "@/components/PreviewModal.tsx"
+import { employeeRoleDisplayName } from "@/lib/enums.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -92,7 +91,6 @@ function RoleDashboard() {
 						<p>You have no favorite content.</p>
 					) : (
 						favoriteContent.data!.content.map((item) => {
-							const object = favoriteContent.data!.objectMetadata.get(item.id)
 							return (
 								<FavoriteContentCard
 									fileName={item.title}
@@ -102,7 +100,7 @@ function RoleDashboard() {
 									contentType={
 										item.type === "Link"
 											? FileType.Link
-											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
+											: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									}
 									item={item}
 									openFilePreview={(file, type) => {
@@ -127,7 +125,6 @@ function RoleDashboard() {
 							data={
 								content.data ?? {
 									content: [],
-									objectMetadata: new Map(),
 									role: "Employee" as EmployeeRole,
 								}
 							}
@@ -221,6 +218,7 @@ function RoleDashboard() {
 					opened={filePreviewOpen}
 					onClose={closeFilePreview}
 					fullScreen
+					shadow="none"
 					transitionProps={{ transition: "fade", duration: 200 }}
 				>
 					<Modal.Overlay backgroundOpacity={0.55} blur={3} />

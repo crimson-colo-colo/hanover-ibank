@@ -6,9 +6,11 @@ import { stringifyTag, unstringifyTag } from "@/lib/tags.ts"
 import { trpc } from "@/lib/trpc.ts"
 
 export function ContentTagsInput({
+	enabled = true,
 	value,
 	onChange,
 }: {
+	enabled?: boolean
 	value: Tag[]
 	onChange: (tags: Tag[]) => void
 }) {
@@ -16,6 +18,8 @@ export function ContentTagsInput({
 
 	return (
 		<TagsInput
+			className="content-tags-input"
+			disabled={!enabled}
 			value={value.map((tag) => stringifyTag(tag))}
 			onChange={(values) => {
 				const tags = values.map((value) => unstringifyTag(value))
@@ -32,7 +36,7 @@ export function ContentTagsInput({
 			renderPill={({ option, onRemove }) => {
 				const { category, name } = unstringifyTag(option.value as string)
 				return (
-					<Pill withRemoveButton onRemove={onRemove}>
+					<Pill withRemoveButton onRemove={onRemove} disabled={!enabled}>
 						{category === TagCategory.Custom
 							? name
 							: `${tagCategoryDisplayName[category as TagCategory]}: ${name}`}
