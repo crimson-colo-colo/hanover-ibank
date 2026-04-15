@@ -61,9 +61,11 @@ async function main() {
 	console.log("🌱 Seeding database...")
 
 	await prisma.$transaction([
+		prisma.favoriteContent.deleteMany(),
+		prisma.contentTag.deleteMany(),
+		prisma.tag.deleteMany(),
 		prisma.content.deleteMany(),
 		prisma.employee.deleteMany(),
-		prisma.contentTag.deleteMany(),
 	])
 
 	const objects = await s3.listObjectsV2({ Bucket: bucketName, MaxKeys: 1000 })

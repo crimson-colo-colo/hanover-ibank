@@ -47,13 +47,13 @@ export type ContentListItem = {
 	| {
 			type: (typeof ContentType)["Object"]
 			objectId: string
+			object: HeadObjectOutput
 	  }
 )
 
 export interface ContentList {
 	role: EmployeeRole
 	content: ContentListItem[]
-	objectMetadata: Map<string, HeadObjectOutput>
 }
 
 export const contentRouter = router({
@@ -99,16 +99,18 @@ export const contentRouter = router({
 
 			const users = await auth0Management.users.list()
 
-			const metadata = await Promise.all(
-				data
-					.filter((content) => content.type === "Object")
-					.map(
-						async (content) =>
-							[
-								content.id,
-								await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
-							] as const
-					)
+			const metadata = new Map(
+				await Promise.all(
+					data
+						.filter((content) => content.type === "Object")
+						.map(
+							async (content) =>
+								[
+									content.id,
+									await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
+								] as const
+						)
+				)
 			)
 
 			return {
@@ -150,9 +152,11 @@ export const contentRouter = router({
 							category: tag.tagCategory,
 							name: tag.tagName,
 						})),
-					} as ContentListItem
+						type: content.type as "Object",
+						objectId: content.objectId!,
+						object: metadata.get(content.id)!,
+					} satisfies ContentListItem
 				}),
-				objectMetadata: new Map(metadata),
 			}
 		}),
 
@@ -589,16 +593,18 @@ export const contentRouter = router({
 			},
 		})
 
-		const metadata = await Promise.all(
-			data
-				.filter((content) => content.type === "Object")
-				.map(
-					async (content) =>
-						[
-							content.id,
-							await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
-						] as const
-				)
+		const metadata = new Map(
+			await Promise.all(
+				data
+					.filter((content) => content.type === "Object")
+					.map(
+						async (content) =>
+							[
+								content.id,
+								await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
+							] as const
+					)
+			)
 		)
 
 		const users = await auth0Management.users.list()
@@ -637,9 +643,11 @@ export const contentRouter = router({
 						category: tag.tagCategory,
 						name: tag.tagName,
 					})),
-				} as ContentListItem
+					type: content.type as "Object",
+					objectId: content.objectId!,
+					object: metadata.get(content.id)!,
+				} satisfies ContentListItem
 			}),
-			objectMetadata: new Map(metadata),
 		}
 	}),
 	checkOut: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
@@ -673,7 +681,7 @@ export const contentRouter = router({
 		const isIntendedAudience = content.tags.some(
 			(tag) => tag.tagCategory === TagCategory.IntendedAudience && tag.tagName === user.role
 		)
-		if (!isIntendedAudience) {
+		if (!isIntendedAudience && user.role !== EmployeeRole.Admin) {
 			throw new TRPCError({
 				code: "FORBIDDEN",
 				message: "User cannot check out content not intended for their role",
@@ -808,11 +816,13 @@ export const contentRouter = router({
 				category: tag.tagCategory,
 				name: tag.tagName,
 			})),
-		} as ContentListItem
+			type: content.type as "Object",
+			objectId: content.objectId!,
+			object: objectMetadata!,
+		} satisfies ContentListItem
 
 		return {
 			content: contentItem,
-			objectMetadata: objectMetadata,
 		}
 	}),
 })

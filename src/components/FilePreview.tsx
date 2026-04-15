@@ -1,6 +1,8 @@
+import { formatBytes } from "@/lib/content.ts"
 import { trpc } from "@/lib/trpc.ts"
 import "@iamjariwala/react-doc-viewer/dist/index.css"
 import { ActionIcon, Flex, Image, ScrollArea } from "@mantine/core"
+import { ContentType } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconChevronDown,
@@ -15,9 +17,7 @@ import { createContext, useContext, useRef, useState } from "react"
 import { Document, type LinkService, Page, pdfjs } from "react-pdf"
 import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
-import type { HeadObjectCommandOutput } from "@aws-sdk/client-s3"
 import type { ScrollPageIntoViewArgs } from "react-pdf/dist/shared/types.js"
-import { formatBytes } from "@/lib/content.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(worker, import.meta.url).toString()
@@ -36,13 +36,11 @@ const FilePreviewContext = createContext<FilePreviewContext | null>(null)
 export function FilePreviewProvider({
 	content,
 	fileType,
-	objectMetadata,
 	closeViewer,
 	children,
 }: {
 	content: ContentListItem
 	fileType: FileType
-	objectMetadata: HeadObjectCommandOutput | null | undefined
 	closeViewer: () => void
 	children: React.ReactNode
 }) {
@@ -207,9 +205,9 @@ export function FilePreviewProvider({
 			value={{
 				controls: (
 					<Flex align="center" className="gap-8 ml-4">
-						{objectMetadata && (
+						{content.type === ContentType.Object && content.object?.ContentLength !== undefined && (
 							<span className="mr-4 text-gray-600">
-								{formatBytes(objectMetadata.ContentLength!)}
+								{formatBytes(content.object.ContentLength)}
 							</span>
 						)}
 

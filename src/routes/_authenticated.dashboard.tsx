@@ -91,7 +91,6 @@ function RoleDashboard() {
 						<p>You have no favorite content.</p>
 					) : (
 						favoriteContent.data!.content.map((item) => {
-							const object = favoriteContent.data!.objectMetadata.get(item.id)
 							return (
 								<FavoriteContentCard
 									fileName={item.title}
@@ -101,7 +100,7 @@ function RoleDashboard() {
 									contentType={
 										item.type === "Link"
 											? FileType.Link
-											: ((object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
+											: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									}
 									item={item}
 									openFilePreview={(file, type) => {
@@ -126,7 +125,6 @@ function RoleDashboard() {
 							data={
 								content.data ?? {
 									content: [],
-									objectMetadata: new Map(),
 									role: "Employee" as EmployeeRole,
 								}
 							}

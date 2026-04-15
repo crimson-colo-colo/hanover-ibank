@@ -20,7 +20,7 @@ export function PreviewModal({
 
 	const content = contentQuery.data?.content
 	const fileType =
-		(contentQuery.data?.objectMetadata?.Metadata?.filetype as FileType) ?? FileType.Unknown
+		(contentQuery.data?.content.object?.Metadata?.filetype as FileType) ?? FileType.Unknown
 
 	if (!content) {
 		return null
@@ -30,7 +30,6 @@ export function PreviewModal({
 		<FilePreviewProvider
 			content={content}
 			fileType={fileType ?? FileType.Unknown}
-			objectMetadata={contentQuery.data?.objectMetadata}
 			closeViewer={closeFilePreview}
 		>
 			<Modal.Content bg="transparent" p="xl" className="flex flex-col w-full h-screen gap-lg">
