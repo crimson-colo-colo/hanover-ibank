@@ -8,11 +8,13 @@ import {
 	Group,
 	Kbd,
 	Modal,
+	Pill,
 	SegmentedControl,
 	Table,
 	Text,
 	TextInput,
 	Title,
+	Tooltip,
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
@@ -47,6 +49,7 @@ import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
+import { tagCategoryDisplayName } from "@/lib/enums.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
@@ -138,7 +141,7 @@ export function ContentTable({
 					</ActionIcon>
 				),
 			}),
-			columnHelper.accessor("title", {
+			columnHelper.accessor((r) => `${r.title} ${r.type === "Link" ? r.url : ""}`, {
 				header: "Name",
 				filterFn: "fuzzy",
 				sortingFn: "fuzzy",
@@ -188,23 +191,24 @@ export function ContentTable({
 					}
 				},
 			}),
-			columnHelper.accessor("owner", {
+			columnHelper.accessor((row) => `${row.owner.name} ${row.owner.email}`, {
+				id: "owner",
 				header: "Owner",
-				filterFn: fuzzyFilter,
+				filterFn: "fuzzy",
+				sortingFn: "fuzzy",
 				enableSorting: true,
-				sortingFn: (a, b) => a.original.owner.name.localeCompare(b.original.owner.name),
 				cell: (info) => (
 					<div className="flex items-center gap-2">
 						<Avatar
-							userId={info.getValue().id}
-							alt={info.getValue().name}
+							userId={info.row.original.owner.id}
+							alt={info.row.original.owner.name}
 							width={24}
 							height={24}
 							radius="100%"
 							className="w-6 h-6 shrink-0"
 						/>
-						<span className="truncate" title={info.getValue().email}>
-							{info.getValue().name}
+						<span className="truncate" title={info.row.original.owner.email}>
+							{info.row.original.owner.name}
 						</span>
 					</div>
 				),
@@ -219,14 +223,25 @@ export function ContentTable({
 					</span>
 				),
 			}),
-			columnHelper.accessor("expirationDate", {
-				header: "Expiration Date",
-				enableSorting: true,
-				sortingFn: "datetime",
+			columnHelper.accessor((row) => row.tags.map((t) => t.name).join(" "), {
+				id: "tags",
+				header: "Tags",
+				filterFn: "fuzzy",
+				sortingFn: "fuzzy",
+				enableSorting: false,
 				cell: (info) => (
-					<span title={new UTCDate(info.getValue()).toLocaleString()}>
-						{formatDistanceToNow(new UTCDate(info.getValue()), { addSuffix: true })}
-					</span>
+					<Group gap={4}>
+						{info.row.original.tags.map((tag) => (
+							<Tooltip
+								key={`${tag.category}-${tag.name}`}
+								label={`${tagCategoryDisplayName[tag.category]}: ${tag.name}`}
+							>
+								<Pill key={`${tag.category}-${tag.name}`} size="xs" color="gray">
+									{tag.name}
+								</Pill>
+							</Tooltip>
+						))}
+					</Group>
 				),
 			}),
 			columnHelper.display({
@@ -289,7 +304,7 @@ export function ContentTable({
 		enableSorting: true,
 		enableRowSelection: true,
 		onGlobalFilterChange: setGlobalFilter,
-		globalFilterFn: fuzzyFilter,
+		globalFilterFn: "fuzzy",
 		sortingFns: {
 			fuzzy: fuzzySort,
 		},
