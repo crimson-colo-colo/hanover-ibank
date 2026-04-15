@@ -66,7 +66,7 @@ export function FilePreviewProvider({
 
 	let controls: React.ReactNode
 	let preview: React.ReactNode
-	console.log("Ok I think the file type is " + fileType)
+
 	if (content.type === "Link") {
 		preview = (
 			<URLCard url={content.url} />

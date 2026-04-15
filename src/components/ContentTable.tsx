@@ -23,12 +23,13 @@ import {
 	IconFilePencil,
 	IconIdBadge2,
 	IconLoader2,
-	IconPencil,
 	IconSortAscending2,
 	IconSortDescending2,
 	IconStar,
 	IconStarFilled,
 	IconTrash,
+	IconCircleArrowUpRight,
+	IconDownload
 } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import {
@@ -47,8 +48,9 @@ import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
-import { queryClient, trpc } from "@/lib/trpc.ts"
+import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
+import {ContentType} from "@prisma/browser.ts";
 
 export function ContentTable({
 	loading,
@@ -175,7 +177,7 @@ export function ContentTable({
 									c="var(--mantine-color-bright)"
 									className="font-semibold m-0 truncate max-w-[30ch]"
 									title={item.title}
-									href={item.url}
+									onClick={ async () => {openFilePreview(item, FileType.Link)}}
 								>
 									{item.title}
 								</Anchor>
@@ -256,15 +258,32 @@ export function ContentTable({
 				id: "actions",
 				cell: (info) => (
 					<Flex className="content-actions" gap="2px" justify="flex-end">
-						<ActionIcon
-							variant="subtle"
-							size="sm"
-							onClick={(e) => {
-								openEditDialog(info.row.original)
-							}}
-						>
-							<IconPencil />
-						</ActionIcon>
+						{info.row.original.type === "Link" ? (
+							<ActionIcon
+								variant="transparent"
+								size="sm"
+								onClick={(e) => {
+									if (info.row.original.type === ContentType.Link) {
+										window.open(info.row.original.url)
+									}
+								}}
+							>
+								<IconCircleArrowUpRight />
+							</ActionIcon>
+						) : (
+							<ActionIcon
+								variant="transparent"
+								size="sm"
+								onClick={async (e) => {
+									const {url} = await trpcClient.content.download.query({id: info.row.original.id})
+									window.open(url, "_blank", "noopener")
+
+								}}
+							>
+								<IconDownload />
+							</ActionIcon>
+						)}
+
 						{info.row.original.type === "Object" && (
 							<ActionIcon
 								variant="subtle"
