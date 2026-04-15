@@ -122,9 +122,15 @@ export function MetadataSidebar({ content }: { content: ContentListItem }) {
 		} else if (field === "owner") {
 			await updateOwner.mutateAsync({ id: content.id, ownerId: value })
 		} else if (field === "lastModifiedDate") {
-			await updateLastModifiedDate.mutateAsync({ id: content.id, lastModifiedDate: value })
+			await updateLastModifiedDate.mutateAsync({
+				id: content.id,
+				lastModifiedDate: value.split("T")[0],
+			})
 		} else if (field === "expirationDate") {
-			await updateExpirationDate.mutateAsync({ id: content.id, expirationDate: value })
+			await updateExpirationDate.mutateAsync({
+				id: content.id,
+				expirationDate: value.split("T")[0],
+			})
 		} else if (field === "status") {
 			await updateStatus.mutateAsync({ id: content.id, status: value as ContentStatus })
 		} else if (field === "tags") {
