@@ -1,7 +1,14 @@
-import { AreaChart, BarChart } from "@mantine/charts"
-import { Avatar, Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
-import { FolderOpen, PencilSimple, SignIn, UploadSimple } from "@phosphor-icons/react"
+import { createFileRoute } from "@tanstack/react-router"
+import {Avatar, Grid, Paper, Stack, Text, Timeline, Title} from "@mantine/core";
+import {AreaChart, BarChart} from "@mantine/charts";
+import {IconFolderOpen, IconPencil, IconUpload, IconUserKey} from "@tabler/icons-react";
+
+export const Route = createFileRoute("/admin/analytics")({
+	component: AnalyticsDashboard,
+})
+
 export function AnalyticsDashboard() {
+
 	const uploadData = [
 		{ month: "Jan", Files: 2, Links: 4 },
 		{ month: "Feb", Files: 1, Links: 5 },
@@ -45,9 +52,9 @@ export function AnalyticsDashboard() {
 		<Stack mt="md" gap="lg">
 			<Title order={2}>Analytics Dashboard</Title>
 
-			<Grid>
+			<Grid align="stretch" grow={true}>
 				{metrics.map((m) => (
-					<Grid.Col key={m.label} span={{ base: 12, sm: 6, md: 4, lg: 2 }}>
+					<Grid.Col key={m.label} span={{ base: 12, sm: 6, md: 4, lg: 2 }} align="stretch">
 						<Paper withBorder p="md" radius="md">
 							<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
 								{m.label}
@@ -86,7 +93,7 @@ export function AnalyticsDashboard() {
 						</Text>
 
 						<Timeline active={3} bulletSize={24} lineWidth={2}>
-							<Timeline.Item bullet={<SignIn size={12} />} title="User logged in">
+							<Timeline.Item bullet={<IconUserKey size={12} />} title="User logged in">
 								<Text size="sm" c="dimmed">
 									Michael Jordan signed into the dashboard
 								</Text>
@@ -95,7 +102,7 @@ export function AnalyticsDashboard() {
 								</Text>
 							</Timeline.Item>
 
-							<Timeline.Item bullet={<FolderOpen size={12} />} title="File accessed">
+							<Timeline.Item bullet={<IconFolderOpen size={12} />} title="File accessed">
 								<Text size="sm" c="dimmed">
 									Opened Quarterly_Report.pdf
 								</Text>
@@ -104,7 +111,7 @@ export function AnalyticsDashboard() {
 								</Text>
 							</Timeline.Item>
 
-							<Timeline.Item bullet={<PencilSimple size={12} />} title="File edited">
+							<Timeline.Item bullet={<IconPencil size={12} />} title="File edited">
 								<Text size="sm" c="dimmed">
 									Updated Budget_Plan.xlsx
 								</Text>
@@ -113,7 +120,7 @@ export function AnalyticsDashboard() {
 								</Text>
 							</Timeline.Item>
 
-							<Timeline.Item bullet={<UploadSimple size={12} />} title="File uploaded">
+							<Timeline.Item bullet={<IconUpload size={12} />} title="File uploaded">
 								<Text size="sm" c="dimmed">
 									Uploaded DesignMockup.png
 								</Text>

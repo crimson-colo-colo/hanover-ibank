@@ -55,6 +55,7 @@
 		"@faker-js/faker": "^10.4.0",
 		"@fontsource-variable/plus-jakarta-sans": "^5.2.8",
 		"@fontsource/miranda-sans": "^5.2.1",
+		"@mantine/charts": "^9.0.2",
 		"@mantine/core": "^9.0.0",
 		"@mantine/dates": "^9.0.0",
 		"@mantine/dropzone": "^9.0.1",

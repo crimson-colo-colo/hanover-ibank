@@ -45,8 +45,8 @@ function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean
 
 					<Button
 						component={Link}
-						variant={location.pathname === "/analytics" ? "light" : "subtle"}
-						to="/analytics"
+						variant={location.pathname === "/admin/analytics" ? "light" : "subtle"}
+						to="/admin/analytics"
 					>
 						Analytics Dashboard
 					</Button>
