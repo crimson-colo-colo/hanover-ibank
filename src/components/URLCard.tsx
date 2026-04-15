@@ -1,12 +1,14 @@
 import { Card, Center, Image, Skeleton, Text } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
+import type { OgObject } from "open-graph-scraper/types"
 import { useMemo } from "react"
+import imageNotFound from "@/assets/image-not-found.png"
 import { trpc } from "@/lib/trpc.ts"
 
 export function URLCard({ url }: { url: string }) {
-	const opengraph = useQuery(trpc.opengraph.getGraphResponse.queryOptions({ url: url }))
+	const opengraph = useQuery(trpc.opengraph.getOpenGraph.queryOptions({ url: url }))
 
-	function extractOGData(response: NonNullable<typeof opengraph.data>["response"]) {
+	function extractOGData(response: OgObject | null) {
 		if (!response) return null
 		return {
 			title: response.ogTitle ?? response.twitterTitle ?? response.dcTitle ?? null,
@@ -23,7 +25,7 @@ export function URLCard({ url }: { url: string }) {
 		}
 	}
 
-	const graph = useMemo(() => {
+	const og = useMemo(() => {
 		if (opengraph.isLoading || !opengraph.data)
 			return {
 				title: null,
@@ -42,41 +44,41 @@ export function URLCard({ url }: { url: string }) {
 
 	return (
 		<Card shadow="md" padding="lg" style={{ maxWidth: 600 }}>
-			{graph ? (
+			{og ? (
 				<>
-					{graph.image !== undefined ? (
+					{og.image !== undefined ? (
 						<Card.Section my="sm">
 							<Center>
-								{graph.image === null ? (
-									<Image mah={300} maw={300} src={"src/assets/image-not-found.png"} />
+								{og.image === null ? (
+									<Image mah={300} maw={300} src={imageNotFound} />
 								) : (
 									<Image
 										mah={300}
 										maw={300}
 										radius="xl"
 										fit="contain"
-										src={graph.image}
-										fallbackSrc={"src/assets/image-not-found.png"}
+										src={og.image}
+										fallbackSrc={imageNotFound}
 									/>
 								)}
 							</Center>
 						</Card.Section>
 					) : null}
-					{graph.title !== undefined ? (
+					{og.title !== undefined ? (
 						<Card.Section my="sm">
-							<Skeleton visible={graph.title === null}>
+							<Skeleton visible={og.title === null}>
 								<Center>
 									<Text p={"md"} size={"lg"} fw={600}>
-										{graph.title ?? "Bad stuff idk you shouldn't see this."}
+										{og.title ?? "Bad stuff idk you shouldn't see this."}
 									</Text>
 								</Center>
 							</Skeleton>
 						</Card.Section>
 					) : null}
-					{graph.description !== undefined ? (
+					{og.description !== undefined ? (
 						<Card.Section>
 							<Center>
-								<Text p={"md"}>{graph.description ?? null}</Text>
+								<Text p={"md"}>{og.description ?? null}</Text>
 							</Center>
 						</Card.Section>
 					) : null}
