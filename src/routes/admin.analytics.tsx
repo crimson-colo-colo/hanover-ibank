@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router"
-import {Avatar, Grid, Paper, Stack, Text, Timeline, Title} from "@mantine/core";
+import { Grid, Paper, Stack, Text, Timeline, Title} from "@mantine/core";
 import {AreaChart, BarChart} from "@mantine/charts";
 import {IconFolderOpen, IconPencil, IconUpload, IconUserKey} from "@tabler/icons-react";
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
-
 export function AnalyticsDashboard() {
 
 	const uploadData = [
@@ -30,7 +29,6 @@ export function AnalyticsDashboard() {
 	const mostActive = uploadData.reduce((max, m) =>
 		m.Files + m.Links > max.Files + max.Links ? m : max
 	)
-	const userAvatar = <Avatar src="/avatar/${userId}" alt="User name" size="lg" radius="xl" />
 
 	const fileTypes = [
 		{ name: "DOCX", Amount: 15 },
@@ -40,12 +38,12 @@ export function AnalyticsDashboard() {
 	]
 
 	const metrics = [
-		{ label: "Time On Site", value: 12 },
+		{ label: "Time On Site", value: "12h" },
 		{ label: "Total Uploads", value: totalUploads },
 		{ label: "Files", value: totalFiles },
 		{ label: "Links", value: totalLinks },
 		{ label: "Top Month", value: mostActive.month },
-		{ label: "Top User", value: userAvatar },
+		{ label: "Employees", value: 14 },
 	]
 
 	return (
