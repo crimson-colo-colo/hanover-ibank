@@ -103,22 +103,22 @@ export function FilePreviewProvider({
 			<Image
 				src={contentPreview?.url}
 				alt={content.title}
-				className="object-contain w-full h-full"
+				className="object-contain w-full h-full z-10"
 			/>
 		)
 	} else if (fileType === FileType.Audio) {
 		preview = (
 			// biome-ignore lint/a11y/useMediaCaption: user generated content
-			<audio controls src={contentPreview?.url} className="w-full max-w-200"></audio>
+			<audio controls src={contentPreview?.url} className="w-full max-w-200 z-10"></audio>
 		)
 	} else if (fileType === FileType.Video) {
 		preview = (
 			// biome-ignore lint/a11y/useMediaCaption: user generated content
-			<video controls src={contentPreview?.url} className="w-full"></video>
+			<video controls src={contentPreview?.url} className="w-full z-10"></video>
 		)
 	} else if (fileType === FileType.Plaintext) {
 		preview = plaintextContent?.text ? (
-			<ScrollArea className="w-full h-full p-4 bg-white rounded-md dark:bg-[#242424]">
+			<ScrollArea className="w-full h-full p-4 bg-white rounded-md dark:bg-[#242424] z-10">
 				<pre className="whitespace-pre-wrap">{plaintextContent.text}</pre>
 			</ScrollArea>
 		) : (
@@ -183,7 +183,7 @@ export function FilePreviewProvider({
 		)
 		preview = (
 			<ScrollArea
-				className="relative flex flex-col items-center justify-center flex-1 h-full max-w-full min-w-0 min-h-0"
+				className="relative flex flex-col items-center justify-center flex-1 h-full max-w-full min-w-0 min-h-0 z-10"
 				offsetScrollbars="y"
 				viewportRef={scrollRef}
 				onScrollPositionChange={onScroll}
