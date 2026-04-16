@@ -12,6 +12,7 @@ import { DatePickerInput } from "@mantine/dates"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, TagCategory } from "@prisma/browser.ts"
+import { ContentFilter } from "@shared/enum.ts"
 import { IconCalendar, IconCloudUpload, IconFileUpload } from "@tabler/icons-react"
 import { useMutation } from "@tanstack/react-query"
 import { format } from "date-fns"
@@ -20,7 +21,7 @@ import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import { ContentTagsInput } from "@/components/ContentTagsInput.tsx"
 import { LabelWithTooltip } from "@/components/FormComponents.tsx"
 import { contentStatusDisplayName, contentTypeDisplayName } from "@/lib/enums.ts"
-import { trpc } from "@/lib/trpc.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
@@ -54,7 +55,20 @@ interface Props {
 
 export function CreateContentForm({ onSuccess }: Props) {
 	const auth0 = useAuth0()
-	const createContent = useMutation(trpc.forms.createContent.mutationOptions())
+	const createContent = useMutation(
+		trpc.forms.createContent.mutationOptions({
+			async onSuccess() {
+				Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+					}),
+					queryClient.invalidateQueries({
+						queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+					}),
+				])
+			},
+		})
+	)
 	const form = useForm<z.input<typeof schema>, z.infer<typeof schema>>({
 		initialValues: {
 			name: "",
