@@ -1,3 +1,4 @@
+import { UTCDate } from "@date-fns/utc"
 import {
 	ActionIcon,
 	Alert,
@@ -11,6 +12,7 @@ import {
 	Text,
 	Title,
 } from "@mantine/core"
+import { Dropzone } from "@mantine/dropzone"
 import { useForm } from "@mantine/form"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
@@ -20,6 +22,7 @@ import {
 	IconCheck,
 	IconCircleArrowUpRight,
 	IconDownload,
+	IconFileUpload,
 	IconIdBadge2,
 	IconPencil,
 	IconProgress,
@@ -102,6 +105,17 @@ export function MetadataSidebar({
 			},
 		})
 	)
+	const updateContentFile = useMutation(
+		trpc.content.updateFile.mutationOptions({
+			async onSuccess() {
+				await Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: trpc.preview.getContentUrl.queryKey({ id: content.id }),
+					}),
+				])
+			},
+		})
+	)
 
 	const isIntendedAudience =
 		content.tags.some((tag) => tag.category === TagCategory.IntendedAudience) &&
@@ -119,12 +133,20 @@ export function MetadataSidebar({
 
 	const isCheckInOverride =
 		content.checkedOutBy?.id !== profile?.id && profile?.role === EmployeeRole.Admin
+	const canUpdateFile =
+		content.type !== "Link" &&
+		(content.checkedOutBy?.id === profile?.id ||
+			(content.checkedOutBy?.id && profile?.role === EmployeeRole.Admin))
+	const canDelete =
+		profile?.role === EmployeeRole.Admin || (!isCheckedOutByOther && isIntendedAudience)
 
 	const [confirmCheckoutOpen, { open: openConfirmCheckout, close: closeConfirmCheckout }] =
 		useDisclosure(false)
 	const [confirmCheckinOpen, { open: openConfirmCheckin, close: closeConfirmCheckin }] =
 		useDisclosure(false)
 	const [confirmDeleteOpen, { open: openConfirmDelete, close: closeConfirmDelete }] =
+		useDisclosure(false)
+	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
 		useDisclosure(false)
 
 	const titleRef = useRef<HTMLInputElement>(null)
@@ -357,6 +379,17 @@ export function MetadataSidebar({
 						}}
 					/>
 				</div>
+				{canUpdateFile && (
+					<Button
+						fullWidth
+						variant="light"
+						leftSection={<IconFileUpload />}
+						onClick={openFileEditDialog}
+					>
+						Update file
+					</Button>
+				)}
+
 				{content.checkedOutBy ? null : canCheckOut ? (
 					<Popover
 						shadow="sm"
@@ -443,9 +476,11 @@ export function MetadataSidebar({
 						</Button>
 					)}
 
-					<ActionIcon variant="light" color="red" size="lg" onClick={openConfirmDelete}>
-						<IconTrash />
-					</ActionIcon>
+					{canDelete && (
+						<ActionIcon variant="light" color="red" size="lg" onClick={openConfirmDelete}>
+							<IconTrash />
+						</ActionIcon>
+					)}
 				</Flex>
 			</Stack>
 			<Modal opened={confirmCheckinOpen} onClose={closeConfirmCheckin} title="Confirm check in">
@@ -497,6 +532,57 @@ export function MetadataSidebar({
 						Delete
 					</Button>
 				</Flex>
+			</Modal>
+			<Modal opened={fileEditDialogOpen} onClose={closeFileEditDialog} title="Edit Content File">
+				<Text mb="md">
+					Updating <b>{content.title}</b> with a new copy/version. This will replace the existing
+					file but keep the same metadata.
+				</Text>
+				<div className="grid grid-cols-2 mb-4">
+					<span className="font-semibold">Content owner</span>
+					<span>{content.owner.email}</span>
+					<span className="font-semibold">Last modified</span>
+					<span>
+						{content.lastModifiedDate && new UTCDate(content.lastModifiedDate).toLocaleString()}
+					</span>
+					<span className="font-semibold">Expiration date</span>
+					<span>
+						{content.expirationDate && new UTCDate(content.expirationDate).toLocaleString()}
+					</span>
+				</div>
+				<Dropzone
+					onDrop={async (files) => {
+						if (files.length === 0) return
+						await updateContentFile.mutateAsync({
+							id: content.id,
+							file: new Uint8Array(await files[0].arrayBuffer()).toBase64(),
+						})
+						closeFileEditDialog()
+						notifications.show({
+							title: "File updated",
+							message: "The file has been updated successfully.",
+							color: "emerald",
+						})
+					}}
+					loading={updateContentFile.isPending}
+					maxFiles={1}
+					maxSize={50_000_000_000}
+					onReject={(files) => {
+						notifications.show({
+							title: "Upload failed",
+							message: files[0].errors.join("; "),
+							color: "red",
+						})
+					}}
+					className="bg-gray-50 hover:bg-gray-100"
+				>
+					<div className="flex flex-col items-center justify-center h-full gap-4 p-12 text-gray-500">
+						<IconFileUpload size={48} className="" stroke={1} />
+						<Text className="text-center">
+							Drag and drop a file here, or click to select a file
+						</Text>
+					</div>
+				</Dropzone>
 			</Modal>
 		</Paper>
 	)
