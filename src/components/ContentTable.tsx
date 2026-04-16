@@ -18,7 +18,7 @@ import {
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { ContentType } from "@prisma/browser.ts"
+import { ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
@@ -49,7 +49,7 @@ import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
-import { tagCategoryDisplayName } from "@/lib/enums.ts"
+import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
@@ -142,6 +142,7 @@ export function ContentTable({
 				),
 			}),
 			columnHelper.accessor((r) => `${r.title} ${r.type === "Link" ? r.url : ""}`, {
+				id: "title",
 				header: "Name",
 				filterFn: "fuzzy",
 				sortingFn: "fuzzy",
@@ -223,27 +224,33 @@ export function ContentTable({
 					</span>
 				),
 			}),
-			columnHelper.accessor((row) => row.tags.map((t) => t.name).join(" "), {
-				id: "tags",
-				header: "Tags",
-				filterFn: "fuzzy",
-				sortingFn: "fuzzy",
-				enableSorting: false,
-				cell: (info) => (
-					<Group gap={4}>
-						{info.row.original.tags.map((tag) => (
-							<Tooltip
-								key={`${tag.category}-${tag.name}`}
-								label={`${tagCategoryDisplayName[tag.category]}: ${tag.name}`}
-							>
-								<Pill key={`${tag.category}-${tag.name}`} size="xs" color="gray">
-									{tag.name}
-								</Pill>
-							</Tooltip>
-						))}
-					</Group>
-				),
-			}),
+			columnHelper.accessor(
+				(row) =>
+					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
+				{
+					id: "tags",
+					header: "Tags",
+					filterFn: "fuzzy",
+					sortingFn: "fuzzy",
+					enableSorting: false,
+					cell: (info) => (
+						<Group gap={4}>
+							{info.row.original.tags.map((tag) => (
+								<Tooltip
+									key={`${tag.category}-${tag.name}`}
+									label={`${tagCategoryDisplayName[tag.category]}: ${tag.name}`}
+								>
+									<Pill key={`${tag.category}-${tag.name}`} size="xs" color="gray">
+										{tag.category === TagCategory.IntendedAudience
+											? employeeRoleDisplayName[tag.name as EmployeeRole]
+											: tag.name}
+									</Pill>
+								</Tooltip>
+							))}
+						</Group>
+					),
+				}
+			),
 			columnHelper.display({
 				id: "actions",
 				cell: (info) => (
@@ -348,7 +355,7 @@ export function ContentTable({
 		<>
 			<Flex align="center" justify="space-between" gap="md" mt="xl" mb="sm">
 				<Title order={3} className="flex items-center gap-4">
-					<span>Your Content ({data.content.length})</span>
+					<span>Your Content ({table.getRowCount()})</span>
 					{loading && <IconLoader2 size={20} className="animate-spin" />}
 				</Title>
 
