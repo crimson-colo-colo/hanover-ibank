@@ -5,7 +5,7 @@ import { DevSupport } from "@react-buddy/ide-toolbox"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools"
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
+import { createRootRouteWithContext, HeadContent, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import Navigation from "@/components/Navigation.tsx"
 import { ScrollToTopButton, useRouteScrollToTop } from "@/components/ScrollToTopButton.tsx"
@@ -21,6 +21,9 @@ interface RouterContext {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
 	component: RootComponent,
+	head: () => ({
+		meta: [{ title: "iBank" }],
+	}),
 })
 
 function RootComponent() {
@@ -40,6 +43,7 @@ function RootComponent() {
 						</AppShell.Header>
 						{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
 						<AppShell.Main className="mx-auto max-w-280">
+							<HeadContent />
 							<Outlet />
 						</AppShell.Main>
 					</AppShell>

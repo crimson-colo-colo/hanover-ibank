@@ -33,6 +33,7 @@ import {
 	IconUser,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import { ContentTagsInput } from "@/components/ContentTagsInput.tsx"
@@ -54,9 +55,11 @@ export type EditableField =
 export function MetadataSidebar({
 	content,
 	closePreview,
+	insideModal = true,
 }: {
 	content: ContentListItem
 	closePreview: () => void
+	insideModal?: boolean
 }) {
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
 	const [editingField, _setEditingField] = useState<EditableField | null>(null)
@@ -206,43 +209,52 @@ export function MetadataSidebar({
 	}, [content])
 
 	return (
-		<Paper w="350px" className="h-full min-h-0 shrink-0" p="md">
-			<Stack gap="md" className="h-full">
-				<Flex gap="sm" justify="space-between">
-					<Title
-						order={4}
-						className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
-						data-enabled={canEdit}
-					>
-						<EditableTextField
-							enabled={canEdit}
-							field="title"
-							value={content.title}
-							editingField={editingField}
-							setEditingField={setEditingField}
-							onFieldEdit={onFieldEdit}
-							ref={titleRef}
-						/>
-					</Title>
+		<Paper
+			w={insideModal ? "350px" : "300px"}
+			className={clsx(
+				"min-h-0 shrink-0",
+				!insideModal ? "border border-gray-200 dark:border-gray-800 mt-4 h-max" : "h-full"
+			)}
+			p="md"
+		>
+			<Stack gap="md" className="h-full @container">
+				{insideModal && (
+					<Flex gap="sm" justify="space-between">
+						<Title
+							order={4}
+							className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
+							data-enabled={canEdit}
+						>
+							<EditableTextField
+								enabled={canEdit}
+								field="title"
+								value={content.title}
+								editingField={editingField}
+								setEditingField={setEditingField}
+								onFieldEdit={onFieldEdit}
+								ref={titleRef}
+							/>
+						</Title>
 
-					<ActionIcon
-						variant="transparent"
-						loading={favoriteContent.isPending || unfavoriteContent.isPending}
-						onClick={async (e) => {
-							if (content.favorited) {
-								await unfavoriteContent.mutateAsync({ id: content.id })
-							} else {
-								await favoriteContent.mutateAsync({ id: content.id })
-							}
-						}}
-					>
-						{content.favorited ? (
-							<IconStarFilled className="fill-[#f8de1f]" size={20} />
-						) : (
-							<IconStar />
-						)}
-					</ActionIcon>
-				</Flex>
+						<ActionIcon
+							variant="transparent"
+							loading={favoriteContent.isPending || unfavoriteContent.isPending}
+							onClick={async (e) => {
+								if (content.favorited) {
+									await unfavoriteContent.mutateAsync({ id: content.id })
+								} else {
+									await favoriteContent.mutateAsync({ id: content.id })
+								}
+							}}
+						>
+							{content.favorited ? (
+								<IconStarFilled className="fill-[#f8de1f]" size={20} />
+							) : (
+								<IconStar />
+							)}
+						</ActionIcon>
+					</Flex>
+				)}
 				{content.checkedOutBy && (
 					<>
 						<Alert
@@ -284,18 +296,22 @@ export function MetadataSidebar({
 					withArrow
 				>
 					<Popover.Target>
-						<Text className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field">
-							<IconUser />
-							<span className="text-gray-600">Owned by</span>
-							<span>{content.owner.name}</span>
-							<ActionIcon
-								className="metadata-edit"
-								variant="subtle"
-								onClick={() => setEditingField("owner")}
-							>
-								<IconPencil />
-							</ActionIcon>
-						</Text>
+						<div className="flex flex-col @xs:flex-row items-start @xs:items-center @xs:gap-2 text-gray-800 dark:text-gray-300 metadata-field">
+							<div className="@xs:contents flex items-center gap-2">
+								<IconUser />
+								<span className="text-gray-600">Owned by</span>
+							</div>
+							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
+								<span>{content.owner.name}</span>
+								<ActionIcon
+									className="metadata-edit"
+									variant="subtle"
+									onClick={() => setEditingField("owner")}
+								>
+									<IconPencil />
+								</ActionIcon>
+							</div>
+						</div>
 					</Popover.Target>
 					<Popover.Dropdown w="300px">
 						<ContentOwnerSelect form={form} initialSearchValue={content.owner.email} />
@@ -327,20 +343,24 @@ export function MetadataSidebar({
 				>
 					<Menu.Target>
 						<div
-							className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field"
+							className="flex flex-col @xs:flex-row items-start @xs:items-center @xs:gap-2 text-gray-800 dark:text-gray-300 metadata-field"
 							data-enabled={canEdit}
 						>
-							<IconProgress />
-							<span className="text-gray-600">Status</span>
-							<span>{contentStatusDisplayName[content.status]}</span>
-							<ActionIcon
-								className="metadata-edit"
-								variant="subtle"
-								onClick={() => setEditingField("status")}
-								disabled={!canEdit}
-							>
-								<IconPencil />
-							</ActionIcon>
+							<div className="@xs:contents flex items-center gap-2">
+								<IconProgress />
+								<span className="text-gray-600">Status</span>
+							</div>
+							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
+								<span>{contentStatusDisplayName[content.status]}</span>
+								<ActionIcon
+									className="metadata-edit"
+									variant="subtle"
+									onClick={() => setEditingField("status")}
+									disabled={!canEdit}
+								>
+									<IconPencil />
+								</ActionIcon>
+							</div>
 						</div>
 					</Menu.Target>
 					<Menu.Dropdown>
