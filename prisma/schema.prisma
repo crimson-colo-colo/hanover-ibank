@@ -19,6 +19,7 @@ model Employee {
     content           Content[]         @relation("Owner")
     favorite          FavoriteContent[]
     checkedOutContent Content[]         @relation("CheckedOutContent")
+    activity          UserActivity[]
 }
 
 model Content {
@@ -86,4 +87,14 @@ enum ContentStatus {
 enum ContentType {
     Object
     Link
+}
+
+model UserActivity {
+    timestamp  DateTime @default(now())
+    employeeId String
+    employee   Employee @relation(fields: [employeeId], references: [id])
+    path       String
+    count      Int      @default(1)
+
+    @@id([timestamp, employeeId])
 }

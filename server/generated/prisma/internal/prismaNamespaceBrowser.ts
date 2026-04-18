@@ -55,7 +55,8 @@ export const ModelName = {
   Content: 'Content',
   Tag: 'Tag',
   ContentTag: 'ContentTag',
-  FavoriteContent: 'FavoriteContent'
+  FavoriteContent: 'FavoriteContent',
+  UserActivity: 'UserActivity'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -124,6 +125,15 @@ export const FavoriteContentScalarFieldEnum = {
 } as const
 
 export type FavoriteContentScalarFieldEnum = (typeof FavoriteContentScalarFieldEnum)[keyof typeof FavoriteContentScalarFieldEnum]
+
+
+export const UserActivityScalarFieldEnum = {
+  timestamp: 'timestamp',
+  employeeId: 'employeeId',
+  count: 'count'
+} as const
+
+export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[keyof typeof UserActivityScalarFieldEnum]
 
 
 export const SortOrder = {
