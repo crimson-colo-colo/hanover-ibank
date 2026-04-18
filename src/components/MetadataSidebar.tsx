@@ -211,10 +211,7 @@ export function MetadataSidebar({
 	return (
 		<Paper
 			w={insideModal ? "350px" : "300px"}
-			className={clsx(
-				"min-h-0 shrink-0",
-				!insideModal ? "border border-gray-200 dark:border-gray-800 mt-4 h-max" : "h-full"
-			)}
+			className={clsx("min-h-0 shrink-0", !insideModal ? "h-max" : "h-full")}
 			p="md"
 		>
 			<Stack gap="md" className="h-full @container">

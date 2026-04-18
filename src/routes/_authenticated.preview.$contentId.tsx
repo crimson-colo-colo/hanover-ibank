@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Flex } from "@mantine/core"
+import { ActionIcon, Button, Flex, ScrollArea } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
 import { IconArrowLeft, IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
@@ -86,7 +86,9 @@ function RouteComponent() {
 				<Flex gap="lg" className="flex-1 min-h-0 z-1">
 					<FilePreview />
 					{sidebarOpen && (
-						<MetadataSidebar insideModal={false} content={content} closePreview={closePreview} />
+						<ScrollArea.Autosize className="border border-gray-200 dark:border-gray-800 mt-4 rounded-md">
+							<MetadataSidebar insideModal={false} content={content} closePreview={closePreview} />
+						</ScrollArea.Autosize>
 					)}
 				</Flex>
 			</div>

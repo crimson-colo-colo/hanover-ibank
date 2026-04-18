@@ -123,11 +123,11 @@ export function FilePreviewProvider({
 		preview = plaintextContent?.text ? (
 			<ScrollArea
 				className={clsx(
-					"w-full h-full p-4 bg-white rounded-md dark:bg-[#242424] z-10",
-					!insideModal && "border border-gray-200"
+					"w-full h-full bg-white rounded-md dark:bg-[#242424] z-10",
+					!insideModal && "border border-gray-200 dark:border-gray-800 mt-4"
 				)}
 			>
-				<pre className="whitespace-pre-wrap m-0">{plaintextContent.text}</pre>
+				<pre className="whitespace-pre-wrap m-0 text-sm p-4">{plaintextContent.text}</pre>
 			</ScrollArea>
 		) : (
 			<div className="w-full h-full flex items-center justify-center p-4 bg-white rounded-md dark:bg-[#242424]">
