@@ -36,8 +36,11 @@ import {
 import { useMutation } from "@tanstack/react-query"
 import {
 	createColumnHelper,
+	type FilterFn,
 	flexRender,
 	getCoreRowModel,
+	getFacetedRowModel,
+	getFacetedUniqueValues,
 	getFilteredRowModel,
 	getSortedRowModel,
 	useReactTable,
@@ -95,6 +98,11 @@ export function ContentTable({
 	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
+
+	const myFilterFn: FilterFn<ContentListItem> = (row, columnId, filterValue: string[]) => {
+		const rowTagNames = row.original.tags.map((t) => t.name)
+		return filterValue.every((selected) => rowTagNames.includes(selected))
+	}
 
 	const columns = useMemo(
 		() => [
@@ -230,9 +238,12 @@ export function ContentTable({
 				{
 					id: "tags",
 					header: "Tags",
-					filterFn: "fuzzy",
+					filterFn: myFilterFn,
 					sortingFn: "fuzzy",
 					enableSorting: false,
+					meta: {
+						filterVariant: "multi-select",
+					},
 					cell: (info) => (
 						<Group gap={4}>
 							{info.row.original.tags.map((tag) => (
@@ -332,6 +343,8 @@ export function ContentTable({
 		getSortedRowModel: getSortedRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
+		getFacetedRowModel: getFacetedRowModel(),
+		getFacetedUniqueValues: getFacetedUniqueValues(),
 	})
 
 	useEffect(() => {
