@@ -37,19 +37,28 @@ export type UserActivitySumAggregateOutputType = {
 export type UserActivityMinAggregateOutputType = {
   timestamp: Date | null
   employeeId: string | null
+  path: string | null
   count: number | null
+  day: Date | null
+  hour: Date | null
 }
 
 export type UserActivityMaxAggregateOutputType = {
   timestamp: Date | null
   employeeId: string | null
+  path: string | null
   count: number | null
+  day: Date | null
+  hour: Date | null
 }
 
 export type UserActivityCountAggregateOutputType = {
   timestamp: number
   employeeId: number
+  path: number
   count: number
+  day: number
+  hour: number
   _all: number
 }
 
@@ -65,19 +74,28 @@ export type UserActivitySumAggregateInputType = {
 export type UserActivityMinAggregateInputType = {
   timestamp?: true
   employeeId?: true
+  path?: true
   count?: true
+  day?: true
+  hour?: true
 }
 
 export type UserActivityMaxAggregateInputType = {
   timestamp?: true
   employeeId?: true
+  path?: true
   count?: true
+  day?: true
+  hour?: true
 }
 
 export type UserActivityCountAggregateInputType = {
   timestamp?: true
   employeeId?: true
+  path?: true
   count?: true
+  day?: true
+  hour?: true
   _all?: true
 }
 
@@ -170,7 +188,10 @@ export type UserActivityGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type UserActivityGroupByOutputType = {
   timestamp: Date
   employeeId: string
+  path: string
   count: number
+  day: Date
+  hour: Date
   _count: UserActivityCountAggregateOutputType | null
   _avg: UserActivityAvgAggregateOutputType | null
   _sum: UserActivitySumAggregateOutputType | null
@@ -199,32 +220,44 @@ export type UserActivityWhereInput = {
   NOT?: Prisma.UserActivityWhereInput | Prisma.UserActivityWhereInput[]
   timestamp?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
   employeeId?: Prisma.StringFilter<"UserActivity"> | string
+  path?: Prisma.StringFilter<"UserActivity"> | string
   count?: Prisma.IntFilter<"UserActivity"> | number
+  day?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
+  hour?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
 }
 
 export type UserActivityOrderByWithRelationInput = {
   timestamp?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
+  path?: Prisma.SortOrder
   count?: Prisma.SortOrder
+  day?: Prisma.SortOrder
+  hour?: Prisma.SortOrder
   employee?: Prisma.EmployeeOrderByWithRelationInput
 }
 
 export type UserActivityWhereUniqueInput = Prisma.AtLeast<{
-  timestamp_employeeId?: Prisma.UserActivityTimestampEmployeeIdCompoundUniqueInput
+  timestamp_employeeId_path?: Prisma.UserActivityTimestampEmployeeIdPathCompoundUniqueInput
   AND?: Prisma.UserActivityWhereInput | Prisma.UserActivityWhereInput[]
   OR?: Prisma.UserActivityWhereInput[]
   NOT?: Prisma.UserActivityWhereInput | Prisma.UserActivityWhereInput[]
   timestamp?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
   employeeId?: Prisma.StringFilter<"UserActivity"> | string
+  path?: Prisma.StringFilter<"UserActivity"> | string
   count?: Prisma.IntFilter<"UserActivity"> | number
+  day?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
+  hour?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
-}, "timestamp_employeeId">
+}, "timestamp_employeeId_path">
 
 export type UserActivityOrderByWithAggregationInput = {
   timestamp?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
+  path?: Prisma.SortOrder
   count?: Prisma.SortOrder
+  day?: Prisma.SortOrder
+  hour?: Prisma.SortOrder
   _count?: Prisma.UserActivityCountOrderByAggregateInput
   _avg?: Prisma.UserActivityAvgOrderByAggregateInput
   _max?: Prisma.UserActivityMaxOrderByAggregateInput
@@ -238,48 +271,72 @@ export type UserActivityScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserActivityScalarWhereWithAggregatesInput | Prisma.UserActivityScalarWhereWithAggregatesInput[]
   timestamp?: Prisma.DateTimeWithAggregatesFilter<"UserActivity"> | Date | string
   employeeId?: Prisma.StringWithAggregatesFilter<"UserActivity"> | string
+  path?: Prisma.StringWithAggregatesFilter<"UserActivity"> | string
   count?: Prisma.IntWithAggregatesFilter<"UserActivity"> | number
+  day?: Prisma.DateTimeWithAggregatesFilter<"UserActivity"> | Date | string
+  hour?: Prisma.DateTimeWithAggregatesFilter<"UserActivity"> | Date | string
 }
 
 export type UserActivityCreateInput = {
-  timestamp?: Date | string
+  timestamp: Date | string
+  path: string
   count?: number
+  day: Date | string
+  hour: Date | string
   employee: Prisma.EmployeeCreateNestedOneWithoutActivityInput
 }
 
 export type UserActivityUncheckedCreateInput = {
-  timestamp?: Date | string
+  timestamp: Date | string
   employeeId: string
+  path: string
   count?: number
+  day: Date | string
+  hour: Date | string
 }
 
 export type UserActivityUpdateInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
+  day?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hour?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutActivityNestedInput
 }
 
 export type UserActivityUncheckedUpdateInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
+  day?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hour?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserActivityCreateManyInput = {
-  timestamp?: Date | string
+  timestamp: Date | string
   employeeId: string
+  path: string
   count?: number
+  day: Date | string
+  hour: Date | string
 }
 
 export type UserActivityUpdateManyMutationInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
+  day?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hour?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserActivityUncheckedUpdateManyInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
+  day?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hour?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserActivityListRelationFilter = {
@@ -292,15 +349,19 @@ export type UserActivityOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type UserActivityTimestampEmployeeIdCompoundUniqueInput = {
+export type UserActivityTimestampEmployeeIdPathCompoundUniqueInput = {
   timestamp: Date | string
   employeeId: string
+  path: string
 }
 
 export type UserActivityCountOrderByAggregateInput = {
   timestamp?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
+  path?: Prisma.SortOrder
   count?: Prisma.SortOrder
+  day?: Prisma.SortOrder
+  hour?: Prisma.SortOrder
 }
 
 export type UserActivityAvgOrderByAggregateInput = {
@@ -310,13 +371,19 @@ export type UserActivityAvgOrderByAggregateInput = {
 export type UserActivityMaxOrderByAggregateInput = {
   timestamp?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
+  path?: Prisma.SortOrder
   count?: Prisma.SortOrder
+  day?: Prisma.SortOrder
+  hour?: Prisma.SortOrder
 }
 
 export type UserActivityMinOrderByAggregateInput = {
   timestamp?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
+  path?: Prisma.SortOrder
   count?: Prisma.SortOrder
+  day?: Prisma.SortOrder
+  hour?: Prisma.SortOrder
 }
 
 export type UserActivitySumOrderByAggregateInput = {
@@ -374,13 +441,19 @@ export type IntFieldUpdateOperationsInput = {
 }
 
 export type UserActivityCreateWithoutEmployeeInput = {
-  timestamp?: Date | string
+  timestamp: Date | string
+  path: string
   count?: number
+  day: Date | string
+  hour: Date | string
 }
 
 export type UserActivityUncheckedCreateWithoutEmployeeInput = {
-  timestamp?: Date | string
+  timestamp: Date | string
+  path: string
   count?: number
+  day: Date | string
+  hour: Date | string
 }
 
 export type UserActivityCreateOrConnectWithoutEmployeeInput = {
@@ -415,27 +488,42 @@ export type UserActivityScalarWhereInput = {
   NOT?: Prisma.UserActivityScalarWhereInput | Prisma.UserActivityScalarWhereInput[]
   timestamp?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
   employeeId?: Prisma.StringFilter<"UserActivity"> | string
+  path?: Prisma.StringFilter<"UserActivity"> | string
   count?: Prisma.IntFilter<"UserActivity"> | number
+  day?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
+  hour?: Prisma.DateTimeFilter<"UserActivity"> | Date | string
 }
 
 export type UserActivityCreateManyEmployeeInput = {
-  timestamp?: Date | string
+  timestamp: Date | string
+  path: string
   count?: number
+  day: Date | string
+  hour: Date | string
 }
 
 export type UserActivityUpdateWithoutEmployeeInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
+  day?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hour?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserActivityUncheckedUpdateWithoutEmployeeInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
+  day?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hour?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserActivityUncheckedUpdateManyWithoutEmployeeInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  path?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
+  day?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hour?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -443,31 +531,43 @@ export type UserActivityUncheckedUpdateManyWithoutEmployeeInput = {
 export type UserActivitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   timestamp?: boolean
   employeeId?: boolean
+  path?: boolean
   count?: boolean
+  day?: boolean
+  hour?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userActivity"]>
 
 export type UserActivitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   timestamp?: boolean
   employeeId?: boolean
+  path?: boolean
   count?: boolean
+  day?: boolean
+  hour?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userActivity"]>
 
 export type UserActivitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   timestamp?: boolean
   employeeId?: boolean
+  path?: boolean
   count?: boolean
+  day?: boolean
+  hour?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userActivity"]>
 
 export type UserActivitySelectScalar = {
   timestamp?: boolean
   employeeId?: boolean
+  path?: boolean
   count?: boolean
+  day?: boolean
+  hour?: boolean
 }
 
-export type UserActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"timestamp" | "employeeId" | "count", ExtArgs["result"]["userActivity"]>
+export type UserActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"timestamp" | "employeeId" | "path" | "count" | "day" | "hour", ExtArgs["result"]["userActivity"]>
 export type UserActivityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
 }
@@ -486,7 +586,10 @@ export type $UserActivityPayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     timestamp: Date
     employeeId: string
+    path: string
     count: number
+    day: Date
+    hour: Date
   }, ExtArgs["result"]["userActivity"]>
   composites: {}
 }
@@ -913,7 +1016,10 @@ export interface Prisma__UserActivityClient<T, Null = never, ExtArgs extends run
 export interface UserActivityFieldRefs {
   readonly timestamp: Prisma.FieldRef<"UserActivity", 'DateTime'>
   readonly employeeId: Prisma.FieldRef<"UserActivity", 'String'>
+  readonly path: Prisma.FieldRef<"UserActivity", 'String'>
   readonly count: Prisma.FieldRef<"UserActivity", 'Int'>
+  readonly day: Prisma.FieldRef<"UserActivity", 'DateTime'>
+  readonly hour: Prisma.FieldRef<"UserActivity", 'DateTime'>
 }
     
 

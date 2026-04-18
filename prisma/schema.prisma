@@ -90,11 +90,16 @@ enum ContentType {
 }
 
 model UserActivity {
-    timestamp  DateTime @default(now())
+    timestamp  DateTime
+    // no default timestamp because we want to prefer using the server's time for this. This avoids
+    // the server and db being significantly out of sync even if improbable. This timestamp is also
+    // truncated to the second it was generated and must be manually done
     employeeId String
     employee   Employee @relation(fields: [employeeId], references: [id])
     path       String
     count      Int      @default(1)
+    day        DateTime // datetime truncated to the UTC day it was created in
+    hour       DateTime // datetime truncated to the UTC hour it was created in
 
-    @@id([timestamp, employeeId])
+    @@id([timestamp, employeeId, path])
 }

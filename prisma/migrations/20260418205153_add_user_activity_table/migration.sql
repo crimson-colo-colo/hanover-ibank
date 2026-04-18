@@ -1,11 +1,13 @@
 -- CreateTable
 CREATE TABLE "UserActivity" (
-    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "timestamp" TIMESTAMP(3) NOT NULL,
     "employeeId" TEXT NOT NULL,
     "path" TEXT NOT NULL,
     "count" INTEGER NOT NULL DEFAULT 1,
+    "day" TIMESTAMP(3) NOT NULL,
+    "hour" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "UserActivity_pkey" PRIMARY KEY ("timestamp","employeeId")
+    CONSTRAINT "UserActivity_pkey" PRIMARY KEY ("timestamp","employeeId","path")
 );
 
 -- AddForeignKey

@@ -130,7 +130,10 @@ export type FavoriteContentScalarFieldEnum = (typeof FavoriteContentScalarFieldE
 export const UserActivityScalarFieldEnum = {
   timestamp: 'timestamp',
   employeeId: 'employeeId',
-  count: 'count'
+  path: 'path',
+  count: 'count',
+  day: 'day',
+  hour: 'hour'
 } as const
 
 export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[keyof typeof UserActivityScalarFieldEnum]
