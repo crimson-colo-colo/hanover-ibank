@@ -36,7 +36,6 @@ import {
 	IconStarFilled,
 	IconTrash,
 } from "@tabler/icons-react"
-import type { UseMutationResult } from "@tanstack/react-query"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import {
 	createColumnHelper,
@@ -46,8 +45,6 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
-import type { TRPCClientErrorLike } from "@trpc/client"
-import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
@@ -58,8 +55,13 @@ import { formatBytes } from "@/lib/content.ts"
 import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { AppRouter } from "../../server/router.ts"
-import type { ContentList, ContentListItem, User } from "../../server/routers/content.ts"
+import type {
+	CheckInMutationType,
+	CheckOutMutationType,
+	ContentList,
+	ContentListItem,
+	User,
+} from "../../shared/types.ts"
 
 export function ContentTable({
 	loading,
@@ -596,16 +598,6 @@ function CannotCheckOutModal({
 	)
 }
 
-type RouterOutput = inferRouterOutputs<AppRouter>
-type RouterInput = inferRouterInputs<AppRouter>
-type CheckInOutput = RouterOutput["content"]["checkIn"]
-type CheckInInput = RouterInput["content"]["checkIn"]
-type CheckInMutationType = UseMutationResult<
-	CheckInOutput,
-	TRPCClientErrorLike<AppRouter>,
-	CheckInInput
->
-
 function CheckInModal({
 	opened,
 	closed,
@@ -642,14 +634,6 @@ function CheckInModal({
 		</Modal>
 	)
 }
-
-type CheckOutOutput = RouterOutput["content"]["checkOut"]
-type CheckOutInput = RouterInput["content"]["checkOut"]
-type CheckOutMutationType = UseMutationResult<
-	CheckOutOutput,
-	TRPCClientErrorLike<AppRouter>,
-	CheckOutInput
->
 
 function CheckOutModal({
 	opened,
