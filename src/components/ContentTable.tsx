@@ -266,7 +266,7 @@ export function ContentTable({
 									<IconDoorEnter />
 								</ActionIcon>
 							) : (
-								<ActionIcon variant="subtle" size="sm">
+								<ActionIcon variant="subtle" size="sm" onClick={() => {}}>
 									<IconDoorOff />
 								</ActionIcon>
 							)
@@ -318,7 +318,7 @@ export function ContentTable({
 				),
 			}),
 		],
-		[]
+		[profile]
 	)
 
 	const table = useReactTable({
