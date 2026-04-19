@@ -829,4 +829,29 @@ export const contentRouter = router({
 			content: contentItem,
 		}
 	}),
+
+	getFileStats : authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
+		const content = await db.content.findUnique({
+			where: { id: opts.input.id },
+		})
+
+		if (!content){
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: "Content not found",
+			})
+		}
+
+		const objectMetadata =
+			content.type === "Object"
+			? await s3.headObject({Bucket: bucketName, Key: content.objectId! }) : null
+
+		return {
+			fileType: content.type,
+			expirationDate: content.expirationDate,
+			lastModifiedDate: content.lastModifiedDate,
+			creationDate: content.createdAt,
+			size: objectMetadata?.ContentLength ?? null
+		}
+	})
 })
