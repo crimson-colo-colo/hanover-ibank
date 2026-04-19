@@ -5,6 +5,7 @@ import { formsRouter } from "./routers/forms.ts"
 import { opengraphRouter } from "./routers/linkPreview.ts"
 import { previewRouter } from "./routers/preview.ts"
 import { userRouter } from "./routers/user.ts"
+import { userActivityRouter } from "./routers/userActivity.ts"
 import { router } from "./trpc.ts"
 
 export type AppRouter = typeof appRouter
@@ -16,4 +17,5 @@ export const appRouter = router({
 	user: userRouter,
 	preview: previewRouter,
 	opengraph: opengraphRouter,
+	userActivity: userActivityRouter,
 })
