@@ -15,6 +15,8 @@ import {
 	TextInput,
 	Title,
 	Tooltip,
+	Pagination,
+	Select
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
@@ -41,6 +43,7 @@ import {
 	getFilteredRowModel,
 	getSortedRowModel,
 	useReactTable,
+	getPaginationRowModel,
 } from "@tanstack/react-table"
 import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
@@ -71,6 +74,8 @@ export function ContentTable({
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
 }) {
+	const [activePage, setPage] = useState(1);
+	
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
 	const [globalFilter, setGlobalFilter] = useState("")
@@ -299,12 +304,18 @@ export function ContentTable({
 		],
 		[]
 	)
+	const [pagination, setPagination] = useState({
+  	pageIndex: 0, //initial page index
+  	pageSize: 10, //default page size
+	});
+
 
 	const table = useReactTable({
 		data: data.content,
 		columns: columns,
 		state: {
 			rowSelection,
+			pagination,
 			globalFilter: debouncedGlobalFilter,
 		},
 		enableGlobalFilter: true,
@@ -324,7 +335,11 @@ export function ContentTable({
 					id: "title",
 					desc: false,
 				},
-			],
+				 
+			],pagination: {
+      				pageIndex: 0, //custom initial page index
+     				pageSize: 10, //custom default page size
+    			},
 		},
 		enableSortingRemoval: false,
 		enableMultiSort: true,
@@ -332,6 +347,9 @@ export function ContentTable({
 		getSortedRowModel: getSortedRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
+
+		getPaginationRowModel: getPaginationRowModel(),
+    	onPaginationChange: setPagination,
 	})
 
 	useEffect(() => {
@@ -499,6 +517,27 @@ export function ContentTable({
 					</Button>
 				</Flex>
 			</Modal>
+			<Flex
+				justify="space-between"
+			    direction="row"
+				align="center"
+				>
+			<Pagination  total = {table.getPageCount()} value={table.getState().pagination.pageIndex + 1} onChange={(newPage) => {table.setPageIndex(newPage - 1)}} />
+			<Group gap="xs"  align="center">
+				<Text>Items per page:</Text>
+			<Select
+				size ="sm"
+				value={table.getState().pagination.pageSize}
+				onChange={(value) => {
+					value && table.setPageSize(Number(value))
+				}}
+				data ={[10, 20, 30, 40, 50]}
+				defaultValue={table.getState().pagination.pageSize}
+				>
+					
+			</Select>
+			</Group>
+			</Flex>
 		</>
 	)
 }
