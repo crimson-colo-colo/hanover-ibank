@@ -21,7 +21,9 @@ import { ContentFilter } from "@shared/enum.ts"
 import {
 	IconCheck,
 	IconCircleArrowUpRight,
+	IconCircleCheck,
 	IconDownload,
+	IconEye,
 	IconFileUpload,
 	IconIdBadge2,
 	IconPencil,
@@ -330,7 +332,13 @@ export function MetadataSidebar({
 							className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field"
 							data-enabled={canEdit}
 						>
-							<IconProgress />
+							{contentStatusDisplayName[content.status] === "Incomplete" ? (
+								<IconProgress />
+							) : contentStatusDisplayName[content.status] === "Under Review" ? (
+								<IconEye />
+							) : (
+								<IconCircleCheck />
+							)}
 							<span className="text-gray-600">Status</span>
 							<span>{contentStatusDisplayName[content.status]}</span>
 							<ActionIcon
