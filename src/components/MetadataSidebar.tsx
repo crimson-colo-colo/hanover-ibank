@@ -21,9 +21,10 @@ import { ContentFilter } from "@shared/enum.ts"
 import {
 	IconCheck,
 	IconCircleArrowUpRight,
+	IconDoorEnter,
+	IconDoorExit,
 	IconDownload,
 	IconFileUpload,
-	IconIdBadge2,
 	IconPencil,
 	IconProgress,
 	IconStar,
@@ -248,7 +249,7 @@ export function MetadataSidebar({
 						<Alert
 							title={
 								<Flex align="center" gap="xs">
-									<IconIdBadge2 />
+									<IconDoorExit />
 									Checked out
 								</Flex>
 							}
@@ -267,7 +268,7 @@ export function MetadataSidebar({
 							)}
 						</Alert>
 						{canCheckIn && (
-							<Button fullWidth leftSection={<IconIdBadge2 />} onClick={openConfirmCheckin}>
+							<Button fullWidth leftSection={<IconDoorEnter />} onClick={openConfirmCheckin}>
 								{isCheckInOverride ? "Force check in" : "Check in"}
 							</Button>
 						)}
@@ -401,7 +402,7 @@ export function MetadataSidebar({
 							<Button
 								fullWidth
 								variant="light"
-								leftSection={<IconIdBadge2 />}
+								leftSection={<IconDoorExit />}
 								onClick={openConfirmCheckout}
 							>
 								Check out
@@ -424,7 +425,7 @@ export function MetadataSidebar({
 										await checkOutContent.mutateAsync({ id: content.id })
 										closeConfirmCheckout()
 									}}
-									leftSection={<IconIdBadge2 />}
+									leftSection={<IconDoorExit />}
 								>
 									Check out
 								</Button>
@@ -502,7 +503,7 @@ export function MetadataSidebar({
 							await checkInContent.mutateAsync({ id: content.id })
 							closeConfirmCheckin()
 						}}
-						leftSection={<IconIdBadge2 />}
+						leftSection={<IconDoorEnter />}
 					>
 						Check in
 					</Button>

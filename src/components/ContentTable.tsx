@@ -24,6 +24,9 @@ import { FileType } from "@shared/filetype.ts"
 import {
 	IconCircleArrowUpRight,
 	IconCloudUpload,
+	IconDoorEnter,
+	IconDoorExit,
+	IconDoorOff,
 	IconDownload,
 	IconFilePencil,
 	IconLoader2,
@@ -33,7 +36,7 @@ import {
 	IconStarFilled,
 	IconTrash,
 } from "@tabler/icons-react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {
 	createColumnHelper,
 	flexRender,
@@ -95,6 +98,8 @@ export function ContentTable({
 	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
+
+	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
 
 	const columns = useMemo(
 		() => [
@@ -255,6 +260,22 @@ export function ContentTable({
 				id: "actions",
 				cell: (info) => (
 					<Flex className="content-actions" gap="2px" justify="flex-end">
+						{info.row.original.checkedOutBy !== null ? (
+							info.row.original.checkedOutBy?.id === profile?.id ? (
+								<ActionIcon variant="subtle" size="sm">
+									<IconDoorEnter />
+								</ActionIcon>
+							) : (
+								<ActionIcon variant="subtle" size="sm">
+									<IconDoorOff />
+								</ActionIcon>
+							)
+						) : (
+							<ActionIcon variant="subtle" size="sm">
+								<IconDoorExit />
+							</ActionIcon>
+						)}
+
 						{info.row.original.type === "Object" && (
 							<ActionIcon
 								variant="subtle"
