@@ -1,6 +1,20 @@
-import { ActionIcon, Group, Indicator, Popover, Text } from "@mantine/core"
+import {
+	ActionIcon,
+	Button,
+	Checkbox,
+	Group,
+	Indicator,
+	Popover,
+	Select,
+	Stack,
+	Text,
+} from "@mantine/core"
+import { type EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { IconFilter } from "@tabler/icons-react"
 import type { Column } from "@tanstack/react-table"
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
+import type { TagFilterValue } from "@/lib/table.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 type Tag = ContentListItem["tags"][number]
@@ -10,9 +24,13 @@ interface TagFilterPopupProps {
 	allTags: Tag[]
 }
 
-export function TagFilterPopup({ column, allTags }) {
+export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 	const [open, setOpen] = useState(false)
 	const [selected, setSelected] = useState<string[]>([])
+	const [selectedType, setSelectedType] = useState<string | null>(null)
+	const [filterMode, setFilterMode] = useState<string>("Includes these tags")
+
+	const filterValue = (column.getFilterValue() as string[] | undefined) ?? []
 
 	const toggleTag = (tagName: string) => {
 		const next = selected.includes(tagName)
@@ -26,6 +44,17 @@ export function TagFilterPopup({ column, allTags }) {
 		setSelected([])
 		column.setFilterValue(undefined)
 	}
+
+	const tagsByCategory = useMemo(() => {
+		return allTags.reduce<Record<string, Tag[]>>((acc, tag) => {
+			const cat = tag.category
+			if (!acc[cat]) acc[cat] = []
+			acc[cat].push(tag)
+			return acc
+		}, {})
+	}, [allTags])
+
+	const hasActiveFilters = selected.length > 0
 
 	return (
 		<Popover
@@ -64,6 +93,55 @@ export function TagFilterPopup({ column, allTags }) {
 					</Indicator>
 				</Group>
 			</Popover.Target>
+
+			<Popover.Dropdown
+				onClick={(e) => e.stopPropagation()}
+				mah={300}
+				style={{ overflowY: "auto" }}
+			>
+				<Stack gap="xs">
+					<Select
+						placeholder="Options"
+						data={["Includes these tags", "Exactly these tags", "Not these tags"]}
+						defaultValue={"Includes these tags"}
+						comboboxProps={{ withinPortal: false }}
+						value={filterMode}
+						onChange={(val) => {
+							setFilterMode(val ?? "Includes these tags")
+						}}
+					/>
+					{Object.entries(tagsByCategory).map(([category, tags]) => (
+						<div key={category}>
+							<Text size="xs" fw={600} c="dimmed" tt="uppercase" mb={4}>
+								{tagCategoryDisplayName[category as TagCategory]}
+							</Text>
+							<Stack gap={4}>
+								{tags.map((tag) => {
+									const displayName =
+										tag.category === TagCategory.IntendedAudience
+											? employeeRoleDisplayName[tag.name as EmployeeRole]
+											: tag.name
+									return (
+										<Checkbox
+											key={`${tag.category}-${tag.name}`}
+											label={displayName}
+											checked={filterValue.includes(tag.name)}
+											onChange={() => toggleTag(tag.name)}
+											size="sm"
+										/>
+									)
+								})}
+							</Stack>
+						</div>
+					))}
+
+					{hasActiveFilters && (
+						<Button variant="subtle" color="gray" size="xs" onClick={clearAll} mt={4}>
+							Clear filters
+						</Button>
+					)}
+				</Stack>
+			</Popover.Dropdown>
 		</Popover>
 	)
 }

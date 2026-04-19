@@ -24,7 +24,7 @@ import { Avatar } from "@/components/Avatar.tsx"
 import { CreateUserForm } from "@/components/CreateUserForm.tsx"
 import { UpdateUserForm, type UpdateUserValues } from "@/components/UpdateUserForm.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
-import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
+import {fuzzyFilter, fuzzySort, tagFilterFn} from "@/lib/table.ts"
 import { trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/admin/manage-users")({
@@ -110,6 +110,7 @@ function RouteComponent() {
 		},
 		filterFns: {
 			fuzzy: fuzzyFilter,
+			tagFilterFn: tagFilterFn,
 		},
 		sortingFns: {
 			fuzzy: fuzzySort,

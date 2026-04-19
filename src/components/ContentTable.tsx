@@ -51,9 +51,10 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from
 import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
-import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
+import { fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
 
@@ -99,10 +100,16 @@ export function ContentTable({
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
-	const myFilterFn: FilterFn<ContentListItem> = (row, columnId, filterValue: string[]) => {
-		const rowTagNames = row.original.tags.map((t) => t.name)
-		return filterValue.every((selected) => rowTagNames.includes(selected))
-	}
+	const allTags = useMemo(
+		() => [
+			...new Map(
+				data.content
+					.flatMap((row) => row.tags)
+					.map((t): [string, typeof t] => [`${t.category}-${t.name}`, t])
+			).values(),
+		],
+		[data]
+	)
 
 	const columns = useMemo(
 		() => [
@@ -237,8 +244,8 @@ export function ContentTable({
 					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
 				{
 					id: "tags",
-					header: "Tags",
-					filterFn: myFilterFn,
+					header: ({ column }) => <TagFilterPopup column={column} allTags={allTags} />,
+					filterFn: "tagFilterFn",
 					sortingFn: "fuzzy",
 					enableSorting: false,
 					meta: {
@@ -308,10 +315,10 @@ export function ContentTable({
 				),
 			}),
 		],
-		[]
+		[allTags]
 	)
 
-	const table = useReactTable({
+	const table = useReactTable<ContentListItem>({
 		data: data.content,
 		columns: columns,
 		state: {
@@ -328,6 +335,7 @@ export function ContentTable({
 		},
 		filterFns: {
 			fuzzy: fuzzyFilter,
+			tagFilterFn: tagFilterFn,
 		},
 		initialState: {
 			sorting: [
@@ -449,8 +457,10 @@ export function ContentTable({
 						return (
 							<Table.Tr
 								key={row.id}
-								bg={row.getIsSelected() ? "fuchsia.0" : undefined}
-								className="content-row"
+								className={clsx(
+									"content-row",
+									row.getIsSelected() && "bg-fuchsia-50 dark:bg-fuchsia-900/40"
+								)}
 							>
 								{row.getVisibleCells().map((cell) => {
 									return (
