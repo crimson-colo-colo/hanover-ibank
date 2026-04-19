@@ -18,7 +18,7 @@ import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
-type User = {
+export type User = {
 	id: string
 	name: string
 	email: string

@@ -36,6 +36,7 @@ import {
 	IconStarFilled,
 	IconTrash,
 } from "@tabler/icons-react"
+import type { UseMutationResult } from "@tanstack/react-query"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import {
 	createColumnHelper,
@@ -45,6 +46,8 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
+import type { TRPCClientErrorLike } from "@trpc/client"
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
@@ -55,7 +58,8 @@ import { formatBytes } from "@/lib/content.ts"
 import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
+import type { AppRouter } from "../../server/router.ts"
+import type { ContentList, ContentListItem, User } from "../../server/routers/content.ts"
 
 export function ContentTable({
 	loading,
@@ -100,6 +104,16 @@ export function ContentTable({
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
+	const [cannotCheckContent, { open: openCannotCheckContent, close: closeCannotCheckContent }] =
+		useDisclosure(false)
+	const [checkOutContent, { open: openCheckOutContent, close: closeCheckOutContent }] =
+		useDisclosure(false)
+	const [checkInContent, { open: openCheckInContent, close: closeCheckInContent }] =
+		useDisclosure(false)
+	const [checkOutUser, setCheckOutUser] = useState<User | null>(null)
+	const [contentUseState, setContentUseState] = useState<ContentListItem | null>(null)
+	const checkInContentMutation = useMutation(trpc.content.checkIn.mutationOptions(options))
+	const checkOutContentMutation = useMutation(trpc.content.checkOut.mutationOptions(options))
 
 	const columns = useMemo(
 		() => [
@@ -262,16 +276,37 @@ export function ContentTable({
 					<Flex className="content-actions" gap="2px" justify="flex-end">
 						{info.row.original.checkedOutBy !== null ? (
 							info.row.original.checkedOutBy?.id === profile?.id ? (
-								<ActionIcon variant="subtle" size="sm">
+								<ActionIcon
+									variant="subtle"
+									size="sm"
+									onClick={() => {
+										setContentUseState(info.row.original)
+										openCheckInContent()
+									}}
+								>
 									<IconDoorEnter />
 								</ActionIcon>
 							) : (
-								<ActionIcon variant="subtle" size="sm" onClick={() => {}}>
+								<ActionIcon
+									variant="subtle"
+									size="sm"
+									onClick={() => {
+										setCheckOutUser(info.row.original.checkedOutBy)
+										openCannotCheckContent()
+									}}
+								>
 									<IconDoorOff />
 								</ActionIcon>
 							)
 						) : (
-							<ActionIcon variant="subtle" size="sm">
+							<ActionIcon
+								variant="subtle"
+								size="sm"
+								onClick={() => {
+									setContentUseState(info.row.original)
+									openCheckOutContent()
+								}}
+							>
 								<IconDoorExit />
 							</ActionIcon>
 						)}
@@ -520,6 +555,138 @@ export function ContentTable({
 					</Button>
 				</Flex>
 			</Modal>
+			<CannotCheckOutModal
+				opened={cannotCheckContent}
+				closed={closeCannotCheckContent}
+				checkedOutBy={checkOutUser}
+			/>
+			<CheckInModal
+				opened={checkInContent}
+				closed={closeCheckInContent}
+				content={contentUseState}
+				checkInMutation={checkInContentMutation}
+			/>
+			<CheckOutModal
+				opened={checkOutContent}
+				closed={closeCheckOutContent}
+				content={contentUseState}
+				checkOutMutation={checkOutContentMutation}
+			/>
 		</>
+	)
+}
+
+function CannotCheckOutModal({
+	opened,
+	closed,
+	checkedOutBy,
+}: {
+	opened: boolean
+	closed: () => void
+	checkedOutBy: User | null
+}) {
+	return (
+		<Modal opened={opened} onClose={closed} title="Cannot Check Out Content">
+			<Text>
+				You cannot check out this content. It has been checked out by{" "}
+				<strong>{checkedOutBy?.name}</strong> ({checkedOutBy?.email}). Only they can edit the
+				content until it's checked back in.
+			</Text>
+		</Modal>
+	)
+}
+
+type RouterOutput = inferRouterOutputs<AppRouter>
+type RouterInput = inferRouterInputs<AppRouter>
+type CheckInOutput = RouterOutput["content"]["checkIn"]
+type CheckInInput = RouterInput["content"]["checkIn"]
+type CheckInMutationType = UseMutationResult<
+	CheckInOutput,
+	TRPCClientErrorLike<AppRouter>,
+	CheckInInput
+>
+
+function CheckInModal({
+	opened,
+	closed,
+	content,
+	checkInMutation,
+}: {
+	opened: boolean
+	closed: () => void
+	content: ContentListItem | null
+	checkInMutation: CheckInMutationType
+}) {
+	return (
+		<Modal opened={opened} onClose={closed} title="Confirm check in">
+			<Text>
+				Ready to check this content back in? Others will be able to edit it once it's checked in.
+			</Text>
+			<Flex gap="md" justify="flex-end" mt="md">
+				<Button variant="subtle" color="gray" onClick={closed} disabled={checkInMutation.isPending}>
+					Cancel
+				</Button>
+				<Button
+					loading={checkInMutation.isPending}
+					onClick={async () => {
+						if (content !== null) {
+							await checkInMutation.mutateAsync({ id: content.id })
+							closed()
+						}
+					}}
+					leftSection={<IconDoorEnter />}
+				>
+					Check in
+				</Button>
+			</Flex>
+		</Modal>
+	)
+}
+
+type CheckOutOutput = RouterOutput["content"]["checkOut"]
+type CheckOutInput = RouterInput["content"]["checkOut"]
+type CheckOutMutationType = UseMutationResult<
+	CheckOutOutput,
+	TRPCClientErrorLike<AppRouter>,
+	CheckOutInput
+>
+
+function CheckOutModal({
+	opened,
+	closed,
+	content,
+	checkOutMutation,
+}: {
+	opened: boolean
+	closed: () => void
+	content: ContentListItem | null
+	checkOutMutation: CheckOutMutationType
+}) {
+	return (
+		<Modal opened={opened} onClose={closed} title="Confirm check out">
+			<Text>Checking out this content will lock it out for editing by other users.</Text>
+			<Flex gap="md" justify="flex-end" mt="md">
+				<Button
+					variant="subtle"
+					color="gray"
+					onClick={closed}
+					disabled={checkOutMutation.isPending}
+				>
+					Cancel
+				</Button>
+				<Button
+					loading={checkOutMutation.isPending}
+					onClick={async () => {
+						if (content !== null) {
+							await checkOutMutation.mutateAsync({ id: content.id })
+							closed()
+						}
+					}}
+					leftSection={<IconDoorExit />}
+				>
+					Check out
+				</Button>
+			</Flex>
+		</Modal>
 	)
 }
