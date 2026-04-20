@@ -41,6 +41,8 @@ model Content {
   favoritedBy      FavoriteContent[]
   checkedOutById   String?
   checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+  size             Int?
+  mimeType         String?
 }
 
 model Tag {
