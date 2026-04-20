@@ -18,15 +18,18 @@ import {
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { ContentStatus, ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconCircleArrowUpRight,
+	IconCircleCheck,
 	IconCloudUpload,
 	IconDownload,
+	IconEye,
 	IconFilePencil,
 	IconLoader2,
+	IconProgress,
 	IconSortAscending2,
 	IconSortDescending2,
 	IconStar,
@@ -140,6 +143,18 @@ export function ContentTable({
 						)}
 					</ActionIcon>
 				),
+			}),
+			columnHelper.accessor("status", {
+				header: "Status",
+				cell: (info) => {
+					return info.row.original.status === ContentStatus.Incomplete ? (
+						<IconProgress size={20} />
+					) : info.row.original.status === ContentStatus.UnderReview ? (
+						<IconEye size={20} />
+					) : (
+						<IconCircleCheck size={20} />
+					)
+				},
 			}),
 			columnHelper.accessor((r) => `${r.title} ${r.type === "Link" ? r.url : ""}`, {
 				id: "title",
