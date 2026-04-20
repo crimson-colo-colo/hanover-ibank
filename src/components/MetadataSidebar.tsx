@@ -42,7 +42,7 @@ import { EditableTextField } from "@/components/EditableTextField.tsx"
 import { contentStatusDisplayName } from "@/lib/enums.ts"
 import { stringifyTagList, unstringifyTagList } from "@/lib/tags.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentListItem } from "../../server/routers/content.ts"
+import type { ContentListItem } from "../../shared/types.ts"
 
 export type EditableField =
 	| "title"
