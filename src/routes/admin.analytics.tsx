@@ -1,5 +1,6 @@
-import { AreaChart, BarChart } from "@mantine/charts"
+import { AreaChart, BarChart, Heatmap } from "@mantine/charts"
 import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import type { ActivityGraphWeek } from "@shared/ActivityGraphInterface.ts"
 import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
 import { createFileRoute } from "@tanstack/react-router"
 
@@ -22,6 +23,33 @@ export function AnalyticsDashboard() {
 		{ month: "Dec", Files: 2, Links: 3 },
 	]
 
+	const activityGraph: ActivityGraphWeek = Array.from({ length: 7 }, () =>
+		Array.from({ length: 24 }, () => Math.floor(Math.random() * 5))
+	)
+
+	const startOfWeek = new Date("2026-04-13") // Sunday
+
+	const activityHeatmapData = Object.fromEntries(
+		activityGraph.map((day, dayIndex) => {
+			const date = new Date(startOfWeek)
+			date.setDate(startOfWeek.getDate() + dayIndex)
+
+			const key = date.toISOString().slice(0, 10)
+
+			const total = day.reduce((sum, h) => sum + h, 0)
+			return [key, total]
+		})
+	)
+
+	const endOfWeek = new Date(startOfWeek)
+	endOfWeek.setDate(startOfWeek.getDate() + 6)
+
+	const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+	const weeklyActivityData = activityGraph.map((day, i) => ({
+		day: dayLabels[i],
+		Activity: day.reduce((sum, hour) => sum + hour, 0),
+	}))
 	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
 	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
@@ -141,6 +169,24 @@ export function AnalyticsDashboard() {
 							data={fileTypes}
 							dataKey="name"
 							series={[{ name: "Amount", color: "violet.6" }]}
+						/>
+					</Paper>
+				</Grid.Col>
+			</Grid>
+			<Grid>
+				<Grid.Col span={12}>
+					<Paper withBorder p="md" radius="md">
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							User Activity Heatmap
+						</Text>
+
+						<Heatmap
+							data={activityHeatmapData}
+							startDate={startOfWeek.toISOString().slice(0, 10)}
+							endDate={endOfWeek.toISOString().slice(0, 10)}
+							withTooltip
+							withWeekdayLabels
+							firstDayOfWeek={0}
 						/>
 					</Paper>
 				</Grid.Col>
