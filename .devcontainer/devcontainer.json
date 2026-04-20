@@ -29,5 +29,14 @@
 			}
 		}
 	},
-	"postCreateCommand": "(bun install &) && docker compose pull --ignore-pull-failures && docker compose up -d"
+	"postCreateCommand": "(bun install &) && docker compose pull --ignore-pull-failures && docker compose up -d",
+	"remoteEnv": {
+		"VITE_AUTH0_DOMAIN": "${localEnv:VITE_AUTH0_DOMAIN}",
+        "VITE_AUTH0_CLIENT_ID": "${localEnv:VITE_AUTH0_CLIENT_ID}",
+        "VITE_AUTH0_AUDIENCE": "${localEnv:VITE_AUTH0_AUDIENCE}",
+        "AUTH0_CLIENT_SECRET": "${localEnv:AUTH0_CLIENT_SECRET}",
+        "AUTH0_TENANT": "${localEnv:AUTH0_TENANT}",
+        "AUTH0_MANAGEMENT_CLIENT_ID": "${localEnv:AUTH0_MANAGEMENT_CLIENT_ID}",
+        "AUTH0_MANAGEMENT_CLIENT_SECRET": "${localEnv:AUTH0_MANAGEMENT_CLIENT_SECRET}",
+	}
 }
