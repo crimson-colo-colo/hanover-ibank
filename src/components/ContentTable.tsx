@@ -248,9 +248,6 @@ export function ContentTable({
 					filterFn: "tagFilterFn",
 					sortingFn: "fuzzy",
 					enableSorting: false,
-					meta: {
-						filterVariant: "multi-select",
-					},
 					cell: (info) => (
 						<Group gap={4}>
 							{info.row.original.tags.map((tag) => (

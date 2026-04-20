@@ -2,6 +2,7 @@ import { compareItems, type RankingInfo, rankItem } from "@tanstack/match-sorter
 import { type FilterFn, type SortingFn, sortingFns } from "@tanstack/react-table"
 import type { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
 import type { ContentListItem } from "../../server/routers/content.ts"
+import type { FilterOptions } from "../components/TagFilterPopup.tsx"
 
 declare module "@tanstack/react-table" {
 	interface FilterFns {
@@ -35,43 +36,25 @@ export const fuzzySort: SortingFn<ContentListItem> = (rowA, rowB, columnId) => {
 	return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir
 }
 
-export type TagFilterMode = "Exactly these tags" | "Not these tags" | "Includes these tags"
-
-export type TagFilterValue = {
-	optionTags: string[]
-	mode: TagFilterPopup.filterMode
-}
-
-export const tagFilterFn: FilterFn<ContentListItem> = (row, columnId, filterValue: string[]) => {
-	//typeof TagFilterValue  {tags, option}
-	//const {tags, mode} = filterValue as unknown as { tags: string[], mode: string }
-
-	//const mode = filterValue as unknown as string
-
+export const tagFilterFn: FilterFn<ContentListItem> = (row, columnId, filterValue: FilterOptions) => {
 	const rowTagNames = row.original.tags.map((t) => t.name)
+	const optionTags = filterValue.tags
+	const filterMode = filterValue.mode
 
-	const { optionTags, mode } = filterValue as unknown as TagFilterValue
-
-	//const mode = "Not these tags"
-
-	console.log("Mode: " + mode)
-	console.log("Option Tags: " + optionTags)
-	console.log("filterValue: " + filterValue)
-
-	if (mode === "Exactly these tags") {
+	if (filterMode === "Exactly these tags") {
 		return (
 			rowTagNames.length === optionTags.length &&
 			optionTags.every((selected) => rowTagNames.includes(selected))
 		)
 	}
 
-	if (mode === "Not these tags") {
+	if (filterMode === "Not these tags") {
 		return !optionTags.every((selected) => rowTagNames.includes(selected))
 	}
 
-	if (mode === "Includes these tags") {
+	if (filterMode === "Includes these tags") {
 		return optionTags.every((selected) => rowTagNames.includes(selected))
 	}
 
-	return true
+	return false
 }

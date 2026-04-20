@@ -14,7 +14,6 @@ import { IconFilter } from "@tabler/icons-react"
 import type { Column } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
 import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
-import type { TagFilterValue } from "@/lib/table.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
 
 type Tag = ContentListItem["tags"][number]
@@ -24,20 +23,30 @@ interface TagFilterPopupProps {
 	allTags: Tag[]
 }
 
+export type FilterOptions = {
+	mode: string
+	tags: string[]
+}
+
 export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 	const [open, setOpen] = useState(false)
 	const [selected, setSelected] = useState<string[]>([])
 	const [selectedType, setSelectedType] = useState<string | null>(null)
 	const [filterMode, setFilterMode] = useState<string>("Includes these tags")
-
-	const filterValue = (column.getFilterValue() as string[] | undefined) ?? []
+	const filter = (column.getFilterValue() as FilterOptions | undefined)
+	const filterValue = filter !== undefined ? filter.tags : []
 
 	const toggleTag = (tagName: string) => {
 		const next = selected.includes(tagName)
 			? selected.filter((t) => t !== tagName)
 			: [...selected, tagName]
 		setSelected(next)
-		column.setFilterValue(next.length ? next : undefined)
+		column.setFilterValue({mode: filterMode, tags: next})
+	}
+
+	const selectMode = (mode: string) => {
+		setFilterMode(mode)
+		column.setFilterValue({mode: mode, tags: selected})
 	}
 
 	const clearAll = () => {
@@ -74,7 +83,7 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 						setOpen((o) => !o)
 					}}
 				>
-					<Text fw={500} size="sm">
+					<Text fw={700} size="sm">
 						Tags
 					</Text>
 					<Indicator
@@ -88,7 +97,7 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 							color={hasActiveFilters ? "fuchsia" : "gray"}
 							size="sm"
 						>
-							<IconFilter size={14} />
+							<IconFilter size={15} />
 						</ActionIcon>
 					</Indicator>
 				</Group>
@@ -102,12 +111,12 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 				<Stack gap="xs">
 					<Select
 						placeholder="Options"
-						data={["Includes these tags", "Exactly these tags", "Not these tags"]}
-						defaultValue={"Includes these tags"}
+						data={["Include these tags", "Exactly these tags", "Not these tags"]}
+						defaultValue="Include these tags"
 						comboboxProps={{ withinPortal: false }}
 						value={filterMode}
 						onChange={(val) => {
-							setFilterMode(val ?? "Includes these tags")
+							selectMode(val ?? "Includes these tags")
 						}}
 					/>
 					{Object.entries(tagsByCategory).map(([category, tags]) => (
