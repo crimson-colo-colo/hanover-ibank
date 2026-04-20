@@ -33,7 +33,7 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 	const [selected, setSelected] = useState<string[]>([])
 	const [selectedType, setSelectedType] = useState<string | null>(null)
 	const [filterMode, setFilterMode] = useState<string>("Includes these tags")
-	const filter = (column.getFilterValue() as FilterOptions | undefined)
+	const filter = column.getFilterValue() as FilterOptions | undefined
 	const filterValue = filter !== undefined ? filter.tags : []
 
 	const toggleTag = (tagName: string) => {
@@ -41,12 +41,12 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 			? selected.filter((t) => t !== tagName)
 			: [...selected, tagName]
 		setSelected(next)
-		column.setFilterValue({mode: filterMode, tags: next})
+		column.setFilterValue({ mode: filterMode, tags: next })
 	}
 
 	const selectMode = (mode: string) => {
 		setFilterMode(mode)
-		column.setFilterValue({mode: mode, tags: selected})
+		column.setFilterValue({ mode: mode, tags: selected })
 	}
 
 	const clearAll = () => {
@@ -111,8 +111,8 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 				<Stack gap="xs">
 					<Select
 						placeholder="Options"
-						data={["Include these tags", "Exactly these tags", "Not these tags"]}
-						defaultValue="Include these tags"
+						data={["Includes these tags", "Exactly these tags", "Not these tags"]}
+						defaultValue="Includes these tags"
 						comboboxProps={{ withinPortal: false }}
 						value={filterMode}
 						onChange={(val) => {
