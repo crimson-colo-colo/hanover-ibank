@@ -1,5 +1,5 @@
 import { AreaChart, BarChart, Heatmap } from "@mantine/charts"
-import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import { Grid, Group, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import type { ActivityGraphWeek } from "@shared/ActivityGraphInterface.ts"
 import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
 import { createFileRoute } from "@tanstack/react-router"
@@ -179,15 +179,45 @@ export function AnalyticsDashboard() {
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							User Activity Heatmap
 						</Text>
+						<Stack gap={6}>
+							{activityGraph.map((day, dayIndex) => (
+								<Group key={dayLabels[dayIndex]} gap={6} wrap="nowrap">
+									<Text w={40} size="sm">
+										{dayLabels[dayIndex]}
+									</Text>
 
-						<Heatmap
-							data={activityHeatmapData}
-							startDate={startOfWeek.toISOString().slice(0, 10)}
-							endDate={endOfWeek.toISOString().slice(0, 10)}
-							withTooltip
-							withWeekdayLabels
-							firstDayOfWeek={0}
-						/>
+									<div
+										style={{
+											display: "grid",
+											gridTemplateColumns: "repeat(24, 14px)",
+											gap: "4px",
+										}}
+									>
+										{day.map((value, hour) => (
+											<div
+												key={dayLabels[dayIndex]}
+												style={{
+													width: 14,
+													height: 14,
+													borderRadius: 3,
+													backgroundColor:
+														value === 0
+															? "#ebedf0"
+															: value === 1
+																? "#c6e48b"
+																: value === 2
+																	? "#7bc96f"
+																	: value === 3
+																		? "#239a3b"
+																		: "#196127",
+												}}
+												title={`${dayLabels[dayIndex]} ${hour}:00 - ${value}`}
+											/>
+										))}
+									</div>
+								</Group>
+							))}
+						</Stack>
 					</Paper>
 				</Grid.Col>
 			</Grid>
