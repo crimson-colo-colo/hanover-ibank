@@ -123,7 +123,7 @@ export function ContentTable({
 			const splitName = name.split(" ")
 			const firstInitial = splitName[0][0]
 			const lastName = splitName[1]
-			return firstInitial + ". " + lastName
+			return `${firstInitial}. ${lastName}`
 		} else {
 			return name
 		}
