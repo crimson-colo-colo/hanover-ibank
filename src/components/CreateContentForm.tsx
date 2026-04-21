@@ -34,7 +34,7 @@ const baseSchema = z.object({
 			name: z.string().min(1).max(50),
 		})
 	),
-	contentStatus: z.enum(Object.values(ContentStatus)),
+	status: z.enum(Object.values(ContentStatus)),
 })
 
 const linkSchema = baseSchema.extend({
@@ -79,7 +79,7 @@ export function CreateContentForm({ onSuccess }: Props) {
 			lastModifiedDate: format(new Date(), "yyyy-MM-dd"),
 			expirationDate: undefined!,
 			tags: [],
-			contentStatus: "" as ContentStatus,
+			status: "" as ContentStatus,
 			// intendedAudience: [],
 			// documentType: "" as DocumentType,
 		} as z.input<typeof schema>,
@@ -266,8 +266,8 @@ export function CreateContentForm({ onSuccess }: Props) {
 					label: contentStatusDisplayName[status],
 				}))}
 				required
-				key={form.key("contentStatus")}
-				{...form.getInputProps("contentStatus")}
+				key={form.key("status")}
+				{...form.getInputProps("status")}
 			/>
 
 			<InputLabel mt="sm">
