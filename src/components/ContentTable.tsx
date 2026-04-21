@@ -6,9 +6,9 @@ import {
 	Flex,
 	Group,
 	Kbd,
+	Menu,
 	Modal,
 	Pill,
-	Popover,
 	SegmentedControl,
 	Stack,
 	Table,
@@ -364,13 +364,13 @@ export function ContentTable({
 								<IconDownload />
 							</ActionIcon>
 						)}
-						<Popover withinPortal={false}>
-							<Popover.Target>
+						<Menu withinPortal={false}>
+							<Menu.Target>
 								<ActionIcon variant="subtle" size="sm">
 									<IconDotsVertical />
 								</ActionIcon>
-							</Popover.Target>
-							<Popover.Dropdown>
+							</Menu.Target>
+							<Menu.Dropdown>
 								<Stack>
 									{info.row.original.type === "Object" ? (
 										<Button
@@ -426,8 +426,8 @@ export function ContentTable({
 										</Button>
 									)}
 								</Stack>
-							</Popover.Dropdown>
-						</Popover>
+							</Menu.Dropdown>
+						</Menu>
 					</Flex>
 				),
 			}),
