@@ -46,6 +46,7 @@ import {
 	getCoreRowModel,
 	getFilteredRowModel,
 	getSortedRowModel,
+	type Row,
 	useReactTable,
 } from "@tanstack/react-table"
 import clsx from "clsx"
@@ -55,7 +56,11 @@ import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
-import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
+import {
+	contentStatusDisplayName,
+	employeeRoleDisplayName,
+	tagCategoryDisplayName,
+} from "@/lib/enums.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 import type {
@@ -165,8 +170,10 @@ export function ContentTable({
 					</ActionIcon>
 				),
 			}),
-			columnHelper.accessor("status", {
+			columnHelper.accessor((row) => `${contentStatusDisplayName[row.status]}`, {
+				id: "status",
 				header: "Status",
+				enableSorting: false,
 				cell: (info) => {
 					return info.row.original.status === ContentStatus.Incomplete ? (
 						<IconProgress size={20} />
@@ -373,6 +380,20 @@ export function ContentTable({
 		[profile]
 	)
 
+	const customFilterFunction = (
+		row: Row<ContentListItem>,
+		columnId: string,
+		filterValue: string
+	) => {
+		const value = row.getValue(columnId)
+		//Just for status column use equals logic
+		if (columnId === "status") {
+			return value?.toString().toLowerCase() === filterValue.toLowerCase()
+		}
+		//For all other columns use fuzzier includes logic
+		return value?.toString().toLowerCase().includes(filterValue.toLowerCase()) ?? false
+	}
+
 	const table = useReactTable({
 		data: data.content,
 		columns: columns,
@@ -384,7 +405,7 @@ export function ContentTable({
 		enableSorting: true,
 		enableRowSelection: true,
 		onGlobalFilterChange: setGlobalFilter,
-		globalFilterFn: "fuzzy",
+		globalFilterFn: customFilterFunction,
 		sortingFns: {
 			fuzzy: fuzzySort,
 		},
