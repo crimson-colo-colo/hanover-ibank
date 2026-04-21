@@ -73,20 +73,17 @@ model ContentThread {
 }
 
 model ThreadComment {
-  id              String    @id @default(cuid())
-  threadId        String
-  authorId        String
-  parentCommentId String?
-  body            String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  editedAt        DateTime?
-  deletedAt       DateTime?
+  id        String    @id @default(cuid())
+  threadId  String
+  authorId  String
+  body      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  editedAt  DateTime?
+  deletedAt DateTime?
 
-  thread        ContentThread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  author        Employee        @relation("CommentAuthor", fields: [authorId], references: [id])
-  parentComment ThreadComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
-  replies       ThreadComment[] @relation("CommentReplies")
+  thread ContentThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author Employee      @relation("CommentAuthor", fields: [authorId], references: [id])
 }
 
 model Tag {
