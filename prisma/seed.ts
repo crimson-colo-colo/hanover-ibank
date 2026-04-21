@@ -42,7 +42,7 @@ async function main() {
 	const { fileContent, fileTypeToContent } = await createFileContent()
 	await createContentTags(fileContent, linkContent)
 
-	console.log(`Uploaded ${fileContentData.length} files to S3 and created content rows for them`)
+	console.log(`Uploaded ${fileContent.length} files to S3 and created content rows for them`)
 
 	await createFavoriteContent(linkContent, fileTypeToContent)
 }
