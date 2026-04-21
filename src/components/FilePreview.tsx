@@ -47,10 +47,10 @@ export function FilePreviewProvider({
 	children: React.ReactNode
 	insideModal?: boolean
 }) {
-	const { data: contentPreview } = useQuery(
+	const { data: contentPreview, isFetching } = useQuery(
 		trpc.preview.getContentUrl.queryOptions({ id: content.id })
 	)
-	const { data: plaintextContent } = useQuery(
+	const { data: plaintextContent, isFetching: isPlaintextFetching } = useQuery(
 		trpc.preview.getPlaintextContent.queryOptions(
 			{ id: content.id },
 			{ enabled: fileType === FileType.Plaintext }
@@ -99,7 +99,14 @@ export function FilePreviewProvider({
 	let controls: React.ReactNode
 	let preview: React.ReactNode
 
-	if (content.type === "Link") {
+	if (isFetching || isPlaintextFetching) {
+		preview = (
+			<IconLoader2
+				className={clsx("animate-spin", insideModal ? "text-white" : "dark:text-white")}
+				size={40}
+			/>
+		)
+	} else if (content.type === "Link") {
 		preview = <URLCard url={content.url} />
 	} else if (fileType === FileType.Image) {
 		preview = (
@@ -142,7 +149,7 @@ export function FilePreviewProvider({
 	) {
 		controls = (
 			<>
-				<Flex align="center" className="gap-3">
+				<Flex align="center" className="gap-3 w-max">
 					<ActionIcon
 						variant="transparent"
 						onClick={() => setScale((prev) => scales[Math.max(0, scales.indexOf(prev) - 1)])}
@@ -202,6 +209,12 @@ export function FilePreviewProvider({
 					onLoadSuccess={onLoadSuccess}
 					className={clsx("flex flex-col items-center gap-4", !insideModal && "mt-4")}
 					ref={documentRef}
+					loading={() => (
+						<IconLoader2
+							className={clsx("animate-spin", insideModal ? "text-white" : "dark:text-white")}
+							size={40}
+						/>
+					)}
 				>
 					{new Array(numPages).fill(0).map((_, index) => (
 						<Page
@@ -209,6 +222,14 @@ export function FilePreviewProvider({
 							key={index}
 							pageNumber={index + 1}
 							scale={scale}
+							loading={() => (
+								<div className="w-full h-96 flex items-center justify-center">
+									<IconLoader2
+										className={clsx("animate-spin", insideModal ? "text-white" : "dark:text-white")}
+										size={24}
+									/>
+								</div>
+							)}
 						/>
 					))}
 				</Document>
@@ -220,7 +241,7 @@ export function FilePreviewProvider({
 		<FilePreviewContext.Provider
 			value={{
 				controls: (
-					<Flex align="center" className="gap-8 ml-4">
+					<Flex align="center" className="gap-8 ml-4 shrink-0 mr-4">
 						{content.type === ContentType.Object && content.object?.ContentLength !== undefined && (
 							<span className="mr-4 text-gray-600">
 								{formatBytes(content.object.ContentLength)}

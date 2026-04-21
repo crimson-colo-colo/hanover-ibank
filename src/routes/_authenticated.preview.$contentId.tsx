@@ -53,21 +53,21 @@ function RouteComponent() {
 			closeViewer={closePreview}
 			insideModal={false}
 		>
-			<div className="flex flex-col w-full h-[calc(100dvh-5.5rem)] overflow-hidden">
+			<div className="flex flex-col w-full h-[calc(100dvh-3.5rem)] overflow-hidden">
 				<Flex
 					justify="space-between"
-					className="w-full z-10 bg-white dark:bg-[#242424] py-4 border-b border-gray-200 dark:border-gray-800 -mt-4"
+					className="w-full z-10 bg-white dark:bg-[#242424] py-4 border-b border-gray-200 dark:border-gray-800 px-4"
 				>
 					<Flex gap="sm" align="center">
 						<ActionIcon variant="transparent" onClick={closePreview}>
 							<IconArrowLeft />
 						</ActionIcon>
 						<FileTypeIcon fileType={fileType} />
-						<div className="text-lg font-semibold font-display">{content.title}</div>
+						<div className="text-lg font-semibold font-display truncate">{content.title}</div>
 						<FilePreviewControls />
 						{contentQuery.isFetching && <IconLoader2 className="animate-spin" />}
 					</Flex>
-					<Flex gap="md" align="center">
+					<Flex gap="md" align="center" className="shrink-0">
 						<Button
 							variant={sidebarOpen ? "light" : "outline"}
 							onClick={() => {
@@ -86,7 +86,7 @@ function RouteComponent() {
 				<Flex gap="lg" className="flex-1 min-h-0 z-1">
 					<FilePreview />
 					{sidebarOpen && (
-						<ScrollArea.Autosize className="border border-gray-200 dark:border-gray-800 mt-4 rounded-md">
+						<ScrollArea.Autosize className="border border-gray-200 dark:border-gray-800 mt-4 mr-4 rounded-md bg-white dark:bg-[#242424]">
 							<MetadataSidebar insideModal={false} content={content} closePreview={closePreview} />
 						</ScrollArea.Autosize>
 					)}
