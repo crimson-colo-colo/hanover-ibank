@@ -36,7 +36,6 @@ import {
 import { useMutation } from "@tanstack/react-query"
 import {
 	createColumnHelper,
-	type FilterFn,
 	flexRender,
 	getCoreRowModel,
 	getFacetedRowModel,

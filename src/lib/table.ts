@@ -1,6 +1,5 @@
 import { compareItems, type RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
 import { type FilterFn, type SortingFn, sortingFns } from "@tanstack/react-table"
-import type { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
 import type { ContentListItem } from "../../server/routers/content.ts"
 import type { FilterOptions } from "../components/TagFilterPopup.tsx"
 
