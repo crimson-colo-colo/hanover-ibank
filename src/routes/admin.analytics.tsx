@@ -20,6 +20,11 @@ export function AnalyticsDashboard() {
 		queryClient
 	)
 
+	const { data: uploadStats } = useQuery(
+		trpc.content.getUploadStats.queryOptions(),
+		queryClient
+	)
+
 	const COLORS = ["violet.6", "blue.6", "teal.6", "orange.6", "red.6", "green.6", "pink.6", "cyan.6"]
 
 	const barData = (fileStats ?? []).map((item) => ({
@@ -33,20 +38,7 @@ export function AnalyticsDashboard() {
 		color: COLORS[i % COLORS.length],
 	}))
 
-	const uploadData = [
-		{ month: "Jan", Files: 2, Links: 4 },
-		{ month: "Feb", Files: 1, Links: 5 },
-		{ month: "Mar", Files: 3, Links: 1 },
-		{ month: "Apr", Files: 6, Links: 1 },
-		{ month: "May", Files: 1, Links: 2 },
-		{ month: "Jun", Files: 3, Links: 7 },
-		{ month: "Jul", Files: 3, Links: 9 },
-		{ month: "Aug", Files: 8, Links: 0 },
-		{ month: "Sep", Files: 6, Links: 4 },
-		{ month: "Oct", Files: 7, Links: 5 },
-		{ month: "Nov", Files: 4, Links: 2 },
-		{ month: "Dec", Files: 2, Links: 3 },
-	]
+	const uploadData = uploadStats ?? []
 
 	const startOfWeek = new Date("2026-04-13")
 	const endOfWeek = new Date(startOfWeek)
@@ -65,9 +57,10 @@ export function AnalyticsDashboard() {
 	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
 	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
-	const mostActive = uploadData.reduce((max, m) =>
-		m.Files + m.Links > max.Files + max.Links ? m : max
-	)
+	const mostActive = uploadData.length > 0
+		? uploadData.reduce((max, m) => m.Files + m.Links > max.Files + max.Links ? m : max)
+		: { month: "-" }
+
 
 	const metrics = [
 		{ label: "Time On Site", value: "12h" },

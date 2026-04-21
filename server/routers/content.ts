@@ -864,5 +864,44 @@ export const contentRouter = router({
 
 
 
+	}),
+
+	getUploadStats: authProcedure.query(async () =>{
+		const contents = await db.content.findMany({
+			select: {
+				type: true,
+				createdAt: true,
+			},
+		})
+
+		const grouped = new Map<string, {Files: number; Links: number }>()
+
+		for (const { type, createdAt } of contents){
+			const month = createdAt.toLocaleString("en-us", { month: "short"})
+			const existing = grouped.get(month)
+			if(existing){
+				if(type === "Object"){
+					existing.Files++
+				}
+				else{
+					existing.Links++
+				}
+			}
+			else {
+				grouped.set(month, {
+					Files: type === "Object" ? 1 : 0,
+					Links: type === "Link" ? 1 : 0
+				})
+			}
+		}
+
+		const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+		return monthOrder.map((month) => ({
+			month,
+			Files: grouped.get(month)?.Files ?? 0,
+			Links: grouped.get(month)?.Links ?? 0,
+		}))
 	})
+
 })
