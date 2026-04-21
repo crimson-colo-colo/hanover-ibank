@@ -67,9 +67,18 @@ export function AnalyticsDashboard() {
 		.toISOString()
 		.slice(0, 10)
 
-	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
-	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
-	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
+	const normalizedUploadData = (uploadStats ?? []).map((item, i) => {
+		const date = new Date()
+		date.setMonth(date.getMonth() - 11 + i)
+		return {
+			...item,
+			month: date.toLocaleString("default", { month: "short", year: "2-digit" }),
+		}
+	})
+
+	const totalUploads = normalizedUploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
+	const totalFiles = normalizedUploadData.reduce((sum, m) => sum + m.Files, 0)
+	const totalLinks = normalizedUploadData.reduce((sum, m) => sum + m.Links, 0)
 	const mostActive =
 		uploadData.length > 0
 			? uploadData.reduce((max, m) => (m.Files + m.Links > max.Files + max.Links ? m : max))
@@ -162,13 +171,16 @@ export function AnalyticsDashboard() {
 						</Text>
 						<AreaChart
 							h={220}
-							data={uploadData}
+							data={normalizedUploadData}
 							dataKey="month"
 							series={[
 								{ name: "Files", color: "blue" },
 								{ name: "Links", color: "teal" },
 							]}
 							curveType="monotone"
+							xAxisProps={{
+								padding: { right: 20 },
+							}}
 						/>
 					</Paper>
 				</Grid.Col>
