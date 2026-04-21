@@ -22,6 +22,12 @@ import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
+import type {
+	CheckInMutationType,
+	CheckOutMutationType,
+	ContentList,
+	ContentListItem,
+} from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconCircleCheck,
@@ -32,13 +38,13 @@ import {
 	IconDownload,
 	IconLoader2,
 	IconMessageCircleUser,
+	IconPencilOff,
 	IconProgress,
 	IconSortAscending2,
 	IconSortDescending2,
 	IconStar,
 	IconStarFilled,
 	IconTrash,
-	IconPencilOff
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import {
@@ -63,12 +69,6 @@ import {
 } from "@/lib/enums.ts"
 import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type {
-	CheckInMutationType,
-	CheckOutMutationType,
-	ContentList,
-	ContentListItem,
-} from "@shared/types.ts"
 
 export function ContentTable({
 	loading,
@@ -117,14 +117,13 @@ export function ContentTable({
 	const checkInContentMutation = useMutation(trpc.content.checkIn.mutationOptions(options))
 	const checkOutContentMutation = useMutation(trpc.content.checkOut.mutationOptions(options))
 
-	const getInitials = (name : string) => {
+	const getInitials = (name: string) => {
 		if (name.includes(" ")) {
 			const splitName = name.split(" ")
 			const firstInitial = splitName[0][0]
 			const lastName = splitName[1]
 			return firstInitial + ". " + lastName
-		}
-		else {
+		} else {
 			return name
 		}
 	}
@@ -220,12 +219,16 @@ export function ContentTable({
 								<span className="ml-2 text-xs text-gray-500 truncate" title={item.url}>
 									{host.replace(/^www\./, "")}
 								</span>
-								{(info.row.original.checkedOutBy !== null) &&
-									(info.row.original.checkedOutBy?.id !== profile?.id) &&
-									<Tooltip withArrow arrowSize={8} label={`Checked out by ${info.row.original.checkedOutBy.name}`}>
-										<IconPencilOff className="checked-out-icon" size={24}/>
-									</Tooltip>
-								}
+								{info.row.original.checkedOutBy !== null &&
+									info.row.original.checkedOutBy?.id !== profile?.id && (
+										<Tooltip
+											withArrow
+											arrowSize={8}
+											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
+										>
+											<IconPencilOff className="checked-out-icon" size={24} />
+										</Tooltip>
+									)}
 							</div>
 						)
 					} else if (item.type === "Object") {
@@ -246,12 +249,16 @@ export function ContentTable({
 								<span className="ml-2 text-xs text-gray-500 truncate" title={size}>
 									{size}
 								</span>
-								{(info.row.original.checkedOutBy !== null) &&
-									(info.row.original.checkedOutBy.id !== profile?.id) &&
-									<Tooltip withArrow arrowSize={8} label={`Checked out by ${info.row.original.checkedOutBy.name}`}>
-										<IconPencilOff className="checked-out-icon" size={24}/>
-									</Tooltip>
-								}
+								{info.row.original.checkedOutBy !== null &&
+									info.row.original.checkedOutBy.id !== profile?.id && (
+										<Tooltip
+											withArrow
+											arrowSize={8}
+											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
+										>
+											<IconPencilOff className="checked-out-icon" size={24} />
+										</Tooltip>
+									)}
 							</div>
 						)
 					}
@@ -274,7 +281,7 @@ export function ContentTable({
 							className="w-6 h-6 shrink-0"
 						/>
 						<span className="truncate" title={info.row.original.owner.email}>
-							{ getInitials(info.row.original.owner.name) }
+							{getInitials(info.row.original.owner.name)}
 						</span>
 					</div>
 				),
@@ -355,37 +362,58 @@ export function ContentTable({
 							<Popover.Dropdown>
 								<Stack>
 									{info.row.original.type === "Object" ? (
-									<Button leftSection={<IconDownload />} variant="subtle" onClick={async () => {
-										const { url } = await trpcClient.content.download.query({
-											id: info.row.original.id,
-										})
-										window.open(url, "_blank", "noopener")
-									}}>
-										Download
-									</Button>) :
-									(<Button leftSection={<IconCircleArrowUpRight />} variant="subtle" onClick={() => {
-										if (info.row.original.type === ContentType.Link) {
-											window.open(info.row.original.url)
-										}
-									}}>
-										Open link
-									</Button>)}
+										<Button
+											leftSection={<IconDownload />}
+											variant="subtle"
+											onClick={async () => {
+												const { url } = await trpcClient.content.download.query({
+													id: info.row.original.id,
+												})
+												window.open(url, "_blank", "noopener")
+											}}
+										>
+											Download
+										</Button>
+									) : (
+										<Button
+											leftSection={<IconCircleArrowUpRight />}
+											variant="subtle"
+											onClick={() => {
+												if (info.row.original.type === ContentType.Link) {
+													window.open(info.row.original.url)
+												}
+											}}
+										>
+											Open link
+										</Button>
+									)}
 									{info.row.original.checkedOutBy === null ? (
-										<Button leftSection={<IconDoorExit />} variant="subtle" onClick={() => {
-											setContentUseState(info.row.original)
-											openCheckOutContent()
-										}}>
-										Check Out
-										</Button>) :
-										(info.row.original.checkedOutBy.id === profile?.id ?
-											(<Button leftSection={<IconDoorEnter/>} variant="subtle" onClick={() => {
+										<Button
+											leftSection={<IconDoorExit />}
+											variant="subtle"
+											onClick={() => {
+												setContentUseState(info.row.original)
+												openCheckOutContent()
+											}}
+										>
+											Check Out
+										</Button>
+									) : info.row.original.checkedOutBy.id === profile?.id ? (
+										<Button
+											leftSection={<IconDoorEnter />}
+											variant="subtle"
+											onClick={() => {
 												setContentUseState(info.row.original)
 												openCheckInContent()
-											}}>
-										Check In
-										</Button>) : <Button leftSection={<IconDoorExit />} variant="subtle" disabled>
-												Check Out
-											</Button>)}
+											}}
+										>
+											Check In
+										</Button>
+									) : (
+										<Button leftSection={<IconDoorExit />} variant="subtle" disabled>
+											Check Out
+										</Button>
+									)}
 								</Stack>
 							</Popover.Dropdown>
 						</Popover>
