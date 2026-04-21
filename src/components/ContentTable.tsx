@@ -29,7 +29,6 @@ import {
 	IconDoorExit,
 	IconDoorOff,
 	IconDownload,
-	IconFilePencil,
 	IconLoader2,
 	IconMessageCircleUser,
 	IconProgress,
@@ -338,18 +337,6 @@ export function ContentTable({
 								}}
 							>
 								<IconDoorExit />
-							</ActionIcon>
-						)}
-
-						{info.row.original.type === "Object" && (
-							<ActionIcon
-								variant="subtle"
-								size="sm"
-								onClick={(e) => {
-									openFileEditDialog(info.row.original)
-								}}
-							>
-								<IconFilePencil />
 							</ActionIcon>
 						)}
 
