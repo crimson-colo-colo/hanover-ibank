@@ -1,4 +1,3 @@
-import { UTCDate } from "@date-fns/utc"
 import {
 	ActionIcon,
 	Anchor,
@@ -29,7 +28,6 @@ import {
 	IconCloudUpload,
 	IconDoorEnter,
 	IconDoorExit,
-	IconDoorOff,
 	IconDotsVertical,
 	IconDownload,
 	IconLoader2,
@@ -53,7 +51,6 @@ import {
 	useReactTable,
 } from "@tanstack/react-table"
 import clsx from "clsx"
-import { formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
@@ -71,22 +68,17 @@ import type {
 	CheckOutMutationType,
 	ContentList,
 	ContentListItem,
-	User,
-} from "../../shared/types.ts"
+} from "@shared/types.ts"
 
 export function ContentTable({
 	loading,
 	data,
-	openEditDialog,
-	openFileEditDialog,
 	openFilePreview,
 	filter,
 	changeFilter,
 }: {
 	loading: boolean
 	data: ContentList
-	openEditDialog: (item: ContentListItem) => void
-	openFileEditDialog: (item: ContentListItem) => void
 	openFilePreview: (item: ContentListItem, type: FileType) => void
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
@@ -121,17 +113,15 @@ export function ContentTable({
 		useDisclosure(false)
 	const [checkInContent, { open: openCheckInContent, close: closeCheckInContent }] =
 		useDisclosure(false)
-	const [checkOutUser, setCheckOutUser] = useState<User | null>(null)
 	const [contentUseState, setContentUseState] = useState<ContentListItem | null>(null)
 	const checkInContentMutation = useMutation(trpc.content.checkIn.mutationOptions(options))
 	const checkOutContentMutation = useMutation(trpc.content.checkOut.mutationOptions(options))
-	const [actionsMenu, {open: openActionsMenu, close: closeActionsMenu, toggle: toggleActionsMenu}] = useDisclosure(false)
 
 	const getInitials = (name : string) => {
 		if (name.includes(" ")) {
-			const splittedName = name.split(" ")
-			const firstInitial = splittedName[0][0]
-			const lastName = splittedName[1]
+			const splitName = name.split(" ")
+			const firstInitial = splitName[0][0]
+			const lastName = splitName[1]
 			return firstInitial + ". " + lastName
 		}
 		else {
@@ -165,7 +155,7 @@ export function ContentTable({
 				cell: (info) => (
 					<ActionIcon
 						size="sm"
-						onClick={async (e) => {
+						onClick={async () => {
 							if (!info.getValue()) {
 								await favoriteContent.mutateAsync({ id: info.row.original.id })
 							} else {
@@ -190,15 +180,15 @@ export function ContentTable({
 				enableSorting: false,
 				cell: (info) => {
 					return info.row.original.status === ContentStatus.Incomplete ? (
-						<Tooltip label="Incomplete">
+						<Tooltip withArrow label="Incomplete">
 							<IconProgress size={20} />
 						</Tooltip>
 					) : info.row.original.status === ContentStatus.UnderReview ? (
-						<Tooltip label="Under Review">
+						<Tooltip withArrow label="Under Review">
 							<IconMessageCircleUser size={20} />
 						</Tooltip>
 					) : (
-						<Tooltip label="Complete">
+						<Tooltip withArrow label="Complete">
 							<IconCircleCheck size={20} />
 						</Tooltip>
 					)
@@ -334,7 +324,7 @@ export function ContentTable({
 							<ActionIcon
 								variant="subtle"
 								size="sm"
-								onClick={(e) => {
+								onClick={() => {
 									if (info.row.original.type === ContentType.Link) {
 										window.open(info.row.original.url)
 									}
@@ -346,7 +336,7 @@ export function ContentTable({
 							<ActionIcon
 								variant="subtle"
 								size="sm"
-								onClick={async (e) => {
+								onClick={async () => {
 									const { url } = await trpcClient.content.download.query({
 										id: info.row.original.id,
 									})
@@ -356,18 +346,16 @@ export function ContentTable({
 								<IconDownload />
 							</ActionIcon>
 						)}
-						<Popover onOpen={openActionsMenu} onClose={closeActionsMenu} withinPortal={false}>
+						<Popover withinPortal={false}>
 							<Popover.Target>
-								<ActionIcon variant="subtle" size="sm" onClick={(e) => {
-									e.stopPropagation()
-									toggleActionsMenu()}}>
+								<ActionIcon variant="subtle" size="sm">
 									<IconDotsVertical />
 								</ActionIcon>
 							</Popover.Target>
 							<Popover.Dropdown>
 								<Stack>
 									{info.row.original.type === "Object" ? (
-									<Button leftSection={<IconDownload />} variant="subtle" onClick={async (e) => {
+									<Button leftSection={<IconDownload />} variant="subtle" onClick={async () => {
 										const { url } = await trpcClient.content.download.query({
 											id: info.row.original.id,
 										})
@@ -375,7 +363,7 @@ export function ContentTable({
 									}}>
 										Download
 									</Button>) :
-									(<Button leftSection={<IconCircleArrowUpRight />} variant="subtle" onClick={(e) => {
+									(<Button leftSection={<IconCircleArrowUpRight />} variant="subtle" onClick={() => {
 										if (info.row.original.type === ContentType.Link) {
 											window.open(info.row.original.url)
 										}
@@ -383,8 +371,7 @@ export function ContentTable({
 										Open link
 									</Button>)}
 									{info.row.original.checkedOutBy === null ? (
-										<Button leftSection={<IconDoorExit />} variant="subtle" withinPortal={false} onClick={() => {
-											toggleActionsMenu()
+										<Button leftSection={<IconDoorExit />} variant="subtle" onClick={() => {
 											setContentUseState(info.row.original)
 											openCheckOutContent()
 										}}>
@@ -392,7 +379,6 @@ export function ContentTable({
 										</Button>) :
 										(info.row.original.checkedOutBy.id === profile?.id ?
 											(<Button leftSection={<IconDoorEnter/>} variant="subtle" onClick={() => {
-												toggleActionsMenu()
 												setContentUseState(info.row.original)
 												openCheckInContent()
 											}}>
