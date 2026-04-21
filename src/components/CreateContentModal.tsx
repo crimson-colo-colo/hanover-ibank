@@ -8,7 +8,13 @@ interface Props {
 
 export function CreateContentModal({ opened, onClose }: Props) {
 	return (
-		<Modal opened={opened} onClose={onClose} title="Create New Content" size="md" scrollAreaComponent={ScrollArea.Autosize}>
+		<Modal
+			opened={opened}
+			onClose={onClose}
+			title="Create New Content"
+			size="md"
+			scrollAreaComponent={ScrollArea.Autosize}
+		>
 			<CreateContentForm onSuccess={onClose} />
 		</Modal>
 	)
