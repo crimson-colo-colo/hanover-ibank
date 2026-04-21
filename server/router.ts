@@ -5,12 +5,14 @@ import { formsRouter } from "./routers/forms.ts"
 import { opengraphRouter } from "./routers/linkPreview.ts"
 import { previewRouter } from "./routers/preview.ts"
 import { userRouter } from "./routers/user.ts"
+import { discussionRouter } from "./routers/discussion.ts"
 import { router } from "./trpc.ts"
 
 export type AppRouter = typeof appRouter
 export const appRouter = router({
 	cli: cliRouter,
 	content: contentRouter,
+	discussion: discussionRouter,
 	forms: formsRouter,
 	admin: adminRouter,
 	user: userRouter,
