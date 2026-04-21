@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 import superjson from "superjson"
@@ -51,26 +52,67 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router
 export const publicProcedure = t.procedure
 
-export const authProcedure = publicProcedure.use((opts) => {
+export const authProcedure = publicProcedure.use(async (opts) => {
 	const { ctx } = opts
 	const auth = ctx.auth
 	if (auth === undefined) {
 		throw new TRPCError({ code: "UNAUTHORIZED" })
-	} else
-		return opts.next({
-			ctx: {
-				...ctx,
-				auth: auth,
+	}
+
+	const userPromise = db.employee.findFirst({
+		where: {
+			id: auth.sub,
+		},
+	})
+	const nowTruncated = Temporal.Now.instant().round({
+		roundingMode: "floor",
+		smallestUnit: "second",
+	})
+	const hour = nowTruncated.round({
+		roundingMode: "floor",
+		smallestUnit: "hour",
+	})
+	const day = nowTruncated.round({
+		roundingMode: "floor",
+		smallestUnit: "hour",
+		roundingIncrement: 24,
+	})
+
+	await db.userActivity.upsert({
+		where: {
+			timestamp_employeeId_path: {
+				employeeId: auth.sub,
+				timestamp: new Date(nowTruncated.epochMilliseconds),
+				path: opts.path,
 			},
-		})
+		},
+		create: {
+			employee: {
+				connect: {
+					id: auth.sub,
+				},
+			},
+			timestamp: new Date(nowTruncated.epochMilliseconds),
+			path: opts.path,
+			day: new Date(day.epochMilliseconds),
+			hour: new Date(hour.epochMilliseconds),
+		},
+		update: {
+			count: { increment: 1 },
+		},
+	})
+
+	return opts.next({
+		ctx: {
+			...ctx,
+			auth: auth,
+			user: await userPromise,
+		},
+	})
 })
 
 export const adminProcedure = authProcedure.use(async (opts) => {
-	const user = await db.employee.findFirst({
-		where: {
-			id: opts.ctx.auth.sub,
-		},
-	})
+	const { user } = opts.ctx
 
 	if (user?.role !== EmployeeRole.Admin) {
 		throw new TRPCError({ code: "UNAUTHORIZED" })

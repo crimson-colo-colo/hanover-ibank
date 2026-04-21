@@ -1,4 +1,6 @@
-import { AreaChart, BarChart } from "@mantine/charts"
+import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
+import { useQuery } from "@tanstack/react-query"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
 import { createFileRoute } from "@tanstack/react-router"
@@ -7,6 +9,12 @@ export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
 export function AnalyticsDashboard() {
+
+	const { data: activityData } = useQuery(
+		trpc.userActivity.viewUserActivityHeatmap.queryOptions(),
+		queryClient
+	)
+
 	const uploadData = [
 		{ month: "Jan", Files: 2, Links: 4 },
 		{ month: "Feb", Files: 1, Links: 5 },
@@ -22,6 +30,13 @@ export function AnalyticsDashboard() {
 		{ month: "Dec", Files: 2, Links: 3 },
 	]
 
+	const startOfWeek = new Date("2026-04-13") // Sunday
+
+	const endOfWeek = new Date(startOfWeek)
+	endOfWeek.setDate(startOfWeek.getDate() + 6)
+
+	const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
 	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
 	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
@@ -35,6 +50,15 @@ export function AnalyticsDashboard() {
 		{ name: "JPEG", Amount: 8 },
 		{ name: "PNG", Amount: 3 },
 	]
+
+	const activityHeatmapData = activityData
+		? Object.fromEntries(
+		activityData.map((count, i) => {
+			const date = new Date(startOfWeek)
+			date.setDate(startOfWeek.getDate() + i)
+			return [date.toISOString().slice(0, 10)]
+		})
+	) : {}
 
 	const metrics = [
 		{ label: "Time On Site", value: "12h" },
@@ -141,6 +165,24 @@ export function AnalyticsDashboard() {
 							data={fileTypes}
 							dataKey="name"
 							series={[{ name: "Amount", color: "violet.6" }]}
+						/>
+					</Paper>
+				</Grid.Col>
+			</Grid>
+			<Grid>
+				<Grid.Col span={12}>
+					<Paper withBorder p="md" radius="md">
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							User Activity Heatmap
+						</Text>
+
+						<Heatmap
+							data={activityHeatmapData}
+							startDate={startOfWeek.toISOString().slice(0, 10)}
+							endDate={endOfWeek.toISOString().slice(0, 10)}
+							withTooltip
+							withWeekdayLabels
+							firstDayOfWeek={0}
 						/>
 					</Paper>
 				</Grid.Col>
