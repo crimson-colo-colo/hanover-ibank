@@ -220,7 +220,7 @@ export function ContentTable({
 				sortingFn: "datetime",
 				cell: (info) => (
 					<span title={new UTCDate(info.getValue()).toLocaleString()}>
-						{formatDistanceToNow(new UTCDate(info.getValue()), { addSuffix: true })}
+						{formatDistanceToNow(new UTCDate(info.getValue()), { addSuffix: true}).replace("about", "")}
 					</span>
 				),
 			}),

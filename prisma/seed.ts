@@ -204,6 +204,7 @@ async function main() {
 		],
 	})
 
+	// @ts-ignore
 	const contentData = [
 		...[
 			{
@@ -374,11 +375,16 @@ async function main() {
 				expirationDate: new Date("2027-01-01"),
 				status: ContentStatus.Complete,
 			},
-		].map((content) => ({
-			...content,
-			type: ContentType.Link,
-			ownerId: nextUndewriter(),
-		})),
+		].map((content) => {
+			const createdAt = new Date()
+			createdAt.setDate(createdAt.getDate() - Math.floor(Math.random() * 365))
+			return {
+				...content,
+				type: ContentType.Link,
+				ownerId: nextUndewriter(),
+				createdAt,
+			}
+		}),
 		...[
 			{
 				title: "Kentucky Tax Law",
@@ -647,11 +653,16 @@ async function main() {
 				expirationDate: new Date("2027-01-01"),
 				status: ContentStatus.Complete,
 			},
-		].map((content) => ({
-			...content,
-			type: ContentType.Link,
-			ownerId: nextAnalyst(),
-		})),
+		].map((content) => {
+			const createdAt = new Date()
+			createdAt.setDate(createdAt.getDate() - Math.floor(Math.random() * 365))
+			return {
+				...content,
+				type: ContentType.Link,
+				ownerId: nextAnalyst(),
+				createdAt,
+			}
+		}),
 	] satisfies Prisma.ContentCreateManyInput[]
 
 	const urlContent = await prisma.content.createManyAndReturn({
@@ -726,6 +737,8 @@ async function main() {
 		const expiresInDays = 30 + Math.floor(Math.random() * 365)
 		const expirationDate = new Date()
 		expirationDate.setDate(expirationDate.getDate() + expiresInDays)
+		const createdAt = new Date()
+		createdAt.setDate(createdAt.getDate() - Math.floor(Math.random() * 365))
 		const isUnderwriter = Math.random() < 0.5
 		const status =
 			Math.random() < 0.33
@@ -738,6 +751,7 @@ async function main() {
 			ownerId: isUnderwriter ? nextUndewriter() : nextAnalyst(),
 			lastModifiedDate,
 			expirationDate,
+			createdAt,
 			objectId: id,
 			type: ContentType.Object,
 			status: status,
