@@ -34,7 +34,7 @@ const fileSchema = baseSchema.extend({
 const contentFormSchema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
 
 export const formsRouter = router({
-	createContent: publicProcedure.input(contentFormSchema).mutation(async (opts) => {
+	createContent: authProcedure.input(contentFormSchema).mutation(async (opts) => {
 		let objectId: string | undefined
 		if (opts.input.contentType === ContentType.Object) {
 			const buffer = Buffer.from(opts.input.file, "base64")

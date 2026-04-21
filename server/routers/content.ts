@@ -16,7 +16,7 @@ import {
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
-import { authProcedure, router } from "../trpc.ts"
+import {adminProcedure, authProcedure, router} from "../trpc.ts"
 
 type User = {
 	id: string
@@ -840,7 +840,6 @@ export const contentRouter = router({
 				size: true,
 			},
 		})
-
 		const grouped = new Map<string, { count: number; totalSize: number}>()
 
 		for(const {mimeType, size} of content) {
@@ -902,6 +901,6 @@ export const contentRouter = router({
 			Files: grouped.get(month)?.Files ?? 0,
 			Links: grouped.get(month)?.Links ?? 0,
 		}))
-	})
+	}),
 
 })
