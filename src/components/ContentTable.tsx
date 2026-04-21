@@ -180,15 +180,15 @@ export function ContentTable({
 				enableSorting: false,
 				cell: (info) => {
 					return info.row.original.status === ContentStatus.Incomplete ? (
-						<Tooltip withArrow label="Incomplete">
+						<Tooltip withArrow arrowSize={8} label="Incomplete">
 							<IconProgress size={20} />
 						</Tooltip>
 					) : info.row.original.status === ContentStatus.UnderReview ? (
-						<Tooltip withArrow label="Under Review">
+						<Tooltip withArrow arrowSize={8} label="Under Review">
 							<IconMessageCircleUser size={20} />
 						</Tooltip>
 					) : (
-						<Tooltip withArrow label="Complete">
+						<Tooltip withArrow arrowSize={8} label="Complete">
 							<IconCircleCheck size={20} />
 						</Tooltip>
 					)
@@ -318,6 +318,8 @@ export function ContentTable({
 						<Group gap={4}>
 							{info.row.original.tags.map((tag) => (
 								<Tooltip
+									withArrow
+									arrowSize={8}
 									key={`${tag.category}-${tag.name}`}
 									label={`${tagCategoryDisplayName[tag.category]}: ${tag.name}`}
 								>
