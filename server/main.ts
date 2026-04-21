@@ -35,3 +35,4 @@ app.get("*any", (req, res) => {
 app.listen(env.PORT, () => {
 	console.log(`[prod] ready on ${env.APP_URL}`)
 })
+

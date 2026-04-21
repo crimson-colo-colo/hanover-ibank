@@ -4,6 +4,7 @@ import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/ico
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { queryClient, trpc } from "@/lib/trpc"
+import { useState, useEffect } from "react"
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
@@ -25,6 +26,26 @@ export function AnalyticsDashboard() {
 		queryClient
 	)
 
+	const { data: heatmapData } = useQuery(
+		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions(),
+		queryClient
+	)
+
+	const { data: userData } = useQuery({
+		...trpc.userActivity.viewRecentActivity.queryOptions(),
+		refetchInterval: 5000,
+		},
+		queryClient
+	)
+
+	const { data: userStats } = useQuery(
+		trpc.admin.getStats.queryOptions(),
+		queryClient
+	)
+
+// compute start/end from actual data
+	const heatmapDates = Object.keys(heatmapData ?? {}).sort()
+
 	const COLORS = ["violet.6", "blue.6", "teal.6", "orange.6", "red.6", "green.6", "pink.6", "cyan.6"]
 
 	const barData = (fileStats ?? []).map((item) => ({
@@ -40,19 +61,9 @@ export function AnalyticsDashboard() {
 
 	const uploadData = uploadStats ?? []
 
-	const startOfWeek = new Date("2026-04-13")
-	const endOfWeek = new Date(startOfWeek)
-	endOfWeek.setDate(startOfWeek.getDate() + 6)
+	const endDate = new Date().toISOString().slice(0, 10)
+	const startDate = new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().slice(0, 10)
 
-	const activityHeatmapData = activityData
-		? Object.fromEntries(
-			activityData.map((count, i) => {
-				const date = new Date(startOfWeek)
-				date.setDate(startOfWeek.getDate() + i)
-				return [date.toISOString().slice(0, 10), count]
-			})
-		)
-		: {}
 
 	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
@@ -61,15 +72,50 @@ export function AnalyticsDashboard() {
 		? uploadData.reduce((max, m) => m.Files + m.Links > max.Files + max.Links ? m : max)
 		: { month: "-" }
 
+	const [timeOnSite, setTimeOnSite] = useState(0)
+
+	useEffect(() => {
+		const sessionStart = parseInt(localStorage.getItem("sessionStart") ?? Date.now().toString())
+		const interval = setInterval(() => {
+			const elapsed = Math.floor((Date.now() - sessionStart) / 1000)
+			setTimeOnSite(elapsed)
+		}, 1000)
+		return () => clearInterval(interval)
+	}, [])
+
+	function formatTime(seconds: number) {
+		const h = Math.floor(seconds / 3600)
+		const m = Math.floor((seconds % 3600) / 60)
+		const s = seconds % 60
+		if (h > 0) return `${h}h ${m}m`
+		if (m > 0) return `${m}m ${s}s`
+		return `${s}s`
+	}
 
 	const metrics = [
-		{ label: "Time On Site", value: "12h" },
+		{ label: "Time On Site", value: formatTime(timeOnSite)},
 		{ label: "Total Uploads", value: totalUploads },
 		{ label: "Files", value: totalFiles },
 		{ label: "Links", value: totalLinks },
 		{ label: "Top Month", value: mostActive.month },
-		{ label: "Employees", value: 14 },
+		{ label: "Employees", value: userStats?.employeeCount ?? "-"},
 	]
+
+	function getActivityLabel(path: string): { title: string; description: string } {
+		if (path.includes("content.list")) return { title: "Content Viewed", description: "Browsed content library" }
+		if (path.includes("content.get")) return { title: "File Accessed", description: "Opened a file" }
+		if (path.includes("content.download")) return { title: "File Downloaded", description: "Downloaded a file" }
+		if (path.includes("content.create") || path.includes("forms.createContent")) return { title: "File Uploaded", description: "Uploaded new content" }
+		if (path.includes("content.update") || path.includes("content.updateFile")) return { title: "File Edited", description: "Updated content" }
+		if (path.includes("content.delete")) return { title: "File Deleted", description: "Deleted content" }
+		if (path.includes("content.favorite")) return { title: "Content Favorited", description: "Marked content as favorite" }
+		if (path.includes("content.unfavorite")) return { title: "Content Unfavorited", description: "Marked content as unfavorite" }
+		if (path.includes("content.checkOut")) return { title: "File Checked Out", description: "Checked out a file" }
+		if (path.includes("content.checkIn")) return { title: "File Checked In", description: "Checked in a file" }
+		if (path.includes("admin.listUsers")) return { title: "Employee Management Page Viewed", description: "Visited employee management" }
+		if (path.includes("admin.") ) return { title: "Analytics Dashboard Viewed", description: "Visited analytics dashboard" }
+		return { title: path, description: "" }
+	}
 
 	return (
 		<Stack mt="md" gap="lg">
@@ -114,24 +160,27 @@ export function AnalyticsDashboard() {
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							Recent User Activity
 						</Text>
-						<Timeline active={3} bulletSize={24} lineWidth={2}>
-							<Timeline.Item bullet={<IconUserKey size={12} />} title="User logged in">
-								<Text size="sm" c="dimmed">Michael Jordan signed into the dashboard</Text>
-								<Text size="xs" mt={4}>9:00 AM</Text>
-							</Timeline.Item>
-							<Timeline.Item bullet={<IconFolderOpen size={12} />} title="File accessed">
-								<Text size="sm" c="dimmed">Opened Quarterly_Report.pdf</Text>
-								<Text size="xs" mt={4}>9:12 AM</Text>
-							</Timeline.Item>
-							<Timeline.Item bullet={<IconPencil size={12} />} title="File edited">
-								<Text size="sm" c="dimmed">Updated Budget_Plan.xlsx</Text>
-								<Text size="xs" mt={4}>9:25 AM</Text>
-							</Timeline.Item>
-							<Timeline.Item bullet={<IconUpload size={12} />} title="File uploaded">
-								<Text size="sm" c="dimmed">Uploaded DesignMockup.png</Text>
-								<Text size="xs" mt={4}>9:40 AM</Text>
-							</Timeline.Item>
-						</Timeline>
+						<div style={{ maxHeight: 200, overflowY: "auto" }}>
+							<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
+								{(userData ?? []).map((activity, i) => {
+									const { title, description } = getActivityLabel(activity.path)
+									return (
+										<Timeline.Item
+											key={i}
+											bullet={<IconUserKey size={12} />}
+											title={title}
+										>
+											<Text size="sm" c="dimmed">
+												{activity.contentTitle ? `Uploaded "${activity.contentTitle}"` : description}
+											</Text>
+											<Text size="xs" mt={4}>
+												{new Date(activity.timestamp).toLocaleTimeString()}
+											</Text>
+										</Timeline.Item>
+									)
+								})}
+							</Timeline>
+						</div>
 					</Paper>
 				</Grid.Col>
 			</Grid>
@@ -190,12 +239,22 @@ export function AnalyticsDashboard() {
 							User Activity Heatmap
 						</Text>
 						<Heatmap
-							data={activityHeatmapData}
-							startDate={startOfWeek.toISOString().slice(0, 10)}
-							endDate={endOfWeek.toISOString().slice(0, 10)}
+							data={heatmapData ?? {}}
+							startDate={startDate}
+							endDate={endDate}
+							colors={[
+								'var(--mantine-color-violet-2)',
+								'var(--mantine-color-violet-3)',
+								'var(--mantine-color-violet-4)',
+								'var(--mantine-color-violet-5)',
+							]}
 							withTooltip
 							withWeekdayLabels
+							withMonthLabels
 							firstDayOfWeek={0}
+							rectSize={20}
+							rectRadius={20}
+							gap={5}
 						/>
 					</Paper>
 				</Grid.Col>
