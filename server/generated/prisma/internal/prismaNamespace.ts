@@ -386,6 +386,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Employee: 'Employee',
   Content: 'Content',
+  ContentThread: 'ContentThread',
+  ThreadComment: 'ThreadComment',
   Tag: 'Tag',
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent'
@@ -404,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "employee" | "content" | "tag" | "contentTag" | "favoriteContent"
+    modelProps: "employee" | "content" | "contentThread" | "threadComment" | "tag" | "contentTag" | "favoriteContent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -553,6 +555,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ContentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ContentCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContentThread: {
+      payload: Prisma.$ContentThreadPayload<ExtArgs>
+      fields: Prisma.ContentThreadFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentThreadFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentThreadFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentThreadFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentThreadFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>
+        }
+        findMany: {
+          args: Prisma.ContentThreadFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>[]
+        }
+        create: {
+          args: Prisma.ContentThreadCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>
+        }
+        createMany: {
+          args: Prisma.ContentThreadCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentThreadCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentThreadDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>
+        }
+        update: {
+          args: Prisma.ContentThreadUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentThreadDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentThreadUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentThreadUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentThreadUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentThreadPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentThreadAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentThread>
+        }
+        groupBy: {
+          args: Prisma.ContentThreadGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentThreadGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentThreadCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentThreadCountAggregateOutputType> | number
+        }
+      }
+    }
+    ThreadComment: {
+      payload: Prisma.$ThreadCommentPayload<ExtArgs>
+      fields: Prisma.ThreadCommentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ThreadCommentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ThreadCommentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>
+        }
+        findFirst: {
+          args: Prisma.ThreadCommentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ThreadCommentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>
+        }
+        findMany: {
+          args: Prisma.ThreadCommentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>[]
+        }
+        create: {
+          args: Prisma.ThreadCommentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>
+        }
+        createMany: {
+          args: Prisma.ThreadCommentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ThreadCommentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>[]
+        }
+        delete: {
+          args: Prisma.ThreadCommentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>
+        }
+        update: {
+          args: Prisma.ThreadCommentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ThreadCommentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ThreadCommentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ThreadCommentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ThreadCommentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ThreadCommentPayload>
+        }
+        aggregate: {
+          args: Prisma.ThreadCommentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateThreadComment>
+        }
+        groupBy: {
+          args: Prisma.ThreadCommentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ThreadCommentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ThreadCommentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ThreadCommentCountAggregateOutputType> | number
         }
       }
     }
@@ -844,6 +994,36 @@ export const ContentScalarFieldEnum = {
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
 
 
+export const ContentThreadScalarFieldEnum = {
+  id: 'id',
+  contentId: 'contentId',
+  title: 'title',
+  sectionLabel: 'sectionLabel',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt',
+  createdById: 'createdById',
+  resolvedById: 'resolvedById'
+} as const
+
+export type ContentThreadScalarFieldEnum = (typeof ContentThreadScalarFieldEnum)[keyof typeof ContentThreadScalarFieldEnum]
+
+
+export const ThreadCommentScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  editedAt: 'editedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type ThreadCommentScalarFieldEnum = (typeof ThreadCommentScalarFieldEnum)[keyof typeof ThreadCommentScalarFieldEnum]
+
+
 export const TagScalarFieldEnum = {
   name: 'name',
   category: 'category'
@@ -966,6 +1146,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ThreadStatus'
+ */
+export type EnumThreadStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ThreadStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ThreadStatus[]'
+ */
+export type ListEnumThreadStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ThreadStatus[]'>
     
 
 
@@ -1093,6 +1287,8 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   employee?: Prisma.EmployeeOmit
   content?: Prisma.ContentOmit
+  contentThread?: Prisma.ContentThreadOmit
+  threadComment?: Prisma.ThreadCommentOmit
   tag?: Prisma.TagOmit
   contentTag?: Prisma.ContentTagOmit
   favoriteContent?: Prisma.FavoriteContentOmit
