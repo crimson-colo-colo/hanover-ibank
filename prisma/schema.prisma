@@ -14,11 +14,13 @@ enum EmployeeRole {
 }
 
 model Employee {
-  id                String            @id
-  role              EmployeeRole
-  content           Content[]         @relation("Owner")
-  favorite          FavoriteContent[]
-  checkedOutContent Content[]         @relation("CheckedOutContent")
+    id                String            @id
+    role              EmployeeRole
+    content           Content[]         @relation("Owner")
+    favorite          FavoriteContent[]
+    checkedOutContent Content[]         @relation("CheckedOutContent")
+    userAnalytics     UserAnalytics?
+    activity          UserActivity[]
 }
 
 model Content {
@@ -83,9 +85,52 @@ enum ContentStatus {
   Incomplete
   UnderReview
   Complete
+  
+}
+model UserAnalytics {
+    id         String   @id @default(cuid())
+    employeeId String   @unique
+    employee   Employee @relation(fields: [employeeId], references: [id])
+
+    recentFiles RecentFile[]
+    commonFiles CommonFile[]
+}
+
+model RecentFile {
+    id          String        @id @default(cuid())
+    analyticsId String
+    analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
+    contentID   String
+    content     Content
+    openedAt    DateTime      @default(now())
+}
+
+model CommonFile {
+    analyticsId String
+    analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
+    contentID   String
+    content     Content
+    openCount   Int           @default(1)
+
+    @@id([analyticsId, contentID])
 }
 
 enum ContentType {
   Object
   Link
+}
+
+model UserActivity {
+    timestamp  DateTime
+    // no default timestamp because we want to prefer using the server's time for this. This avoids
+    // the server and db being significantly out of sync even if improbable. This timestamp is also
+    // truncated to the second it was generated and must be manually done
+    employeeId String
+    employee   Employee @relation(fields: [employeeId], references: [id])
+    path       String
+    count      Int      @default(1)
+    day        DateTime // datetime truncated to the UTC day it was created in
+    hour       DateTime // datetime truncated to the UTC hour it was created in
+
+    @@id([timestamp, employeeId, path])
 }

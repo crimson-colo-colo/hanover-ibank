@@ -43,6 +43,13 @@ export function AnalyticsDashboard() {
 		{ month: "Dec", Files: 2, Links: 3 },
 	]
 
+	const startOfWeek = new Date("2026-04-13") // Sunday
+
+	const endOfWeek = new Date(startOfWeek)
+	endOfWeek.setDate(startOfWeek.getDate() + 6)
+
+	const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
 	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
 	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
@@ -56,6 +63,15 @@ export function AnalyticsDashboard() {
 		{ name: "JPEG", Amount: 8 },
 		{ name: "PNG", Amount: 3 },
 	]
+
+	const activityHeatmapData = activityData
+		? Object.fromEntries(
+		activityData.map((count, i) => {
+			const date = new Date(startOfWeek)
+			date.setDate(startOfWeek.getDate() + i)
+			return [date.toISOString().slice(0, 10)]
+		})
+	) : {}
 
 	const metrics = [
 		{ label: "Time On Site", value: "12h" },
@@ -194,6 +210,24 @@ export function AnalyticsDashboard() {
 						) : (
 							<Text c="dimmed" ta="center" mt="xl">No file data available yet</Text>
 						)}
+					</Paper>
+				</Grid.Col>
+			</Grid>
+			<Grid>
+				<Grid.Col span={12}>
+					<Paper withBorder p="md" radius="md">
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							User Activity Heatmap
+						</Text>
+
+						<Heatmap
+							data={activityHeatmapData}
+							startDate={startOfWeek.toISOString().slice(0, 10)}
+							endDate={endOfWeek.toISOString().slice(0, 10)}
+							withTooltip
+							withWeekdayLabels
+							firstDayOfWeek={0}
+						/>
 					</Paper>
 				</Grid.Col>
 			</Grid>
