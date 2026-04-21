@@ -10,7 +10,6 @@ import {
 	Modal,
 	Pill,
 	SegmentedControl,
-	Stack,
 	Table,
 	Text,
 	TextInput,
@@ -364,17 +363,16 @@ export function ContentTable({
 								<IconDownload />
 							</ActionIcon>
 						)}
-						<Menu withinPortal={false}>
+						<Menu width={140} trigger="hover" closeOnItemClick={true}>
 							<Menu.Target>
 								<ActionIcon variant="subtle" size="sm">
 									<IconDotsVertical />
 								</ActionIcon>
 							</Menu.Target>
 							<Menu.Dropdown>
-								<Stack>
 									{info.row.original.type === "Object" ? (
-										<Button
-											leftSection={<IconDownload />}
+										<Menu.Item
+											leftSection={<IconDownload size={22}/>}
 											variant="subtle"
 											onClick={async () => {
 												const { url } = await trpcClient.content.download.query({
@@ -384,10 +382,10 @@ export function ContentTable({
 											}}
 										>
 											Download
-										</Button>
+										</Menu.Item>
 									) : (
-										<Button
-											leftSection={<IconCircleArrowUpRight />}
+										<Menu.Item
+											leftSection={<IconCircleArrowUpRight size={22}/>}
 											variant="subtle"
 											onClick={() => {
 												if (info.row.original.type === ContentType.Link) {
@@ -396,11 +394,11 @@ export function ContentTable({
 											}}
 										>
 											Open link
-										</Button>
+										</Menu.Item>
 									)}
 									{info.row.original.checkedOutBy === null ? (
-										<Button
-											leftSection={<IconDoorExit />}
+										<Menu.Item
+											leftSection={<IconDoorExit size={22}/>}
 											variant="subtle"
 											onClick={() => {
 												setContentUseState(info.row.original)
@@ -408,10 +406,10 @@ export function ContentTable({
 											}}
 										>
 											Check Out
-										</Button>
+										</Menu.Item>
 									) : info.row.original.checkedOutBy.id === profile?.id ? (
-										<Button
-											leftSection={<IconDoorEnter />}
+										<Menu.Item
+											leftSection={<IconDoorEnter size={22}/>}
 											variant="subtle"
 											onClick={() => {
 												setContentUseState(info.row.original)
@@ -419,13 +417,12 @@ export function ContentTable({
 											}}
 										>
 											Check In
-										</Button>
+										</Menu.Item>
 									) : (
-										<Button leftSection={<IconDoorExit />} variant="subtle" disabled>
+										<Menu.Item leftSection={<IconDoorExit size={22}/>} variant="subtle" disabled>
 											Check Out
-										</Button>
+										</Menu.Item>
 									)}
-								</Stack>
 							</Menu.Dropdown>
 						</Menu>
 					</Flex>
