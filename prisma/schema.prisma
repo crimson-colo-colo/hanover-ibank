@@ -13,6 +13,12 @@ enum EmployeeRole {
   Admin
 }
 
+enum ThreadStatus {
+  Open
+  Resolved
+  Archived
+}
+
 model Employee {
   id                String            @id
   role              EmployeeRole
@@ -22,6 +28,7 @@ model Employee {
 
   createdThreads  ContentThread[] @relation("ThreadCreatedBy")
   resolvedThreads ContentThread[] @relation("ThreadResolvedBy")
+  comments        ThreadComment[] @relation("CommentAuthor")
 }
 
 model Content {
@@ -44,6 +51,42 @@ model Content {
   favoritedBy      FavoriteContent[]
   checkedOutById   String?
   checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+  threads          ContentThread[]
+}
+
+model ContentThread {
+  id           String       @id @default(cuid())
+  contentId    String
+  title        String?
+  sectionLabel String?
+  status       ThreadStatus @default(Open)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  resolvedAt   DateTime?
+  createdById  String
+  resolvedById String?
+
+  content    Content         @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdBy  Employee        @relation("ThreadCreatedBy", fields: [createdById], references: [id])
+  resolvedBy Employee?       @relation("ThreadResolvedBy", fields: [resolvedById], references: [id])
+  comments   ThreadComment[]
+}
+
+model ThreadComment {
+  id              String    @id @default(cuid())
+  threadId        String
+  authorId        String
+  parentCommentId String?
+  body            String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  editedAt        DateTime?
+  deletedAt       DateTime?
+
+  thread        ContentThread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author        Employee        @relation("CommentAuthor", fields: [authorId], references: [id])
+  parentComment ThreadComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies       ThreadComment[] @relation("CommentReplies")
 }
 
 model Tag {
