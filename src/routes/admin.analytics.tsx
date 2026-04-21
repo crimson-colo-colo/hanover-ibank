@@ -1,12 +1,33 @@
-import { AreaChart, BarChart } from "@mantine/charts"
+import { BarChart, PieChart } from "@mantine/charts"
+import { AreaChart } from "@mantine/charts"
 import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import { queryClient, trpc } from "@/lib/trpc"
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
 export function AnalyticsDashboard() {
+
+	const { data: fileStats } = useQuery(
+		trpc.content.getFileStats.queryOptions(),
+		queryClient
+	)
+
+	const COLORS = ["violet.6", "blue.6", "teal.6", "orange.6", "red.6", "green.6", "pink.6", "cyan.6"]
+	const barData = (fileStats ?? []).map((item) => ({
+		type: item.type,
+		storage: item.totalSize,
+
+	}))
+
+	const pieData = (fileStats ?? []).map((item, i) => ({
+		name: item.type,
+		value: item.count,
+		color: COLORS[i % COLORS.length],
+	}))
 	const uploadData = [
 		{ month: "Jan", Files: 2, Links: 4 },
 		{ month: "Feb", Files: 1, Links: 5 },
@@ -131,17 +152,48 @@ export function AnalyticsDashboard() {
 			</Grid>
 
 			<Grid>
-				<Grid.Col span={12}>
+				<Grid.Col span={{base: 12, md: 6}}>
 					<Paper withBorder p="md" radius="md">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							File Types
 						</Text>
-						<BarChart
-							h={300}
-							data={fileTypes}
-							dataKey="name"
-							series={[{ name: "Amount", color: "violet.6" }]}
-						/>
+						{pieData.length > 0 ? (
+							<PieChart
+								size={200}
+								data={pieData}
+								withTooltip
+								tooltipDataSource="segment"
+								withLabels
+								withLabelsLine
+								labelsPosition="outside"
+								labelsType="value"
+							/>
+						) : (
+							<Text c="dimmed" ta="center" mt="xl">No file data available yet</Text>
+						)}
+					</Paper>
+				</Grid.Col>
+
+				<Grid.Col span={{base: 12, md: 6}}>
+					<Paper withBorder p="md" radius="md">
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							Storage Used by Type
+						</Text>
+						{barData.length > 0 ? (
+							<BarChart
+								h={300}
+								data={barData}
+								dataKey="type"
+								valueFormatter={(value) => {
+									if (value < 1024) return `${value} B`
+									if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`
+									return `${(value / (1024 * 1024)).toFixed(1)} MB`
+								}}
+								series={[{ name: "storage", color: "violet.6", label: "Storage Used" }]}
+							/>
+						) : (
+							<Text c="dimmed" ta="center" mt="xl">No file data available yet</Text>
+						)}
 					</Paper>
 				</Grid.Col>
 			</Grid>
