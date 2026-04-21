@@ -453,6 +453,8 @@ export const contentRouter = router({
 				where: { id: opts.input.id },
 				data: {
 					lastModifiedDate: new Date(),
+					size: buffer.length,
+					mimeType: fileType,
 				},
 			})
 		}),
@@ -829,4 +831,38 @@ export const contentRouter = router({
 			content: contentItem,
 		}
 	}),
+
+	getFileStats : authProcedure.query(async (opts) => {
+		const content = await db.content.findMany({
+			where: {type : "Object"},
+			select: {
+				mimeType: true,
+				size: true,
+			},
+		})
+
+		const grouped = new Map<string, { count: number; totalSize: number}>()
+
+		for(const {mimeType, size} of content) {
+			const key = mimeType ?? "unknown"
+			const existing = grouped.get(key)
+			if(existing){
+				existing.count += 1
+				existing.totalSize += size ?? 0
+			}
+			else {
+				grouped.set(key, {count: 1, totalSize: size ?? 0})
+			}
+		}
+
+		return Array.from(grouped.entries()).map(([type, {count, totalSize}]) => ({
+			type,
+			count,
+			totalSize,
+		}))
+
+
+
+
+	})
 })

@@ -20,8 +20,18 @@ export type ContentModel = runtime.Types.Result.DefaultSelection<Prisma.$Content
 
 export type AggregateContent = {
   _count: ContentCountAggregateOutputType | null
+  _avg: ContentAvgAggregateOutputType | null
+  _sum: ContentSumAggregateOutputType | null
   _min: ContentMinAggregateOutputType | null
   _max: ContentMaxAggregateOutputType | null
+}
+
+export type ContentAvgAggregateOutputType = {
+  size: number | null
+}
+
+export type ContentSumAggregateOutputType = {
+  size: number | null
 }
 
 export type ContentMinAggregateOutputType = {
@@ -38,6 +48,8 @@ export type ContentMinAggregateOutputType = {
   url: string | null
   ownerId: string | null
   checkedOutById: string | null
+  size: number | null
+  mimeType: string | null
 }
 
 export type ContentMaxAggregateOutputType = {
@@ -54,6 +66,8 @@ export type ContentMaxAggregateOutputType = {
   url: string | null
   ownerId: string | null
   checkedOutById: string | null
+  size: number | null
+  mimeType: string | null
 }
 
 export type ContentCountAggregateOutputType = {
@@ -70,9 +84,19 @@ export type ContentCountAggregateOutputType = {
   url: number
   ownerId: number
   checkedOutById: number
+  size: number
+  mimeType: number
   _all: number
 }
 
+
+export type ContentAvgAggregateInputType = {
+  size?: true
+}
+
+export type ContentSumAggregateInputType = {
+  size?: true
+}
 
 export type ContentMinAggregateInputType = {
   id?: true
@@ -88,6 +112,8 @@ export type ContentMinAggregateInputType = {
   url?: true
   ownerId?: true
   checkedOutById?: true
+  size?: true
+  mimeType?: true
 }
 
 export type ContentMaxAggregateInputType = {
@@ -104,6 +130,8 @@ export type ContentMaxAggregateInputType = {
   url?: true
   ownerId?: true
   checkedOutById?: true
+  size?: true
+  mimeType?: true
 }
 
 export type ContentCountAggregateInputType = {
@@ -120,6 +148,8 @@ export type ContentCountAggregateInputType = {
   url?: true
   ownerId?: true
   checkedOutById?: true
+  size?: true
+  mimeType?: true
   _all?: true
 }
 
@@ -161,6 +191,18 @@ export type ContentAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ContentAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ContentSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ContentMinAggregateInputType
@@ -191,6 +233,8 @@ export type ContentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: ContentCountAggregateInputType | true
+  _avg?: ContentAvgAggregateInputType
+  _sum?: ContentSumAggregateInputType
   _min?: ContentMinAggregateInputType
   _max?: ContentMaxAggregateInputType
 }
@@ -209,7 +253,11 @@ export type ContentGroupByOutputType = {
   url: string | null
   ownerId: string
   checkedOutById: string | null
+  size: number | null
+  mimeType: string | null
   _count: ContentCountAggregateOutputType | null
+  _avg: ContentAvgAggregateOutputType | null
+  _sum: ContentSumAggregateOutputType | null
   _min: ContentMinAggregateOutputType | null
   _max: ContentMaxAggregateOutputType | null
 }
@@ -246,6 +294,8 @@ export type ContentWhereInput = {
   url?: Prisma.StringNullableFilter<"Content"> | string | null
   ownerId?: Prisma.StringFilter<"Content"> | string
   checkedOutById?: Prisma.StringNullableFilter<"Content"> | string | null
+  size?: Prisma.IntNullableFilter<"Content"> | number | null
+  mimeType?: Prisma.StringNullableFilter<"Content"> | string | null
   owner?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
@@ -266,6 +316,8 @@ export type ContentOrderByWithRelationInput = {
   url?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   checkedOutById?: Prisma.SortOrderInput | Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
+  mimeType?: Prisma.SortOrderInput | Prisma.SortOrder
   owner?: Prisma.EmployeeOrderByWithRelationInput
   tags?: Prisma.ContentTagOrderByRelationAggregateInput
   favoritedBy?: Prisma.FavoriteContentOrderByRelationAggregateInput
@@ -289,6 +341,8 @@ export type ContentWhereUniqueInput = Prisma.AtLeast<{
   url?: Prisma.StringNullableFilter<"Content"> | string | null
   ownerId?: Prisma.StringFilter<"Content"> | string
   checkedOutById?: Prisma.StringNullableFilter<"Content"> | string | null
+  size?: Prisma.IntNullableFilter<"Content"> | number | null
+  mimeType?: Prisma.StringNullableFilter<"Content"> | string | null
   owner?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
@@ -309,9 +363,13 @@ export type ContentOrderByWithAggregationInput = {
   url?: Prisma.SortOrderInput | Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   checkedOutById?: Prisma.SortOrderInput | Prisma.SortOrder
+  size?: Prisma.SortOrderInput | Prisma.SortOrder
+  mimeType?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ContentCountOrderByAggregateInput
+  _avg?: Prisma.ContentAvgOrderByAggregateInput
   _max?: Prisma.ContentMaxOrderByAggregateInput
   _min?: Prisma.ContentMinOrderByAggregateInput
+  _sum?: Prisma.ContentSumOrderByAggregateInput
 }
 
 export type ContentScalarWhereWithAggregatesInput = {
@@ -331,6 +389,8 @@ export type ContentScalarWhereWithAggregatesInput = {
   url?: Prisma.StringNullableWithAggregatesFilter<"Content"> | string | null
   ownerId?: Prisma.StringWithAggregatesFilter<"Content"> | string
   checkedOutById?: Prisma.StringNullableWithAggregatesFilter<"Content"> | string | null
+  size?: Prisma.IntNullableWithAggregatesFilter<"Content"> | number | null
+  mimeType?: Prisma.StringNullableWithAggregatesFilter<"Content"> | string | null
 }
 
 export type ContentCreateInput = {
@@ -345,6 +405,8 @@ export type ContentCreateInput = {
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
+  size?: number | null
+  mimeType?: string | null
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
@@ -365,6 +427,8 @@ export type ContentUncheckedCreateInput = {
   url?: string | null
   ownerId: string
   checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
@@ -381,6 +445,8 @@ export type ContentUpdateInput = {
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
@@ -401,6 +467,8 @@ export type ContentUncheckedUpdateInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
@@ -419,6 +487,8 @@ export type ContentCreateManyInput = {
   url?: string | null
   ownerId: string
   checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
 }
 
 export type ContentUpdateManyMutationInput = {
@@ -433,6 +503,8 @@ export type ContentUpdateManyMutationInput = {
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ContentUncheckedUpdateManyInput = {
@@ -449,6 +521,8 @@ export type ContentUncheckedUpdateManyInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ContentListRelationFilter = {
@@ -475,6 +549,12 @@ export type ContentCountOrderByAggregateInput = {
   url?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   checkedOutById?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
+}
+
+export type ContentAvgOrderByAggregateInput = {
+  size?: Prisma.SortOrder
 }
 
 export type ContentMaxOrderByAggregateInput = {
@@ -491,6 +571,8 @@ export type ContentMaxOrderByAggregateInput = {
   url?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   checkedOutById?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
 }
 
 export type ContentMinOrderByAggregateInput = {
@@ -507,6 +589,12 @@ export type ContentMinOrderByAggregateInput = {
   url?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   checkedOutById?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
+}
+
+export type ContentSumOrderByAggregateInput = {
+  size?: Prisma.SortOrder
 }
 
 export type ContentScalarRelationFilter = {
@@ -614,6 +702,14 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ContentCreateNestedOneWithoutTagsInput = {
   create?: Prisma.XOR<Prisma.ContentCreateWithoutTagsInput, Prisma.ContentUncheckedCreateWithoutTagsInput>
   connectOrCreate?: Prisma.ContentCreateOrConnectWithoutTagsInput
@@ -654,6 +750,8 @@ export type ContentCreateWithoutOwnerInput = {
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
+  size?: number | null
+  mimeType?: string | null
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
@@ -672,6 +770,8 @@ export type ContentUncheckedCreateWithoutOwnerInput = {
   objectId?: string | null
   url?: string | null
   checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
@@ -698,6 +798,8 @@ export type ContentCreateWithoutCheckedOutByInput = {
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
+  size?: number | null
+  mimeType?: string | null
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
@@ -716,6 +818,8 @@ export type ContentUncheckedCreateWithoutCheckedOutByInput = {
   objectId?: string | null
   url?: string | null
   ownerId: string
+  size?: number | null
+  mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
@@ -763,6 +867,8 @@ export type ContentScalarWhereInput = {
   url?: Prisma.StringNullableFilter<"Content"> | string | null
   ownerId?: Prisma.StringFilter<"Content"> | string
   checkedOutById?: Prisma.StringNullableFilter<"Content"> | string | null
+  size?: Prisma.IntNullableFilter<"Content"> | number | null
+  mimeType?: Prisma.StringNullableFilter<"Content"> | string | null
 }
 
 export type ContentUpsertWithWhereUniqueWithoutCheckedOutByInput = {
@@ -793,6 +899,8 @@ export type ContentCreateWithoutTagsInput = {
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
+  size?: number | null
+  mimeType?: string | null
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
@@ -812,6 +920,8 @@ export type ContentUncheckedCreateWithoutTagsInput = {
   url?: string | null
   ownerId: string
   checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
 }
 
@@ -843,6 +953,8 @@ export type ContentUpdateWithoutTagsInput = {
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
@@ -862,6 +974,8 @@ export type ContentUncheckedUpdateWithoutTagsInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
 
@@ -877,6 +991,8 @@ export type ContentCreateWithoutFavoritedByInput = {
   expirationDate: Date | string
   objectId?: string | null
   url?: string | null
+  size?: number | null
+  mimeType?: string | null
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
@@ -896,6 +1012,8 @@ export type ContentUncheckedCreateWithoutFavoritedByInput = {
   url?: string | null
   ownerId: string
   checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
 }
 
@@ -927,6 +1045,8 @@ export type ContentUpdateWithoutFavoritedByInput = {
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
@@ -946,6 +1066,8 @@ export type ContentUncheckedUpdateWithoutFavoritedByInput = {
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
 }
 
@@ -962,6 +1084,8 @@ export type ContentCreateManyOwnerInput = {
   objectId?: string | null
   url?: string | null
   checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
 }
 
 export type ContentCreateManyCheckedOutByInput = {
@@ -977,6 +1101,8 @@ export type ContentCreateManyCheckedOutByInput = {
   objectId?: string | null
   url?: string | null
   ownerId: string
+  size?: number | null
+  mimeType?: string | null
 }
 
 export type ContentUpdateWithoutOwnerInput = {
@@ -991,6 +1117,8 @@ export type ContentUpdateWithoutOwnerInput = {
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
@@ -1009,6 +1137,8 @@ export type ContentUncheckedUpdateWithoutOwnerInput = {
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
@@ -1026,6 +1156,8 @@ export type ContentUncheckedUpdateManyWithoutOwnerInput = {
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ContentUpdateWithoutCheckedOutByInput = {
@@ -1040,6 +1172,8 @@ export type ContentUpdateWithoutCheckedOutByInput = {
   expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
@@ -1058,6 +1192,8 @@ export type ContentUncheckedUpdateWithoutCheckedOutByInput = {
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
 }
@@ -1075,6 +1211,8 @@ export type ContentUncheckedUpdateManyWithoutCheckedOutByInput = {
   objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1131,6 +1269,8 @@ export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   url?: boolean
   ownerId?: boolean
   checkedOutById?: boolean
+  size?: boolean
+  mimeType?: boolean
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
   favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
@@ -1152,6 +1292,8 @@ export type ContentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   url?: boolean
   ownerId?: boolean
   checkedOutById?: boolean
+  size?: boolean
+  mimeType?: boolean
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   checkedOutBy?: boolean | Prisma.Content$checkedOutByArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
@@ -1170,6 +1312,8 @@ export type ContentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   url?: boolean
   ownerId?: boolean
   checkedOutById?: boolean
+  size?: boolean
+  mimeType?: boolean
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   checkedOutBy?: boolean | Prisma.Content$checkedOutByArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
@@ -1188,9 +1332,11 @@ export type ContentSelectScalar = {
   url?: boolean
   ownerId?: boolean
   checkedOutById?: boolean
+  size?: boolean
+  mimeType?: boolean
 }
 
-export type ContentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "type" | "createdAt" | "updatedAt" | "lastModifiedDate" | "expirationDate" | "objectId" | "url" | "ownerId" | "checkedOutById", ExtArgs["result"]["content"]>
+export type ContentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "status" | "type" | "createdAt" | "updatedAt" | "lastModifiedDate" | "expirationDate" | "objectId" | "url" | "ownerId" | "checkedOutById" | "size" | "mimeType", ExtArgs["result"]["content"]>
 export type ContentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
@@ -1235,6 +1381,8 @@ export type $ContentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     url: string | null
     ownerId: string
     checkedOutById: string | null
+    size: number | null
+    mimeType: string | null
   }, ExtArgs["result"]["content"]>
   composites: {}
 }
@@ -1675,6 +1823,8 @@ export interface ContentFieldRefs {
   readonly url: Prisma.FieldRef<"Content", 'String'>
   readonly ownerId: Prisma.FieldRef<"Content", 'String'>
   readonly checkedOutById: Prisma.FieldRef<"Content", 'String'>
+  readonly size: Prisma.FieldRef<"Content", 'Int'>
+  readonly mimeType: Prisma.FieldRef<"Content", 'String'>
 }
     
 

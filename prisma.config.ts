@@ -4,6 +4,8 @@ import * as dotenv from "dotenv"
 dotenv.config({ path: ".env.development.local" })
 dotenv.config({ path: ".env.development" })
 
+dotenv.config({ path: ".env.development.local" })
+dotenv.config({ path: ".env.development" })
 export default defineConfig({
 	schema: "./prisma/schema.prisma",
 	migrations: {

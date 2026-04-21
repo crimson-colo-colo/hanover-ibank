@@ -18,3 +18,5 @@ bun install;
 bun run db:start;
 bun run dev;
 ```
+
+%LOCALAPPDATA%\Docker\log\vm\dockerd.log
