@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Employee: 'Employee',
   Content: 'Content',
+  ContentThread: 'ContentThread',
+  ThreadComment: 'ThreadComment',
   Tag: 'Tag',
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent'
@@ -99,6 +101,36 @@ export const ContentScalarFieldEnum = {
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
+
+
+export const ContentThreadScalarFieldEnum = {
+  id: 'id',
+  contentId: 'contentId',
+  title: 'title',
+  sectionLabel: 'sectionLabel',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt',
+  createdById: 'createdById',
+  resolvedById: 'resolvedById'
+} as const
+
+export type ContentThreadScalarFieldEnum = (typeof ContentThreadScalarFieldEnum)[keyof typeof ContentThreadScalarFieldEnum]
+
+
+export const ThreadCommentScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  editedAt: 'editedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type ThreadCommentScalarFieldEnum = (typeof ThreadCommentScalarFieldEnum)[keyof typeof ThreadCommentScalarFieldEnum]
 
 
 export const TagScalarFieldEnum = {

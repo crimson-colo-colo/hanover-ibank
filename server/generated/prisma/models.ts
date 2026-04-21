@@ -10,6 +10,8 @@
  */
 export type * from './models/Employee.js'
 export type * from './models/Content.js'
+export type * from './models/ContentThread.js'
+export type * from './models/ThreadComment.js'
 export type * from './models/Tag.js'
 export type * from './models/ContentTag.js'
 export type * from './models/FavoriteContent.js'

@@ -18,6 +18,15 @@ export const EmployeeRole = {
 export type EmployeeRole = (typeof EmployeeRole)[keyof typeof EmployeeRole]
 
 
+export const ThreadStatus = {
+  Open: 'Open',
+  Resolved: 'Resolved',
+  Archived: 'Archived'
+} as const
+
+export type ThreadStatus = (typeof ThreadStatus)[keyof typeof ThreadStatus]
+
+
 export const TagCategory = {
   DocumentType: 'DocumentType',
   IntendedAudience: 'IntendedAudience',

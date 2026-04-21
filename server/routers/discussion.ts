@@ -123,4 +123,41 @@ export const discussionRouter = router({
                 },
             })
         }),
+
+    resolveThread: authProcedure
+        .input(
+            z.object({
+                threadId: z.string(),
+            })
+        )
+        .mutation(async (opts) => {
+            return db.contentThread.update({
+                where: {
+                    id: opts.input.threadId,
+                },
+                data: {
+                    status: ThreadStatus.Resolved,
+                    resolvedAt: new Date(),
+                    resolvedById: opts.ctx.auth.sub,
+                },
+            })
+        }),
+    reopenThread: authProcedure
+        .input(
+            z.object({
+                threadId: z.string(),
+            })
+        )
+        .mutation(async (opts) => {
+            return db.contentThread.update({
+                where: {
+                    id: opts.input.threadId,
+                },
+                data: {
+                    status: ThreadStatus.Open,
+                    resolvedAt: null,
+                    resolvedById: null,
+                },
+            })
+        }),
 })
