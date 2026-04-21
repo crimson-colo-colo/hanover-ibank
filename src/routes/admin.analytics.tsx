@@ -1,5 +1,4 @@
-import { BarChart, PieChart } from "@mantine/charts"
-import { AreaChart } from "@mantine/charts"
+import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
 import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
@@ -9,18 +8,23 @@ import { queryClient, trpc } from "@/lib/trpc"
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
-export function AnalyticsDashboard() {
 
+export function AnalyticsDashboard() {
 	const { data: fileStats } = useQuery(
 		trpc.content.getFileStats.queryOptions(),
 		queryClient
 	)
 
+	const { data: activityData } = useQuery(
+		trpc.userActivity.viewUserActivityHeatmap.queryOptions(),
+		queryClient
+	)
+
 	const COLORS = ["violet.6", "blue.6", "teal.6", "orange.6", "red.6", "green.6", "pink.6", "cyan.6"]
+
 	const barData = (fileStats ?? []).map((item) => ({
 		type: item.type,
 		storage: item.totalSize,
-
 	}))
 
 	const pieData = (fileStats ?? []).map((item, i) => ({
@@ -28,6 +32,7 @@ export function AnalyticsDashboard() {
 		value: item.count,
 		color: COLORS[i % COLORS.length],
 	}))
+
 	const uploadData = [
 		{ month: "Jan", Files: 2, Links: 4 },
 		{ month: "Feb", Files: 1, Links: 5 },
@@ -43,12 +48,19 @@ export function AnalyticsDashboard() {
 		{ month: "Dec", Files: 2, Links: 3 },
 	]
 
-	const startOfWeek = new Date("2026-04-13") // Sunday
-
+	const startOfWeek = new Date("2026-04-13")
 	const endOfWeek = new Date(startOfWeek)
 	endOfWeek.setDate(startOfWeek.getDate() + 6)
 
-	const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+	const activityHeatmapData = activityData
+		? Object.fromEntries(
+			activityData.map((count, i) => {
+				const date = new Date(startOfWeek)
+				date.setDate(startOfWeek.getDate() + i)
+				return [date.toISOString().slice(0, 10), count]
+			})
+		)
+		: {}
 
 	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
@@ -56,22 +68,6 @@ export function AnalyticsDashboard() {
 	const mostActive = uploadData.reduce((max, m) =>
 		m.Files + m.Links > max.Files + max.Links ? m : max
 	)
-
-	const fileTypes = [
-		{ name: "DOCX", Amount: 15 },
-		{ name: "PDF", Amount: 6 },
-		{ name: "JPEG", Amount: 8 },
-		{ name: "PNG", Amount: 3 },
-	]
-
-	const activityHeatmapData = activityData
-		? Object.fromEntries(
-		activityData.map((count, i) => {
-			const date = new Date(startOfWeek)
-			date.setDate(startOfWeek.getDate() + i)
-			return [date.toISOString().slice(0, 10)]
-		})
-	) : {}
 
 	const metrics = [
 		{ label: "Time On Site", value: "12h" },
@@ -125,42 +121,22 @@ export function AnalyticsDashboard() {
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							Recent User Activity
 						</Text>
-
 						<Timeline active={3} bulletSize={24} lineWidth={2}>
 							<Timeline.Item bullet={<IconUserKey size={12} />} title="User logged in">
-								<Text size="sm" c="dimmed">
-									Michael Jordan signed into the dashboard
-								</Text>
-								<Text size="xs" mt={4}>
-									9:00 AM
-								</Text>
+								<Text size="sm" c="dimmed">Michael Jordan signed into the dashboard</Text>
+								<Text size="xs" mt={4}>9:00 AM</Text>
 							</Timeline.Item>
-
 							<Timeline.Item bullet={<IconFolderOpen size={12} />} title="File accessed">
-								<Text size="sm" c="dimmed">
-									Opened Quarterly_Report.pdf
-								</Text>
-								<Text size="xs" mt={4}>
-									9:12 AM
-								</Text>
+								<Text size="sm" c="dimmed">Opened Quarterly_Report.pdf</Text>
+								<Text size="xs" mt={4}>9:12 AM</Text>
 							</Timeline.Item>
-
 							<Timeline.Item bullet={<IconPencil size={12} />} title="File edited">
-								<Text size="sm" c="dimmed">
-									Updated Budget_Plan.xlsx
-								</Text>
-								<Text size="xs" mt={4}>
-									9:25 AM
-								</Text>
+								<Text size="sm" c="dimmed">Updated Budget_Plan.xlsx</Text>
+								<Text size="xs" mt={4}>9:25 AM</Text>
 							</Timeline.Item>
-
 							<Timeline.Item bullet={<IconUpload size={12} />} title="File uploaded">
-								<Text size="sm" c="dimmed">
-									Uploaded DesignMockup.png
-								</Text>
-								<Text size="xs" mt={4}>
-									9:40 AM
-								</Text>
+								<Text size="sm" c="dimmed">Uploaded DesignMockup.png</Text>
+								<Text size="xs" mt={4}>9:40 AM</Text>
 							</Timeline.Item>
 						</Timeline>
 					</Paper>
@@ -168,7 +144,7 @@ export function AnalyticsDashboard() {
 			</Grid>
 
 			<Grid>
-				<Grid.Col span={{base: 12, md: 6}}>
+				<Grid.Col span={{ base: 12, md: 6 }}>
 					<Paper withBorder p="md" radius="md">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							File Types
@@ -190,7 +166,7 @@ export function AnalyticsDashboard() {
 					</Paper>
 				</Grid.Col>
 
-				<Grid.Col span={{base: 12, md: 6}}>
+				<Grid.Col span={{ base: 12, md: 6 }}>
 					<Paper withBorder p="md" radius="md">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							Storage Used by Type
@@ -213,13 +189,13 @@ export function AnalyticsDashboard() {
 					</Paper>
 				</Grid.Col>
 			</Grid>
+
 			<Grid>
 				<Grid.Col span={12}>
 					<Paper withBorder p="md" radius="md">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							User Activity Heatmap
 						</Text>
-
 						<Heatmap
 							data={activityHeatmapData}
 							startDate={startOfWeek.toISOString().slice(0, 10)}

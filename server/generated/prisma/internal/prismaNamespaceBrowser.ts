@@ -56,6 +56,9 @@ export const ModelName = {
   Tag: 'Tag',
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
+  UserAnalytics: 'UserAnalytics',
+  RecentFile: 'RecentFile',
+  CommonFile: 'CommonFile',
   UserActivity: 'UserActivity'
 } as const
 
@@ -127,6 +130,33 @@ export const FavoriteContentScalarFieldEnum = {
 } as const
 
 export type FavoriteContentScalarFieldEnum = (typeof FavoriteContentScalarFieldEnum)[keyof typeof FavoriteContentScalarFieldEnum]
+
+
+export const UserAnalyticsScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId'
+} as const
+
+export type UserAnalyticsScalarFieldEnum = (typeof UserAnalyticsScalarFieldEnum)[keyof typeof UserAnalyticsScalarFieldEnum]
+
+
+export const RecentFileScalarFieldEnum = {
+  id: 'id',
+  analyticsId: 'analyticsId',
+  contentID: 'contentID',
+  openedAt: 'openedAt'
+} as const
+
+export type RecentFileScalarFieldEnum = (typeof RecentFileScalarFieldEnum)[keyof typeof RecentFileScalarFieldEnum]
+
+
+export const CommonFileScalarFieldEnum = {
+  analyticsId: 'analyticsId',
+  contentID: 'contentID',
+  openCount: 'openCount'
+} as const
+
+export type CommonFileScalarFieldEnum = (typeof CommonFileScalarFieldEnum)[keyof typeof CommonFileScalarFieldEnum]
 
 
 export const UserActivityScalarFieldEnum = {

@@ -14,13 +14,13 @@ enum EmployeeRole {
 }
 
 model Employee {
-    id                String            @id
-    role              EmployeeRole
-    content           Content[]         @relation("Owner")
-    favorite          FavoriteContent[]
-    checkedOutContent Content[]         @relation("CheckedOutContent")
-    userAnalytics     UserAnalytics?
-    activity          UserActivity[]
+  id                String            @id
+  role              EmployeeRole
+  content           Content[]         @relation("Owner")
+  favorite          FavoriteContent[]
+  checkedOutContent Content[]         @relation("CheckedOutContent")
+  userAnalytics     UserAnalytics?
+  activity          UserActivity[]
 }
 
 model Content {
@@ -45,6 +45,8 @@ model Content {
   checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
   size             Int?
   mimeType         String?
+  recentFiles      RecentFile[]
+  commonFiles      CommonFile[]
 }
 
 model Tag {
@@ -85,34 +87,33 @@ enum ContentStatus {
   Incomplete
   UnderReview
   Complete
-  
 }
 model UserAnalytics {
-    id         String   @id @default(cuid())
-    employeeId String   @unique
-    employee   Employee @relation(fields: [employeeId], references: [id])
+  id         String   @id @default(cuid())
+  employeeId String   @unique
+  employee   Employee @relation(fields: [employeeId], references: [id])
 
-    recentFiles RecentFile[]
-    commonFiles CommonFile[]
+  recentFiles RecentFile[]
+  commonFiles CommonFile[]
 }
 
 model RecentFile {
-    id          String        @id @default(cuid())
-    analyticsId String
-    analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
-    contentID   String
-    content     Content
-    openedAt    DateTime      @default(now())
+  id          String        @id @default(cuid())
+  analyticsId String
+  analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
+  contentID   String
+  content     Content       @relation(fields: [contentID], references: [id])
+  openedAt    DateTime      @default(now())
 }
 
 model CommonFile {
-    analyticsId String
-    analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
-    contentID   String
-    content     Content
-    openCount   Int           @default(1)
+  analyticsId String
+  analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
+  contentID   String
+  content     Content       @relation(fields: [contentID], references: [id])
+  openCount   Int           @default(1)
 
-    @@id([analyticsId, contentID])
+  @@id([analyticsId, contentID])
 }
 
 enum ContentType {
@@ -121,16 +122,16 @@ enum ContentType {
 }
 
 model UserActivity {
-    timestamp  DateTime
-    // no default timestamp because we want to prefer using the server's time for this. This avoids
-    // the server and db being significantly out of sync even if improbable. This timestamp is also
-    // truncated to the second it was generated and must be manually done
-    employeeId String
-    employee   Employee @relation(fields: [employeeId], references: [id])
-    path       String
-    count      Int      @default(1)
-    day        DateTime // datetime truncated to the UTC day it was created in
-    hour       DateTime // datetime truncated to the UTC hour it was created in
+  timestamp  DateTime
+  // no default timestamp because we want to prefer using the server's time for this. This avoids
+  // the server and db being significantly out of sync even if improbable. This timestamp is also
+  // truncated to the second it was generated and must be manually done
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  path       String
+  count      Int      @default(1)
+  day        DateTime // datetime truncated to the UTC day it was created in
+  hour       DateTime // datetime truncated to the UTC hour it was created in
 
-    @@id([timestamp, employeeId, path])
+  @@id([timestamp, employeeId, path])
 }

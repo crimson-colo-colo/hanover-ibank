@@ -300,6 +300,8 @@ export type ContentWhereInput = {
   tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
   checkedOutBy?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
+  recentFiles?: Prisma.RecentFileListRelationFilter
+  commonFiles?: Prisma.CommonFileListRelationFilter
 }
 
 export type ContentOrderByWithRelationInput = {
@@ -322,6 +324,8 @@ export type ContentOrderByWithRelationInput = {
   tags?: Prisma.ContentTagOrderByRelationAggregateInput
   favoritedBy?: Prisma.FavoriteContentOrderByRelationAggregateInput
   checkedOutBy?: Prisma.EmployeeOrderByWithRelationInput
+  recentFiles?: Prisma.RecentFileOrderByRelationAggregateInput
+  commonFiles?: Prisma.CommonFileOrderByRelationAggregateInput
 }
 
 export type ContentWhereUniqueInput = Prisma.AtLeast<{
@@ -347,6 +351,8 @@ export type ContentWhereUniqueInput = Prisma.AtLeast<{
   tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
   checkedOutBy?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
+  recentFiles?: Prisma.RecentFileListRelationFilter
+  commonFiles?: Prisma.CommonFileListRelationFilter
 }, "id">
 
 export type ContentOrderByWithAggregationInput = {
@@ -411,6 +417,8 @@ export type ContentCreateInput = {
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  recentFiles?: Prisma.RecentFileCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateInput = {
@@ -431,6 +439,8 @@ export type ContentUncheckedCreateInput = {
   mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  recentFiles?: Prisma.RecentFileUncheckedCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentUpdateInput = {
@@ -451,6 +461,8 @@ export type ContentUpdateInput = {
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  recentFiles?: Prisma.RecentFileUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateInput = {
@@ -471,6 +483,8 @@ export type ContentUncheckedUpdateInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  recentFiles?: Prisma.RecentFileUncheckedUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyInput = {
@@ -738,6 +752,34 @@ export type ContentUpdateOneRequiredWithoutFavoritedByNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutFavoritedByInput, Prisma.ContentUpdateWithoutFavoritedByInput>, Prisma.ContentUncheckedUpdateWithoutFavoritedByInput>
 }
 
+export type ContentCreateNestedOneWithoutRecentFilesInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutRecentFilesInput, Prisma.ContentUncheckedCreateWithoutRecentFilesInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutRecentFilesInput
+  connect?: Prisma.ContentWhereUniqueInput
+}
+
+export type ContentUpdateOneRequiredWithoutRecentFilesNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutRecentFilesInput, Prisma.ContentUncheckedCreateWithoutRecentFilesInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutRecentFilesInput
+  upsert?: Prisma.ContentUpsertWithoutRecentFilesInput
+  connect?: Prisma.ContentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutRecentFilesInput, Prisma.ContentUpdateWithoutRecentFilesInput>, Prisma.ContentUncheckedUpdateWithoutRecentFilesInput>
+}
+
+export type ContentCreateNestedOneWithoutCommonFilesInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutCommonFilesInput, Prisma.ContentUncheckedCreateWithoutCommonFilesInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutCommonFilesInput
+  connect?: Prisma.ContentWhereUniqueInput
+}
+
+export type ContentUpdateOneRequiredWithoutCommonFilesNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutCommonFilesInput, Prisma.ContentUncheckedCreateWithoutCommonFilesInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutCommonFilesInput
+  upsert?: Prisma.ContentUpsertWithoutCommonFilesInput
+  connect?: Prisma.ContentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutCommonFilesInput, Prisma.ContentUpdateWithoutCommonFilesInput>, Prisma.ContentUncheckedUpdateWithoutCommonFilesInput>
+}
+
 export type ContentCreateWithoutOwnerInput = {
   id?: string
   title: string
@@ -755,6 +797,8 @@ export type ContentCreateWithoutOwnerInput = {
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  recentFiles?: Prisma.RecentFileCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutOwnerInput = {
@@ -774,6 +818,8 @@ export type ContentUncheckedCreateWithoutOwnerInput = {
   mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  recentFiles?: Prisma.RecentFileUncheckedCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutOwnerInput = {
@@ -803,6 +849,8 @@ export type ContentCreateWithoutCheckedOutByInput = {
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
+  recentFiles?: Prisma.RecentFileCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutCheckedOutByInput = {
@@ -822,6 +870,8 @@ export type ContentUncheckedCreateWithoutCheckedOutByInput = {
   mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  recentFiles?: Prisma.RecentFileUncheckedCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutCheckedOutByInput = {
@@ -904,6 +954,8 @@ export type ContentCreateWithoutTagsInput = {
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  recentFiles?: Prisma.RecentFileCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutTagsInput = {
@@ -923,6 +975,8 @@ export type ContentUncheckedCreateWithoutTagsInput = {
   size?: number | null
   mimeType?: string | null
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  recentFiles?: Prisma.RecentFileUncheckedCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutTagsInput = {
@@ -958,6 +1012,8 @@ export type ContentUpdateWithoutTagsInput = {
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  recentFiles?: Prisma.RecentFileUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutTagsInput = {
@@ -977,6 +1033,8 @@ export type ContentUncheckedUpdateWithoutTagsInput = {
   size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  recentFiles?: Prisma.RecentFileUncheckedUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateWithoutFavoritedByInput = {
@@ -996,6 +1054,8 @@ export type ContentCreateWithoutFavoritedByInput = {
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  recentFiles?: Prisma.RecentFileCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutFavoritedByInput = {
@@ -1015,6 +1075,8 @@ export type ContentUncheckedCreateWithoutFavoritedByInput = {
   size?: number | null
   mimeType?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
+  recentFiles?: Prisma.RecentFileUncheckedCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutFavoritedByInput = {
@@ -1050,6 +1112,8 @@ export type ContentUpdateWithoutFavoritedByInput = {
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  recentFiles?: Prisma.RecentFileUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutFavoritedByInput = {
@@ -1069,6 +1133,208 @@ export type ContentUncheckedUpdateWithoutFavoritedByInput = {
   size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
+  recentFiles?: Prisma.RecentFileUncheckedUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUncheckedUpdateManyWithoutContentNestedInput
+}
+
+export type ContentCreateWithoutRecentFilesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  size?: number | null
+  mimeType?: string | null
+  owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
+  checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  commonFiles?: Prisma.CommonFileCreateNestedManyWithoutContentInput
+}
+
+export type ContentUncheckedCreateWithoutRecentFilesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  ownerId: string
+  checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
+  tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  commonFiles?: Prisma.CommonFileUncheckedCreateNestedManyWithoutContentInput
+}
+
+export type ContentCreateOrConnectWithoutRecentFilesInput = {
+  where: Prisma.ContentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentCreateWithoutRecentFilesInput, Prisma.ContentUncheckedCreateWithoutRecentFilesInput>
+}
+
+export type ContentUpsertWithoutRecentFilesInput = {
+  update: Prisma.XOR<Prisma.ContentUpdateWithoutRecentFilesInput, Prisma.ContentUncheckedUpdateWithoutRecentFilesInput>
+  create: Prisma.XOR<Prisma.ContentCreateWithoutRecentFilesInput, Prisma.ContentUncheckedCreateWithoutRecentFilesInput>
+  where?: Prisma.ContentWhereInput
+}
+
+export type ContentUpdateToOneWithWhereWithoutRecentFilesInput = {
+  where?: Prisma.ContentWhereInput
+  data: Prisma.XOR<Prisma.ContentUpdateWithoutRecentFilesInput, Prisma.ContentUncheckedUpdateWithoutRecentFilesInput>
+}
+
+export type ContentUpdateWithoutRecentFilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
+  checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  commonFiles?: Prisma.CommonFileUpdateManyWithoutContentNestedInput
+}
+
+export type ContentUncheckedUpdateWithoutRecentFilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUncheckedUpdateManyWithoutContentNestedInput
+}
+
+export type ContentCreateWithoutCommonFilesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  size?: number | null
+  mimeType?: string | null
+  owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
+  checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  recentFiles?: Prisma.RecentFileCreateNestedManyWithoutContentInput
+}
+
+export type ContentUncheckedCreateWithoutCommonFilesInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  ownerId: string
+  checkedOutById?: string | null
+  size?: number | null
+  mimeType?: string | null
+  tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  recentFiles?: Prisma.RecentFileUncheckedCreateNestedManyWithoutContentInput
+}
+
+export type ContentCreateOrConnectWithoutCommonFilesInput = {
+  where: Prisma.ContentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentCreateWithoutCommonFilesInput, Prisma.ContentUncheckedCreateWithoutCommonFilesInput>
+}
+
+export type ContentUpsertWithoutCommonFilesInput = {
+  update: Prisma.XOR<Prisma.ContentUpdateWithoutCommonFilesInput, Prisma.ContentUncheckedUpdateWithoutCommonFilesInput>
+  create: Prisma.XOR<Prisma.ContentCreateWithoutCommonFilesInput, Prisma.ContentUncheckedCreateWithoutCommonFilesInput>
+  where?: Prisma.ContentWhereInput
+}
+
+export type ContentUpdateToOneWithWhereWithoutCommonFilesInput = {
+  where?: Prisma.ContentWhereInput
+  data: Prisma.XOR<Prisma.ContentUpdateWithoutCommonFilesInput, Prisma.ContentUncheckedUpdateWithoutCommonFilesInput>
+}
+
+export type ContentUpdateWithoutCommonFilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
+  checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  recentFiles?: Prisma.RecentFileUpdateManyWithoutContentNestedInput
+}
+
+export type ContentUncheckedUpdateWithoutCommonFilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  size?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  recentFiles?: Prisma.RecentFileUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyOwnerInput = {
@@ -1122,6 +1388,8 @@ export type ContentUpdateWithoutOwnerInput = {
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  recentFiles?: Prisma.RecentFileUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutOwnerInput = {
@@ -1141,6 +1409,8 @@ export type ContentUncheckedUpdateWithoutOwnerInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  recentFiles?: Prisma.RecentFileUncheckedUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutOwnerInput = {
@@ -1177,6 +1447,8 @@ export type ContentUpdateWithoutCheckedOutByInput = {
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
+  recentFiles?: Prisma.RecentFileUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutCheckedOutByInput = {
@@ -1196,6 +1468,8 @@ export type ContentUncheckedUpdateWithoutCheckedOutByInput = {
   mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  recentFiles?: Prisma.RecentFileUncheckedUpdateManyWithoutContentNestedInput
+  commonFiles?: Prisma.CommonFileUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutCheckedOutByInput = {
@@ -1223,11 +1497,15 @@ export type ContentUncheckedUpdateManyWithoutCheckedOutByInput = {
 export type ContentCountOutputType = {
   tags: number
   favoritedBy: number
+  recentFiles: number
+  commonFiles: number
 }
 
 export type ContentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | ContentCountOutputTypeCountTagsArgs
   favoritedBy?: boolean | ContentCountOutputTypeCountFavoritedByArgs
+  recentFiles?: boolean | ContentCountOutputTypeCountRecentFilesArgs
+  commonFiles?: boolean | ContentCountOutputTypeCountCommonFilesArgs
 }
 
 /**
@@ -1254,6 +1532,20 @@ export type ContentCountOutputTypeCountFavoritedByArgs<ExtArgs extends runtime.T
   where?: Prisma.FavoriteContentWhereInput
 }
 
+/**
+ * ContentCountOutputType without action
+ */
+export type ContentCountOutputTypeCountRecentFilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecentFileWhereInput
+}
+
+/**
+ * ContentCountOutputType without action
+ */
+export type ContentCountOutputTypeCountCommonFilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommonFileWhereInput
+}
+
 
 export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1275,6 +1567,8 @@ export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
   favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   checkedOutBy?: boolean | Prisma.Content$checkedOutByArgs<ExtArgs>
+  recentFiles?: boolean | Prisma.Content$recentFilesArgs<ExtArgs>
+  commonFiles?: boolean | Prisma.Content$commonFilesArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
 
@@ -1342,6 +1636,8 @@ export type ContentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
   favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   checkedOutBy?: boolean | Prisma.Content$checkedOutByArgs<ExtArgs>
+  recentFiles?: boolean | Prisma.Content$recentFilesArgs<ExtArgs>
+  commonFiles?: boolean | Prisma.Content$commonFilesArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1360,6 +1656,8 @@ export type $ContentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     tags: Prisma.$ContentTagPayload<ExtArgs>[]
     favoritedBy: Prisma.$FavoriteContentPayload<ExtArgs>[]
     checkedOutBy: Prisma.$EmployeePayload<ExtArgs> | null
+    recentFiles: Prisma.$RecentFilePayload<ExtArgs>[]
+    commonFiles: Prisma.$CommonFilePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1781,6 +2079,8 @@ export interface Prisma__ContentClient<T, Null = never, ExtArgs extends runtime.
   tags<T extends Prisma.Content$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favoritedBy<T extends Prisma.Content$favoritedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$favoritedByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   checkedOutBy<T extends Prisma.Content$checkedOutByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$checkedOutByArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  recentFiles<T extends Prisma.Content$recentFilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$recentFilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecentFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  commonFiles<T extends Prisma.Content$commonFilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$commonFilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommonFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2290,6 +2590,54 @@ export type Content$checkedOutByArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.EmployeeInclude<ExtArgs> | null
   where?: Prisma.EmployeeWhereInput
+}
+
+/**
+ * Content.recentFiles
+ */
+export type Content$recentFilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecentFile
+   */
+  select?: Prisma.RecentFileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecentFile
+   */
+  omit?: Prisma.RecentFileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecentFileInclude<ExtArgs> | null
+  where?: Prisma.RecentFileWhereInput
+  orderBy?: Prisma.RecentFileOrderByWithRelationInput | Prisma.RecentFileOrderByWithRelationInput[]
+  cursor?: Prisma.RecentFileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecentFileScalarFieldEnum | Prisma.RecentFileScalarFieldEnum[]
+}
+
+/**
+ * Content.commonFiles
+ */
+export type Content$commonFilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CommonFile
+   */
+  select?: Prisma.CommonFileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CommonFile
+   */
+  omit?: Prisma.CommonFileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommonFileInclude<ExtArgs> | null
+  where?: Prisma.CommonFileWhereInput
+  orderBy?: Prisma.CommonFileOrderByWithRelationInput | Prisma.CommonFileOrderByWithRelationInput[]
+  cursor?: Prisma.CommonFileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommonFileScalarFieldEnum | Prisma.CommonFileScalarFieldEnum[]
 }
 
 /**
