@@ -5,10 +5,10 @@ import {
 	Group,
 	Indicator,
 	Popover,
+	ScrollArea,
 	Select,
 	Stack,
 	Text,
-	ScrollArea
 } from "@mantine/core"
 import { type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { IconFilter } from "@tabler/icons-react"
@@ -32,7 +32,6 @@ export type FilterOptions = {
 export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 	const [open, setOpen] = useState(false)
 	const [selected, setSelected] = useState<string[]>([])
-	const [selectedType, setSelectedType] = useState<string | null>(null)
 	const [filterMode, setFilterMode] = useState<string>("Includes these tags")
 	const filter = column.getFilterValue() as FilterOptions | undefined
 	const filterValue = filter !== undefined ? filter.tags : []
@@ -70,7 +69,6 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 		<Popover
 			opened={open}
 			onChange={setOpen}
-			closeOnClickOutside={false}
 			position="bottom-start"
 			shadow="md"
 			width={260}
@@ -105,16 +103,14 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 				</Group>
 			</Popover.Target>
 
-			<Popover.Dropdown
-				onClick={(e) => e.stopPropagation()}
-			>
-				<ScrollArea.Autosize mah={300} offsetScrollbars="present" scrollbarSize={8}>
+			<Popover.Dropdown onClick={(e) => e.stopPropagation()}>
+				<ScrollArea.Autosize mah={300} offsetScrollbars scrollbarSize={8}>
 					<Stack gap="xs">
 						<Select
 							placeholder="Options"
 							data={["Includes these tags", "Exactly these tags", "Not these tags"]}
 							defaultValue="Includes these tags"
-							comboboxProps={{ withinPortal: true }}
+							comboboxProps={{ withinPortal: false }}
 							value={filterMode}
 							onChange={(val) => {
 								selectMode(val ?? "Includes these tags")
@@ -145,11 +141,11 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 							</div>
 						))}
 
-							{hasActiveFilters && (
-								<Button variant="subtle" color="gray" size="xs" onClick={clearAll} mt={4}>
-									Clear filters
-								</Button>
-							)}
+						{hasActiveFilters && (
+							<Button variant="subtle" color="gray" size="xs" onClick={clearAll} mt={4}>
+								Clear filters
+							</Button>
+						)}
 					</Stack>
 				</ScrollArea.Autosize>
 			</Popover.Dropdown>
