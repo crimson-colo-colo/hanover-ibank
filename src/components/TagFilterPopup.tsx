@@ -8,6 +8,7 @@ import {
 	Select,
 	Stack,
 	Text,
+	ScrollArea
 } from "@mantine/core"
 import { type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { IconFilter } from "@tabler/icons-react"
@@ -69,6 +70,7 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 		<Popover
 			opened={open}
 			onChange={setOpen}
+			closeOnClickOutside={false}
 			position="bottom-start"
 			shadow="md"
 			width={260}
@@ -105,51 +107,51 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 
 			<Popover.Dropdown
 				onClick={(e) => e.stopPropagation()}
-				mah={300}
-				style={{ overflowY: "auto" }}
 			>
-				<Stack gap="xs">
-					<Select
-						placeholder="Options"
-						data={["Includes these tags", "Exactly these tags", "Not these tags"]}
-						defaultValue="Includes these tags"
-						comboboxProps={{ withinPortal: false }}
-						value={filterMode}
-						onChange={(val) => {
-							selectMode(val ?? "Includes these tags")
-						}}
-					/>
-					{Object.entries(tagsByCategory).map(([category, tags]) => (
-						<div key={category}>
-							<Text size="xs" fw={600} c="dimmed" tt="uppercase" mb={4}>
-								{tagCategoryDisplayName[category as TagCategory]}
-							</Text>
-							<Stack gap={4}>
-								{tags.map((tag) => {
-									const displayName =
-										tag.category === TagCategory.IntendedAudience
-											? employeeRoleDisplayName[tag.name as EmployeeRole]
-											: tag.name
-									return (
-										<Checkbox
-											key={`${tag.category}-${tag.name}`}
-											label={displayName}
-											checked={filterValue.includes(tag.name)}
-											onChange={() => toggleTag(tag.name)}
-											size="sm"
-										/>
-									)
-								})}
-							</Stack>
-						</div>
-					))}
+				<ScrollArea.Autosize mah={300} offsetScrollbars="present" scrollbarSize={8}>
+					<Stack gap="xs">
+						<Select
+							placeholder="Options"
+							data={["Includes these tags", "Exactly these tags", "Not these tags"]}
+							defaultValue="Includes these tags"
+							comboboxProps={{ withinPortal: true }}
+							value={filterMode}
+							onChange={(val) => {
+								selectMode(val ?? "Includes these tags")
+							}}
+						/>
+						{Object.entries(tagsByCategory).map(([category, tags]) => (
+							<div key={category}>
+								<Text size="xs" fw={600} c="dimmed" tt="uppercase" mb={4}>
+									{tagCategoryDisplayName[category as TagCategory]}
+								</Text>
+								<Stack gap={4}>
+									{tags.map((tag) => {
+										const displayName =
+											tag.category === TagCategory.IntendedAudience
+												? employeeRoleDisplayName[tag.name as EmployeeRole]
+												: tag.name
+										return (
+											<Checkbox
+												key={`${tag.category}-${tag.name}`}
+												label={displayName}
+												checked={filterValue.includes(tag.name)}
+												onChange={() => toggleTag(tag.name)}
+												size="sm"
+											/>
+										)
+									})}
+								</Stack>
+							</div>
+						))}
 
-					{hasActiveFilters && (
-						<Button variant="subtle" color="gray" size="xs" onClick={clearAll} mt={4}>
-							Clear filters
-						</Button>
-					)}
-				</Stack>
+							{hasActiveFilters && (
+								<Button variant="subtle" color="gray" size="xs" onClick={clearAll} mt={4}>
+									Clear filters
+								</Button>
+							)}
+					</Stack>
+				</ScrollArea.Autosize>
 			</Popover.Dropdown>
 		</Popover>
 	)
