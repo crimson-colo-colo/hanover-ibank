@@ -205,11 +205,14 @@ async function generatePptx() {
 async function downloadMedia() {
 	const mediaTypes = [
 		{ ext: "jpg", url: "https://picsum.photos/1200/800" },
-		{
-			ext: "mp4",
-			url: "https://www.w3schools.com/html/mov_bbb.mp4",
-		},
+		{ ext: "jpg", url: "https://picsum.photos/1920/1080" },
+		{ ext: "jpg", url: "https://picsum.photos/800/600" },
+		{ ext: "mp4", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
+		{ ext: "mp4", url: "https://www.w3schools.com/html/movie.mp4" },
+		{ ext: "mp4", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
 		{ ext: "mp3", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+		{ ext: "mp3", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+		{ ext: "mp3", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
 	]
 
 	for (const media of mediaTypes) {
