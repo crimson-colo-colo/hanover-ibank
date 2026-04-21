@@ -29,9 +29,9 @@ import {
 	IconDoorExit,
 	IconDoorOff,
 	IconDownload,
-	IconEye,
 	IconFilePencil,
 	IconLoader2,
+	IconMessageCircleUser,
 	IconProgress,
 	IconSortAscending2,
 	IconSortDescending2,
@@ -176,11 +176,17 @@ export function ContentTable({
 				enableSorting: false,
 				cell: (info) => {
 					return info.row.original.status === ContentStatus.Incomplete ? (
-						<IconProgress size={20} />
+						<Tooltip label="Incomplete">
+							<IconProgress size={20} />
+						</Tooltip>
 					) : info.row.original.status === ContentStatus.UnderReview ? (
-						<IconEye size={20} />
+						<Tooltip label="Under Review">
+							<IconMessageCircleUser size={20} />
+						</Tooltip>
 					) : (
-						<IconCircleCheck size={20} />
+						<Tooltip label="Complete">
+							<IconCircleCheck size={20} />
+						</Tooltip>
 					)
 				},
 			}),

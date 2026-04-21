@@ -25,8 +25,8 @@ import {
 	IconDoorEnter,
 	IconDoorExit,
 	IconDownload,
-	IconEye,
 	IconFileUpload,
+	IconMessageCircleUser,
 	IconPencil,
 	IconProgress,
 	IconStar,
@@ -336,7 +336,7 @@ export function MetadataSidebar({
 							{contentStatusDisplayName[content.status] === "Incomplete" ? (
 								<IconProgress />
 							) : contentStatusDisplayName[content.status] === "Under Review" ? (
-								<IconEye />
+								<IconMessageCircleUser />
 							) : (
 								<IconCircleCheck />
 							)}
