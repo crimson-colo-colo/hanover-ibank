@@ -22,10 +22,11 @@ import {
 	IconCheck,
 	IconCircleArrowUpRight,
 	IconCircleCheck,
+	IconDoorEnter,
+	IconDoorExit,
 	IconDownload,
 	IconEye,
 	IconFileUpload,
-	IconIdBadge2,
 	IconPencil,
 	IconProgress,
 	IconStar,
@@ -43,7 +44,7 @@ import { EditableTextField } from "@/components/EditableTextField.tsx"
 import { contentStatusDisplayName } from "@/lib/enums.ts"
 import { stringifyTagList, unstringifyTagList } from "@/lib/tags.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentListItem } from "../../server/routers/content.ts"
+import type { ContentListItem } from "../../shared/types.ts"
 
 export type EditableField =
 	| "title"
@@ -250,7 +251,7 @@ export function MetadataSidebar({
 						<Alert
 							title={
 								<Flex align="center" gap="xs">
-									<IconIdBadge2 />
+									<IconDoorExit />
 									Checked out
 								</Flex>
 							}
@@ -269,7 +270,7 @@ export function MetadataSidebar({
 							)}
 						</Alert>
 						{canCheckIn && (
-							<Button fullWidth leftSection={<IconIdBadge2 />} onClick={openConfirmCheckin}>
+							<Button fullWidth leftSection={<IconDoorEnter />} onClick={openConfirmCheckin}>
 								{isCheckInOverride ? "Force check in" : "Check in"}
 							</Button>
 						)}
@@ -409,7 +410,7 @@ export function MetadataSidebar({
 							<Button
 								fullWidth
 								variant="light"
-								leftSection={<IconIdBadge2 />}
+								leftSection={<IconDoorExit />}
 								onClick={openConfirmCheckout}
 							>
 								Check out
@@ -432,7 +433,7 @@ export function MetadataSidebar({
 										await checkOutContent.mutateAsync({ id: content.id })
 										closeConfirmCheckout()
 									}}
-									leftSection={<IconIdBadge2 />}
+									leftSection={<IconDoorExit />}
 								>
 									Check out
 								</Button>
@@ -510,7 +511,7 @@ export function MetadataSidebar({
 							await checkInContent.mutateAsync({ id: content.id })
 							closeConfirmCheckin()
 						}}
-						leftSection={<IconIdBadge2 />}
+						leftSection={<IconDoorEnter />}
 					>
 						Check in
 					</Button>
