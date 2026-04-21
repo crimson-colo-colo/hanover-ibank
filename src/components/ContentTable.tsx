@@ -38,6 +38,7 @@ import {
 	IconDownload,
 	IconLoader2,
 	IconMessageCircleUser,
+	IconPencilCheck,
 	IconPencilOff,
 	IconProgress,
 	IconSortAscending2,
@@ -220,7 +221,11 @@ export function ContentTable({
 									{host.replace(/^www\./, "")}
 								</span>
 								{info.row.original.checkedOutBy !== null &&
-									info.row.original.checkedOutBy?.id !== profile?.id && (
+									(info.row.original.checkedOutBy.id === profile?.id ? (
+										<Tooltip withArrow arrowSize={8} label="You have checked out this link">
+											<IconPencilCheck size={24} />
+										</Tooltip>
+									) : (
 										<Tooltip
 											withArrow
 											arrowSize={8}
@@ -228,7 +233,7 @@ export function ContentTable({
 										>
 											<IconPencilOff className="checked-out-icon" size={24} />
 										</Tooltip>
-									)}
+									))}
 							</div>
 						)
 					} else if (item.type === "Object") {
@@ -250,7 +255,11 @@ export function ContentTable({
 									{size}
 								</span>
 								{info.row.original.checkedOutBy !== null &&
-									info.row.original.checkedOutBy.id !== profile?.id && (
+									(info.row.original.checkedOutBy.id === profile?.id ? (
+										<Tooltip withArrow arrowSize={8} label="You have checked out this file">
+											<IconPencilCheck size={24} />
+										</Tooltip>
+									) : (
 										<Tooltip
 											withArrow
 											arrowSize={8}
@@ -258,7 +267,7 @@ export function ContentTable({
 										>
 											<IconPencilOff className="checked-out-icon" size={24} />
 										</Tooltip>
-									)}
+									))}
 							</div>
 						)
 					}
