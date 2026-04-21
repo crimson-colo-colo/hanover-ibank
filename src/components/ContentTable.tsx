@@ -9,7 +9,9 @@ import {
 	Kbd,
 	Modal,
 	Pill,
+	Popover,
 	SegmentedControl,
+	Stack,
 	Table,
 	Text,
 	TextInput,
@@ -28,6 +30,7 @@ import {
 	IconDoorEnter,
 	IconDoorExit,
 	IconDoorOff,
+	IconDotsVertical,
 	IconDownload,
 	IconLoader2,
 	IconMessageCircleUser,
@@ -37,6 +40,7 @@ import {
 	IconStar,
 	IconStarFilled,
 	IconTrash,
+	IconPencilOff
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import {
@@ -113,8 +117,6 @@ export function ContentTable({
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
-	const [cannotCheckContent, { open: openCannotCheckContent, close: closeCannotCheckContent }] =
-		useDisclosure(false)
 	const [checkOutContent, { open: openCheckOutContent, close: closeCheckOutContent }] =
 		useDisclosure(false)
 	const [checkInContent, { open: openCheckInContent, close: closeCheckInContent }] =
@@ -123,6 +125,19 @@ export function ContentTable({
 	const [contentUseState, setContentUseState] = useState<ContentListItem | null>(null)
 	const checkInContentMutation = useMutation(trpc.content.checkIn.mutationOptions(options))
 	const checkOutContentMutation = useMutation(trpc.content.checkOut.mutationOptions(options))
+	const [actionsMenu, {open: openActionsMenu, close: closeActionsMenu, toggle: toggleActionsMenu}] = useDisclosure(false)
+
+	const getInitials = (name : string) => {
+		if (name.includes(" ")) {
+			const splittedName = name.split(" ")
+			const firstInitial = splittedName[0][0]
+			const lastName = splittedName[1]
+			return firstInitial + ". " + lastName
+		}
+		else {
+			return name
+		}
+	}
 
 	const columns = useMemo(
 		() => [
@@ -215,6 +230,12 @@ export function ContentTable({
 								<span className="ml-2 text-xs text-gray-500 truncate" title={item.url}>
 									{host.replace(/^www\./, "")}
 								</span>
+								{(info.row.original.checkedOutBy !== null) &&
+									(info.row.original.checkedOutBy?.id !== profile?.id) &&
+									<Tooltip withArrow arrowSize={8} label={`Checked out by ${info.row.original.checkedOutBy.name}`}>
+										<IconPencilOff className="checked-out-icon" size={24}/>
+									</Tooltip>
+								}
 							</div>
 						)
 					} else if (item.type === "Object") {
@@ -235,6 +256,12 @@ export function ContentTable({
 								<span className="ml-2 text-xs text-gray-500 truncate" title={size}>
 									{size}
 								</span>
+								{(info.row.original.checkedOutBy !== null) &&
+									(info.row.original.checkedOutBy.id !== profile?.id) &&
+									<Tooltip withArrow arrowSize={8} label={`Checked out by ${info.row.original.checkedOutBy.name}`}>
+										<IconPencilOff className="checked-out-icon" size={24}/>
+									</Tooltip>
+								}
 							</div>
 						)
 					}
@@ -257,7 +284,7 @@ export function ContentTable({
 							className="w-6 h-6 shrink-0"
 						/>
 						<span className="truncate" title={info.row.original.owner.email}>
-							{info.row.original.owner.name}
+							{ getInitials(info.row.original.owner.name) }
 						</span>
 					</div>
 				),
@@ -267,8 +294,8 @@ export function ContentTable({
 				enableSorting: true,
 				sortingFn: "datetime",
 				cell: (info) => (
-					<span title={new UTCDate(info.getValue()).toLocaleString()}>
-						{formatDistanceToNow(new UTCDate(info.getValue()), { addSuffix: true })}
+					<span title={info.getValue().toLocaleString()}>
+						{info.getValue().toDateString().slice(3)}
 					</span>
 				),
 			}),
@@ -303,46 +330,9 @@ export function ContentTable({
 				id: "actions",
 				cell: (info) => (
 					<Flex className="content-actions" gap="2px" justify="flex-end">
-						{info.row.original.checkedOutBy !== null ? (
-							info.row.original.checkedOutBy?.id === profile?.id ? (
-								<ActionIcon
-									variant="subtle"
-									size="sm"
-									onClick={() => {
-										setContentUseState(info.row.original)
-										openCheckInContent()
-									}}
-								>
-									<IconDoorEnter />
-								</ActionIcon>
-							) : (
-								<ActionIcon
-									variant="subtle"
-									size="sm"
-									onClick={() => {
-										setCheckOutUser(info.row.original.checkedOutBy)
-										openCannotCheckContent()
-									}}
-								>
-									<IconDoorOff />
-								</ActionIcon>
-							)
-						) : (
-							<ActionIcon
-								variant="subtle"
-								size="sm"
-								onClick={() => {
-									setContentUseState(info.row.original)
-									openCheckOutContent()
-								}}
-							>
-								<IconDoorExit />
-							</ActionIcon>
-						)}
-
 						{info.row.original.type === "Link" ? (
 							<ActionIcon
-								variant="transparent"
+								variant="subtle"
 								size="sm"
 								onClick={(e) => {
 									if (info.row.original.type === ContentType.Link) {
@@ -354,7 +344,7 @@ export function ContentTable({
 							</ActionIcon>
 						) : (
 							<ActionIcon
-								variant="transparent"
+								variant="subtle"
 								size="sm"
 								onClick={async (e) => {
 									const { url } = await trpcClient.content.download.query({
@@ -366,6 +356,53 @@ export function ContentTable({
 								<IconDownload />
 							</ActionIcon>
 						)}
+						<Popover onOpen={openActionsMenu} onClose={closeActionsMenu} withinPortal={false}>
+							<Popover.Target>
+								<ActionIcon variant="subtle" size="sm" onClick={(e) => {
+									e.stopPropagation()
+									toggleActionsMenu()}}>
+									<IconDotsVertical />
+								</ActionIcon>
+							</Popover.Target>
+							<Popover.Dropdown>
+								<Stack>
+									{info.row.original.type === "Object" ? (
+									<Button leftSection={<IconDownload />} variant="subtle" onClick={async (e) => {
+										const { url } = await trpcClient.content.download.query({
+											id: info.row.original.id,
+										})
+										window.open(url, "_blank", "noopener")
+									}}>
+										Download
+									</Button>) :
+									(<Button leftSection={<IconCircleArrowUpRight />} variant="subtle" onClick={(e) => {
+										if (info.row.original.type === ContentType.Link) {
+											window.open(info.row.original.url)
+										}
+									}}>
+										Open link
+									</Button>)}
+									{info.row.original.checkedOutBy === null ? (
+										<Button leftSection={<IconDoorExit />} variant="subtle" withinPortal={false} onClick={() => {
+											toggleActionsMenu()
+											setContentUseState(info.row.original)
+											openCheckOutContent()
+										}}>
+										Check Out
+										</Button>) :
+										(info.row.original.checkedOutBy.id === profile?.id ?
+											(<Button leftSection={<IconDoorEnter/>} variant="subtle" onClick={() => {
+												toggleActionsMenu()
+												setContentUseState(info.row.original)
+												openCheckInContent()
+											}}>
+										Check In
+										</Button>) : <Button leftSection={<IconDoorExit />} variant="subtle" disabled>
+												Check Out
+											</Button>)}
+								</Stack>
+							</Popover.Dropdown>
+						</Popover>
 					</Flex>
 				),
 			}),
@@ -586,11 +623,6 @@ export function ContentTable({
 					</Button>
 				</Flex>
 			</Modal>
-			<CannotCheckOutModal
-				opened={cannotCheckContent}
-				closed={closeCannotCheckContent}
-				checkedOutBy={checkOutUser}
-			/>
 			<CheckInModal
 				opened={checkInContent}
 				closed={closeCheckInContent}
@@ -605,101 +637,86 @@ export function ContentTable({
 			/>
 		</>
 	)
-}
 
-function CannotCheckOutModal({
-	opened,
-	closed,
-	checkedOutBy,
-}: {
-	opened: boolean
-	closed: () => void
-	checkedOutBy: User | null
-}) {
-	return (
-		<Modal opened={opened} onClose={closed} title="Cannot Check Out Content">
-			<Text>
-				You cannot check out this content. It has been checked out by{" "}
-				<strong>{checkedOutBy?.name}</strong> ({checkedOutBy?.email}). Only they can edit the
-				content until it's checked back in.
-			</Text>
-		</Modal>
-	)
-}
+	function CheckInModal({
+		opened,
+		closed,
+		content,
+		checkInMutation,
+	}: {
+		opened: boolean
+		closed: () => void
+		content: ContentListItem | null
+		checkInMutation: CheckInMutationType
+	}) {
+		return (
+			<Modal opened={opened} onClose={closed} title="Confirm check in">
+				<Text>
+					Ready to check this content back in? Others will be able to edit it once it's checked in.
+				</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={closed}
+						disabled={checkInMutation.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={checkInMutation.isPending}
+						onClick={async () => {
+							if (content !== null) {
+								await checkInMutation.mutateAsync({ id: content.id })
+								closed()
+							}
+						}}
+						leftSection={<IconDoorEnter />}
+					>
+						Check in
+					</Button>
+				</Flex>
+			</Modal>
+		)
+	}
 
-function CheckInModal({
-	opened,
-	closed,
-	content,
-	checkInMutation,
-}: {
-	opened: boolean
-	closed: () => void
-	content: ContentListItem | null
-	checkInMutation: CheckInMutationType
-}) {
-	return (
-		<Modal opened={opened} onClose={closed} title="Confirm check in">
-			<Text>
-				Ready to check this content back in? Others will be able to edit it once it's checked in.
-			</Text>
-			<Flex gap="md" justify="flex-end" mt="md">
-				<Button variant="subtle" color="gray" onClick={closed} disabled={checkInMutation.isPending}>
-					Cancel
-				</Button>
-				<Button
-					loading={checkInMutation.isPending}
-					onClick={async () => {
-						if (content !== null) {
-							await checkInMutation.mutateAsync({ id: content.id })
-							closed()
-						}
-					}}
-					leftSection={<IconDoorEnter />}
-				>
-					Check in
-				</Button>
-			</Flex>
-		</Modal>
-	)
-}
-
-function CheckOutModal({
-	opened,
-	closed,
-	content,
-	checkOutMutation,
-}: {
-	opened: boolean
-	closed: () => void
-	content: ContentListItem | null
-	checkOutMutation: CheckOutMutationType
-}) {
-	return (
-		<Modal opened={opened} onClose={closed} title="Confirm check out">
-			<Text>Checking out this content will lock it out for editing by other users.</Text>
-			<Flex gap="md" justify="flex-end" mt="md">
-				<Button
-					variant="subtle"
-					color="gray"
-					onClick={closed}
-					disabled={checkOutMutation.isPending}
-				>
-					Cancel
-				</Button>
-				<Button
-					loading={checkOutMutation.isPending}
-					onClick={async () => {
-						if (content !== null) {
-							await checkOutMutation.mutateAsync({ id: content.id })
-							closed()
-						}
-					}}
-					leftSection={<IconDoorExit />}
-				>
-					Check out
-				</Button>
-			</Flex>
-		</Modal>
-	)
+	function CheckOutModal({
+		opened,
+		closed,
+		content,
+		checkOutMutation,
+	}: {
+		opened: boolean
+		closed: () => void
+		content: ContentListItem | null
+		checkOutMutation: CheckOutMutationType
+	}) {
+		return (
+			<Modal opened={opened} onClose={closed} title="Confirm check out">
+				<Text>Checking out this content will lock it out for editing by other users.</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={closed}
+						disabled={checkOutMutation.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={checkOutMutation.isPending}
+						onClick={async () => {
+							if (content !== null) {
+								await checkOutMutation.mutateAsync({ id: content.id })
+								closed()
+							}
+						}}
+						leftSection={<IconDoorExit />}
+					>
+						Check out
+					</Button>
+				</Flex>
+			</Modal>
+		)
+	}
 }
