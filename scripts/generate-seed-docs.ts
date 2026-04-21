@@ -27,7 +27,7 @@ const TOPICS = [
 	"Legal and General Counsel",
 ]
 
-const COUNT_PER_TYPE = 5
+const COUNT_PER_TYPE = 10
 
 async function ensureDir() {
 	if (fs.existsSync(OUTPUT_DIR)) {
@@ -298,13 +298,19 @@ async function downloadMedia() {
 	const mediaTypes = [
 		{
 			ext: "jpg",
-			url: () => `https://picsum.photos/seed/${faker.string.alphanumeric(8)}/1200/800`,
+			url: () =>
+				faker.helpers.arrayElement([
+					`https://picsum.photos/1200/800`,
+					"https://picsum.photos/1920/1080",
+					"https://picsum.photos/800/600",
+				]),
 		},
 		{
 			ext: "mp4",
 			url: () =>
 				faker.helpers.arrayElement([
 					"https://www.w3schools.com/html/mov_bbb.mp4",
+					"https://www.w3schools.com/html/movie.mp4",
 					"https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
 				]),
 		},
