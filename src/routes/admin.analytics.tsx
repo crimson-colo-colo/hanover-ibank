@@ -3,9 +3,9 @@ import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { queryClient, trpc } from "@/lib/trpc.ts"
-
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
@@ -270,11 +270,15 @@ export function AnalyticsDashboard() {
 							]}
 							withTooltip
 							withWeekdayLabels
+							weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
 							withMonthLabels
 							firstDayOfWeek={0}
 							rectSize={20}
 							rectRadius={20}
 							gap={5}
+							getTooltipLabel={({ date, value }) =>
+								`${dayjs(date).format("DD MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
+							}
 						/>
 					</Paper>
 				</Grid.Col>
