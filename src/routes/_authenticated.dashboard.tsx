@@ -18,6 +18,7 @@ import { PreviewModal } from "@/components/PreviewModal.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
+import DiscussionPanel from "@/components/discussion/DiscussionPanel"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -226,6 +227,9 @@ function RoleDashboard() {
 					)}
 				</Modal.Root>
 			</div>
+			<section className="mt-10">
+				<DiscussionPanel contentId="content-1" />
+			</section>
 		</main>
 	)
 }
