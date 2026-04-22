@@ -14,6 +14,7 @@ import {
 } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useForm } from "@mantine/form"
+
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { type ContentStatus, EmployeeRole, TagCategory } from "@prisma/browser.ts"
@@ -454,7 +455,6 @@ export function MetadataSidebar({
 						content for editing.
 					</Alert>
 				)}
-
 				<div className="grow" />
 
 				<Flex gap="sm">

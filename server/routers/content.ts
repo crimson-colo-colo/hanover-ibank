@@ -7,12 +7,7 @@ import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { Tag } from "../generated/prisma/client.ts"
-import {
-	ContentStatus,
-	type ContentType,
-	EmployeeRole,
-	TagCategory,
-} from "../generated/prisma/enums.ts"
+import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -453,6 +448,8 @@ export const contentRouter = router({
 				where: { id: opts.input.id },
 				data: {
 					lastModifiedDate: new Date(),
+					size: buffer.length,
+					mimeType: fileType,
 				},
 			})
 		}),
@@ -828,5 +825,101 @@ export const contentRouter = router({
 		return {
 			content: contentItem,
 		}
+	}),
+
+	getFileStats: authProcedure.query(async (opts) => {
+		const content = await db.content.findMany({
+			where: {
+				type: ContentType.Object,
+			},
+		})
+		const objects = await Promise.all(
+			content.map((content) =>
+				s3
+					.headObject({
+						Bucket: bucketName,
+						Key: content.objectId!,
+					})
+					.then((head) => [
+						{
+							type: head.Metadata?.filetype ?? head.ContentType ?? "unknown",
+							size: head.ContentLength ?? 0,
+						},
+					])
+					.catch(() => [])
+			)
+		).then((results) => results.flat())
+
+		const grouped = new Map<string, { count: number; totalSize: number }>()
+
+		for (const { type, size } of objects) {
+			const existing = grouped.get(type)
+			if (existing) {
+				existing.count += 1
+				existing.totalSize += size ?? 0
+			} else {
+				grouped.set(type, { count: 1, totalSize: size ?? 0 })
+			}
+		}
+
+		return Array.from(grouped.entries()).map(([type, { count, totalSize }]) => ({
+			type,
+			count,
+			totalSize,
+		}))
+	}),
+
+	getUploadStats: authProcedure.query(async () => {
+		const contents = await db.content.findMany({
+			where: {
+				createdAt: {
+					gte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12), // last 12 months
+				},
+			},
+			select: {
+				type: true,
+				createdAt: true,
+			},
+		})
+
+		const grouped = new Map<string, { Files: number; Links: number }>()
+
+		for (const { type, createdAt } of contents) {
+			const month = createdAt.toLocaleString("en-us", { month: "short" })
+			const existing = grouped.get(month)
+			if (existing) {
+				if (type === "Object") {
+					existing.Files++
+				} else {
+					existing.Links++
+				}
+			} else {
+				grouped.set(month, {
+					Files: type === "Object" ? 1 : 0,
+					Links: type === "Link" ? 1 : 0,
+				})
+			}
+		}
+
+		const monthOrder = [
+			"Jan",
+			"Feb",
+			"Mar",
+			"Apr",
+			"May",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Oct",
+			"Nov",
+			"Dec",
+		]
+
+		return monthOrder.map((month) => ({
+			month,
+			Files: grouped.get(month)?.Files ?? 0,
+			Links: grouped.get(month)?.Links ?? 0,
+		}))
 	}),
 })

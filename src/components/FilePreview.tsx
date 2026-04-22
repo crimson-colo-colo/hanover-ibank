@@ -48,7 +48,10 @@ export function FilePreviewProvider({
 	insideModal?: boolean
 }) {
 	const { data: contentPreview, isFetching } = useQuery(
-		trpc.preview.getContentUrl.queryOptions({ id: content.id })
+		trpc.preview.getContentUrl.queryOptions(
+			{ id: content.id },
+			{ enabled: content.type === ContentType.Object }
+		)
 	)
 	const { data: plaintextContent, isFetching: isPlaintextFetching } = useQuery(
 		trpc.preview.getPlaintextContent.queryOptions(
