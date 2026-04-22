@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Flex, Indicator, Modal } from "@mantine/core"
+import { ActionIcon, Button, Flex, Modal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
 import { IconInfoCircle, IconLoader2, IconMessageCircle } from "@tabler/icons-react"
