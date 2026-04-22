@@ -9,33 +9,39 @@ export const discussionRouter = router({
 		.input(
 			z.object({
 				contentId: z.string().min(1),
-				includeComments: z.boolean().optional(),
 			})
 		)
 		.query(async ({ input }) => {
-			const includeComments = input.includeComments ?? true
 			return db.contentTalkThread.findMany({
 				where: {
 					contentId: input.contentId,
 				},
 				orderBy: {
-					createdAt: "asc",
+					updatedAt: "asc",
 				},
 				select: {
+					id: true,
 					title: true,
-					body: true,
 					createdBy: {
 						select: { id: true },
 					},
-					comments: includeComments
-						? {
-								select: {
-									authorId: true,
-									body: true,
-									createdAt: true,
-								},
-							}
-						: undefined,
+					updatedAt: true,
+					createdAt: true,
+					status: true,
+					resolvedAt: true,
+					resolvedBy: { select: { id: true } },
+					content: { select: { id: true } },
+					comments: {
+						select: {
+							author: { select: { id: true } },
+							body: true,
+							createdAt: true,
+							updatedAt: true,
+						},
+						orderBy: {
+							updatedAt: "asc",
+						},
+					},
 				},
 			})
 		}),
@@ -43,6 +49,7 @@ export const discussionRouter = router({
 	createThread: authProcedure
 		.input(
 			z.object({
+				contentId: z.string(),
 				title: z.string().min(1).max(250).optional(),
 				body: z.string().min(1).max(5000),
 			})
@@ -64,6 +71,7 @@ export const discussionRouter = router({
 			return db.contentTalkThread.create({
 				data: {
 					title: opts.input.title,
+					content: { connect: { id: opts.input.contentId } },
 					createdBy: { connect: { id: opts.ctx.auth.sub } },
 					comments: {
 						create: {
@@ -76,6 +84,7 @@ export const discussionRouter = router({
 					updatedAt: new Date(),
 				},
 				include: {
+					id: true,
 					createdBy: true,
 					comments: {
 						include: {
@@ -94,7 +103,7 @@ export const discussionRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const thread = await db.contentThread.findUnique({
+			const thread = await db.contentTalkThread.findUnique({
 				where: {
 					id: opts.input.threadId,
 				},
@@ -114,22 +123,30 @@ export const discussionRouter = router({
 				})
 			}
 
-			return db.contentTalkThread.u
-			id: opts.input.threadId
-			,
-					author:
-			id: opts.ctx.auth.sub
-			,
-					body: opts.input.body,
-					createdAt: new Date(),
-					updatedAt
-			,
-				include:
-			author: true,
-			,
-			)
+			return db.contentTalkThread.update({
+				where: {
+					id: opts.input.threadId,
+				},
+				data: {
+					updatedAt: { set: new Date() },
+					comments: {
+						create: {
+							author: { connect: { id: opts.ctx.auth.sub } },
+							body: opts.input.body,
+							createdAt: new Date(),
+						},
+					},
+				},
+				include: {
+					id: true,
+					comments: {
+						include: {
+							author: true,
+						},
+					},
+				},
+			})
 		}),
-
 	resolveThread: authProcedure
 		.input(
 			z.object({
@@ -137,14 +154,14 @@ export const discussionRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			return db.contentThread.update({
+			return db.contentTalkThread.update({
 				where: {
 					id: opts.input.threadId,
 				},
 				data: {
 					status: ThreadStatus.Resolved,
 					resolvedAt: new Date(),
-					resolvedById: opts.ctx.auth.sub,
+					resolvedBy: { connect: { id: opts.ctx.auth.sub } },
 				},
 			})
 		}),
@@ -155,14 +172,14 @@ export const discussionRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			return db.contentThread.update({
+			return db.contentTalkThread.update({
 				where: {
 					id: opts.input.threadId,
 				},
 				data: {
 					status: ThreadStatus.Open,
 					resolvedAt: null,
-					resolvedById: null,
+					resolvedBy: { disconnect: true },
 				},
 			})
 		}),

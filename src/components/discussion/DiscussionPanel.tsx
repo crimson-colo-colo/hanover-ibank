@@ -50,61 +50,24 @@ type Props = {
 	contentId: string
 }
 
-const mockThreads: Thread[] = [
-	{
-		id: "t1",
-		contentId: "content-1",
-		title: "Should this paragraph cite the RFC directly?",
-		sectionLabel: "Authentication",
-		status: "Open",
-		createdAt: "2026-04-17T10:30:00.000Z",
-		createdBy: { id: "u1", name: "Maya Patel" },
-		comments: [
-			{
-				id: "c1",
-				body: "I think this section is making a standards claim without pointing to the primary reference.",
-				createdAt: "2026-04-17T10:31:00.000Z",
-				author: { id: "u1", name: "Maya Patel" },
-			},
-		],
-	},
-	{
-		id: "t2",
-		contentId: "content-1",
-		title: "Clarify whether this applies to mobile only",
-		sectionLabel: "Client behavior",
-		status: "Resolved",
-		createdAt: "2026-04-15T14:08:00.000Z",
-		createdBy: { id: "u3", name: "Sofia Chen" },
-		resolvedBy: { id: "u2", name: "Daniel Kim" },
-		resolvedAt: "2026-04-16T08:22:00.000Z",
-		comments: [
-			{
-				id: "c2",
-				body: "The wording here sounds platform-agnostic, but the implementation note below seems mobile-specific.",
-				createdAt: "2026-04-15T14:10:00.000Z",
-				author: { id: "u3", name: "Sofia Chen" },
-			},
-		],
-	},
-]
-
 export default function DiscussionPanel({ contentId }: Props) {
 	const threads = useQuery(
 		trpc.content.discussion.getThreadsByContentId.queryOptions({ contentId: contentId })
 	)
+	const [activeFilter, setActiveFilter] = useState<"all" | "open" | "resolved" | "archived">("all")
+	const [query, setQuery] = useState("")
+	const [selectedThread, setSelectedThread] = useState<Thread | null>(null)
 	const [drawerOpened, setDrawerOpened] = useState(false)
 	const [createOpened, setCreateOpened] = useState(false)
 
 	const filteredThreads = useMemo(() => {
-		return threads.filter((thread) => {
+		return threads.data?.filter((thread) => {
 			const matchesFilter =
-				activeFilter === "all" ? true : thread.status.toLowerCase() === activeFilter
+				activeFilter === null ? true : thread.status.toLowerCase() === activeFilter
 
 			const searchBlob = [
 				thread.title || "",
-				thread.sectionLabel || "",
-				thread.createdBy.name,
+				// thread.createdBy.name, // we are incapable of doing this efficiently at the moment
 				...thread.comments.map((comment) => comment.body),
 			]
 				.join(" ")
@@ -116,93 +79,50 @@ export default function DiscussionPanel({ contentId }: Props) {
 	}, [threads, activeFilter, query])
 
 	const openThread = (thread: Thread) => {
-		setSelectedThread(thread)
 		setDrawerOpened(true)
 	}
 
-	const handleCreateThread = (values: { title: string; sectionLabel: string; body: string }) => {
-		const newThread: Thread = {
-			id: `t-${Date.now()}`,
-			contentId,
-			title: values.title || null,
-			sectionLabel: values.sectionLabel || null,
-			status: "Open",
-			createdAt: new Date().toISOString(),
-			createdBy: { id: "current-user", name: "You" },
-			comments: [
-				{
-					id: `c-${Date.now()}`,
-					body: values.body,
-					createdAt: new Date().toISOString(),
-					author: { id: "current-user", name: "You" },
-				},
-			],
-		}
+	const threadMutation = useMutation(trpc.content.discussion.createThread.mutationOptions())
 
-		setThreads((prev) => [newThread, ...prev])
-		setSelectedThread(newThread)
+	const handleCreateThread = async (values: { title: string; body: string }) => {
+		await threadMutation.mutateAsync({
+			contentId: contentId,
+			title: values.title,
+			body: values.body,
+		})
+		await threads.refetch()
+
 		setDrawerOpened(true)
 	}
 
-	const handleReply = (threadId: string, body: string) => {
-		setThreads((prev) =>
-			prev.map((thread) =>
-				thread.id === threadId
-					? {
-							...thread,
-							comments: [
-								...thread.comments,
-								{
-									id: `c-${Date.now()}`,
-									body,
-									createdAt: new Date().toISOString(),
-									author: { id: "current-user", name: "You" },
-								},
-							],
-						}
-					: thread
-			)
-		)
+	const replyMutation = useMutation(trpc.content.discussion.addComment.mutationOptions())
+
+	const handleReply = async (threadId: string, body: string) => {
+		await replyMutation.mutateAsync({ threadId, body })
+		await threads.refetch()
 	}
 
-	const handleResolve = (threadId: string) => {
-		setThreads((prev) =>
-			prev.map((thread) =>
-				thread.id === threadId
-					? {
-							...thread,
-							status: "Resolved",
-							resolvedAt: new Date().toISOString(),
-							resolvedBy: { id: "current-user", name: "You" },
-						}
-					: thread
-			)
-		)
+	const resolveMutation = useMutation(trpc.content.discussion.resolveThread.mutationOptions())
+
+	const handleResolve = async (threadId: string) => {
+		await resolveMutation.mutateAsync({ threadId })
 	}
 
-	const handleReopen = (threadId: string) => {
-		setThreads((prev) =>
-			prev.map((thread) =>
-				thread.id === threadId
-					? {
-							...thread,
-							status: "Open",
-							resolvedAt: null,
-							resolvedBy: null,
-						}
-					: thread
-			)
-		)
+	const reopenMutation = useMutation(trpc.content.discussion.reopenThread.mutationOptions())
+
+	const handleReopen = async (threadId: string) => {
+		await reopenMutation.mutateAsync({ threadId })
 	}
 
 	const counts = {
-		all: threads.length,
-		open: threads.filter((t) => t.status === "Open").length,
-		resolved: threads.filter((t) => t.status === "Resolved").length,
-		archived: threads.filter((t) => t.status === "Archived").length,
+		all: threads.data?.length ?? "Loading",
+		open: threads.data?.filter((t) => t.status === "Open")?.length ?? "Loading",
+		resolved: threads.data?.filter((t) => t.status === "Resolved")?.length ?? "Loading",
+		archived: threads.data?.filter((t) => t.status === "Archived")?.length ?? "Loading",
 	}
 
-	const selectedThreadFresh = threads.find((thread) => thread.id === selectedThread?.id) ?? null
+	const selectedThreadFresh =
+		threads.data?.find((thread) => thread.id === selectedThread?.id) ?? null
 
 	return (
 		<Box p="md">
