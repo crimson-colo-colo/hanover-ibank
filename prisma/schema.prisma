@@ -88,6 +88,7 @@ enum ContentStatus {
   UnderReview
   Complete
 }
+
 model UserAnalytics {
   id         String   @id @default(cuid())
   employeeId String   @unique
@@ -101,19 +102,21 @@ model RecentFile {
   id          String        @id @default(cuid())
   analyticsId String
   analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
-  contentID   String
-  content     Content       @relation(fields: [contentID], references: [id])
+  contentId   String
+  content     Content       @relation(fields: [contentId], references: [id])
   openedAt    DateTime      @default(now())
+  contentId   String
 }
 
 model CommonFile {
   analyticsId String
   analytics   UserAnalytics @relation(fields: [analyticsId], references: [id])
-  contentID   String
-  content     Content       @relation(fields: [contentID], references: [id])
+  contentId   String
+  content     Content       @relation(fields: [contentId], references: [id])
   openCount   Int           @default(1)
+  contentId   String
 
-  @@id([analyticsId, contentID])
+  @@id([analyticsId, contentId])
 }
 
 enum ContentType {

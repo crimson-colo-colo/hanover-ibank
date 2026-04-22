@@ -3,6 +3,7 @@ import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 
@@ -59,9 +60,19 @@ export function AnalyticsDashboard() {
 		.toISOString()
 		.slice(0, 10)
 
-	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
-	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
-	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
+	const normalizedUploadData = (uploadStats ?? []).map((item, i) => {
+		const date = new Date()
+		date.setMonth(date.getMonth() - 11 + i)
+		return {
+			...item,
+			month: date.toLocaleString("default", { month: "short", year: "2-digit" }),
+		}
+	})
+
+	const totalUploads = normalizedUploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
+	const totalFiles = normalizedUploadData.reduce((sum, m) => sum + m.Files, 0)
+	const totalLinks = normalizedUploadData.reduce((sum, m) => sum + m.Links, 0)
+
 	const mostActive =
 		uploadData.length > 0
 			? uploadData.reduce((max, m) => (m.Files + m.Links > max.Files + max.Links ? m : max))
@@ -154,13 +165,16 @@ export function AnalyticsDashboard() {
 						</Text>
 						<AreaChart
 							h={220}
-							data={uploadData}
+							data={normalizedUploadData}
 							dataKey="month"
 							series={[
 								{ name: "Files", color: "blue" },
 								{ name: "Links", color: "teal" },
 							]}
 							curveType="monotone"
+							xAxisProps={{
+								padding: { right: 20 },
+							}}
 						/>
 					</Paper>
 				</Grid.Col>
@@ -175,7 +189,11 @@ export function AnalyticsDashboard() {
 								{(userData ?? []).map((activity, i) => {
 									const { title, description } = getActivityLabel(activity.path)
 									return (
-										<Timeline.Item key={i} bullet={<IconUserKey size={12} />} title={title}>
+										<Timeline.Item
+											key={`${activity.employeeId}_${activity.path}_${activity.timestamp.getDate()}`}
+											bullet={<IconUserKey size={12} />}
+											title={title}
+										>
 											<Text size="sm" c="dimmed">
 												{activity.contentTitle
 													? `Uploaded "${activity.contentTitle}"`
@@ -262,11 +280,15 @@ export function AnalyticsDashboard() {
 							]}
 							withTooltip
 							withWeekdayLabels
+							weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
 							withMonthLabels
 							firstDayOfWeek={0}
 							rectSize={20}
 							rectRadius={20}
 							gap={5}
+							getTooltipLabel={({ date, value }) =>
+								`${dayjs(date).format("DD MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
+							}
 						/>
 					</Paper>
 				</Grid.Col>

@@ -1,3 +1,4 @@
+import { UTCDate } from "@date-fns/utc"
 import { Temporal } from "@js-temporal/polyfill"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
@@ -78,29 +79,12 @@ export const authProcedure = publicProcedure.use(async (opts) => {
 		roundingIncrement: 24,
 	})
 
-	await db.userActivity.upsert({
-		where: {
-			timestamp_employeeId_path: {
-				employeeId: auth.sub,
-				timestamp: new Date(nowTruncated.epochMilliseconds),
-				path: opts.path,
-			},
-		},
-		create: {
-			employee: {
-				connect: {
-					id: auth.sub,
-				},
-			},
-			timestamp: new Date(nowTruncated.epochMilliseconds),
-			path: opts.path,
-			day: new Date(day.epochMilliseconds),
-			hour: new Date(hour.epochMilliseconds),
-		},
-		update: {
-			count: { increment: 1 },
-		},
-	})
+	// FIXME: fix this awful way to handle concurrent upserts
+	try {
+		await logActivity(auth, nowTruncated, opts, day, hour)
+	} catch {
+		await logActivity(auth, nowTruncated, opts, day, hour)
+	}
 
 	return opts.next({
 		ctx: {
@@ -122,3 +106,34 @@ export const adminProcedure = authProcedure.use(async (opts) => {
 		ctx: opts.ctx,
 	})
 })
+async function logActivity(
+	auth: JWTPayload,
+	nowTruncated: Temporal.Instant,
+	opts: { path: string },
+	day: Temporal.Instant,
+	hour: Temporal.Instant
+) {
+	await db.userActivity.upsert({
+		where: {
+			timestamp_employeeId_path: {
+				employeeId: auth.sub,
+				timestamp: new UTCDate(nowTruncated.epochMilliseconds).toISOString(),
+				path: opts.path,
+			},
+		},
+		create: {
+			employee: {
+				connect: {
+					id: auth.sub,
+				},
+			},
+			timestamp: new UTCDate(nowTruncated.epochMilliseconds).toISOString(),
+			path: opts.path,
+			day: new UTCDate(day.epochMilliseconds).toISOString(),
+			hour: new UTCDate(hour.epochMilliseconds).toISOString(),
+		},
+		update: {
+			count: { increment: 1 },
+		},
+	})
+}
