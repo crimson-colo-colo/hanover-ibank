@@ -348,13 +348,13 @@ export function MetadataSidebar({
 							data-enabled={canEdit}
 						>
 							<div className="@xs:contents flex items-center gap-2">
-							{contentStatusDisplayName[content.status] === "Incomplete" ? (
-								<IconProgress />
-							) : contentStatusDisplayName[content.status] === "Under Review" ? (
-								<IconMessageCircleUser />
-							) : (
-								<IconCircleCheck />
-							)}
+								{contentStatusDisplayName[content.status] === "Incomplete" ? (
+									<IconProgress />
+								) : contentStatusDisplayName[content.status] === "Under Review" ? (
+									<IconMessageCircleUser />
+								) : (
+									<IconCircleCheck />
+								)}
 								<span className="text-gray-600">Status</span>
 							</div>
 							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">

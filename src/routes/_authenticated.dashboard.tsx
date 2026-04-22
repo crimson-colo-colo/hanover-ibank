@@ -4,6 +4,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { ContentType, type EmployeeRole } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
+import type { ContentListItem } from "@shared/types.ts"
 import { IconAlertOctagon, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
@@ -13,7 +14,6 @@ import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { PreviewModal } from "@/components/PreviewModal.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
-import type { ContentListItem } from "@shared/types.ts"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
