@@ -12,13 +12,13 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import { ContentTable } from "@/components/ContentTable.tsx"
+import DiscussionPanel from "@/components/discussion/DiscussionPanel.tsx"
 import { EditContentForm } from "@/components/EditContentForm.tsx"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { PreviewModal } from "@/components/PreviewModal.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import type { ContentListItem } from "../../server/routers/content.ts"
-import DiscussionPanel from "@/components/discussion/DiscussionPanel"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,

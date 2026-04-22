@@ -52,15 +52,15 @@ export type Employee = Prisma.EmployeeModel
  */
 export type Content = Prisma.ContentModel
 /**
- * Model ContentThread
+ * Model ContentTalkThread
  * 
  */
-export type ContentThread = Prisma.ContentThreadModel
+export type ContentTalkThread = Prisma.ContentTalkThreadModel
 /**
- * Model ThreadComment
+ * Model TalkThreadComment
  * 
  */
-export type ThreadComment = Prisma.ThreadCommentModel
+export type TalkThreadComment = Prisma.TalkThreadCommentModel
 /**
  * Model Tag
  * 

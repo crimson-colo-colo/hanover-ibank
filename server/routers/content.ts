@@ -17,6 +17,7 @@ import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
+import { discussionRouter } from "./discussion.ts"
 
 type User = {
 	id: string
@@ -57,6 +58,7 @@ export interface ContentList {
 }
 
 export const contentRouter = router({
+	discussion: discussionRouter,
 	list: authProcedure
 		.input(z.object({ filter: z.enum(Object.values(ContentFilter)) }))
 		.query(async (opts): Promise<ContentList> => {

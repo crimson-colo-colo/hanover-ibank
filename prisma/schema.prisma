@@ -22,23 +22,22 @@ enum ThreadStatus {
 model Employee {
   id                String            @id
   role              EmployeeRole
-  content           Content[]         @relation("Owner")
   favorite          FavoriteContent[]
   checkedOutContent Content[]         @relation("CheckedOutContent")
 
-  createdThreads  ContentThread[] @relation("ThreadCreatedBy")
-  resolvedThreads ContentThread[] @relation("ThreadResolvedBy")
-  comments        ThreadComment[] @relation("CommentAuthor")
+  content  Content[]           @relation("Owner")
+  threads  ContentTalkThread[] @relation("ThreadCreatedBy")
+  comments TalkThreadComment[] @relation("CommentAuthor")
 }
 
 model Content {
-  id               String            @id @default(cuid())
+  id               String              @id @default(cuid())
   title            String
   description      String?
-  status           ContentStatus     @default(Incomplete)
+  status           ContentStatus       @default(Incomplete)
   type             ContentType
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
   lastModifiedDate DateTime
   expirationDate   DateTime
   /// S3 Object ID
@@ -46,44 +45,39 @@ model Content {
   /// URL for links
   url              String?
   ownerId          String
-  owner            Employee          @relation("Owner", fields: [ownerId], references: [id])
+  owner            Employee            @relation("Owner", fields: [ownerId], references: [id])
   tags             ContentTag[]
   favoritedBy      FavoriteContent[]
   checkedOutById   String?
-  checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
-  threads          ContentThread[]
+  checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+  threads          ContentTalkThread[]
 }
 
-model ContentThread {
+model ContentTalkThread {
   id           String       @id @default(cuid())
-  contentId    String
   title        String?
-  sectionLabel String?
+  body String
   status       ThreadStatus @default(Open)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  resolvedAt   DateTime?
-  createdById  String
-  resolvedById String?
 
-  content    Content         @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  createdBy  Employee        @relation("ThreadCreatedBy", fields: [createdById], references: [id])
-  resolvedBy Employee?       @relation("ThreadResolvedBy", fields: [resolvedById], references: [id])
-  comments   ThreadComment[]
+  createdById  String
+  createdBy Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
+  contentId    String
+  content   Content             @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  comments  TalkThreadComment[]
 }
 
-model ThreadComment {
-  id        String    @id @default(cuid())
-  threadId  String
-  authorId  String
-  body      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  editedAt  DateTime?
-  deletedAt DateTime?
+model TalkThreadComment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  thread ContentThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  author Employee      @relation("CommentAuthor", fields: [authorId], references: [id])
+  threadId String
+  thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
 }
 
 model Tag {
