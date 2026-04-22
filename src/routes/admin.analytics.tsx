@@ -1,52 +1,45 @@
 import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
 import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
-import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
+import { IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { queryClient, trpc } from "@/lib/trpc"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
+import { queryClient, trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
 
 export function AnalyticsDashboard() {
-	const { data: fileStats } = useQuery(
-		trpc.content.getFileStats.queryOptions(),
-		queryClient
-	)
+	const { data: fileStats } = useQuery(trpc.content.getFileStats.queryOptions(), queryClient)
 
-	const { data: activityData } = useQuery(
-		trpc.userActivity.viewUserActivityHeatmap.queryOptions(),
-		queryClient
-	)
-
-	const { data: uploadStats } = useQuery(
-		trpc.content.getUploadStats.queryOptions(),
-		queryClient
-	)
+	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions(), queryClient)
 
 	const { data: heatmapData } = useQuery(
 		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions(),
 		queryClient
 	)
 
-	const { data: userData } = useQuery({
-		...trpc.userActivity.viewRecentActivity.queryOptions(),
-		refetchInterval: 5000,
+	const { data: userData } = useQuery(
+		{
+			...trpc.userActivity.viewRecentActivity.queryOptions(),
+			refetchInterval: 5000,
 		},
 		queryClient
 	)
 
-	const { data: userStats } = useQuery(
-		trpc.admin.getStats.queryOptions(),
-		queryClient
-	)
+	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions(), queryClient)
 
-// compute start/end from actual data
-	const heatmapDates = Object.keys(heatmapData ?? {}).sort()
-
-	const COLORS = ["violet.6", "blue.6", "teal.6", "orange.6", "red.6", "green.6", "pink.6", "cyan.6"]
+	const COLORS = [
+		"violet.6",
+		"blue.6",
+		"teal.6",
+		"orange.6",
+		"red.6",
+		"green.6",
+		"pink.6",
+		"cyan.6",
+	]
 
 	const barData = (fileStats ?? []).map((item) => ({
 		type: item.type,
@@ -62,15 +55,17 @@ export function AnalyticsDashboard() {
 	const uploadData = uploadStats ?? []
 
 	const endDate = new Date().toISOString().slice(0, 10)
-	const startDate = new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().slice(0, 10)
-
+	const startDate = new Date(new Date().setMonth(new Date().getMonth() - 6))
+		.toISOString()
+		.slice(0, 10)
 
 	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
 	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
-	const mostActive = uploadData.length > 0
-		? uploadData.reduce((max, m) => m.Files + m.Links > max.Files + max.Links ? m : max)
-		: { month: "-" }
+	const mostActive =
+		uploadData.length > 0
+			? uploadData.reduce((max, m) => (m.Files + m.Links > max.Files + max.Links ? m : max))
+			: { month: "-" }
 
 	const [timeOnSite, setTimeOnSite] = useState(0)
 
@@ -93,27 +88,42 @@ export function AnalyticsDashboard() {
 	}
 
 	const metrics = [
-		{ label: "Time On Site", value: formatTime(timeOnSite)},
+		{ label: "Time On Site", value: formatTime(timeOnSite) },
 		{ label: "Total Uploads", value: totalUploads },
 		{ label: "Files", value: totalFiles },
 		{ label: "Links", value: totalLinks },
 		{ label: "Top Month", value: mostActive.month },
-		{ label: "Employees", value: userStats?.employeeCount ?? "-"},
+		{ label: "Employees", value: userStats?.employeeCount ?? "-" },
 	]
 
 	function getActivityLabel(path: string): { title: string; description: string } {
-		if (path.includes("content.list")) return { title: "Content Viewed", description: "Browsed content library" }
-		if (path.includes("content.get")) return { title: "File Accessed", description: "Opened a file" }
-		if (path.includes("content.download")) return { title: "File Downloaded", description: "Downloaded a file" }
-		if (path.includes("content.create") || path.includes("forms.createContent")) return { title: "File Uploaded", description: "Uploaded new content" }
-		if (path.includes("content.update") || path.includes("content.updateFile")) return { title: "File Edited", description: "Updated content" }
-		if (path.includes("content.delete")) return { title: "File Deleted", description: "Deleted content" }
-		if (path.includes("content.favorite")) return { title: "Content Favorited", description: "Marked content as favorite" }
-		if (path.includes("content.unfavorite")) return { title: "Content Unfavorited", description: "Marked content as unfavorite" }
-		if (path.includes("content.checkOut")) return { title: "File Checked Out", description: "Checked out a file" }
-		if (path.includes("content.checkIn")) return { title: "File Checked In", description: "Checked in a file" }
-		if (path.includes("admin.listUsers")) return { title: "Employee Management Page Viewed", description: "Visited employee management" }
-		if (path.includes("admin.") ) return { title: "Analytics Dashboard Viewed", description: "Visited analytics dashboard" }
+		if (path.includes("content.list"))
+			return { title: "Content Viewed", description: "Browsed content library" }
+		if (path.includes("content.get"))
+			return { title: "File Accessed", description: "Opened a file" }
+		if (path.includes("content.download"))
+			return { title: "File Downloaded", description: "Downloaded a file" }
+		if (path.includes("content.create") || path.includes("forms.createContent"))
+			return { title: "File Uploaded", description: "Uploaded new content" }
+		if (path.includes("content.update") || path.includes("content.updateFile"))
+			return { title: "File Edited", description: "Updated content" }
+		if (path.includes("content.delete"))
+			return { title: "File Deleted", description: "Deleted content" }
+		if (path.includes("content.favorite"))
+			return { title: "Content Favorited", description: "Marked content as favorite" }
+		if (path.includes("content.unfavorite"))
+			return { title: "Content Unfavorited", description: "Marked content as unfavorite" }
+		if (path.includes("content.checkOut"))
+			return { title: "File Checked Out", description: "Checked out a file" }
+		if (path.includes("content.checkIn"))
+			return { title: "File Checked In", description: "Checked in a file" }
+		if (path.includes("admin.listUsers"))
+			return {
+				title: "Employee Management Page Viewed",
+				description: "Visited employee management",
+			}
+		if (path.includes("admin."))
+			return { title: "Analytics Dashboard Viewed", description: "Visited analytics dashboard" }
 		return { title: path, description: "" }
 	}
 
@@ -165,13 +175,11 @@ export function AnalyticsDashboard() {
 								{(userData ?? []).map((activity, i) => {
 									const { title, description } = getActivityLabel(activity.path)
 									return (
-										<Timeline.Item
-											key={i}
-											bullet={<IconUserKey size={12} />}
-											title={title}
-										>
+										<Timeline.Item key={i} bullet={<IconUserKey size={12} />} title={title}>
 											<Text size="sm" c="dimmed">
-												{activity.contentTitle ? `Uploaded "${activity.contentTitle}"` : description}
+												{activity.contentTitle
+													? `Uploaded "${activity.contentTitle}"`
+													: description}
 											</Text>
 											<Text size="xs" mt={4}>
 												{new Date(activity.timestamp).toLocaleTimeString()}
@@ -203,7 +211,9 @@ export function AnalyticsDashboard() {
 								labelsType="value"
 							/>
 						) : (
-							<Text c="dimmed" ta="center" mt="xl">No file data available yet</Text>
+							<Text c="dimmed" ta="center" mt="xl">
+								No file data available yet
+							</Text>
 						)}
 					</Paper>
 				</Grid.Col>
@@ -226,7 +236,9 @@ export function AnalyticsDashboard() {
 								series={[{ name: "storage", color: "violet.6", label: "Storage Used" }]}
 							/>
 						) : (
-							<Text c="dimmed" ta="center" mt="xl">No file data available yet</Text>
+							<Text c="dimmed" ta="center" mt="xl">
+								No file data available yet
+							</Text>
 						)}
 					</Paper>
 				</Grid.Col>
@@ -243,10 +255,10 @@ export function AnalyticsDashboard() {
 							startDate={startDate}
 							endDate={endDate}
 							colors={[
-								'var(--mantine-color-violet-2)',
-								'var(--mantine-color-violet-3)',
-								'var(--mantine-color-violet-4)',
-								'var(--mantine-color-violet-5)',
+								"var(--mantine-color-violet-2)",
+								"var(--mantine-color-violet-3)",
+								"var(--mantine-color-violet-4)",
+								"var(--mantine-color-violet-5)",
 							]}
 							withTooltip
 							withWeekdayLabels
