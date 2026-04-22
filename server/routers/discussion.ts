@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server"
 import z from "zod"
+import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { ThreadStatus } from "../generated/prisma/enums.ts"
 import { authProcedure, router } from "../trpc.ts"
@@ -12,7 +13,7 @@ export const discussionRouter = router({
 			})
 		)
 		.query(async ({ input }) => {
-			return db.contentTalkThread.findMany({
+			const findMany = await db.contentTalkThread.findMany({
 				where: {
 					contentId: input.contentId,
 				},
@@ -45,6 +46,26 @@ export const discussionRouter = router({
 					},
 				},
 			})
+			const users = findMany
+				.flatMap((v) => [v.createdBy, v.resolvedBy, ...v.comments.flatMap((v) => v.author)])
+				.filter((v) => v !== null)
+			const auth0User = new Map(
+				await Promise.all(
+					users.map(async ({ id }) => {
+						const v = await auth0Management.users.get(id)
+						return [
+							id as const,
+							{
+								id: id,
+								name: v.name ?? v.nickname ?? v.username!,
+								email: v.email!,
+								username: v.username!,
+							},
+						]
+					})
+				)
+			)
+			return { threads: findMany, users: auth0User }
 		}),
 
 	createThread: authProcedure
@@ -76,6 +97,7 @@ export const discussionRouter = router({
 					createdBy: { connect: { id: opts.ctx.auth.sub } },
 					comments: {
 						create: {
+							body: opts.input.body,
 							author: { connect: { id: opts.ctx.auth.sub } },
 							createdAt: new Date(),
 							updatedAt: new Date(),

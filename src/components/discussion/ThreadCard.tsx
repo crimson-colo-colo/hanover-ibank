@@ -19,15 +19,24 @@ function getStatusColor(status: ThreadStatus) {
 	return "gray"
 }
 
-export type Thread = (typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"][0]
+export type Thread =
+	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["threads"]
+export type Users =
+	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["users"]
 
 type Props = {
 	thread: Thread
 	onOpen: (thread: Thread) => void
+	users: Users
 }
 
-export default function ThreadCard({ thread, onOpen }: Props) {
+export default function ThreadCard({ thread, onOpen, users }: Props) {
 	const preview = thread.comments[thread.comments.length - 1]?.body ?? "No comments yet"
+
+	//Create four functions for the four things we need from a user: we need their display name
+	async function getDisplayName(userId: string) {
+		await users.get(userId)
+	}
 
 	return (
 		<Card
@@ -62,12 +71,12 @@ export default function ThreadCard({ thread, onOpen }: Props) {
 				</Text>
 
 				<Group justify="space-between">
-					{/*<Group gap="sm">*/}
-					{/*	<Avatar radius="xl" name={thread.createdBy.name} />*/}
-					{/*	<Text size="sm" c="dimmed">*/}
-					{/*		{thread.createdBy.name}*/}
-					{/*	</Text>*/}
-					{/*</Group>*/}
+					<Group gap="sm">
+						<Avatar radius="xl" name={thread.createdBy.name} />
+						<Text size="sm" c="dimmed">
+							{thread.createdBy.name}
+						</Text>
+					</Group>
 
 					<Group gap="md">
 						<Group gap={4}>

@@ -12,7 +12,7 @@ import {
 } from "@mantine/core"
 import { IconMessagePlus, IconSearch, IconSparkles } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useContext, useMemo, useState } from "react"
 import { trpc } from "@/lib/trpc.ts"
 import NewThreadModal from "./NewThreadModal.tsx"
 import ThreadCard, { type Thread } from "./ThreadCard.tsx"
@@ -48,7 +48,7 @@ export default function DiscussionPanel({ contentId }: Props) {
 	const [createOpened, setCreateOpened] = useState(false)
 
 	const filteredThreads = useMemo(() => {
-		return threads.data?.filter((thread) => {
+		return threads.data?.threads?.filter((thread) => {
 			const matchesFilter =
 				activeFilter === null ? true : thread.status.toLowerCase() === activeFilter
 
@@ -102,14 +102,14 @@ export default function DiscussionPanel({ contentId }: Props) {
 	}
 
 	const counts = {
-		all: threads.data?.length ?? "Loading",
-		open: threads.data?.filter((t) => t.status === "Open")?.length ?? "Loading",
-		resolved: threads.data?.filter((t) => t.status === "Resolved")?.length ?? "Loading",
-		archived: threads.data?.filter((t) => t.status === "Archived")?.length ?? "Loading",
+		all: threads.data?.threads?.length ?? "Loading",
+		open: threads.data?.threads?.filter((t) => t.status === "Open")?.length ?? "Loading",
+		resolved: threads.data?.threads?.filter((t) => t.status === "Resolved")?.length ?? "Loading",
+		archived: threads.data?.threads?.filter((t) => t.status === "Archived")?.length ?? "Loading",
 	}
 
 	const selectedThreadFresh =
-		threads.data?.find((thread) => thread.id === selectedThread?.id) ?? null
+		threads.data?.threads?.find((thread) => thread.id === selectedThread?.id) ?? null
 
 	return (
 		<Box p="md">
