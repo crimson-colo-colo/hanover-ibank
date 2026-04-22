@@ -15,7 +15,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import { trpc } from "@/lib/trpc.ts"
 import NewThreadModal from "./NewThreadModal.tsx"
-import ThreadCard from "./ThreadCard.tsx"
+import ThreadCard, { type Thread } from "./ThreadCard.tsx"
 import ThreadDrawer from "./ThreadDrawer.tsx"
 
 export type ThreadStatus = "Open" | "Resolved" | "Archived"
@@ -31,19 +31,6 @@ export type Comment = {
 	body: string
 	createdAt: string
 	author: User
-}
-
-export type Thread = {
-	id: string
-	contentId: string
-	title?: string | null
-	sectionLabel?: string | null
-	status: ThreadStatus
-	createdAt: string
-	createdBy: User
-	resolvedBy?: User | null
-	resolvedAt?: string | null
-	comments: Comment[]
 }
 
 type Props = {
@@ -181,7 +168,7 @@ export default function DiscussionPanel({ contentId }: Props) {
 					</Paper>
 
 					<Stack gap="md">
-						{filteredThreads.map((thread) => (
+						{filteredThreads?.map((thread) => (
 							<ThreadCard key={thread.id} thread={thread} onOpen={openThread} />
 						))}
 					</Stack>

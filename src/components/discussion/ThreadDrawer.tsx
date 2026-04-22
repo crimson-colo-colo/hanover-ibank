@@ -1,4 +1,3 @@
-import { useState } from "react"
 import {
 	Avatar,
 	Badge,
@@ -13,15 +12,16 @@ import {
 	Textarea,
 } from "@mantine/core"
 import { IconCheck, IconRefresh } from "@tabler/icons-react"
-import type { Thread } from "./DiscussionPanel"
+import { useState } from "react"
+import type { Thread } from "@/components/discussion/ThreadCard.tsx"
 
-function formatDate(date: string) {
+function formatDate(date: Date) {
 	return new Intl.DateTimeFormat("en-US", {
 		month: "short",
 		day: "numeric",
 		hour: "numeric",
 		minute: "2-digit",
-	}).format(new Date(date))
+	}).format(date)
 }
 
 type Props = {
@@ -60,7 +60,7 @@ export default function ThreadDrawer({
 			title={
 				<Stack gap={4}>
 					<Group gap="xs">
-						{thread.sectionLabel ? <Badge variant="outline">{thread.sectionLabel}</Badge> : null}
+						{/*{thread.sectionLabel ? <Badge variant="outline">{thread.sectionLabel}</Badge> : null}*/}
 						<Badge variant="light">{thread.status}</Badge>
 					</Group>
 					<Text fw={700}>{thread.title || "Untitled thread"}</Text>
@@ -71,9 +71,9 @@ export default function ThreadDrawer({
 				<Paper withBorder radius="xl" p="md">
 					<Group justify="space-between" align="flex-start">
 						<Box>
-							<Text size="sm">
-								Started by <strong>{thread.createdBy.name}</strong>
-							</Text>
+							{/*<Text size="sm">*/}
+							{/*	Started by <strong>{thread.createdBy.name}</strong>*/}
+							{/*</Text>*/}
 							<Text size="xs" c="dimmed">
 								{formatDate(thread.createdAt)}
 							</Text>
@@ -105,12 +105,12 @@ export default function ThreadDrawer({
 						<div key={comment.id}>
 							<Paper withBorder radius="lg" p="md">
 								<Group align="flex-start" wrap="nowrap">
-									<Avatar radius="xl" name={comment.author.name} />
+									{/*<Avatar radius="xl" name={comment.author.name} />*/}
 									<Box style={{ flex: 1 }}>
 										<Group justify="space-between" mb={6}>
-											<Text fw={600} size="sm">
-												{comment.author.name}
-											</Text>
+											{/*<Text fw={600} size="sm">*/}
+											{/*	{comment.author.name}*/}
+											{/*</Text>*/}
 											<Text size="xs" c="dimmed">
 												{formatDate(comment.createdAt)}
 											</Text>

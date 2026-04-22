@@ -1,15 +1,16 @@
-import { Avatar, Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
-import type { ContentTalkThread } from "@prisma/browser.ts";
-import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react";
-import type { Thread, ThreadStatus } from "./DiscussionPanel.tsx";
+import { Avatar, Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core"
+import type { ContentTalkThread } from "@prisma/browser.ts"
+import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react"
+import type { trpc } from "@/lib/trpc.ts"
+import type { ThreadStatus } from "./DiscussionPanel.tsx"
 
-function formatDate(date: string) {
+function formatDate(date: Date) {
 	return new Intl.DateTimeFormat("en-US", {
 		month: "short",
 		day: "numeric",
 		hour: "numeric",
 		minute: "2-digit",
-	}).format(new Date(date))
+	}).format(date)
 }
 
 function getStatusColor(status: ThreadStatus) {
@@ -18,8 +19,10 @@ function getStatusColor(status: ThreadStatus) {
 	return "gray"
 }
 
+export type Thread = (typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"][0]
+
 type Props = {
-	thread: ContentTalkThread
+	thread: Thread
 	onOpen: (thread: Thread) => void
 }
 
@@ -39,12 +42,6 @@ export default function ThreadCard({ thread, onOpen }: Props) {
 				<Group justify="space-between" align="flex-start">
 					<Stack gap={8} style={{ flex: 1 }}>
 						<Group gap="xs">
-							{thread.sectionLabel ? (
-								<Badge variant="outline" radius="xl">
-									{thread.sectionLabel}
-								</Badge>
-							) : null}
-
 							<Badge color={getStatusColor(thread.status)} variant="light" radius="xl">
 								{thread.status}
 							</Badge>
@@ -65,12 +62,12 @@ export default function ThreadCard({ thread, onOpen }: Props) {
 				</Text>
 
 				<Group justify="space-between">
-					<Group gap="sm">
-						<Avatar radius="xl" name={thread.createdBy.name} />
-						<Text size="sm" c="dimmed">
-							{thread.createdBy.name}
-						</Text>
-					</Group>
+					{/*<Group gap="sm">*/}
+					{/*	<Avatar radius="xl" name={thread.createdBy.name} />*/}
+					{/*	<Text size="sm" c="dimmed">*/}
+					{/*		{thread.createdBy.name}*/}
+					{/*	</Text>*/}
+					{/*</Group>*/}
 
 					<Group gap="md">
 						<Group gap={4}>

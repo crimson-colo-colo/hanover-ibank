@@ -33,6 +33,7 @@ export const discussionRouter = router({
 					content: { select: { id: true } },
 					comments: {
 						select: {
+							id: true,
 							author: { select: { id: true } },
 							body: true,
 							createdAt: true,
