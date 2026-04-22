@@ -16,6 +16,7 @@ import { formatBytes } from "@/lib/content.ts"
 import { trpc } from "@/lib/trpc.ts"
 import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
+import clsx from "clsx"
 import type { ScrollPageIntoViewArgs } from "react-pdf/dist/shared/types.js"
 import { URLCard } from "@/components/URLCard.tsx"
 import type { ContentListItem } from "../../server/routers/content.ts"
@@ -38,16 +39,18 @@ export function FilePreviewProvider({
 	fileType,
 	closeViewer,
 	children,
+	insideModal = true,
 }: {
 	content: ContentListItem
 	fileType: FileType
 	closeViewer: () => void
 	children: React.ReactNode
+	insideModal?: boolean
 }) {
-	const { data: contentPreview } = useQuery(
+	const { data: contentPreview, isFetching } = useQuery(
 		trpc.preview.getContentUrl.queryOptions({ id: content.id })
 	)
-	const { data: plaintextContent } = useQuery(
+	const { data: plaintextContent, isFetching: isPlaintextFetching } = useQuery(
 		trpc.preview.getPlaintextContent.queryOptions(
 			{ id: content.id },
 			{ enabled: fileType === FileType.Plaintext }
@@ -96,7 +99,14 @@ export function FilePreviewProvider({
 	let controls: React.ReactNode
 	let preview: React.ReactNode
 
-	if (content.type === "Link") {
+	if (isFetching || isPlaintextFetching) {
+		preview = (
+			<IconLoader2
+				className={clsx("animate-spin", insideModal ? "text-white" : "dark:text-white")}
+				size={40}
+			/>
+		)
+	} else if (content.type === "Link") {
 		preview = <URLCard url={content.url} />
 	} else if (fileType === FileType.Image) {
 		preview = (
@@ -118,8 +128,13 @@ export function FilePreviewProvider({
 		)
 	} else if (fileType === FileType.Plaintext) {
 		preview = plaintextContent?.text ? (
-			<ScrollArea className="w-full h-full p-4 bg-white rounded-md dark:bg-[#242424] z-10">
-				<pre className="whitespace-pre-wrap">{plaintextContent.text}</pre>
+			<ScrollArea
+				className={clsx(
+					"w-full h-full bg-white rounded-md dark:bg-[#242424] z-10",
+					!insideModal && "border border-gray-200 dark:border-gray-800 mt-4"
+				)}
+			>
+				<pre className="whitespace-pre-wrap m-0 text-sm p-4">{plaintextContent.text}</pre>
 			</ScrollArea>
 		) : (
 			<div className="w-full h-full flex items-center justify-center p-4 bg-white rounded-md dark:bg-[#242424]">
@@ -134,7 +149,7 @@ export function FilePreviewProvider({
 	) {
 		controls = (
 			<>
-				<Flex align="center" className="gap-3">
+				<Flex align="center" className="gap-3 w-max">
 					<ActionIcon
 						variant="transparent"
 						onClick={() => setScale((prev) => scales[Math.max(0, scales.indexOf(prev) - 1)])}
@@ -183,7 +198,7 @@ export function FilePreviewProvider({
 		)
 		preview = (
 			<ScrollArea
-				className="relative flex flex-col items-center justify-center flex-1 h-full max-w-full min-w-0 min-h-0 z-10"
+				className="relative flex flex-col items-center justify-center flex-1 h-full max-w-full min-w-0 min-h-0 z-10 overflow-visible"
 				offsetScrollbars="y"
 				viewportRef={scrollRef}
 				onScrollPositionChange={onScroll}
@@ -192,8 +207,14 @@ export function FilePreviewProvider({
 					file={contentPreview?.url}
 					options={options}
 					onLoadSuccess={onLoadSuccess}
-					className="flex flex-col items-center gap-4"
+					className={clsx("flex flex-col items-center gap-4", !insideModal && "mt-4")}
 					ref={documentRef}
+					loading={() => (
+						<IconLoader2
+							className={clsx("animate-spin", insideModal ? "text-white" : "dark:text-white")}
+							size={40}
+						/>
+					)}
 				>
 					{new Array(numPages).fill(0).map((_, index) => (
 						<Page
@@ -201,6 +222,14 @@ export function FilePreviewProvider({
 							key={index}
 							pageNumber={index + 1}
 							scale={scale}
+							loading={() => (
+								<div className="w-full h-96 flex items-center justify-center">
+									<IconLoader2
+										className={clsx("animate-spin", insideModal ? "text-white" : "dark:text-white")}
+										size={24}
+									/>
+								</div>
+							)}
 						/>
 					))}
 				</Document>
@@ -212,7 +241,7 @@ export function FilePreviewProvider({
 		<FilePreviewContext.Provider
 			value={{
 				controls: (
-					<Flex align="center" className="gap-8 ml-4">
+					<Flex align="center" className="gap-8 ml-4 shrink-0 mr-4">
 						{content.type === ContentType.Object && content.object?.ContentLength !== undefined && (
 							<span className="mr-4 text-gray-600">
 								{formatBytes(content.object.ContentLength)}
@@ -224,9 +253,11 @@ export function FilePreviewProvider({
 				),
 				preview: (
 					<div className="relative flex flex-col items-center justify-center flex-1 h-full min-w-0 min-h-0 shrink @container">
-						{/** biome-ignore lint/a11y/noStaticElementInteractions: backdrop */}
-						{/** biome-ignore lint/a11y/useKeyWithClickEvents: backdrop */}
-						<div className="absolute inset-0 z-0" onClick={closeViewer}></div>
+						{insideModal && (
+							// biome-ignore lint/a11y/noStaticElementInteractions: backdrop
+							// biome-ignore lint/a11y/useKeyWithClickEvents: backdrop
+							<div className="absolute inset-0 z-0" onClick={closeViewer}></div>
+						)}
 						{preview}
 					</div>
 				),
