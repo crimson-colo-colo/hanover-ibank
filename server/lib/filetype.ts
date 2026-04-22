@@ -52,7 +52,29 @@ export async function getFileTypeFromFile(filename: string, buffer: Buffer): Pro
 		case "csv":
 		case "rtf":
 			return FileType.Plaintext
+		case "jpg":
+		case "jpeg":
+		case "png":
+		case "gif":
+		case "webp":
+		case "svg":
+		case "bmp":
+		case "tiff":
+			return FileType.Image
+		case "mp4":
+		case "mov":
+		case "avi":
+		case "mkv":
+		case "webm":
+		case "flv":
+			return FileType.Video
+		case "mp3":
+		case "wav":
+		case "ogg":
+		case "flac":
+		case "aac":
+		case "m4a":
+			return FileType.Audio
 	}
-
 	return FileType.Unknown
 }

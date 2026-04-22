@@ -559,5 +559,6 @@ export const linkContentData = [
 		...content,
 		type: ContentType.Link,
 		ownerId: randomUserId(),
+		createdAt: content.lastModifiedDate,
 	})),
 ] satisfies Prisma.ContentCreateManyInput[]
