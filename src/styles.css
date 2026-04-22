@@ -99,13 +99,18 @@ button[aria-label='Open TanStack Devtools'] {
     visibility: hidden;
 }
 
-.content-row:hover {
+.content-row:hover, .content-row.is-active {
     @apply bg-gray-50 dark:bg-gray-900;
 }
 
 .content-row:hover .content-not-favorite,
 .content-row:hover .content-actions {
     visibility: visible;
+}
+
+.checked-out-icon:hover {
+    @apply bg-red-500;
+    @apply rounded-md;
 }
 
 .metadata-edit {

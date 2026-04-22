@@ -76,3 +76,8 @@ export type ContentTag = Prisma.ContentTagModel
  * 
  */
 export type FavoriteContent = Prisma.FavoriteContentModel
+/**
+ * Model UserActivity
+ * 
+ */
+export type UserActivity = Prisma.UserActivityModel

@@ -14,6 +14,7 @@ import {
 } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useForm } from "@mantine/form"
+
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { type ContentStatus, EmployeeRole, TagCategory } from "@prisma/browser.ts"
@@ -21,9 +22,12 @@ import { ContentFilter } from "@shared/enum.ts"
 import {
 	IconCheck,
 	IconCircleArrowUpRight,
+	IconCircleCheck,
+	IconDoorEnter,
+	IconDoorExit,
 	IconDownload,
 	IconFileUpload,
-	IconIdBadge2,
+	IconMessageCircleUser,
 	IconPencil,
 	IconProgress,
 	IconStar,
@@ -33,6 +37,7 @@ import {
 	IconUser,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import { ContentTagsInput } from "@/components/ContentTagsInput.tsx"
@@ -41,7 +46,7 @@ import { EditableTextField } from "@/components/EditableTextField.tsx"
 import { contentStatusDisplayName } from "@/lib/enums.ts"
 import { stringifyTagList, unstringifyTagList } from "@/lib/tags.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentListItem } from "../../server/routers/content.ts"
+import type { ContentListItem } from "../../shared/types.ts"
 
 export type EditableField =
 	| "title"
@@ -54,9 +59,11 @@ export type EditableField =
 export function MetadataSidebar({
 	content,
 	closePreview,
+	insideModal = true,
 }: {
 	content: ContentListItem
 	closePreview: () => void
+	insideModal?: boolean
 }) {
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
 	const [editingField, _setEditingField] = useState<EditableField | null>(null)
@@ -206,49 +213,55 @@ export function MetadataSidebar({
 	}, [content])
 
 	return (
-		<Paper w="350px" className="h-full min-h-0 shrink-0" p="md">
-			<Stack gap="md" className="h-full">
-				<Flex gap="sm" justify="space-between">
-					<Title
-						order={4}
-						className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
-						data-enabled={canEdit}
-					>
-						<EditableTextField
-							enabled={canEdit}
-							field="title"
-							value={content.title}
-							editingField={editingField}
-							setEditingField={setEditingField}
-							onFieldEdit={onFieldEdit}
-							ref={titleRef}
-						/>
-					</Title>
+		<Paper
+			w={insideModal ? "350px" : "300px"}
+			className={clsx("min-h-0 shrink-0", !insideModal ? "h-max" : "h-full")}
+			p="md"
+		>
+			<Stack gap="md" className="h-full @container">
+				{insideModal && (
+					<Flex gap="sm" justify="space-between">
+						<Title
+							order={4}
+							className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
+							data-enabled={canEdit}
+						>
+							<EditableTextField
+								enabled={canEdit}
+								field="title"
+								value={content.title}
+								editingField={editingField}
+								setEditingField={setEditingField}
+								onFieldEdit={onFieldEdit}
+								ref={titleRef}
+							/>
+						</Title>
 
-					<ActionIcon
-						variant="transparent"
-						loading={favoriteContent.isPending || unfavoriteContent.isPending}
-						onClick={async (e) => {
-							if (content.favorited) {
-								await unfavoriteContent.mutateAsync({ id: content.id })
-							} else {
-								await favoriteContent.mutateAsync({ id: content.id })
-							}
-						}}
-					>
-						{content.favorited ? (
-							<IconStarFilled className="fill-[#f8de1f]" size={20} />
-						) : (
-							<IconStar />
-						)}
-					</ActionIcon>
-				</Flex>
+						<ActionIcon
+							variant="transparent"
+							loading={favoriteContent.isPending || unfavoriteContent.isPending}
+							onClick={async (e) => {
+								if (content.favorited) {
+									await unfavoriteContent.mutateAsync({ id: content.id })
+								} else {
+									await favoriteContent.mutateAsync({ id: content.id })
+								}
+							}}
+						>
+							{content.favorited ? (
+								<IconStarFilled className="fill-[#f8de1f]" size={20} />
+							) : (
+								<IconStar />
+							)}
+						</ActionIcon>
+					</Flex>
+				)}
 				{content.checkedOutBy && (
 					<>
 						<Alert
 							title={
 								<Flex align="center" gap="xs">
-									<IconIdBadge2 />
+									<IconDoorExit />
 									Checked out
 								</Flex>
 							}
@@ -267,7 +280,7 @@ export function MetadataSidebar({
 							)}
 						</Alert>
 						{canCheckIn && (
-							<Button fullWidth leftSection={<IconIdBadge2 />} onClick={openConfirmCheckin}>
+							<Button fullWidth leftSection={<IconDoorEnter />} onClick={openConfirmCheckin}>
 								{isCheckInOverride ? "Force check in" : "Check in"}
 							</Button>
 						)}
@@ -284,18 +297,22 @@ export function MetadataSidebar({
 					withArrow
 				>
 					<Popover.Target>
-						<Text className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field">
-							<IconUser />
-							<span className="text-gray-600">Owned by</span>
-							<span>{content.owner.name}</span>
-							<ActionIcon
-								className="metadata-edit"
-								variant="subtle"
-								onClick={() => setEditingField("owner")}
-							>
-								<IconPencil />
-							</ActionIcon>
-						</Text>
+						<div className="flex flex-col @xs:flex-row items-start @xs:items-center @xs:gap-2 text-gray-800 dark:text-gray-300 metadata-field">
+							<div className="@xs:contents flex items-center gap-2">
+								<IconUser />
+								<span className="text-gray-600">Owned by</span>
+							</div>
+							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
+								<span>{content.owner.name}</span>
+								<ActionIcon
+									className="metadata-edit"
+									variant="subtle"
+									onClick={() => setEditingField("owner")}
+								>
+									<IconPencil />
+								</ActionIcon>
+							</div>
+						</div>
 					</Popover.Target>
 					<Popover.Dropdown w="300px">
 						<ContentOwnerSelect form={form} initialSearchValue={content.owner.email} />
@@ -327,20 +344,30 @@ export function MetadataSidebar({
 				>
 					<Menu.Target>
 						<div
-							className="flex items-center gap-2 text-gray-800 dark:text-gray-300 metadata-field"
+							className="flex flex-col @xs:flex-row items-start @xs:items-center @xs:gap-2 text-gray-800 dark:text-gray-300 metadata-field"
 							data-enabled={canEdit}
 						>
-							<IconProgress />
-							<span className="text-gray-600">Status</span>
-							<span>{contentStatusDisplayName[content.status]}</span>
-							<ActionIcon
-								className="metadata-edit"
-								variant="subtle"
-								onClick={() => setEditingField("status")}
-								disabled={!canEdit}
-							>
-								<IconPencil />
-							</ActionIcon>
+							<div className="@xs:contents flex items-center gap-2">
+								{contentStatusDisplayName[content.status] === "Incomplete" ? (
+									<IconProgress />
+								) : contentStatusDisplayName[content.status] === "Under Review" ? (
+									<IconMessageCircleUser />
+								) : (
+									<IconCircleCheck />
+								)}
+								<span className="text-gray-600">Status</span>
+							</div>
+							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
+								<span>{contentStatusDisplayName[content.status]}</span>
+								<ActionIcon
+									className="metadata-edit"
+									variant="subtle"
+									onClick={() => setEditingField("status")}
+									disabled={!canEdit}
+								>
+									<IconPencil />
+								</ActionIcon>
+							</div>
 						</div>
 					</Menu.Target>
 					<Menu.Dropdown>
@@ -401,7 +428,7 @@ export function MetadataSidebar({
 							<Button
 								fullWidth
 								variant="light"
-								leftSection={<IconIdBadge2 />}
+								leftSection={<IconDoorExit />}
 								onClick={openConfirmCheckout}
 							>
 								Check out
@@ -424,7 +451,7 @@ export function MetadataSidebar({
 										await checkOutContent.mutateAsync({ id: content.id })
 										closeConfirmCheckout()
 									}}
-									leftSection={<IconIdBadge2 />}
+									leftSection={<IconDoorExit />}
 								>
 									Check out
 								</Button>
@@ -437,7 +464,6 @@ export function MetadataSidebar({
 						content for editing.
 					</Alert>
 				)}
-
 				<div className="grow" />
 
 				<Flex gap="sm">
@@ -502,7 +528,7 @@ export function MetadataSidebar({
 							await checkInContent.mutateAsync({ id: content.id })
 							closeConfirmCheckin()
 						}}
-						leftSection={<IconIdBadge2 />}
+						leftSection={<IconDoorEnter />}
 					>
 						Check in
 					</Button>

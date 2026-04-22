@@ -1,6 +1,7 @@
 import { ActionIcon, Card, Divider, Flex, Menu, Text, Tooltip } from "@mantine/core"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
+import type { ContentListItem } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconDotsVertical,
@@ -14,7 +15,6 @@ import { useEffect, useRef, useState } from "react"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { isTruncated } from "@/lib/isTruncated.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentListItem } from "../../server/routers/content.ts"
 
 export function FavoriteContentCard({
 	contentId,
@@ -56,27 +56,23 @@ export function FavoriteContentCard({
 
 	return (
 		<Card
-			// component={contentUrl ? "a" : undefined}
-			//href={contentUrl ?? undefined}
 			rel="noopener noreferrer"
-			//target="_blank"
 			p="28"
 			className="transition duration-75 cursor-pointer bg-gray-light hover:bg-gray-light-hover hover:shadow-sm"
 			onClick={() => {
 				openFilePreview(item, contentType)
-				/*
-                if (contentType !== FileType.Link) {
-                    openFilePreview(item, contentType)
-                }*/
 			}}
 		>
 			<Card.Section>
 				<Flex justify="space-between" align="center" gap="sm">
-					<Tooltip label={fileName} withArrow disabled={!titleTruncated}>
-						<Text className="font-medium truncate" ref={titleRef}>
-							{fileName}
-						</Text>
-					</Tooltip>
+					<Flex align="center" gap="xs" className="truncate">
+						<FileTypeIcon fileType={contentType} size={24} strokeWidth={1.5} className="shrink-0" />
+						<Tooltip label={fileName} withArrow disabled={!titleTruncated}>
+							<Text className="font-medium truncate" ref={titleRef}>
+								{fileName}
+							</Text>
+						</Tooltip>
+					</Flex>
 					<Menu position="bottom-end">
 						<Menu.Target>
 							<ActionIcon
@@ -85,6 +81,7 @@ export function FavoriteContentCard({
 									e.stopPropagation()
 								}}
 								variant="subtle"
+								className="shrink-0"
 							>
 								<IconDotsVertical size={20} />
 							</ActionIcon>

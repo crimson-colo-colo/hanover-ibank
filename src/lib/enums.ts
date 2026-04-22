@@ -4,6 +4,9 @@ export const employeeRoleDisplayName: Record<EmployeeRole, string> = {
 	BusinessAnalyst: "Business Analyst",
 	Underwriter: "Underwriter",
 	Admin: "Admin",
+	ActuarialAnalyst: "Actuarial Analyst",
+	ExlOperations: "EXL Operations",
+	BusinessOperations: "Business Operations",
 }
 
 export const contentStatusDisplayName: Record<ContentStatus, string> = {

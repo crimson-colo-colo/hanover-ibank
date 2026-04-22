@@ -6,7 +6,7 @@ export const opengraphRouter = router({
 	getOpenGraph: authProcedure.input(z.object({ url: z.url() })).query(async (opts) => {
 		const url = opts.input.url
 
-		const { error, html, result, response } = await ogs({ url: url })
+		const { error, result } = await ogs({ url: url })
 
 		if (!error) {
 			return { response: result }

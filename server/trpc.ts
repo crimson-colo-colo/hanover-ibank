@@ -1,3 +1,5 @@
+import { UTCDate } from "@date-fns/utc"
+import { Temporal } from "@js-temporal/polyfill"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 import superjson from "superjson"
@@ -51,26 +53,50 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router
 export const publicProcedure = t.procedure
 
-export const authProcedure = publicProcedure.use((opts) => {
+export const authProcedure = publicProcedure.use(async (opts) => {
 	const { ctx } = opts
 	const auth = ctx.auth
 	if (auth === undefined) {
 		throw new TRPCError({ code: "UNAUTHORIZED" })
-	} else
-		return opts.next({
-			ctx: {
-				...ctx,
-				auth: auth,
-			},
-		})
+	}
+
+	const userPromise = db.employee.findFirst({
+		where: {
+			id: auth.sub,
+		},
+	})
+	const nowTruncated = Temporal.Now.instant().round({
+		roundingMode: "floor",
+		smallestUnit: "second",
+	})
+	const hour = nowTruncated.round({
+		roundingMode: "floor",
+		smallestUnit: "hour",
+	})
+	const day = nowTruncated.round({
+		roundingMode: "floor",
+		smallestUnit: "hour",
+		roundingIncrement: 24,
+	})
+
+	// FIXME: fix this awful way to handle concurrent upserts
+	try {
+		await logActivity(auth, nowTruncated, opts, day, hour)
+	} catch {
+		await logActivity(auth, nowTruncated, opts, day, hour)
+	}
+
+	return opts.next({
+		ctx: {
+			...ctx,
+			auth: auth,
+			user: await userPromise,
+		},
+	})
 })
 
 export const adminProcedure = authProcedure.use(async (opts) => {
-	const user = await db.employee.findFirst({
-		where: {
-			id: opts.ctx.auth.sub,
-		},
-	})
+	const { user } = opts.ctx
 
 	if (user?.role !== EmployeeRole.Admin) {
 		throw new TRPCError({ code: "UNAUTHORIZED" })
@@ -80,3 +106,34 @@ export const adminProcedure = authProcedure.use(async (opts) => {
 		ctx: opts.ctx,
 	})
 })
+async function logActivity(
+	auth: JWTPayload,
+	nowTruncated: Temporal.Instant,
+	opts: { path: string },
+	day: Temporal.Instant,
+	hour: Temporal.Instant
+) {
+	await db.userActivity.upsert({
+		where: {
+			timestamp_employeeId_path: {
+				employeeId: auth.sub,
+				timestamp: new UTCDate(nowTruncated.epochMilliseconds).toISOString(),
+				path: opts.path,
+			},
+		},
+		create: {
+			employee: {
+				connect: {
+					id: auth.sub,
+				},
+			},
+			timestamp: new UTCDate(nowTruncated.epochMilliseconds).toISOString(),
+			path: opts.path,
+			day: new UTCDate(day.epochMilliseconds).toISOString(),
+			hour: new UTCDate(hour.epochMilliseconds).toISOString(),
+		},
+		update: {
+			count: { increment: 1 },
+		},
+	})
+}

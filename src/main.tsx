@@ -15,6 +15,8 @@ declare module "@tanstack/react-router" {
 
 const router = getRouter()
 
+localStorage.setItem("sessionStart", Date.now().toString())
+
 function App() {
 	const auth0 = useAuth0()
 

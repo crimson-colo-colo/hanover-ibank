@@ -1,4 +1,3 @@
-import { UTCDate } from "@date-fns/utc"
 import {
 	ActionIcon,
 	Anchor,
@@ -6,10 +5,17 @@ import {
 	Checkbox,
 	Flex,
 	Group,
+	HoverCard,
+	Image,
 	Kbd,
+	Menu,
 	Modal,
+	NumberInput,
+	Pagination,
 	Pill,
 	SegmentedControl,
+	Select,
+	Stack,
 	Table,
 	Text,
 	TextInput,
@@ -18,55 +24,81 @@ import {
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { ContentStatus, ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
+import type { ContentList, ContentListItem } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
+	IconCircleCheck,
 	IconCloudUpload,
+	IconDoorEnter,
+	IconDoorExit,
+	IconDotsVertical,
 	IconDownload,
-	IconFilePencil,
 	IconLoader2,
+	IconMessageCircleUser,
+	IconPencilCheck,
+	IconPencilOff,
+	IconProgress,
 	IconSortAscending2,
 	IconSortDescending2,
 	IconStar,
 	IconStarFilled,
 	IconTrash,
 } from "@tabler/icons-react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
+	getFacetedRowModel,
+	getFacetedUniqueValues,
 	getFilteredRowModel,
+	getPaginationRowModel,
 	getSortedRowModel,
+	type Row,
 	useReactTable,
 } from "@tanstack/react-table"
 import clsx from "clsx"
-import { formatDistanceToNow } from "date-fns"
+import { formatDate } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
 import { formatBytes } from "@/lib/content.ts"
-import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
-import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
+import {
+	contentStatusDisplayName,
+	employeeRoleDisplayName,
+	tagCategoryDisplayName,
+} from "@/lib/enums.ts"
+import { fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentList, ContentListItem } from "../../server/routers/content.ts"
+
+const mutationOptions = {
+	async onSettled() {
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+			}),
+			queryClient.invalidateQueries({
+				queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+			}),
+			queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
+		])
+	},
+}
 
 export function ContentTable({
 	loading,
 	data,
-	openEditDialog,
-	openFileEditDialog,
 	openFilePreview,
 	filter,
 	changeFilter,
 }: {
 	loading: boolean
 	data: ContentList
-	openEditDialog: (item: ContentListItem) => void
-	openFileEditDialog: (item: ContentListItem) => void
 	openFilePreview: (item: ContentListItem, type: FileType) => void
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
@@ -77,24 +109,31 @@ export function ContentTable({
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
 	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
-	const options = {
-		async onSettled() {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
-				}),
-				queryClient.invalidateQueries({
-					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
-				}),
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
-			])
-		},
-	}
-	const deleteContent = useMutation(trpc.content.delete.mutationOptions(options))
-	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(options))
-	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
+	const deleteContent = useMutation(trpc.content.delete.mutationOptions(mutationOptions))
+	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(mutationOptions))
+	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(mutationOptions))
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
+
+	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
+	const [checkOutModalOpen, { open: openCheckOutModal, close: closeCheckOutModal }] =
+		useDisclosure(false)
+	const [checkInModalOpen, { open: openCheckInModal, close: closeCheckInModal }] =
+		useDisclosure(false)
+	const [contentSelectedForCheckout, selectContentForCheckout] = useState<ContentListItem | null>(
+		null
+	)
+
+	const allTags = useMemo(
+		() => [
+			...new Map(
+				data.content
+					.flatMap((row) => row.tags)
+					.map((t): [string, typeof t] => [`${t.category}-${t.name}`, t])
+			).values(),
+		],
+		[data]
+	)
 
 	const columns = useMemo(
 		() => [
@@ -122,7 +161,7 @@ export function ContentTable({
 				cell: (info) => (
 					<ActionIcon
 						size="sm"
-						onClick={async (e) => {
+						onClick={async () => {
 							if (!info.getValue()) {
 								await favoriteContent.mutateAsync({ id: info.row.original.id })
 							} else {
@@ -140,6 +179,26 @@ export function ContentTable({
 						)}
 					</ActionIcon>
 				),
+			}),
+			columnHelper.accessor((row) => `${contentStatusDisplayName[row.status]}`, {
+				id: "status",
+				header: "Status",
+				enableSorting: false,
+				cell: (info) => {
+					return info.row.original.status === ContentStatus.Incomplete ? (
+						<Tooltip withArrow arrowSize={8} label="Incomplete">
+							<IconProgress size={20} />
+						</Tooltip>
+					) : info.row.original.status === ContentStatus.UnderReview ? (
+						<Tooltip withArrow arrowSize={8} label="Under Review">
+							<IconMessageCircleUser size={20} />
+						</Tooltip>
+					) : (
+						<Tooltip withArrow arrowSize={8} label="Complete">
+							<IconCircleCheck size={20} />
+						</Tooltip>
+					)
+				},
 			}),
 			columnHelper.accessor((r) => `${r.title} ${r.type === "Link" ? r.url : ""}`, {
 				id: "title",
@@ -167,6 +226,21 @@ export function ContentTable({
 								<span className="ml-2 text-xs text-gray-500 truncate" title={item.url}>
 									{host.replace(/^www\./, "")}
 								</span>
+								{info.row.original.checkedOutBy !== null &&
+									(info.row.original.checkedOutBy.id === profile?.id ? (
+										<Tooltip withArrow arrowSize={8} label="You have this link checked out">
+											<IconPencilCheck size={24} />
+										</Tooltip>
+									) : (
+										<Tooltip
+											withArrow
+											arrowSize={8}
+											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
+										>
+											link
+											<IconPencilOff className="checked-out-icon" size={24} />
+										</Tooltip>
+									))}
 							</div>
 						)
 					} else if (item.type === "Object") {
@@ -187,6 +261,20 @@ export function ContentTable({
 								<span className="ml-2 text-xs text-gray-500 truncate" title={size}>
 									{size}
 								</span>
+								{info.row.original.checkedOutBy !== null &&
+									(info.row.original.checkedOutBy.id === profile?.id ? (
+										<Tooltip withArrow arrowSize={8} label="You have this file checked out">
+											<IconPencilCheck size={24} />
+										</Tooltip>
+									) : (
+										<Tooltip
+											withArrow
+											arrowSize={8}
+											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
+										>
+											<IconPencilOff className="checked-out-icon" size={24} />
+										</Tooltip>
+									))}
 							</div>
 						)
 					}
@@ -199,19 +287,32 @@ export function ContentTable({
 				sortingFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => (
-					<div className="flex items-center gap-2">
-						<Avatar
-							userId={info.row.original.owner.id}
-							alt={info.row.original.owner.name}
-							width={24}
-							height={24}
-							radius="100%"
-							className="w-6 h-6 shrink-0"
-						/>
-						<span className="truncate" title={info.row.original.owner.email}>
-							{info.row.original.owner.name}
-						</span>
-					</div>
+					<HoverCard openDelay={250} withArrow>
+						<HoverCard.Target>
+							<Avatar
+								userId={info.row.original.owner.id}
+								alt={info.row.original.owner.name}
+								width={24}
+								height={24}
+								radius="100%"
+								className="w-6 h-6 shrink-0"
+							/>
+						</HoverCard.Target>
+						<HoverCard.Dropdown className="shadow-sm">
+							<Flex gap="md">
+								<Image src={`/avatar/${info.row.original.owner.id}`} radius="100%" h={40} w={40} />
+								<Stack gap={0} justify="center">
+									<Text size="sm" fw={500}>
+										{info.row.original.owner.name}
+									</Text>
+									<Text size="xs" c="gray">
+										{info.row.original.owner.email} ·{" "}
+										{employeeRoleDisplayName[info.row.original.owner.role]}
+									</Text>
+								</Stack>
+							</Flex>
+						</HoverCard.Dropdown>
+					</HoverCard>
 				),
 			}),
 			columnHelper.accessor("lastModifiedDate", {
@@ -219,8 +320,10 @@ export function ContentTable({
 				enableSorting: true,
 				sortingFn: "datetime",
 				cell: (info) => (
-					<span title={new UTCDate(info.getValue()).toLocaleString()}>
-						{formatDistanceToNow(new UTCDate(info.getValue()), { addSuffix: true })}
+					<span title={info.getValue().toLocaleString()}>
+						{info.getValue().getFullYear() === new Date().getFullYear()
+							? formatDate(info.getValue(), "MMM d")
+							: formatDate(info.getValue(), "MMM d yyyy")}
 					</span>
 				),
 			}),
@@ -229,16 +332,22 @@ export function ContentTable({
 					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
 				{
 					id: "tags",
-					header: "Tags",
-					filterFn: "fuzzy",
+					header: ({ column }) => <TagFilterPopup column={column} allTags={allTags} />,
+					filterFn: "tagFilterFn",
 					sortingFn: "fuzzy",
 					enableSorting: false,
 					cell: (info) => (
 						<Group gap={4}>
 							{info.row.original.tags.map((tag) => (
 								<Tooltip
+									withArrow
+									arrowSize={8}
 									key={`${tag.category}-${tag.name}`}
-									label={`${tagCategoryDisplayName[tag.category]}: ${tag.name}`}
+									label={`${tagCategoryDisplayName[tag.category]}: ${
+										tag.category === TagCategory.IntendedAudience
+											? employeeRoleDisplayName[tag.name as EmployeeRole]
+											: tag.name
+									}`}
 								>
 									<Pill key={`${tag.category}-${tag.name}`} size="xs" color="gray">
 										{tag.category === TagCategory.IntendedAudience
@@ -255,23 +364,11 @@ export function ContentTable({
 				id: "actions",
 				cell: (info) => (
 					<Flex className="content-actions" gap="2px" justify="flex-end">
-						{info.row.original.type === "Object" && (
+						{info.row.original.type === "Link" ? (
 							<ActionIcon
 								variant="subtle"
 								size="sm"
-								onClick={(e) => {
-									openFileEditDialog(info.row.original)
-								}}
-							>
-								<IconFilePencil />
-							</ActionIcon>
-						)}
-
-						{info.row.original.type === "Link" ? (
-							<ActionIcon
-								variant="transparent"
-								size="sm"
-								onClick={(e) => {
+								onClick={() => {
 									if (info.row.original.type === ContentType.Link) {
 										window.open(info.row.original.url)
 									}
@@ -281,9 +378,9 @@ export function ContentTable({
 							</ActionIcon>
 						) : (
 							<ActionIcon
-								variant="transparent"
+								variant="subtle"
 								size="sm"
-								onClick={async (e) => {
+								onClick={async () => {
 									const { url } = await trpcClient.content.download.query({
 										id: info.row.original.id,
 									})
@@ -293,30 +390,112 @@ export function ContentTable({
 								<IconDownload />
 							</ActionIcon>
 						)}
+						<Menu width={140} closeOnItemClick={true} position="bottom-end">
+							<Menu.Target>
+								<ActionIcon variant="subtle" size="sm">
+									<IconDotsVertical />
+								</ActionIcon>
+							</Menu.Target>
+							<Menu.Dropdown>
+								{info.row.original.type === "Object" ? (
+									<Menu.Item
+										leftSection={<IconDownload size={22} />}
+										variant="subtle"
+										onClick={async () => {
+											const { url } = await trpcClient.content.download.query({
+												id: info.row.original.id,
+											})
+											window.open(url, "_blank", "noopener")
+										}}
+									>
+										Download
+									</Menu.Item>
+								) : (
+									<Menu.Item
+										leftSection={<IconCircleArrowUpRight size={22} />}
+										variant="subtle"
+										onClick={() => {
+											if (info.row.original.type === ContentType.Link) {
+												window.open(info.row.original.url)
+											}
+										}}
+									>
+										Open link
+									</Menu.Item>
+								)}
+								{info.row.original.checkedOutBy === null ? (
+									<Menu.Item
+										leftSection={<IconDoorExit size={22} />}
+										variant="subtle"
+										onClick={() => {
+											selectContentForCheckout(info.row.original)
+											openCheckOutModal()
+										}}
+									>
+										Check Out
+									</Menu.Item>
+								) : info.row.original.checkedOutBy.id === profile?.id ? (
+									<Menu.Item
+										leftSection={<IconDoorEnter size={22} />}
+										variant="subtle"
+										onClick={() => {
+											selectContentForCheckout(info.row.original)
+											openCheckInModal()
+										}}
+									>
+										Check In
+									</Menu.Item>
+								) : (
+									<Menu.Item leftSection={<IconDoorExit size={22} />} variant="subtle" disabled>
+										Check Out
+									</Menu.Item>
+								)}
+							</Menu.Dropdown>
+						</Menu>
 					</Flex>
 				),
 			}),
 		],
-		[]
+		[profile, allTags]
 	)
 
-	const table = useReactTable({
+	const customFilterFunction = (
+		row: Row<ContentListItem>,
+		columnId: string,
+		filterValue: string
+	) => {
+		const value = row.getValue(columnId)
+		//Just for status column use equals logic
+		if (columnId === "status") {
+			return value?.toString().toLowerCase() === filterValue.toLowerCase()
+		}
+		//For all other columns use fuzzier includes logic
+		return value?.toString().toLowerCase().includes(filterValue.toLowerCase()) ?? false
+	}
+	const [pagination, setPagination] = useState({
+		pageIndex: 0, //initial page index
+		pageSize: 10, //default page size
+	})
+
+	const table = useReactTable<ContentListItem>({
 		data: data.content,
 		columns: columns,
 		state: {
 			rowSelection,
+			pagination,
 			globalFilter: debouncedGlobalFilter,
 		},
 		enableGlobalFilter: true,
 		enableSorting: true,
 		enableRowSelection: true,
 		onGlobalFilterChange: setGlobalFilter,
-		globalFilterFn: "fuzzy",
+		globalFilterFn: customFilterFunction,
 		sortingFns: {
 			fuzzy: fuzzySort,
 		},
 		filterFns: {
 			fuzzy: fuzzyFilter,
+			tagFilterFn: tagFilterFn,
 		},
 		initialState: {
 			sorting: [
@@ -325,6 +504,10 @@ export function ContentTable({
 					desc: false,
 				},
 			],
+			pagination: {
+				pageIndex: 0, //custom initial page index
+				pageSize: 10, //custom default page size
+			},
 		},
 		enableSortingRemoval: false,
 		enableMultiSort: true,
@@ -332,6 +515,10 @@ export function ContentTable({
 		getSortedRowModel: getSortedRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		onPaginationChange: setPagination,
+		getFacetedRowModel: getFacetedRowModel(),
+		getFacetedUniqueValues: getFacetedUniqueValues(),
 	})
 
 	useEffect(() => {
@@ -436,8 +623,10 @@ export function ContentTable({
 						return (
 							<Table.Tr
 								key={row.id}
-								bg={row.getIsSelected() ? "fuchsia.0" : undefined}
-								className="content-row"
+								className={clsx(
+									"content-row",
+									row.getIsSelected() && "bg-fuchsia-50 dark:bg-fuchsia-900/40"
+								)}
 							>
 								{row.getVisibleCells().map((cell) => {
 									return (
@@ -499,6 +688,147 @@ export function ContentTable({
 					</Button>
 				</Flex>
 			</Modal>
+			<Flex justify="space-between" direction="row" align="center" mt="md">
+				<Group>
+					<Pagination.Root
+						siblings={1}
+						boundaries={1}
+						defaultValue={table.getState().pagination.pageIndex}
+						total={table.getPageCount()}
+						value={table.getState().pagination.pageIndex + 1}
+						onChange={(newPage) => {
+							table.setPageIndex(newPage - 1)
+						}}
+					>
+						<Group gap={3} justify="center">
+							<Pagination.First />
+							<Pagination.Previous />
+							<Pagination.Items />
+							<Pagination.Next />
+							<Pagination.Last />
+						</Group>
+					</Pagination.Root>
+
+					<Text size="sm">Go to page:</Text>
+					<NumberInput
+						w={70}
+						placeholder="0"
+						defaultValue={table.getState().pagination.pageIndex}
+						value={table.getState().pagination.pageIndex + 1}
+						onChange={(value) => {
+							if (value === "" || value === null) return
+							const page = Number(value) - 1
+							if (page >= 0 && page < table.getPageCount()) {
+								table.setPageIndex(page)
+							}
+						}}
+						min={1}
+						max={table.getPageCount()}
+					/>
+				</Group>
+				<Group gap="xs" align="center">
+					<Text>Items per page:</Text>
+					<Select
+						size="sm"
+						value={table.getState().pagination.pageSize}
+						onChange={(value) => {
+							value && table.setPageSize(Number(value))
+						}}
+						data={[10, 20, 30, 40, 50]}
+						defaultValue={table.getState().pagination.pageSize}
+					></Select>
+				</Group>
+			</Flex>
+			<CheckInModal
+				opened={checkInModalOpen}
+				onClose={closeCheckInModal}
+				content={contentSelectedForCheckout}
+			/>
+			<CheckOutModal
+				opened={checkOutModalOpen}
+				onClose={closeCheckOutModal}
+				content={contentSelectedForCheckout}
+			/>
 		</>
 	)
+
+	function CheckInModal({
+		opened,
+		onClose,
+		content,
+	}: {
+		opened: boolean
+		onClose: () => void
+		content: ContentListItem | null
+	}) {
+		const checkInMutation = useMutation(trpc.content.checkIn.mutationOptions(mutationOptions))
+		return (
+			<Modal opened={opened} onClose={onClose} title="Confirm check in">
+				<Text>
+					Ready to check this content back in? Others will be able to edit it once it's checked in.
+				</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={onClose}
+						disabled={checkInMutation.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={checkInMutation.isPending}
+						onClick={async () => {
+							if (content !== null) {
+								await checkInMutation.mutateAsync({ id: content.id })
+								onClose()
+							}
+						}}
+						leftSection={<IconDoorEnter />}
+					>
+						Check in
+					</Button>
+				</Flex>
+			</Modal>
+		)
+	}
+
+	function CheckOutModal({
+		opened,
+		onClose,
+		content,
+	}: {
+		opened: boolean
+		onClose: () => void
+		content: ContentListItem | null
+	}) {
+		const checkOutMutation = useMutation(trpc.content.checkOut.mutationOptions(mutationOptions))
+		return (
+			<Modal opened={opened} onClose={onClose} title="Confirm check out">
+				<Text>Checking out this content will lock it out for editing by other users.</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={onClose}
+						disabled={checkOutMutation.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={checkOutMutation.isPending}
+						onClick={async () => {
+							if (content !== null) {
+								await checkOutMutation.mutateAsync({ id: content.id })
+								onClose()
+							}
+						}}
+						leftSection={<IconDoorExit />}
+					>
+						Check out
+					</Button>
+				</Flex>
+			</Modal>
+		)
+	}
 }
