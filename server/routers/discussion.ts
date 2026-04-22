@@ -43,6 +43,7 @@ export const discussionRouter = router({
 	createThread: authProcedure
 		.input(
 			z.object({
+				contentId: z.string(),
 				title: z.string().min(1).max(250).optional(),
 				body: z.string().min(1).max(5000),
 			})
@@ -64,6 +65,7 @@ export const discussionRouter = router({
 			return db.contentTalkThread.create({
 				data: {
 					title: opts.input.title,
+					content: { connect: { id: opts.input.contentId } },
 					createdBy: { connect: { id: opts.ctx.auth.sub } },
 					comments: {
 						create: {
@@ -94,7 +96,7 @@ export const discussionRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const thread = await db.contentThread.findUnique({
+			const thread = await db.contentTalkThread.findUnique({
 				where: {
 					id: opts.input.threadId,
 				},
@@ -114,22 +116,29 @@ export const discussionRouter = router({
 				})
 			}
 
-			return db.contentTalkThread.u
-			id: opts.input.threadId
-			,
-					author:
-			id: opts.ctx.auth.sub
-			,
-					body: opts.input.body,
-					createdAt: new Date(),
-					updatedAt
-			,
-				include:
-			author: true,
-			,
-			)
+			return db.contentTalkThread.update({
+				where: {
+					id: opts.input.threadId,
+				},
+				data: {
+					updatedAt: { set: new Date() },
+					comments: {
+						create: {
+							author: { connect: { id: opts.ctx.auth.sub } },
+							body: opts.input.body,
+							createdAt: new Date(),
+						},
+					},
+				},
+				include: {
+					comments: {
+						include: {
+							author: true,
+						},
+					},
+				},
+			})
 		}),
-
 	resolveThread: authProcedure
 		.input(
 			z.object({
@@ -137,14 +146,14 @@ export const discussionRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			return db.contentThread.update({
+			return db.contentTalkThread.update({
 				where: {
 					id: opts.input.threadId,
 				},
 				data: {
 					status: ThreadStatus.Resolved,
 					resolvedAt: new Date(),
-					resolvedById: opts.ctx.auth.sub,
+					resolvedBy: { connect: { id: opts.ctx.auth.sub } },
 				},
 			})
 		}),
@@ -155,14 +164,14 @@ export const discussionRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			return db.contentThread.update({
+			return db.contentTalkThread.update({
 				where: {
 					id: opts.input.threadId,
 				},
 				data: {
 					status: ThreadStatus.Open,
 					resolvedAt: null,
-					resolvedById: null,
+					resolvedBy: { disconnect: true },
 				},
 			})
 		}),

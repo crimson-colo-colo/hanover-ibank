@@ -28,6 +28,7 @@ export type TalkThreadCommentMinAggregateOutputType = {
   id: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  body: string | null
   threadId: string | null
   authorId: string | null
 }
@@ -36,6 +37,7 @@ export type TalkThreadCommentMaxAggregateOutputType = {
   id: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  body: string | null
   threadId: string | null
   authorId: string | null
 }
@@ -44,6 +46,7 @@ export type TalkThreadCommentCountAggregateOutputType = {
   id: number
   createdAt: number
   updatedAt: number
+  body: number
   threadId: number
   authorId: number
   _all: number
@@ -54,6 +57,7 @@ export type TalkThreadCommentMinAggregateInputType = {
   id?: true
   createdAt?: true
   updatedAt?: true
+  body?: true
   threadId?: true
   authorId?: true
 }
@@ -62,6 +66,7 @@ export type TalkThreadCommentMaxAggregateInputType = {
   id?: true
   createdAt?: true
   updatedAt?: true
+  body?: true
   threadId?: true
   authorId?: true
 }
@@ -70,6 +75,7 @@ export type TalkThreadCommentCountAggregateInputType = {
   id?: true
   createdAt?: true
   updatedAt?: true
+  body?: true
   threadId?: true
   authorId?: true
   _all?: true
@@ -151,6 +157,7 @@ export type TalkThreadCommentGroupByOutputType = {
   id: string
   createdAt: Date
   updatedAt: Date
+  body: string
   threadId: string
   authorId: string
   _count: TalkThreadCommentCountAggregateOutputType | null
@@ -180,6 +187,7 @@ export type TalkThreadCommentWhereInput = {
   id?: Prisma.StringFilter<"TalkThreadComment"> | string
   createdAt?: Prisma.DateTimeFilter<"TalkThreadComment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TalkThreadComment"> | Date | string
+  body?: Prisma.StringFilter<"TalkThreadComment"> | string
   threadId?: Prisma.StringFilter<"TalkThreadComment"> | string
   authorId?: Prisma.StringFilter<"TalkThreadComment"> | string
   thread?: Prisma.XOR<Prisma.ContentTalkThreadScalarRelationFilter, Prisma.ContentTalkThreadWhereInput>
@@ -190,6 +198,7 @@ export type TalkThreadCommentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  body?: Prisma.SortOrder
   threadId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   thread?: Prisma.ContentTalkThreadOrderByWithRelationInput
@@ -203,6 +212,7 @@ export type TalkThreadCommentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TalkThreadCommentWhereInput | Prisma.TalkThreadCommentWhereInput[]
   createdAt?: Prisma.DateTimeFilter<"TalkThreadComment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TalkThreadComment"> | Date | string
+  body?: Prisma.StringFilter<"TalkThreadComment"> | string
   threadId?: Prisma.StringFilter<"TalkThreadComment"> | string
   authorId?: Prisma.StringFilter<"TalkThreadComment"> | string
   thread?: Prisma.XOR<Prisma.ContentTalkThreadScalarRelationFilter, Prisma.ContentTalkThreadWhereInput>
@@ -213,6 +223,7 @@ export type TalkThreadCommentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  body?: Prisma.SortOrder
   threadId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   _count?: Prisma.TalkThreadCommentCountOrderByAggregateInput
@@ -227,6 +238,7 @@ export type TalkThreadCommentScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"TalkThreadComment"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TalkThreadComment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TalkThreadComment"> | Date | string
+  body?: Prisma.StringWithAggregatesFilter<"TalkThreadComment"> | string
   threadId?: Prisma.StringWithAggregatesFilter<"TalkThreadComment"> | string
   authorId?: Prisma.StringWithAggregatesFilter<"TalkThreadComment"> | string
 }
@@ -235,6 +247,7 @@ export type TalkThreadCommentCreateInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   thread: Prisma.ContentTalkThreadCreateNestedOneWithoutCommentsInput
   author: Prisma.EmployeeCreateNestedOneWithoutCommentsInput
 }
@@ -243,6 +256,7 @@ export type TalkThreadCommentUncheckedCreateInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   threadId: string
   authorId: string
 }
@@ -251,6 +265,7 @@ export type TalkThreadCommentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   thread?: Prisma.ContentTalkThreadUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.EmployeeUpdateOneRequiredWithoutCommentsNestedInput
 }
@@ -259,6 +274,7 @@ export type TalkThreadCommentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   threadId?: Prisma.StringFieldUpdateOperationsInput | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -267,6 +283,7 @@ export type TalkThreadCommentCreateManyInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   threadId: string
   authorId: string
 }
@@ -275,12 +292,14 @@ export type TalkThreadCommentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TalkThreadCommentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   threadId?: Prisma.StringFieldUpdateOperationsInput | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -299,6 +318,7 @@ export type TalkThreadCommentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  body?: Prisma.SortOrder
   threadId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
 }
@@ -307,6 +327,7 @@ export type TalkThreadCommentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  body?: Prisma.SortOrder
   threadId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
 }
@@ -315,6 +336,7 @@ export type TalkThreadCommentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  body?: Prisma.SortOrder
   threadId?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
 }
@@ -407,6 +429,7 @@ export type TalkThreadCommentCreateWithoutAuthorInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   thread: Prisma.ContentTalkThreadCreateNestedOneWithoutCommentsInput
 }
 
@@ -414,6 +437,7 @@ export type TalkThreadCommentUncheckedCreateWithoutAuthorInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   threadId: string
 }
 
@@ -450,6 +474,7 @@ export type TalkThreadCommentScalarWhereInput = {
   id?: Prisma.StringFilter<"TalkThreadComment"> | string
   createdAt?: Prisma.DateTimeFilter<"TalkThreadComment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TalkThreadComment"> | Date | string
+  body?: Prisma.StringFilter<"TalkThreadComment"> | string
   threadId?: Prisma.StringFilter<"TalkThreadComment"> | string
   authorId?: Prisma.StringFilter<"TalkThreadComment"> | string
 }
@@ -458,6 +483,7 @@ export type TalkThreadCommentCreateWithoutThreadInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   author: Prisma.EmployeeCreateNestedOneWithoutCommentsInput
 }
 
@@ -465,6 +491,7 @@ export type TalkThreadCommentUncheckedCreateWithoutThreadInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   authorId: string
 }
 
@@ -498,6 +525,7 @@ export type TalkThreadCommentCreateManyAuthorInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   threadId: string
 }
 
@@ -505,6 +533,7 @@ export type TalkThreadCommentUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   thread?: Prisma.ContentTalkThreadUpdateOneRequiredWithoutCommentsNestedInput
 }
 
@@ -512,6 +541,7 @@ export type TalkThreadCommentUncheckedUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   threadId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -519,6 +549,7 @@ export type TalkThreadCommentUncheckedUpdateManyWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   threadId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -526,6 +557,7 @@ export type TalkThreadCommentCreateManyThreadInput = {
   id?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  body: string
   authorId: string
 }
 
@@ -533,6 +565,7 @@ export type TalkThreadCommentUpdateWithoutThreadInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   author?: Prisma.EmployeeUpdateOneRequiredWithoutCommentsNestedInput
 }
 
@@ -540,6 +573,7 @@ export type TalkThreadCommentUncheckedUpdateWithoutThreadInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -547,6 +581,7 @@ export type TalkThreadCommentUncheckedUpdateManyWithoutThreadInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -556,6 +591,7 @@ export type TalkThreadCommentSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  body?: boolean
   threadId?: boolean
   authorId?: boolean
   thread?: boolean | Prisma.ContentTalkThreadDefaultArgs<ExtArgs>
@@ -566,6 +602,7 @@ export type TalkThreadCommentSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  body?: boolean
   threadId?: boolean
   authorId?: boolean
   thread?: boolean | Prisma.ContentTalkThreadDefaultArgs<ExtArgs>
@@ -576,6 +613,7 @@ export type TalkThreadCommentSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  body?: boolean
   threadId?: boolean
   authorId?: boolean
   thread?: boolean | Prisma.ContentTalkThreadDefaultArgs<ExtArgs>
@@ -586,11 +624,12 @@ export type TalkThreadCommentSelectScalar = {
   id?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  body?: boolean
   threadId?: boolean
   authorId?: boolean
 }
 
-export type TalkThreadCommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "threadId" | "authorId", ExtArgs["result"]["talkThreadComment"]>
+export type TalkThreadCommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "body" | "threadId" | "authorId", ExtArgs["result"]["talkThreadComment"]>
 export type TalkThreadCommentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   thread?: boolean | Prisma.ContentTalkThreadDefaultArgs<ExtArgs>
   author?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -614,6 +653,7 @@ export type $TalkThreadCommentPayload<ExtArgs extends runtime.Types.Extensions.I
     id: string
     createdAt: Date
     updatedAt: Date
+    body: string
     threadId: string
     authorId: string
   }, ExtArgs["result"]["talkThreadComment"]>
@@ -1044,6 +1084,7 @@ export interface TalkThreadCommentFieldRefs {
   readonly id: Prisma.FieldRef<"TalkThreadComment", 'String'>
   readonly createdAt: Prisma.FieldRef<"TalkThreadComment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"TalkThreadComment", 'DateTime'>
+  readonly body: Prisma.FieldRef<"TalkThreadComment", 'String'>
   readonly threadId: Prisma.FieldRef<"TalkThreadComment", 'String'>
   readonly authorId: Prisma.FieldRef<"TalkThreadComment", 'String'>
 }

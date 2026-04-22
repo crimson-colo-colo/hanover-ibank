@@ -27,10 +27,11 @@ export type AggregateContentTalkThread = {
 export type ContentTalkThreadMinAggregateOutputType = {
   id: string | null
   title: string | null
-  body: string | null
   status: $Enums.ThreadStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  resolvedAt: Date | null
+  resolvedById: string | null
   createdById: string | null
   contentId: string | null
 }
@@ -38,10 +39,11 @@ export type ContentTalkThreadMinAggregateOutputType = {
 export type ContentTalkThreadMaxAggregateOutputType = {
   id: string | null
   title: string | null
-  body: string | null
   status: $Enums.ThreadStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  resolvedAt: Date | null
+  resolvedById: string | null
   createdById: string | null
   contentId: string | null
 }
@@ -49,10 +51,11 @@ export type ContentTalkThreadMaxAggregateOutputType = {
 export type ContentTalkThreadCountAggregateOutputType = {
   id: number
   title: number
-  body: number
   status: number
   createdAt: number
   updatedAt: number
+  resolvedAt: number
+  resolvedById: number
   createdById: number
   contentId: number
   _all: number
@@ -62,10 +65,11 @@ export type ContentTalkThreadCountAggregateOutputType = {
 export type ContentTalkThreadMinAggregateInputType = {
   id?: true
   title?: true
-  body?: true
   status?: true
   createdAt?: true
   updatedAt?: true
+  resolvedAt?: true
+  resolvedById?: true
   createdById?: true
   contentId?: true
 }
@@ -73,10 +77,11 @@ export type ContentTalkThreadMinAggregateInputType = {
 export type ContentTalkThreadMaxAggregateInputType = {
   id?: true
   title?: true
-  body?: true
   status?: true
   createdAt?: true
   updatedAt?: true
+  resolvedAt?: true
+  resolvedById?: true
   createdById?: true
   contentId?: true
 }
@@ -84,10 +89,11 @@ export type ContentTalkThreadMaxAggregateInputType = {
 export type ContentTalkThreadCountAggregateInputType = {
   id?: true
   title?: true
-  body?: true
   status?: true
   createdAt?: true
   updatedAt?: true
+  resolvedAt?: true
+  resolvedById?: true
   createdById?: true
   contentId?: true
   _all?: true
@@ -168,10 +174,11 @@ export type ContentTalkThreadGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type ContentTalkThreadGroupByOutputType = {
   id: string
   title: string | null
-  body: string
   status: $Enums.ThreadStatus
   createdAt: Date
   updatedAt: Date
+  resolvedAt: Date | null
+  resolvedById: string | null
   createdById: string
   contentId: string
   _count: ContentTalkThreadCountAggregateOutputType | null
@@ -200,12 +207,14 @@ export type ContentTalkThreadWhereInput = {
   NOT?: Prisma.ContentTalkThreadWhereInput | Prisma.ContentTalkThreadWhereInput[]
   id?: Prisma.StringFilter<"ContentTalkThread"> | string
   title?: Prisma.StringNullableFilter<"ContentTalkThread"> | string | null
-  body?: Prisma.StringFilter<"ContentTalkThread"> | string
   status?: Prisma.EnumThreadStatusFilter<"ContentTalkThread"> | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFilter<"ContentTalkThread"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ContentTalkThread"> | Date | string
+  resolvedAt?: Prisma.DateTimeNullableFilter<"ContentTalkThread"> | Date | string | null
+  resolvedById?: Prisma.StringNullableFilter<"ContentTalkThread"> | string | null
   createdById?: Prisma.StringFilter<"ContentTalkThread"> | string
   contentId?: Prisma.StringFilter<"ContentTalkThread"> | string
+  resolvedBy?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
   createdBy?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   content?: Prisma.XOR<Prisma.ContentScalarRelationFilter, Prisma.ContentWhereInput>
   comments?: Prisma.TalkThreadCommentListRelationFilter
@@ -214,12 +223,14 @@ export type ContentTalkThreadWhereInput = {
 export type ContentTalkThreadOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
-  body?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
+  resolvedBy?: Prisma.EmployeeOrderByWithRelationInput
   createdBy?: Prisma.EmployeeOrderByWithRelationInput
   content?: Prisma.ContentOrderByWithRelationInput
   comments?: Prisma.TalkThreadCommentOrderByRelationAggregateInput
@@ -231,12 +242,14 @@ export type ContentTalkThreadWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ContentTalkThreadWhereInput[]
   NOT?: Prisma.ContentTalkThreadWhereInput | Prisma.ContentTalkThreadWhereInput[]
   title?: Prisma.StringNullableFilter<"ContentTalkThread"> | string | null
-  body?: Prisma.StringFilter<"ContentTalkThread"> | string
   status?: Prisma.EnumThreadStatusFilter<"ContentTalkThread"> | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFilter<"ContentTalkThread"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ContentTalkThread"> | Date | string
+  resolvedAt?: Prisma.DateTimeNullableFilter<"ContentTalkThread"> | Date | string | null
+  resolvedById?: Prisma.StringNullableFilter<"ContentTalkThread"> | string | null
   createdById?: Prisma.StringFilter<"ContentTalkThread"> | string
   contentId?: Prisma.StringFilter<"ContentTalkThread"> | string
+  resolvedBy?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
   createdBy?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   content?: Prisma.XOR<Prisma.ContentScalarRelationFilter, Prisma.ContentWhereInput>
   comments?: Prisma.TalkThreadCommentListRelationFilter
@@ -245,10 +258,11 @@ export type ContentTalkThreadWhereUniqueInput = Prisma.AtLeast<{
 export type ContentTalkThreadOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
-  body?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdById?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
   _count?: Prisma.ContentTalkThreadCountOrderByAggregateInput
@@ -262,10 +276,11 @@ export type ContentTalkThreadScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ContentTalkThreadScalarWhereWithAggregatesInput | Prisma.ContentTalkThreadScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ContentTalkThread"> | string
   title?: Prisma.StringNullableWithAggregatesFilter<"ContentTalkThread"> | string | null
-  body?: Prisma.StringWithAggregatesFilter<"ContentTalkThread"> | string
   status?: Prisma.EnumThreadStatusWithAggregatesFilter<"ContentTalkThread"> | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ContentTalkThread"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ContentTalkThread"> | Date | string
+  resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ContentTalkThread"> | Date | string | null
+  resolvedById?: Prisma.StringNullableWithAggregatesFilter<"ContentTalkThread"> | string | null
   createdById?: Prisma.StringWithAggregatesFilter<"ContentTalkThread"> | string
   contentId?: Prisma.StringWithAggregatesFilter<"ContentTalkThread"> | string
 }
@@ -273,10 +288,11 @@ export type ContentTalkThreadScalarWhereWithAggregatesInput = {
 export type ContentTalkThreadCreateInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedBy?: Prisma.EmployeeCreateNestedOneWithoutResolvedThreadsInput
   createdBy: Prisma.EmployeeCreateNestedOneWithoutThreadsInput
   content: Prisma.ContentCreateNestedOneWithoutThreadsInput
   comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutThreadInput
@@ -285,10 +301,11 @@ export type ContentTalkThreadCreateInput = {
 export type ContentTalkThreadUncheckedCreateInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedById?: string | null
   createdById: string
   contentId: string
   comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutThreadInput
@@ -297,10 +314,11 @@ export type ContentTalkThreadUncheckedCreateInput = {
 export type ContentTalkThreadUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedBy?: Prisma.EmployeeUpdateOneWithoutResolvedThreadsNestedInput
   createdBy?: Prisma.EmployeeUpdateOneRequiredWithoutThreadsNestedInput
   content?: Prisma.ContentUpdateOneRequiredWithoutThreadsNestedInput
   comments?: Prisma.TalkThreadCommentUpdateManyWithoutThreadNestedInput
@@ -309,10 +327,11 @@ export type ContentTalkThreadUpdateInput = {
 export type ContentTalkThreadUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
   comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutThreadNestedInput
@@ -321,10 +340,11 @@ export type ContentTalkThreadUncheckedUpdateInput = {
 export type ContentTalkThreadCreateManyInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedById?: string | null
   createdById: string
   contentId: string
 }
@@ -332,19 +352,20 @@ export type ContentTalkThreadCreateManyInput = {
 export type ContentTalkThreadUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ContentTalkThreadUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -362,10 +383,11 @@ export type ContentTalkThreadOrderByRelationAggregateInput = {
 export type ContentTalkThreadCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  body?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  resolvedById?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
 }
@@ -373,10 +395,11 @@ export type ContentTalkThreadCountOrderByAggregateInput = {
 export type ContentTalkThreadMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  body?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  resolvedById?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
 }
@@ -384,10 +407,11 @@ export type ContentTalkThreadMaxOrderByAggregateInput = {
 export type ContentTalkThreadMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  body?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  resolvedAt?: Prisma.SortOrder
+  resolvedById?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
 }
@@ -404,10 +428,24 @@ export type ContentTalkThreadCreateNestedManyWithoutCreatedByInput = {
   connect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
 }
 
+export type ContentTalkThreadCreateNestedManyWithoutResolvedByInput = {
+  create?: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput> | Prisma.ContentTalkThreadCreateWithoutResolvedByInput[] | Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput[]
+  connectOrCreate?: Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput | Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput[]
+  createMany?: Prisma.ContentTalkThreadCreateManyResolvedByInputEnvelope
+  connect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+}
+
 export type ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput = {
   create?: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutCreatedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutCreatedByInput> | Prisma.ContentTalkThreadCreateWithoutCreatedByInput[] | Prisma.ContentTalkThreadUncheckedCreateWithoutCreatedByInput[]
   connectOrCreate?: Prisma.ContentTalkThreadCreateOrConnectWithoutCreatedByInput | Prisma.ContentTalkThreadCreateOrConnectWithoutCreatedByInput[]
   createMany?: Prisma.ContentTalkThreadCreateManyCreatedByInputEnvelope
+  connect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+}
+
+export type ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput = {
+  create?: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput> | Prisma.ContentTalkThreadCreateWithoutResolvedByInput[] | Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput[]
+  connectOrCreate?: Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput | Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput[]
+  createMany?: Prisma.ContentTalkThreadCreateManyResolvedByInputEnvelope
   connect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
 }
 
@@ -425,6 +463,20 @@ export type ContentTalkThreadUpdateManyWithoutCreatedByNestedInput = {
   deleteMany?: Prisma.ContentTalkThreadScalarWhereInput | Prisma.ContentTalkThreadScalarWhereInput[]
 }
 
+export type ContentTalkThreadUpdateManyWithoutResolvedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput> | Prisma.ContentTalkThreadCreateWithoutResolvedByInput[] | Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput[]
+  connectOrCreate?: Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput | Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput[]
+  upsert?: Prisma.ContentTalkThreadUpsertWithWhereUniqueWithoutResolvedByInput | Prisma.ContentTalkThreadUpsertWithWhereUniqueWithoutResolvedByInput[]
+  createMany?: Prisma.ContentTalkThreadCreateManyResolvedByInputEnvelope
+  set?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  disconnect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  delete?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  connect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  update?: Prisma.ContentTalkThreadUpdateWithWhereUniqueWithoutResolvedByInput | Prisma.ContentTalkThreadUpdateWithWhereUniqueWithoutResolvedByInput[]
+  updateMany?: Prisma.ContentTalkThreadUpdateManyWithWhereWithoutResolvedByInput | Prisma.ContentTalkThreadUpdateManyWithWhereWithoutResolvedByInput[]
+  deleteMany?: Prisma.ContentTalkThreadScalarWhereInput | Prisma.ContentTalkThreadScalarWhereInput[]
+}
+
 export type ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput = {
   create?: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutCreatedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutCreatedByInput> | Prisma.ContentTalkThreadCreateWithoutCreatedByInput[] | Prisma.ContentTalkThreadUncheckedCreateWithoutCreatedByInput[]
   connectOrCreate?: Prisma.ContentTalkThreadCreateOrConnectWithoutCreatedByInput | Prisma.ContentTalkThreadCreateOrConnectWithoutCreatedByInput[]
@@ -436,6 +488,20 @@ export type ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput = {
   connect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
   update?: Prisma.ContentTalkThreadUpdateWithWhereUniqueWithoutCreatedByInput | Prisma.ContentTalkThreadUpdateWithWhereUniqueWithoutCreatedByInput[]
   updateMany?: Prisma.ContentTalkThreadUpdateManyWithWhereWithoutCreatedByInput | Prisma.ContentTalkThreadUpdateManyWithWhereWithoutCreatedByInput[]
+  deleteMany?: Prisma.ContentTalkThreadScalarWhereInput | Prisma.ContentTalkThreadScalarWhereInput[]
+}
+
+export type ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput> | Prisma.ContentTalkThreadCreateWithoutResolvedByInput[] | Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput[]
+  connectOrCreate?: Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput | Prisma.ContentTalkThreadCreateOrConnectWithoutResolvedByInput[]
+  upsert?: Prisma.ContentTalkThreadUpsertWithWhereUniqueWithoutResolvedByInput | Prisma.ContentTalkThreadUpsertWithWhereUniqueWithoutResolvedByInput[]
+  createMany?: Prisma.ContentTalkThreadCreateManyResolvedByInputEnvelope
+  set?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  disconnect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  delete?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  connect?: Prisma.ContentTalkThreadWhereUniqueInput | Prisma.ContentTalkThreadWhereUniqueInput[]
+  update?: Prisma.ContentTalkThreadUpdateWithWhereUniqueWithoutResolvedByInput | Prisma.ContentTalkThreadUpdateWithWhereUniqueWithoutResolvedByInput[]
+  updateMany?: Prisma.ContentTalkThreadUpdateManyWithWhereWithoutResolvedByInput | Prisma.ContentTalkThreadUpdateManyWithWhereWithoutResolvedByInput[]
   deleteMany?: Prisma.ContentTalkThreadScalarWhereInput | Prisma.ContentTalkThreadScalarWhereInput[]
 }
 
@@ -485,6 +551,10 @@ export type EnumThreadStatusFieldUpdateOperationsInput = {
   set?: $Enums.ThreadStatus
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type ContentTalkThreadCreateNestedOneWithoutCommentsInput = {
   create?: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutCommentsInput, Prisma.ContentTalkThreadUncheckedCreateWithoutCommentsInput>
   connectOrCreate?: Prisma.ContentTalkThreadCreateOrConnectWithoutCommentsInput
@@ -502,10 +572,11 @@ export type ContentTalkThreadUpdateOneRequiredWithoutCommentsNestedInput = {
 export type ContentTalkThreadCreateWithoutCreatedByInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedBy?: Prisma.EmployeeCreateNestedOneWithoutResolvedThreadsInput
   content: Prisma.ContentCreateNestedOneWithoutThreadsInput
   comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutThreadInput
 }
@@ -513,10 +584,11 @@ export type ContentTalkThreadCreateWithoutCreatedByInput = {
 export type ContentTalkThreadUncheckedCreateWithoutCreatedByInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedById?: string | null
   contentId: string
   comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutThreadInput
 }
@@ -528,6 +600,40 @@ export type ContentTalkThreadCreateOrConnectWithoutCreatedByInput = {
 
 export type ContentTalkThreadCreateManyCreatedByInputEnvelope = {
   data: Prisma.ContentTalkThreadCreateManyCreatedByInput | Prisma.ContentTalkThreadCreateManyCreatedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type ContentTalkThreadCreateWithoutResolvedByInput = {
+  id?: string
+  title?: string | null
+  status?: $Enums.ThreadStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  createdBy: Prisma.EmployeeCreateNestedOneWithoutThreadsInput
+  content: Prisma.ContentCreateNestedOneWithoutThreadsInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutThreadInput
+}
+
+export type ContentTalkThreadUncheckedCreateWithoutResolvedByInput = {
+  id?: string
+  title?: string | null
+  status?: $Enums.ThreadStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  createdById: string
+  contentId: string
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutThreadInput
+}
+
+export type ContentTalkThreadCreateOrConnectWithoutResolvedByInput = {
+  where: Prisma.ContentTalkThreadWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput>
+}
+
+export type ContentTalkThreadCreateManyResolvedByInputEnvelope = {
+  data: Prisma.ContentTalkThreadCreateManyResolvedByInput | Prisma.ContentTalkThreadCreateManyResolvedByInput[]
   skipDuplicates?: boolean
 }
 
@@ -553,21 +659,39 @@ export type ContentTalkThreadScalarWhereInput = {
   NOT?: Prisma.ContentTalkThreadScalarWhereInput | Prisma.ContentTalkThreadScalarWhereInput[]
   id?: Prisma.StringFilter<"ContentTalkThread"> | string
   title?: Prisma.StringNullableFilter<"ContentTalkThread"> | string | null
-  body?: Prisma.StringFilter<"ContentTalkThread"> | string
   status?: Prisma.EnumThreadStatusFilter<"ContentTalkThread"> | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFilter<"ContentTalkThread"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ContentTalkThread"> | Date | string
+  resolvedAt?: Prisma.DateTimeNullableFilter<"ContentTalkThread"> | Date | string | null
+  resolvedById?: Prisma.StringNullableFilter<"ContentTalkThread"> | string | null
   createdById?: Prisma.StringFilter<"ContentTalkThread"> | string
   contentId?: Prisma.StringFilter<"ContentTalkThread"> | string
+}
+
+export type ContentTalkThreadUpsertWithWhereUniqueWithoutResolvedByInput = {
+  where: Prisma.ContentTalkThreadWhereUniqueInput
+  update: Prisma.XOR<Prisma.ContentTalkThreadUpdateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedUpdateWithoutResolvedByInput>
+  create: Prisma.XOR<Prisma.ContentTalkThreadCreateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedCreateWithoutResolvedByInput>
+}
+
+export type ContentTalkThreadUpdateWithWhereUniqueWithoutResolvedByInput = {
+  where: Prisma.ContentTalkThreadWhereUniqueInput
+  data: Prisma.XOR<Prisma.ContentTalkThreadUpdateWithoutResolvedByInput, Prisma.ContentTalkThreadUncheckedUpdateWithoutResolvedByInput>
+}
+
+export type ContentTalkThreadUpdateManyWithWhereWithoutResolvedByInput = {
+  where: Prisma.ContentTalkThreadScalarWhereInput
+  data: Prisma.XOR<Prisma.ContentTalkThreadUpdateManyMutationInput, Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByInput>
 }
 
 export type ContentTalkThreadCreateWithoutContentInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedBy?: Prisma.EmployeeCreateNestedOneWithoutResolvedThreadsInput
   createdBy: Prisma.EmployeeCreateNestedOneWithoutThreadsInput
   comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutThreadInput
 }
@@ -575,10 +699,11 @@ export type ContentTalkThreadCreateWithoutContentInput = {
 export type ContentTalkThreadUncheckedCreateWithoutContentInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedById?: string | null
   createdById: string
   comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutThreadInput
 }
@@ -612,10 +737,11 @@ export type ContentTalkThreadUpdateManyWithWhereWithoutContentInput = {
 export type ContentTalkThreadCreateWithoutCommentsInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedBy?: Prisma.EmployeeCreateNestedOneWithoutResolvedThreadsInput
   createdBy: Prisma.EmployeeCreateNestedOneWithoutThreadsInput
   content: Prisma.ContentCreateNestedOneWithoutThreadsInput
 }
@@ -623,10 +749,11 @@ export type ContentTalkThreadCreateWithoutCommentsInput = {
 export type ContentTalkThreadUncheckedCreateWithoutCommentsInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedById?: string | null
   createdById: string
   contentId: string
 }
@@ -650,10 +777,11 @@ export type ContentTalkThreadUpdateToOneWithWhereWithoutCommentsInput = {
 export type ContentTalkThreadUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedBy?: Prisma.EmployeeUpdateOneWithoutResolvedThreadsNestedInput
   createdBy?: Prisma.EmployeeUpdateOneRequiredWithoutThreadsNestedInput
   content?: Prisma.ContentUpdateOneRequiredWithoutThreadsNestedInput
 }
@@ -661,10 +789,11 @@ export type ContentTalkThreadUpdateWithoutCommentsInput = {
 export type ContentTalkThreadUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -672,20 +801,33 @@ export type ContentTalkThreadUncheckedUpdateWithoutCommentsInput = {
 export type ContentTalkThreadCreateManyCreatedByInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedById?: string | null
+  contentId: string
+}
+
+export type ContentTalkThreadCreateManyResolvedByInput = {
+  id?: string
+  title?: string | null
+  status?: $Enums.ThreadStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  createdById: string
   contentId: string
 }
 
 export type ContentTalkThreadUpdateWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedBy?: Prisma.EmployeeUpdateOneWithoutResolvedThreadsNestedInput
   content?: Prisma.ContentUpdateOneRequiredWithoutThreadsNestedInput
   comments?: Prisma.TalkThreadCommentUpdateManyWithoutThreadNestedInput
 }
@@ -693,10 +835,11 @@ export type ContentTalkThreadUpdateWithoutCreatedByInput = {
 export type ContentTalkThreadUncheckedUpdateWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
   comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutThreadNestedInput
 }
@@ -704,30 +847,68 @@ export type ContentTalkThreadUncheckedUpdateWithoutCreatedByInput = {
 export type ContentTalkThreadUncheckedUpdateManyWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type ContentTalkThreadUpdateWithoutResolvedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdBy?: Prisma.EmployeeUpdateOneRequiredWithoutThreadsNestedInput
+  content?: Prisma.ContentUpdateOneRequiredWithoutThreadsNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutThreadNestedInput
+}
+
+export type ContentTalkThreadUncheckedUpdateWithoutResolvedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdById?: Prisma.StringFieldUpdateOperationsInput | string
+  contentId?: Prisma.StringFieldUpdateOperationsInput | string
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutThreadNestedInput
+}
+
+export type ContentTalkThreadUncheckedUpdateManyWithoutResolvedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdById?: Prisma.StringFieldUpdateOperationsInput | string
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ContentTalkThreadCreateManyContentInput = {
   id?: string
   title?: string | null
-  body: string
   status?: $Enums.ThreadStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  resolvedAt?: Date | string | null
+  resolvedById?: string | null
   createdById: string
 }
 
 export type ContentTalkThreadUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedBy?: Prisma.EmployeeUpdateOneWithoutResolvedThreadsNestedInput
   createdBy?: Prisma.EmployeeUpdateOneRequiredWithoutThreadsNestedInput
   comments?: Prisma.TalkThreadCommentUpdateManyWithoutThreadNestedInput
 }
@@ -735,10 +916,11 @@ export type ContentTalkThreadUpdateWithoutContentInput = {
 export type ContentTalkThreadUncheckedUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
   comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutThreadNestedInput
 }
@@ -746,10 +928,11 @@ export type ContentTalkThreadUncheckedUpdateWithoutContentInput = {
 export type ContentTalkThreadUncheckedUpdateManyWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumThreadStatusFieldUpdateOperationsInput | $Enums.ThreadStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdById?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -787,12 +970,14 @@ export type ContentTalkThreadCountOutputTypeCountCommentsArgs<ExtArgs extends ru
 export type ContentTalkThreadSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
-  body?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  resolvedAt?: boolean
+  resolvedById?: boolean
   createdById?: boolean
   contentId?: boolean
+  resolvedBy?: boolean | Prisma.ContentTalkThread$resolvedByArgs<ExtArgs>
   createdBy?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
   comments?: boolean | Prisma.ContentTalkThread$commentsArgs<ExtArgs>
@@ -802,12 +987,14 @@ export type ContentTalkThreadSelect<ExtArgs extends runtime.Types.Extensions.Int
 export type ContentTalkThreadSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
-  body?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  resolvedAt?: boolean
+  resolvedById?: boolean
   createdById?: boolean
   contentId?: boolean
+  resolvedBy?: boolean | Prisma.ContentTalkThread$resolvedByArgs<ExtArgs>
   createdBy?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contentTalkThread"]>
@@ -815,12 +1002,14 @@ export type ContentTalkThreadSelectCreateManyAndReturn<ExtArgs extends runtime.T
 export type ContentTalkThreadSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
-  body?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  resolvedAt?: boolean
+  resolvedById?: boolean
   createdById?: boolean
   contentId?: boolean
+  resolvedBy?: boolean | Prisma.ContentTalkThread$resolvedByArgs<ExtArgs>
   createdBy?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contentTalkThread"]>
@@ -828,26 +1017,30 @@ export type ContentTalkThreadSelectUpdateManyAndReturn<ExtArgs extends runtime.T
 export type ContentTalkThreadSelectScalar = {
   id?: boolean
   title?: boolean
-  body?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  resolvedAt?: boolean
+  resolvedById?: boolean
   createdById?: boolean
   contentId?: boolean
 }
 
-export type ContentTalkThreadOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "body" | "status" | "createdAt" | "updatedAt" | "createdById" | "contentId", ExtArgs["result"]["contentTalkThread"]>
+export type ContentTalkThreadOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "status" | "createdAt" | "updatedAt" | "resolvedAt" | "resolvedById" | "createdById" | "contentId", ExtArgs["result"]["contentTalkThread"]>
 export type ContentTalkThreadInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  resolvedBy?: boolean | Prisma.ContentTalkThread$resolvedByArgs<ExtArgs>
   createdBy?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
   comments?: boolean | Prisma.ContentTalkThread$commentsArgs<ExtArgs>
   _count?: boolean | Prisma.ContentTalkThreadCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContentTalkThreadIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  resolvedBy?: boolean | Prisma.ContentTalkThread$resolvedByArgs<ExtArgs>
   createdBy?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
 }
 export type ContentTalkThreadIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  resolvedBy?: boolean | Prisma.ContentTalkThread$resolvedByArgs<ExtArgs>
   createdBy?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
 }
@@ -855,6 +1048,7 @@ export type ContentTalkThreadIncludeUpdateManyAndReturn<ExtArgs extends runtime.
 export type $ContentTalkThreadPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ContentTalkThread"
   objects: {
+    resolvedBy: Prisma.$EmployeePayload<ExtArgs> | null
     createdBy: Prisma.$EmployeePayload<ExtArgs>
     content: Prisma.$ContentPayload<ExtArgs>
     comments: Prisma.$TalkThreadCommentPayload<ExtArgs>[]
@@ -862,10 +1056,11 @@ export type $ContentTalkThreadPayload<ExtArgs extends runtime.Types.Extensions.I
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string | null
-    body: string
     status: $Enums.ThreadStatus
     createdAt: Date
     updatedAt: Date
+    resolvedAt: Date | null
+    resolvedById: string | null
     createdById: string
     contentId: string
   }, ExtArgs["result"]["contentTalkThread"]>
@@ -1262,6 +1457,7 @@ readonly fields: ContentTalkThreadFieldRefs;
  */
 export interface Prisma__ContentTalkThreadClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  resolvedBy<T extends Prisma.ContentTalkThread$resolvedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ContentTalkThread$resolvedByArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   createdBy<T extends Prisma.EmployeeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmployeeDefaultArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   content<T extends Prisma.ContentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ContentDefaultArgs<ExtArgs>>): Prisma.Prisma__ContentClient<runtime.Types.Result.GetResult<Prisma.$ContentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   comments<T extends Prisma.ContentTalkThread$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ContentTalkThread$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TalkThreadCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1296,10 +1492,11 @@ export interface Prisma__ContentTalkThreadClient<T, Null = never, ExtArgs extend
 export interface ContentTalkThreadFieldRefs {
   readonly id: Prisma.FieldRef<"ContentTalkThread", 'String'>
   readonly title: Prisma.FieldRef<"ContentTalkThread", 'String'>
-  readonly body: Prisma.FieldRef<"ContentTalkThread", 'String'>
   readonly status: Prisma.FieldRef<"ContentTalkThread", 'ThreadStatus'>
   readonly createdAt: Prisma.FieldRef<"ContentTalkThread", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ContentTalkThread", 'DateTime'>
+  readonly resolvedAt: Prisma.FieldRef<"ContentTalkThread", 'DateTime'>
+  readonly resolvedById: Prisma.FieldRef<"ContentTalkThread", 'String'>
   readonly createdById: Prisma.FieldRef<"ContentTalkThread", 'String'>
   readonly contentId: Prisma.FieldRef<"ContentTalkThread", 'String'>
 }
@@ -1700,6 +1897,25 @@ export type ContentTalkThreadDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many ContentTalkThreads to delete.
    */
   limit?: number
+}
+
+/**
+ * ContentTalkThread.resolvedBy
+ */
+export type ContentTalkThread$resolvedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Employee
+   */
+  select?: Prisma.EmployeeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Employee
+   */
+  omit?: Prisma.EmployeeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmployeeInclude<ExtArgs> | null
+  where?: Prisma.EmployeeWhereInput
 }
 
 /**

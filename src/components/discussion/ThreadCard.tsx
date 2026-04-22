@@ -1,93 +1,93 @@
-import { Avatar, Badge, Card, Group, Text, ThemeIcon, Stack } from "@mantine/core";
-import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react";
-import type { Thread, ThreadStatus } from "./DiscussionPanel";
+import { Avatar, Badge, Card, Group, Text, ThemeIcon, Stack } from "@mantine/core"
+import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react"
+import type { Thread, ThreadStatus } from "./DiscussionPanel"
 
 function formatDate(date: string) {
-    return new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-    }).format(new Date(date));
+	return new Intl.DateTimeFormat("en-US", {
+		month: "short",
+		day: "numeric",
+		hour: "numeric",
+		minute: "2-digit",
+	}).format(new Date(date))
 }
 
 function getStatusColor(status: ThreadStatus) {
-    if (status === "Open") return "blue";
-    if (status === "Resolved") return "green";
-    return "gray";
+	if (status === "Open") return "blue"
+	if (status === "Resolved") return "green"
+	return "gray"
 }
 
 type Props = {
-    thread: Thread;
-    onOpen: (thread: Thread) => void;
-};
+	thread: Thread
+	onOpen: (thread: Thread) => void
+}
 
 export default function ThreadCard({ thread, onOpen }: Props) {
-    const preview = thread.comments[thread.comments.length - 1]?.body ?? "No comments yet";
+	const preview = thread.comments[thread.comments.length - 1]?.body ?? "No comments yet"
 
-    return (
-        <Card
-            withBorder
-            radius="xl"
-            padding="lg"
-            shadow="sm"
-            style={{ cursor: "pointer" }}
-            onClick={() => onOpen(thread)}
-        >
-            <Stack gap="md">
-                <Group justify="space-between" align="flex-start">
-                    <Stack gap={8} style={{ flex: 1 }}>
-                        <Group gap="xs">
-                            {thread.sectionLabel ? (
-                                <Badge variant="outline" radius="xl">
-                                    {thread.sectionLabel}
-                                </Badge>
-                            ) : null}
+	return (
+		<Card
+			withBorder
+			radius="xl"
+			padding="lg"
+			shadow="sm"
+			style={{ cursor: "pointer" }}
+			onClick={() => onOpen(thread)}
+		>
+			<Stack gap="md">
+				<Group justify="space-between" align="flex-start">
+					<Stack gap={8} style={{ flex: 1 }}>
+						<Group gap="xs">
+							{thread.sectionLabel ? (
+								<Badge variant="outline" radius="xl">
+									{thread.sectionLabel}
+								</Badge>
+							) : null}
 
-                            <Badge color={getStatusColor(thread.status)} variant="light" radius="xl">
-                                {thread.status}
-                            </Badge>
-                        </Group>
+							<Badge color={getStatusColor(thread.status)} variant="light" radius="xl">
+								{thread.status}
+							</Badge>
+						</Group>
 
-                        <Text fw={700} size="lg">
-                            {thread.title || "Untitled thread"}
-                        </Text>
-                    </Stack>
+						<Text fw={700} size="lg">
+							{thread.title || "Untitled thread"}
+						</Text>
+					</Stack>
 
-                    <ThemeIcon variant="light" radius="xl">
-                        <IconChevronRight size={16} />
-                    </ThemeIcon>
-                </Group>
+					<ThemeIcon variant="light" radius="xl">
+						<IconChevronRight size={16} />
+					</ThemeIcon>
+				</Group>
 
-                <Text c="dimmed" size="sm" lineClamp={2}>
-                    {preview}
-                </Text>
+				<Text c="dimmed" size="sm" lineClamp={2}>
+					{preview}
+				</Text>
 
-                <Group justify="space-between">
-                    <Group gap="sm">
-                        <Avatar radius="xl" name={thread.createdBy.name} />
-                        <Text size="sm" c="dimmed">
-                            {thread.createdBy.name}
-                        </Text>
-                    </Group>
+				<Group justify="space-between">
+					<Group gap="sm">
+						<Avatar radius="xl" name={thread.createdBy.name} />
+						<Text size="sm" c="dimmed">
+							{thread.createdBy.name}
+						</Text>
+					</Group>
 
-                    <Group gap="md">
-                        <Group gap={4}>
-                            <IconMessageCircle size={15} />
-                            <Text size="sm" c="dimmed">
-                                {thread.comments.length}
-                            </Text>
-                        </Group>
+					<Group gap="md">
+						<Group gap={4}>
+							<IconMessageCircle size={15} />
+							<Text size="sm" c="dimmed">
+								{thread.comments.length}
+							</Text>
+						</Group>
 
-                        <Group gap={4}>
-                            <IconClock size={15} />
-                            <Text size="sm" c="dimmed">
-                                {formatDate(thread.createdAt)}
-                            </Text>
-                        </Group>
-                    </Group>
-                </Group>
-            </Stack>
-        </Card>
-    );
+						<Group gap={4}>
+							<IconClock size={15} />
+							<Text size="sm" c="dimmed">
+								{formatDate(thread.createdAt)}
+							</Text>
+						</Group>
+					</Group>
+				</Group>
+			</Stack>
+		</Card>
+	)
 }

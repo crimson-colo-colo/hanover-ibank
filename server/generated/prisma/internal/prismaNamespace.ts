@@ -997,10 +997,11 @@ export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeo
 export const ContentTalkThreadScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  body: 'body',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt',
+  resolvedById: 'resolvedById',
   createdById: 'createdById',
   contentId: 'contentId'
 } as const
@@ -1012,6 +1013,7 @@ export const TalkThreadCommentScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  body: 'body',
   threadId: 'threadId',
   authorId: 'authorId'
 } as const

@@ -28,6 +28,7 @@ model Employee {
   content  Content[]           @relation("Owner")
   threads  ContentTalkThread[] @relation("ThreadCreatedBy")
   comments TalkThreadComment[] @relation("CommentAuthor")
+  resolvedThreads ContentTalkThread[]
 }
 
 model Content {
@@ -56,10 +57,12 @@ model Content {
 model ContentTalkThread {
   id           String       @id @default(cuid())
   title        String?
-  body String
   status       ThreadStatus @default(Open)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   Employee? @relation(fields: [resolvedById], references: [id])
 
   createdById  String
   createdBy Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
@@ -72,12 +75,13 @@ model TalkThreadComment {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  body      String
 
-  threadId String
-  thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId  String
+  thread    ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
-  authorId String
-  author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
+  authorId  String
+  author    Employee @relation("CommentAuthor", fields: [authorId], references: [id])
 }
 
 model Tag {
