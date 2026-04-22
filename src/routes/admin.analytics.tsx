@@ -219,6 +219,7 @@ export function AnalyticsDashboard() {
 								withLabelsLine
 								labelsPosition="outside"
 								labelsType="value"
+								className="mx-auto"
 							/>
 						) : (
 							<Text c="dimmed" ta="center" mt="xl">
