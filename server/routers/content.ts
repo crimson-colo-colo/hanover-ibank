@@ -7,16 +7,11 @@ import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { Tag } from "../generated/prisma/client.ts"
-import {
-	ContentStatus,
-	type ContentType,
-	EmployeeRole,
-	TagCategory,
-} from "../generated/prisma/enums.ts"
+import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
-import {adminProcedure, authProcedure, router} from "../trpc.ts"
+import { authProcedure, router } from "../trpc.ts"
 
 type User = {
 	id: string
@@ -832,40 +827,49 @@ export const contentRouter = router({
 		}
 	}),
 
-	getFileStats : authProcedure.query(async (opts) => {
+	getFileStats: authProcedure.query(async (opts) => {
 		const content = await db.content.findMany({
-			where: {type : "Object"},
-			select: {
-				mimeType: true,
-				size: true,
+			where: {
+				type: ContentType.Object,
 			},
 		})
-		const grouped = new Map<string, { count: number; totalSize: number}>()
+		const objects = await Promise.all(
+			content.map((content) =>
+				s3
+					.headObject({
+						Bucket: bucketName,
+						Key: content.objectId!,
+					})
+					.then((head) => [
+						{
+							type: head.Metadata?.filetype ?? head.ContentType ?? "unknown",
+							size: head.ContentLength ?? 0,
+						},
+					])
+					.catch(() => [])
+			)
+		).then((results) => results.flat())
 
-		for(const {mimeType, size} of content) {
-			const key = mimeType ?? "unknown"
-			const existing = grouped.get(key)
-			if(existing){
+		const grouped = new Map<string, { count: number; totalSize: number }>()
+
+		for (const { type, size } of objects) {
+			const existing = grouped.get(type)
+			if (existing) {
 				existing.count += 1
 				existing.totalSize += size ?? 0
-			}
-			else {
-				grouped.set(key, {count: 1, totalSize: size ?? 0})
+			} else {
+				grouped.set(type, { count: 1, totalSize: size ?? 0 })
 			}
 		}
 
-		return Array.from(grouped.entries()).map(([type, {count, totalSize}]) => ({
+		return Array.from(grouped.entries()).map(([type, { count, totalSize }]) => ({
 			type,
 			count,
 			totalSize,
 		}))
-
-
-
-
 	}),
 
-	getUploadStats: authProcedure.query(async () =>{
+	getUploadStats: authProcedure.query(async () => {
 		const contents = await db.content.findMany({
 			select: {
 				type: true,
@@ -873,28 +877,39 @@ export const contentRouter = router({
 			},
 		})
 
-		const grouped = new Map<string, {Files: number; Links: number }>()
+		const grouped = new Map<string, { Files: number; Links: number }>()
 
-		for (const { type, createdAt } of contents){
-			const month = createdAt.toLocaleString("en-us", { month: "short"})
+		for (const { type, createdAt } of contents) {
+			const month = createdAt.toLocaleString("en-us", { month: "short" })
 			const existing = grouped.get(month)
-			if(existing){
-				if(type === "Object"){
+			if (existing) {
+				if (type === "Object") {
 					existing.Files++
-				}
-				else{
+				} else {
 					existing.Links++
 				}
-			}
-			else {
+			} else {
 				grouped.set(month, {
 					Files: type === "Object" ? 1 : 0,
-					Links: type === "Link" ? 1 : 0
+					Links: type === "Link" ? 1 : 0,
 				})
 			}
 		}
 
-		const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+		const monthOrder = [
+			"Jan",
+			"Feb",
+			"Mar",
+			"Apr",
+			"May",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Oct",
+			"Nov",
+			"Dec",
+		]
 
 		return monthOrder.map((month) => ({
 			month,
@@ -902,5 +917,4 @@ export const contentRouter = router({
 			Links: grouped.get(month)?.Links ?? 0,
 		}))
 	}),
-
 })
