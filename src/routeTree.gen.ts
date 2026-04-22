@@ -16,6 +16,7 @@ import { Route as AdminManageUsersRouteImport } from './routes/admin.manage-user
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedPreviewContentIdRouteImport } from './routes/_authenticated.preview.$contentId'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -51,6 +52,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPreviewContentIdRoute =
+  AuthenticatedPreviewContentIdRouteImport.update({
+    id: '/preview/$contentId',
+    path: '/preview/$contentId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
+  '/preview/$contentId': typeof AuthenticatedPreviewContentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +75,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
+  '/preview/$contentId': typeof AuthenticatedPreviewContentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +86,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
+  '/_authenticated/preview/$contentId': typeof AuthenticatedPreviewContentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/analytics'
     | '/admin/manage-users'
+    | '/preview/$contentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/analytics'
     | '/admin/manage-users'
+    | '/preview/$contentId'
   id:
     | '__root__'
     | '/'
@@ -104,6 +116,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/admin/analytics'
     | '/admin/manage-users'
+    | '/_authenticated/preview/$contentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -163,17 +176,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/preview/$contentId': {
+      id: '/_authenticated/preview/$contentId'
+      path: '/preview/$contentId'
+      fullPath: '/preview/$contentId'
+      preLoaderRoute: typeof AuthenticatedPreviewContentIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedPreviewContentIdRoute: typeof AuthenticatedPreviewContentIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedPreviewContentIdRoute: AuthenticatedPreviewContentIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
