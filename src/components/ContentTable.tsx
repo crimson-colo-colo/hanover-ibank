@@ -27,12 +27,7 @@ import { notifications } from "@mantine/notifications"
 import { ContentStatus, ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
-import type {
-	CheckInMutationType,
-	CheckOutMutationType,
-	ContentList,
-	ContentListItem,
-} from "@shared/types.ts"
+import type { ContentList, ContentListItem } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconCircleCheck,
@@ -81,6 +76,20 @@ import {
 import { fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 
+const mutationOptions = {
+	async onSettled() {
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
+			}),
+			queryClient.invalidateQueries({
+				queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
+			}),
+			queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
+		])
+	},
+}
+
 export function ContentTable({
 	loading,
 	data,
@@ -100,33 +109,20 @@ export function ContentTable({
 	const [deleteDialogOpen, { open: openDeleteDialog, close: closeDeleteDialog }] =
 		useDisclosure(false)
 	const [createModalOpen, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false)
-	const options = {
-		async onSettled() {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.Own }),
-				}),
-				queryClient.invalidateQueries({
-					queryKey: trpc.content.list.queryKey({ filter: ContentFilter.All }),
-				}),
-				queryClient.invalidateQueries({ queryKey: trpc.content.listFavorites.queryKey() }),
-			])
-		},
-	}
-	const deleteContent = useMutation(trpc.content.delete.mutationOptions(options))
-	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(options))
-	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(options))
+	const deleteContent = useMutation(trpc.content.delete.mutationOptions(mutationOptions))
+	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(mutationOptions))
+	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(mutationOptions))
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
-	const [checkOutContent, { open: openCheckOutContent, close: closeCheckOutContent }] =
+	const [checkOutModalOpen, { open: openCheckOutModal, close: closeCheckOutModal }] =
 		useDisclosure(false)
-	const [checkInContent, { open: openCheckInContent, close: closeCheckInContent }] =
+	const [checkInModalOpen, { open: openCheckInModal, close: closeCheckInModal }] =
 		useDisclosure(false)
-	const [contentUseState, setContentUseState] = useState<ContentListItem | null>(null)
-	const checkInContentMutation = useMutation(trpc.content.checkIn.mutationOptions(options))
-	const checkOutContentMutation = useMutation(trpc.content.checkOut.mutationOptions(options))
+	const [contentSelectedForCheckout, selectContentForCheckout] = useState<ContentListItem | null>(
+		null
+	)
 
 	const allTags = useMemo(
 		() => [
@@ -232,7 +228,7 @@ export function ContentTable({
 								</span>
 								{info.row.original.checkedOutBy !== null &&
 									(info.row.original.checkedOutBy.id === profile?.id ? (
-										<Tooltip withArrow arrowSize={8} label="You have checked out this link">
+										<Tooltip withArrow arrowSize={8} label="You have this link checked out">
 											<IconPencilCheck size={24} />
 										</Tooltip>
 									) : (
@@ -241,6 +237,7 @@ export function ContentTable({
 											arrowSize={8}
 											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
 										>
+											link
 											<IconPencilOff className="checked-out-icon" size={24} />
 										</Tooltip>
 									))}
@@ -266,7 +263,7 @@ export function ContentTable({
 								</span>
 								{info.row.original.checkedOutBy !== null &&
 									(info.row.original.checkedOutBy.id === profile?.id ? (
-										<Tooltip withArrow arrowSize={8} label="You have checked out this file">
+										<Tooltip withArrow arrowSize={8} label="You have this file checked out">
 											<IconPencilCheck size={24} />
 										</Tooltip>
 									) : (
@@ -393,7 +390,7 @@ export function ContentTable({
 								<IconDownload />
 							</ActionIcon>
 						)}
-						<Menu width={140} trigger="hover" closeOnItemClick={true}>
+						<Menu width={140} closeOnItemClick={true} position="bottom-end">
 							<Menu.Target>
 								<ActionIcon variant="subtle" size="sm">
 									<IconDotsVertical />
@@ -431,8 +428,8 @@ export function ContentTable({
 										leftSection={<IconDoorExit size={22} />}
 										variant="subtle"
 										onClick={() => {
-											setContentUseState(info.row.original)
-											openCheckOutContent()
+											selectContentForCheckout(info.row.original)
+											openCheckOutModal()
 										}}
 									>
 										Check Out
@@ -442,8 +439,8 @@ export function ContentTable({
 										leftSection={<IconDoorEnter size={22} />}
 										variant="subtle"
 										onClick={() => {
-											setContentUseState(info.row.original)
-											openCheckInContent()
+											selectContentForCheckout(info.row.original)
+											openCheckInModal()
 										}}
 									>
 										Check In
@@ -743,33 +740,30 @@ export function ContentTable({
 				</Group>
 			</Flex>
 			<CheckInModal
-				opened={checkInContent}
-				closed={closeCheckInContent}
-				content={contentUseState}
-				checkInMutation={checkInContentMutation}
+				opened={checkInModalOpen}
+				onClose={closeCheckInModal}
+				content={contentSelectedForCheckout}
 			/>
 			<CheckOutModal
-				opened={checkOutContent}
-				closed={closeCheckOutContent}
-				content={contentUseState}
-				checkOutMutation={checkOutContentMutation}
+				opened={checkOutModalOpen}
+				onClose={closeCheckOutModal}
+				content={contentSelectedForCheckout}
 			/>
 		</>
 	)
 
 	function CheckInModal({
 		opened,
-		closed,
+		onClose,
 		content,
-		checkInMutation,
 	}: {
 		opened: boolean
-		closed: () => void
+		onClose: () => void
 		content: ContentListItem | null
-		checkInMutation: CheckInMutationType
 	}) {
+		const checkInMutation = useMutation(trpc.content.checkIn.mutationOptions(mutationOptions))
 		return (
-			<Modal opened={opened} onClose={closed} title="Confirm check in">
+			<Modal opened={opened} onClose={onClose} title="Confirm check in">
 				<Text>
 					Ready to check this content back in? Others will be able to edit it once it's checked in.
 				</Text>
@@ -777,7 +771,7 @@ export function ContentTable({
 					<Button
 						variant="subtle"
 						color="gray"
-						onClick={closed}
+						onClick={onClose}
 						disabled={checkInMutation.isPending}
 					>
 						Cancel
@@ -787,7 +781,7 @@ export function ContentTable({
 						onClick={async () => {
 							if (content !== null) {
 								await checkInMutation.mutateAsync({ id: content.id })
-								closed()
+								onClose()
 							}
 						}}
 						leftSection={<IconDoorEnter />}
@@ -801,23 +795,22 @@ export function ContentTable({
 
 	function CheckOutModal({
 		opened,
-		closed,
+		onClose,
 		content,
-		checkOutMutation,
 	}: {
 		opened: boolean
-		closed: () => void
+		onClose: () => void
 		content: ContentListItem | null
-		checkOutMutation: CheckOutMutationType
 	}) {
+		const checkOutMutation = useMutation(trpc.content.checkOut.mutationOptions(mutationOptions))
 		return (
-			<Modal opened={opened} onClose={closed} title="Confirm check out">
+			<Modal opened={opened} onClose={onClose} title="Confirm check out">
 				<Text>Checking out this content will lock it out for editing by other users.</Text>
 				<Flex gap="md" justify="flex-end" mt="md">
 					<Button
 						variant="subtle"
 						color="gray"
-						onClick={closed}
+						onClick={onClose}
 						disabled={checkOutMutation.isPending}
 					>
 						Cancel
@@ -827,7 +820,7 @@ export function ContentTable({
 						onClick={async () => {
 							if (content !== null) {
 								await checkOutMutation.mutateAsync({ id: content.id })
-								closed()
+								onClose()
 							}
 						}}
 						leftSection={<IconDoorExit />}

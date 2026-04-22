@@ -165,7 +165,7 @@ export function Navigation() {
 
 	return (
 		<header className="border-b border-gray-300 h-14 mb-30 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
-			<Container size="1120px" className="flex items-center justify-between h-full">
+			<Container size="1300px" className="flex items-center justify-between h-full">
 				<Group hiddenFrom="xs">
 					<Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
 					<Link
