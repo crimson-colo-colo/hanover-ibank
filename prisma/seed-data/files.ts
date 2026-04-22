@@ -10,10 +10,11 @@ import { bucketName, s3 } from "../../server/s3.ts"
 import { randomUserId } from "./users.ts"
 
 const baseDir = "./prisma/seed-data"
+const contentDir = path.join(baseDir, "content")
 const generatedDir = path.join(baseDir, "generated")
-const allFiles = (await fs.readdir(baseDir)).filter(
-	(f) => f !== "Hanover Data.zip" && f !== "generated"
-)
+const allFiles = await fs
+	.readdir(contentDir)
+	.then((files) => files.map((f) => path.join("content", f)))
 if (await fs.stat(generatedDir).catch(() => false)) {
 	const genFiles = await fs.readdir(generatedDir)
 	allFiles.push(...genFiles.map((f) => path.join("generated", f)))

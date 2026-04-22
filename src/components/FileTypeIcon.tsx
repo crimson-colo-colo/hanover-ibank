@@ -12,40 +12,65 @@ import {
 	IconPhoto,
 	type IconProps,
 } from "@tabler/icons-react"
+import clsx from "clsx"
 
 const fileTypeIcons: Record<
 	FileType,
 	(props: IconProps & React.SVGProps<SVGSVGElement>) => React.ReactNode
 > = {
 	[FileType.WordDocument]: (props) => (
-		<IconFileTypeDocx className="stroke-blue-600 dark:stroke-blue-400" {...props} />
+		<IconFileTypeDocx
+			{...props}
+			className={clsx(props.className, "stroke-blue-600 dark:stroke-blue-400")}
+		/>
 	),
 	[FileType.Powerpoint]: (props) => (
-		<IconFileTypePpt className="stroke-orange-600 dark:stroke-orange-400" {...props} />
+		<IconFileTypePpt
+			{...props}
+			className={clsx(props.className, "stroke-orange-600 dark:stroke-orange-400")}
+		/>
 	),
 	[FileType.Excel]: (props) => (
-		<IconFileTypeXls className="stroke-emerald-600 dark:stroke-emerald-400" {...props} />
+		<IconFileTypeXls
+			{...props}
+			className={clsx(props.className, "stroke-emerald-600 dark:stroke-emerald-400")}
+		/>
 	),
 	[FileType.Pdf]: (props) => (
-		<IconFileTypePdf className="stroke-red-600 dark:stroke-red-400" {...props} />
+		<IconFileTypePdf
+			{...props}
+			className={clsx(props.className, "stroke-red-600 dark:stroke-red-400")}
+		/>
 	),
 	[FileType.Audio]: (props) => (
-		<IconFileMusic className="stroke-emerald-600 dark:stroke-emerald-400" {...props} />
+		<IconFileMusic
+			{...props}
+			className={clsx(props.className, "stroke-emerald-600 dark:stroke-emerald-400")}
+		/>
 	),
 	[FileType.Video]: (props) => (
-		<IconMovie className="stroke-red-600 dark:stroke-red-400" {...props} />
+		<IconMovie {...props} className={clsx(props.className, "stroke-red-600 dark:stroke-red-400")} />
 	),
 	[FileType.Image]: (props) => (
-		<IconPhoto className="stroke-sky-600 dark:stroke-sky-400" {...props} />
+		<IconPhoto {...props} className={clsx(props.className, "stroke-sky-600 dark:stroke-sky-400")} />
 	),
 	[FileType.Link]: (props) => (
-		<IconLink className="stroke-gray-600 dark:stroke-gray-400" {...props} />
+		<IconLink
+			{...props}
+			className={clsx(props.className, "stroke-gray-600 dark:stroke-gray-400")}
+		/>
 	),
 	[FileType.Plaintext]: (props) => (
-		<IconFileText className="stroke-pear-700 dark:stroke-pear-400" {...props} />
+		<IconFileText
+			{...props}
+			className={clsx(props.className, "stroke-pear-700 dark:stroke-pear-400")}
+		/>
 	),
 	[FileType.Unknown]: (props) => (
-		<IconFile className="stroke-gray-700 dark:stroke-gray-400" {...props} />
+		<IconFile
+			{...props}
+			className={clsx(props.className, "stroke-gray-700 dark:stroke-gray-400")}
+		/>
 	),
 }
 

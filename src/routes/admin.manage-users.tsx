@@ -68,6 +68,11 @@ function RouteComponent() {
 					</Flex>
 				),
 			}),
+			columnHelper.accessor("username", {
+				header: "Username",
+				enableSorting: true,
+				sortingFn: "alphanumeric",
+			}),
 			columnHelper.accessor("email", {
 				header: "Email",
 				enableSorting: true,

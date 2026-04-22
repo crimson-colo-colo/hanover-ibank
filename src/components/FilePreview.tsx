@@ -16,10 +16,10 @@ import { formatBytes } from "@/lib/content.ts"
 import { trpc } from "@/lib/trpc.ts"
 import "react-pdf/dist/Page/AnnotationLayer.css"
 import "react-pdf/dist/Page/TextLayer.css"
+import type { ContentListItem } from "@shared/types.ts"
 import clsx from "clsx"
 import type { ScrollPageIntoViewArgs } from "react-pdf/dist/shared/types.js"
 import { URLCard } from "@/components/URLCard.tsx"
-import type { ContentListItem } from "../../server/routers/content.ts"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(worker, import.meta.url).toString()
 
