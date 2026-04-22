@@ -67,21 +67,6 @@ export type ContentTag = Prisma.ContentTagModel
  */
 export type FavoriteContent = Prisma.FavoriteContentModel
 /**
- * Model UserAnalytics
- * 
- */
-export type UserAnalytics = Prisma.UserAnalyticsModel
-/**
- * Model RecentFile
- * 
- */
-export type RecentFile = Prisma.RecentFileModel
-/**
- * Model CommonFile
- * 
- */
-export type CommonFile = Prisma.CommonFileModel
-/**
  * Model UserActivity
  * 
  */
