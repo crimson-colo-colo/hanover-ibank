@@ -371,6 +371,7 @@ export function ContentTable({
 		onPaginationChange: setPagination,
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
+		autoResetPageIndex: false,
 	})
 
 	useEffect(() => {
