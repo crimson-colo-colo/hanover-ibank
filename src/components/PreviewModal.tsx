@@ -1,7 +1,7 @@
-import { Button, Flex, Modal } from "@mantine/core"
+import { ActionIcon, Button, Flex, Indicator, Modal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
-import { IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
+import { IconInfoCircle, IconLoader2, IconMessageCircle} from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
@@ -46,8 +46,8 @@ export function PreviewModal({
 						{contentQuery.isFetching && <IconLoader2 className="animate-spin" />}
 					</Flex>
 					<Flex gap="md" align="center">
-						<Button
-							variant="light"
+						<ActionIcon
+							variant="subtle"
 							onClick={() => {
 								if (sidebarOpen) {
 									closeSidebar()
@@ -55,10 +55,17 @@ export function PreviewModal({
 									openSidebar()
 								}
 							}}
-							leftSection={<IconInfoCircle />}
 						>
-							Details
-						</Button>
+							<IconInfoCircle size={30} />
+						</ActionIcon>
+						<Indicator color="red" size={12}>
+							<Button
+								onClick={}
+								leftSection={<IconMessageCircle />}
+							>
+								Discussion
+							</Button>
+						</Indicator>
 						<Modal.CloseButton size="lg" />
 					</Flex>
 				</Modal.Header>

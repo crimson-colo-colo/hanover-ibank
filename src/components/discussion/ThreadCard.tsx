@@ -2,6 +2,7 @@ import { Avatar, Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/cor
 import type { ContentTalkThread } from "@prisma/browser.ts"
 import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react"
 import type { trpc } from "@/lib/trpc.ts"
+import { auth0Api, auth0Management } from "../../../server/auth.ts"
 import type { ThreadStatus } from "./DiscussionPanel.tsx"
 
 function formatDate(date: Date) {
