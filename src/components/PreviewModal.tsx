@@ -1,8 +1,9 @@
 import { Button, Flex, Modal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
-import { IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
+import { IconCircleArrowUpRight, IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { MetadataSidebar } from "@/components/MetadataSidebar.tsx"
@@ -46,6 +47,16 @@ export function PreviewModal({
 						{contentQuery.isFetching && <IconLoader2 className="animate-spin" />}
 					</Flex>
 					<Flex gap="md" align="center">
+						<Button
+							variant="light"
+							component={Link}
+							to={`/preview/${contentId}`}
+							target="_blank"
+							rel="opener"
+							leftSection={<IconCircleArrowUpRight />}
+						>
+							Open in new tab
+						</Button>
 						<Button
 							variant="light"
 							onClick={() => {

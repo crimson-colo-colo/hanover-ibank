@@ -11,6 +11,9 @@ enum EmployeeRole {
     BusinessAnalyst
     Underwriter
     Admin
+    ActuarialAnalyst
+    ExlOperations
+    BusinessOperations
 }
 
 model Employee {
