@@ -5,31 +5,24 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
-import { queryClient, trpc } from "@/lib/trpc.ts"
+import { trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
 
 export function AnalyticsDashboard() {
-	const { data: fileStats } = useQuery(trpc.content.getFileStats.queryOptions(), queryClient)
+	const { data: fileStats } = useQuery(trpc.content.getFileStats.queryOptions())
 
-	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions(), queryClient)
+	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions())
 
 	const { data: heatmapData } = useQuery(
-		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions(),
-		queryClient
+		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions()
 	)
 
-	const { data: userData } = useQuery(
-		{
-			...trpc.userActivity.viewRecentActivity.queryOptions(),
-			refetchInterval: 5000,
-		},
-		queryClient
-	)
+	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
 
-	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions(), queryClient)
+	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions())
 
 	const COLORS = [
 		"violet.6",
@@ -52,8 +45,6 @@ export function AnalyticsDashboard() {
 		value: item.count,
 		color: COLORS[i % COLORS.length],
 	}))
-
-	const uploadData = uploadStats ?? []
 
 	const endDate = new Date().toISOString().slice(0, 10)
 	const startDate = new Date(new Date().setMonth(new Date().getMonth() - 6))
@@ -190,7 +181,8 @@ export function AnalyticsDashboard() {
 									const { title, description } = getActivityLabel(activity.path)
 									return (
 										<Timeline.Item
-											key={`${activity.employeeId}_${activity.path}_${activity.timestamp.getDate()}`}
+											// biome-ignore lint/suspicious/noArrayIndexKey: foo
+											key={i}
 											bullet={<IconUserKey size={12} />}
 											title={title}
 										>

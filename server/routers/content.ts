@@ -871,6 +871,11 @@ export const contentRouter = router({
 
 	getUploadStats: authProcedure.query(async () => {
 		const contents = await db.content.findMany({
+			where: {
+				createdAt: {
+					gte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 12), // last 12 months
+				},
+			},
 			select: {
 				type: true,
 				createdAt: true,

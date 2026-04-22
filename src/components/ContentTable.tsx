@@ -220,7 +220,10 @@ export function ContentTable({
 				sortingFn: "datetime",
 				cell: (info) => (
 					<span title={new UTCDate(info.getValue()).toLocaleString()}>
-						{formatDistanceToNow(new UTCDate(info.getValue()), { addSuffix: true}).replace("about", "")}
+						{formatDistanceToNow(new UTCDate(info.getValue()), { addSuffix: true }).replace(
+							"about",
+							""
+						)}
 					</span>
 				),
 			}),
@@ -238,7 +241,11 @@ export function ContentTable({
 							{info.row.original.tags.map((tag) => (
 								<Tooltip
 									key={`${tag.category}-${tag.name}`}
-									label={`${tagCategoryDisplayName[tag.category]}: ${tag.name}`}
+									label={`${tagCategoryDisplayName[tag.category]}: ${
+										tag.category === TagCategory.IntendedAudience
+											? employeeRoleDisplayName[tag.name as EmployeeRole]
+											: tag.name
+									}`}
 								>
 									<Pill key={`${tag.category}-${tag.name}`} size="xs" color="gray">
 										{tag.category === TagCategory.IntendedAudience

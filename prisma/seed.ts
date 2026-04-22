@@ -70,6 +70,7 @@ async function confirmOverwrite() {
 
 async function wipeDBandS3() {
 	await prisma.$transaction([
+		prisma.userActivity.deleteMany(),
 		prisma.favoriteContent.deleteMany(),
 		prisma.contentTag.deleteMany(),
 		prisma.tag.deleteMany(),
@@ -127,7 +128,7 @@ async function createLinkContent() {
 async function createFileContent() {
 	const fileTypeToContent = new Map<FileType, string[]>()
 	const fileContent = await prisma.content.createManyAndReturn({
-		data: fileContentData,
+		data: fileContentData(),
 		select: {
 			id: true,
 			ownerId: true,
