@@ -3,7 +3,6 @@ import { IconInfoCircleFilled } from "@tabler/icons-react"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import { useState } from "react"
 import office from "@/assets/office.png"
-import DiscussionPanel from "@/components/discussion/DiscussionPanel"
 
 export const Route = createFileRoute("/")({
 	component: Index,
@@ -81,9 +80,6 @@ function Index() {
 					fosters teamwork and efficiency. Join the iBank community today and revolutionize the way
 					you manage your content!
 				</Text>
-			</section>
-			<section className="mt-10">
-				<DiscussionPanel contentId="content-1" />
 			</section>
 		</main>
 	)

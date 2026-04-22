@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
 
-export function AnalyticsDashboard() {
+function AnalyticsDashboard() {
 	const { data: fileStats } = useQuery(trpc.content.getFileStats.queryOptions())
 
 	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions())

@@ -1,4 +1,5 @@
 import { UTCDate } from "@date-fns/utc"
+import { faker } from "@faker-js/faker"
 import { Temporal } from "@js-temporal/polyfill"
 import { PrismaPg } from "@prisma/adapter-pg"
 import type { FileType } from "@shared/filetype.ts"
@@ -9,6 +10,7 @@ import {
 	type Prisma,
 	PrismaClient,
 	TagCategory,
+	ThreadStatus,
 } from "../server/generated/prisma/client.ts"
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
 import { bucketName, s3 } from "../server/s3.ts"
@@ -52,6 +54,8 @@ async function main() {
 	await createUserActivity()
 
 	await checkoutFiles(fileContent)
+
+	await createContentThreads()
 }
 
 async function confirmOverwrite() {
@@ -77,6 +81,8 @@ async function confirmOverwrite() {
 
 async function wipeDBandS3() {
 	await prisma.$transaction([
+		prisma.talkThreadComment.deleteMany(),
+		prisma.contentTalkThread.deleteMany(),
 		prisma.userActivity.deleteMany(),
 		prisma.favoriteContent.deleteMany(),
 		prisma.contentTag.deleteMany(),
@@ -115,7 +121,10 @@ async function createUsersAndAvatars() {
 	await Promise.all(
 		employeeData.map(async ({ id }) => {
 			const user = users.data.find((u) => u.user_id === id)!
-			const avatar = generateDefaultAvatar(user.name ?? user.email!)
+			const avatar =
+				Math.random() < 0.8
+					? await downloadAvatar()
+					: generateDefaultAvatar(user.name ?? user.email!)
 			console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
 			await s3.putObject({
 				Bucket: bucketName,
@@ -126,6 +135,11 @@ async function createUsersAndAvatars() {
 	)
 
 	console.log(`Created ${employeeData.length} employee rows`)
+}
+
+async function downloadAvatar() {
+	const response = await fetch(faker.image.personPortrait({ size: 256 }))
+	return response.arrayBuffer().then((buffer) => Buffer.from(buffer))
 }
 
 async function createLinkContent() {
@@ -320,4 +334,78 @@ async function checkoutFiles(
 		})
 	}
 	console.log(`Checked out ${toCheckOut.length} files`)
+}
+
+async function createContentThreads() {
+	const contentItems = await prisma.content.findMany({
+		select: { id: true },
+	})
+
+	const threadData: Prisma.ContentTalkThreadCreateManyInput[] = []
+	const commentData: Omit<Prisma.TalkThreadCommentCreateManyInput, "threadId">[][] = []
+
+	for (const content of contentItems) {
+		const numThreads = Math.floor(Math.random() * 3) + 1
+		for (let i = 0; i < numThreads; i++) {
+			const createdById = employeeData[Math.floor(Math.random() * employeeData.length)].id
+			const numComments = Math.random() < 0.5 ? 1 : Math.floor(Math.random() * 8) + 1
+			const ONE_DAY = 24 * 60 * 60 * 1000
+			// within the past 30 days, at least one day ago
+			const createdAt = new Date(Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY))
+			let offsetMs = 0
+			threadData.push({
+				contentId: content.id,
+				createdById: createdById,
+				createdAt,
+				status:
+					Math.random() < 0.6
+						? ThreadStatus.Open
+						: Math.random() < 0.5
+							? ThreadStatus.Resolved
+							: ThreadStatus.Archived,
+				title:
+					Math.random() < 0.4
+						? `Question about ${faker.company.buzzAdjective()} ${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`
+						: Math.random() < 0.4
+							? `Discussion on ${faker.hacker.adjective()} ${faker.hacker.adjective()} ${faker.hacker.noun()}`
+							: `Feedback on ${faker.commerce.productAdjective()} ${faker.commerce.productMaterial()} ${faker.commerce.product()}`,
+			})
+			commentData.push(
+				Array.from({ length: numComments }, (_, i) => {
+					const sentences = Array.from({ length: 1 + Math.floor(Math.random() * 3) }, () =>
+						Math.random() < 0.5 ? faker.lorem.sentence() : faker.hacker.phrase()
+					)
+					// add random number of seconds to createdAt for each comment to ensure ordering, between 120 sec and 3600 sec (1 hour)
+					const differenceSeconds = i === 0 ? 0 : 120 + Math.floor(Math.random() * (3600 - 120))
+					offsetMs += differenceSeconds * 1000
+					return {
+						body: sentences.join(" "),
+						createdAt: new Date(createdAt.getTime() + offsetMs),
+						authorId:
+							i === 0
+								? createdById
+								: employeeData[Math.floor(Math.random() * employeeData.length)].id,
+					}
+				})
+			)
+		}
+	}
+
+	const threads = await prisma.contentTalkThread.createManyAndReturn({
+		data: threadData,
+		select: { id: true },
+	})
+
+	console.log(`Created ${threadData.length} threads`)
+
+	await prisma.talkThreadComment.createMany({
+		data: threads.flatMap((thread, index) =>
+			commentData[index].map((comment) => ({
+				...comment,
+				threadId: thread.id,
+			}))
+		),
+	})
+
+	console.log(`Created ${commentData.flat().length} comments across all threads`)
 }

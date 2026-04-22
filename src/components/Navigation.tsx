@@ -217,7 +217,13 @@ export function Navigation() {
 								</Menu.Item>
 								<Menu.Item
 									leftSection={<IconLayoutSidebarLeftExpand />}
-									onClick={() => auth0.logout()}
+									onClick={() =>
+										auth0.logout({
+											logoutParams: {
+												returnTo: window.location.origin,
+											},
+										})
+									}
 									color="red"
 								>
 									Sign Out

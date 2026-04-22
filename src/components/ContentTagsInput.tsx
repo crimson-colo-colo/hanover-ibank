@@ -1,7 +1,7 @@
 import { Group, Pill, TagsInput } from "@mantine/core"
-import { type Tag, TagCategory } from "@prisma/browser.ts"
+import { type EmployeeRole, type Tag, TagCategory } from "@prisma/browser.ts"
 import { useQuery } from "@tanstack/react-query"
-import { tagCategoryDisplayName } from "@/lib/enums.ts"
+import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
 import { stringifyTag, unstringifyTag } from "@/lib/tags.ts"
 import { trpc } from "@/lib/trpc.ts"
 
@@ -39,7 +39,7 @@ export function ContentTagsInput({
 					<Pill withRemoveButton onRemove={onRemove} disabled={!enabled}>
 						{category === TagCategory.Custom
 							? name
-							: `${tagCategoryDisplayName[category as TagCategory]}: ${name}`}
+							: `${tagCategoryDisplayName[category as TagCategory]}: ${category === TagCategory.IntendedAudience ? employeeRoleDisplayName[name as EmployeeRole] : name}`}
 					</Pill>
 				)
 			}}

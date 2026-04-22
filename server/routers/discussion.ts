@@ -13,47 +13,37 @@ export const discussionRouter = router({
 			})
 		)
 		.query(async ({ input }) => {
-			const findMany = await db.contentTalkThread.findMany({
+			const threads = await db.contentTalkThread.findMany({
 				where: {
 					contentId: input.contentId,
 				},
 				orderBy: {
-					updatedAt: "asc",
+					updatedAt: "desc",
 				},
-				select: {
-					id: true,
-					title: true,
-					createdBy: {
-						select: { id: true },
-					},
-					updatedAt: true,
-					createdAt: true,
-					status: true,
-					resolvedAt: true,
-					resolvedBy: { select: { id: true } },
-					content: { select: { id: true } },
+				include: {
+					createdBy: true,
+					resolvedBy: true,
 					comments: {
-						select: {
-							id: true,
-							author: { select: { id: true } },
-							body: true,
-							createdAt: true,
-							updatedAt: true,
-						},
 						orderBy: {
 							updatedAt: "asc",
+						},
+						include: {
+							author: true,
 						},
 					},
 				},
 			})
-			const users = findMany
+			const users = threads
 				.flatMap((v) => [v.createdBy, v.resolvedBy, ...v.comments.flatMap((v) => v.author)])
 				.filter((v) => v !== null)
+
+			const auth0Users = await auth0Management.users.list()
 			const auth0User = new Map(
-				await Promise.all(
-					users.map(async ({ id }) => {
-						const v = await auth0Management.users.get(id)
-						return [
+				users.flatMap(({ id }) => {
+					const v = auth0Users.data.find((u) => u.user_id === id)
+					if (!v) return []
+					return [
+						[
 							id,
 							{
 								id: id,
@@ -61,11 +51,12 @@ export const discussionRouter = router({
 								email: v.email!,
 								username: v.username!,
 							},
-						] as const
-					})
-				)
+						],
+					] as const
+				})
 			)
-			return { threads: findMany, users: auth0User }
+
+			return { threads: threads, users: auth0User }
 		}),
 
 	createThread: authProcedure
@@ -108,7 +99,11 @@ export const discussionRouter = router({
 				},
 				include: {
 					createdBy: true,
+					resolvedBy: true,
 					comments: {
+						orderBy: {
+							updatedAt: "asc",
+						},
 						include: {
 							author: true,
 						},

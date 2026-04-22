@@ -1,7 +1,7 @@
-import { Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core"
+import { Badge, Card, Group, Stack, Text, ThemeIcon, Title } from "@mantine/core"
+import type { Thread } from "@shared/types.ts"
 import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react"
 import { Avatar } from "@/components/Avatar.tsx"
-import type { trpc } from "@/lib/trpc.ts"
 import type { ThreadStatus } from "./DiscussionPanel.tsx"
 
 function formatDate(date: Date) {
@@ -13,16 +13,21 @@ function formatDate(date: Date) {
 	}).format(date)
 }
 
-function getStatusColor(status: ThreadStatus) {
+export function getStatusColor(status: ThreadStatus) {
 	if (status === "Open") return "blue"
 	if (status === "Resolved") return "green"
 	return "gray"
 }
 
-export type Thread =
-	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["threads"][number]
-export type Users =
-	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["users"]
+type Users = Map<
+	string,
+	{
+		id: string
+		name: string
+		email: string
+		username: string
+	}
+>
 
 type Props = {
 	thread: Thread
@@ -36,24 +41,21 @@ export default function ThreadCard({ thread, onOpen, user }: Props) {
 	return (
 		<Card
 			withBorder
-			radius="xl"
-			padding="lg"
-			shadow="sm"
-			style={{ cursor: "pointer" }}
+			className="cursor-pointer transition-shadow hover:shadow-sm"
 			onClick={() => onOpen(thread)}
 		>
-			<Stack gap="md">
+			<Stack gap="xs">
 				<Group justify="space-between" align="flex-start">
-					<Stack gap={8} style={{ flex: 1 }}>
+					<Stack gap={8} className="flex-1">
 						<Group gap="xs">
-							<Badge color={getStatusColor(thread.status)} variant="light" radius="xl">
+							<Badge color={getStatusColor(thread.status)} variant="light">
 								{thread.status}
 							</Badge>
 						</Group>
 
-						<Text fw={700} size="lg">
+						<Title order={6} size="lg">
 							{thread.title || "Untitled thread"}
-						</Text>
+						</Title>
 					</Stack>
 
 					<ThemeIcon variant="light" radius="xl">
@@ -65,7 +67,7 @@ export default function ThreadCard({ thread, onOpen, user }: Props) {
 					{preview}
 				</Text>
 
-				<Group justify="space-between">
+				<Group justify="space-between" mt="sm">
 					<Group gap="sm">
 						<Avatar
 							className="w-6 h-6 shrink-0"

@@ -1,14 +1,10 @@
-import { ActionIcon, Button, Flex, Modal } from "@mantine/core"
+import { Button, Flex, Modal, ScrollArea, Tabs } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
-import {
-	IconCircleArrowUpRight,
-	IconInfoCircle,
-	IconLoader2,
-	IconMessageCircle,
-} from "@tabler/icons-react"
+import { IconCircleArrowUpRight, IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
+import clsx from "clsx"
 import DiscussionPanel from "@/components/discussion/DiscussionPanel.tsx"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
@@ -24,7 +20,6 @@ export function PreviewModal({
 }) {
 	const contentQuery = useQuery(trpc.content.get.queryOptions({ id: contentId }))
 	const [sidebarOpen, { open: openSidebar, close: closeSidebar }] = useDisclosure(true)
-	const [discussionOpen, { open: openDiscussion, close: closeDiscussion }] = useDisclosure(false)
 
 	const content = contentQuery.data?.content
 	const fileType =
@@ -55,7 +50,7 @@ export function PreviewModal({
 					</Flex>
 					<Flex gap="md" align="center">
 						<Button
-							variant="light"
+							variant="subtle"
 							component={Link}
 							to={`/preview/${contentId}`}
 							target="_blank"
@@ -64,13 +59,10 @@ export function PreviewModal({
 						>
 							Open in new tab
 						</Button>
-						<ActionIcon
-							variant="subtle"
+						<Button
+							leftSection={<IconInfoCircle />}
+							variant={sidebarOpen ? "light" : "outline"}
 							onClick={() => {
-								if (discussionOpen) {
-									closeDiscussion()
-								}
-
 								if (sidebarOpen) {
 									closeSidebar()
 								} else {
@@ -78,30 +70,37 @@ export function PreviewModal({
 								}
 							}}
 						>
-							<IconInfoCircle size={30} />
-						</ActionIcon>
-						<Button
-							leftSection={<IconMessageCircle />}
-							onClick={() => {
-								if (sidebarOpen) {
-									closeSidebar()
-								}
-								if (discussionOpen) {
-									closeDiscussion()
-								} else {
-									openDiscussion()
-								}
-							}}
-						>
-							Discussion
+							Details
 						</Button>
 						<Modal.CloseButton size="lg" />
 					</Flex>
 				</Modal.Header>
 				<Flex gap="lg" className="flex-1 min-h-0 overflow-hidden z-1">
 					<FilePreview />
-					{sidebarOpen && <MetadataSidebar content={content} closePreview={closePreview} />}
-					{discussionOpen && <DiscussionPanel contentId={content.id} />}
+					<ScrollArea
+						w="350px"
+						className={clsx(
+							"min-h-0 shrink-0 h-full bg-white dark:bg-[#242424] rounded-md",
+							!sidebarOpen && "hidden!"
+						)}
+						classNames={{
+							content: "min-h-full p-md",
+						}}
+					>
+						<Tabs defaultValue="metadata" variant="pills" className="h-full flex flex-col">
+							<Tabs.List className="mb-md">
+								<Tabs.Tab value="metadata">Details</Tabs.Tab>
+								<Tabs.Tab value="discussions">Discussions</Tabs.Tab>
+							</Tabs.List>
+
+							<Tabs.Panel value="metadata" className="h-full">
+								<MetadataSidebar content={content} closePreview={closePreview} />
+							</Tabs.Panel>
+							<Tabs.Panel value="discussions" className="h-full">
+								<DiscussionPanel contentId={content.id} insideModal />
+							</Tabs.Panel>
+						</Tabs>
+					</ScrollArea>
 				</Flex>
 			</Modal.Content>
 		</FilePreviewProvider>

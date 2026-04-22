@@ -1,9 +1,11 @@
-import { ActionIcon, Button, Flex, ScrollArea } from "@mantine/core"
+import { ActionIcon, Button, Flex, ScrollArea, Tabs } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
 import { IconArrowLeft, IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, useCanGoBack, useRouter } from "@tanstack/react-router"
+import clsx from "clsx"
+import DiscussionPanel from "@/components/discussion/DiscussionPanel.tsx"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { MetadataSidebar } from "@/components/MetadataSidebar.tsx"
@@ -85,11 +87,30 @@ function RouteComponent() {
 				</Flex>
 				<Flex gap="lg" className="flex-1 min-h-0 z-1">
 					<FilePreview />
-					{sidebarOpen && (
-						<ScrollArea.Autosize className="border border-gray-200 dark:border-gray-800 mt-4 mr-4 rounded-md bg-white dark:bg-[#242424]">
-							<MetadataSidebar insideModal={false} content={content} closePreview={closePreview} />
-						</ScrollArea.Autosize>
-					)}
+					<ScrollArea.Autosize
+						w="350px"
+						className={clsx(
+							"border border-gray-200 dark:border-gray-800 mt-4 mr-4 rounded-md bg-white dark:bg-[#242424]",
+							!sidebarOpen && "hidden!"
+						)}
+						classNames={{
+							content: "min-h-full p-md",
+						}}
+					>
+						<Tabs defaultValue="metadata" variant="pills" className="h-full flex flex-col">
+							<Tabs.List className="mb-md">
+								<Tabs.Tab value="metadata">Details</Tabs.Tab>
+								<Tabs.Tab value="discussions">Discussions</Tabs.Tab>
+							</Tabs.List>
+
+							<Tabs.Panel value="metadata" className="h-full">
+								<MetadataSidebar content={content} closePreview={closePreview} />
+							</Tabs.Panel>
+							<Tabs.Panel value="discussions" className="h-full">
+								<DiscussionPanel contentId={content.id} insideModal />
+							</Tabs.Panel>
+						</Tabs>
+					</ScrollArea.Autosize>
 				</Flex>
 			</div>
 		</FilePreviewProvider>
