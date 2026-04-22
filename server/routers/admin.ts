@@ -127,4 +127,9 @@ export const adminRouter = router({
 			})
 		)
 	}),
+
+	getStats: adminProcedure.query(async () => {
+		const employeeCount = await db.employee.count()
+		return { employeeCount }
+	}),
 })

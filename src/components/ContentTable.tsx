@@ -5,6 +5,8 @@ import {
 	Checkbox,
 	Flex,
 	Group,
+	HoverCard,
+	Image,
 	Kbd,
 	Menu,
 	Modal,
@@ -13,6 +15,7 @@ import {
 	Pill,
 	SegmentedControl,
 	Select,
+	Stack,
 	Table,
 	Text,
 	TextInput,
@@ -54,6 +57,8 @@ import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
+	getFacetedRowModel,
+	getFacetedUniqueValues,
 	getFilteredRowModel,
 	getPaginationRowModel,
 	getSortedRowModel,
@@ -61,17 +66,19 @@ import {
 	useReactTable,
 } from "@tanstack/react-table"
 import clsx from "clsx"
+import { formatDate } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import {
 	contentStatusDisplayName,
 	employeeRoleDisplayName,
 	tagCategoryDisplayName,
 } from "@/lib/enums.ts"
-import { fuzzyFilter, fuzzySort } from "@/lib/table.ts"
+import { fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
 
 export function ContentTable({
@@ -121,16 +128,16 @@ export function ContentTable({
 	const checkInContentMutation = useMutation(trpc.content.checkIn.mutationOptions(options))
 	const checkOutContentMutation = useMutation(trpc.content.checkOut.mutationOptions(options))
 
-	const getInitials = (name: string) => {
-		if (name.includes(" ")) {
-			const splitName = name.split(" ")
-			const firstInitial = splitName[0][0]
-			const lastName = splitName[1]
-			return `${firstInitial}. ${lastName}`
-		} else {
-			return name
-		}
-	}
+	const allTags = useMemo(
+		() => [
+			...new Map(
+				data.content
+					.flatMap((row) => row.tags)
+					.map((t): [string, typeof t] => [`${t.category}-${t.name}`, t])
+			).values(),
+		],
+		[data]
+	)
 
 	const columns = useMemo(
 		() => [
@@ -283,19 +290,32 @@ export function ContentTable({
 				sortingFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => (
-					<div className="flex items-center gap-2">
-						<Avatar
-							userId={info.row.original.owner.id}
-							alt={info.row.original.owner.name}
-							width={24}
-							height={24}
-							radius="100%"
-							className="w-6 h-6 shrink-0"
-						/>
-						<span className="truncate" title={info.row.original.owner.email}>
-							{getInitials(info.row.original.owner.name)}
-						</span>
-					</div>
+					<HoverCard openDelay={250} withArrow>
+						<HoverCard.Target>
+							<Avatar
+								userId={info.row.original.owner.id}
+								alt={info.row.original.owner.name}
+								width={24}
+								height={24}
+								radius="100%"
+								className="w-6 h-6 shrink-0"
+							/>
+						</HoverCard.Target>
+						<HoverCard.Dropdown className="shadow-sm">
+							<Flex gap="md">
+								<Image src={`/avatar/${info.row.original.owner.id}`} radius="100%" h={40} w={40} />
+								<Stack gap={0} justify="center">
+									<Text size="sm" fw={500}>
+										{info.row.original.owner.name}
+									</Text>
+									<Text size="xs" c="gray">
+										{info.row.original.owner.email} ·{" "}
+										{employeeRoleDisplayName[info.row.original.owner.role]}
+									</Text>
+								</Stack>
+							</Flex>
+						</HoverCard.Dropdown>
+					</HoverCard>
 				),
 			}),
 			columnHelper.accessor("lastModifiedDate", {
@@ -304,7 +324,9 @@ export function ContentTable({
 				sortingFn: "datetime",
 				cell: (info) => (
 					<span title={info.getValue().toLocaleString()}>
-						{info.getValue().toDateString().slice(3)}
+						{info.getValue().getFullYear() === new Date().getFullYear()
+							? formatDate(info.getValue(), "MMM d")
+							: formatDate(info.getValue(), "MMM d yyyy")}
 					</span>
 				),
 			}),
@@ -313,8 +335,8 @@ export function ContentTable({
 					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
 				{
 					id: "tags",
-					header: "Tags",
-					filterFn: "fuzzy",
+					header: ({ column }) => <TagFilterPopup column={column} allTags={allTags} />,
+					filterFn: "tagFilterFn",
 					sortingFn: "fuzzy",
 					enableSorting: false,
 					cell: (info) => (
@@ -324,7 +346,11 @@ export function ContentTable({
 									withArrow
 									arrowSize={8}
 									key={`${tag.category}-${tag.name}`}
-									label={`${tagCategoryDisplayName[tag.category]}: ${tag.name}`}
+									label={`${tagCategoryDisplayName[tag.category]}: ${
+										tag.category === TagCategory.IntendedAudience
+											? employeeRoleDisplayName[tag.name as EmployeeRole]
+											: tag.name
+									}`}
 								>
 									<Pill key={`${tag.category}-${tag.name}`} size="xs" color="gray">
 										{tag.category === TagCategory.IntendedAudience
@@ -374,66 +400,66 @@ export function ContentTable({
 								</ActionIcon>
 							</Menu.Target>
 							<Menu.Dropdown>
-									{info.row.original.type === "Object" ? (
-										<Menu.Item
-											leftSection={<IconDownload size={22}/>}
-											variant="subtle"
-											onClick={async () => {
-												const { url } = await trpcClient.content.download.query({
-													id: info.row.original.id,
-												})
-												window.open(url, "_blank", "noopener")
-											}}
-										>
-											Download
-										</Menu.Item>
-									) : (
-										<Menu.Item
-											leftSection={<IconCircleArrowUpRight size={22}/>}
-											variant="subtle"
-											onClick={() => {
-												if (info.row.original.type === ContentType.Link) {
-													window.open(info.row.original.url)
-												}
-											}}
-										>
-											Open link
-										</Menu.Item>
-									)}
-									{info.row.original.checkedOutBy === null ? (
-										<Menu.Item
-											leftSection={<IconDoorExit size={22}/>}
-											variant="subtle"
-											onClick={() => {
-												setContentUseState(info.row.original)
-												openCheckOutContent()
-											}}
-										>
-											Check Out
-										</Menu.Item>
-									) : info.row.original.checkedOutBy.id === profile?.id ? (
-										<Menu.Item
-											leftSection={<IconDoorEnter size={22}/>}
-											variant="subtle"
-											onClick={() => {
-												setContentUseState(info.row.original)
-												openCheckInContent()
-											}}
-										>
-											Check In
-										</Menu.Item>
-									) : (
-										<Menu.Item leftSection={<IconDoorExit size={22}/>} variant="subtle" disabled>
-											Check Out
-										</Menu.Item>
-									)}
+								{info.row.original.type === "Object" ? (
+									<Menu.Item
+										leftSection={<IconDownload size={22} />}
+										variant="subtle"
+										onClick={async () => {
+											const { url } = await trpcClient.content.download.query({
+												id: info.row.original.id,
+											})
+											window.open(url, "_blank", "noopener")
+										}}
+									>
+										Download
+									</Menu.Item>
+								) : (
+									<Menu.Item
+										leftSection={<IconCircleArrowUpRight size={22} />}
+										variant="subtle"
+										onClick={() => {
+											if (info.row.original.type === ContentType.Link) {
+												window.open(info.row.original.url)
+											}
+										}}
+									>
+										Open link
+									</Menu.Item>
+								)}
+								{info.row.original.checkedOutBy === null ? (
+									<Menu.Item
+										leftSection={<IconDoorExit size={22} />}
+										variant="subtle"
+										onClick={() => {
+											setContentUseState(info.row.original)
+											openCheckOutContent()
+										}}
+									>
+										Check Out
+									</Menu.Item>
+								) : info.row.original.checkedOutBy.id === profile?.id ? (
+									<Menu.Item
+										leftSection={<IconDoorEnter size={22} />}
+										variant="subtle"
+										onClick={() => {
+											setContentUseState(info.row.original)
+											openCheckInContent()
+										}}
+									>
+										Check In
+									</Menu.Item>
+								) : (
+									<Menu.Item leftSection={<IconDoorExit size={22} />} variant="subtle" disabled>
+										Check Out
+									</Menu.Item>
+								)}
 							</Menu.Dropdown>
 						</Menu>
 					</Flex>
 				),
 			}),
 		],
-		[profile]
+		[profile, allTags]
 	)
 
 	const customFilterFunction = (
@@ -454,7 +480,7 @@ export function ContentTable({
 		pageSize: 10, //default page size
 	})
 
-	const table = useReactTable({
+	const table = useReactTable<ContentListItem>({
 		data: data.content,
 		columns: columns,
 		state: {
@@ -472,6 +498,7 @@ export function ContentTable({
 		},
 		filterFns: {
 			fuzzy: fuzzyFilter,
+			tagFilterFn: tagFilterFn,
 		},
 		initialState: {
 			sorting: [
@@ -491,9 +518,10 @@ export function ContentTable({
 		getSortedRowModel: getSortedRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
-
 		getPaginationRowModel: getPaginationRowModel(),
 		onPaginationChange: setPagination,
+		getFacetedRowModel: getFacetedRowModel(),
+		getFacetedUniqueValues: getFacetedUniqueValues(),
 	})
 
 	useEffect(() => {
@@ -598,8 +626,10 @@ export function ContentTable({
 						return (
 							<Table.Tr
 								key={row.id}
-								bg={row.getIsSelected() ? "fuchsia.0" : undefined}
-								className="content-row"
+								className={clsx(
+									"content-row",
+									row.getIsSelected() && "bg-fuchsia-50 dark:bg-fuchsia-900/40"
+								)}
 							>
 								{row.getVisibleCells().map((cell) => {
 									return (

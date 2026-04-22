@@ -1,49 +1,133 @@
-import { AreaChart, BarChart } from "@mantine/charts"
+import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
 import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
-import { IconFolderOpen, IconPencil, IconUpload, IconUserKey } from "@tabler/icons-react"
+import { IconUserKey } from "@tabler/icons-react"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import dayjs from "dayjs"
+import { useEffect, useState } from "react"
+import { trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
-export function AnalyticsDashboard() {
-	const uploadData = [
-		{ month: "Jan", Files: 2, Links: 4 },
-		{ month: "Feb", Files: 1, Links: 5 },
-		{ month: "Mar", Files: 3, Links: 1 },
-		{ month: "Apr", Files: 6, Links: 1 },
-		{ month: "May", Files: 1, Links: 2 },
-		{ month: "Jun", Files: 3, Links: 7 },
-		{ month: "Jul", Files: 3, Links: 9 },
-		{ month: "Aug", Files: 8, Links: 0 },
-		{ month: "Sep", Files: 6, Links: 4 },
-		{ month: "Oct", Files: 7, Links: 5 },
-		{ month: "Nov", Files: 4, Links: 2 },
-		{ month: "Dec", Files: 2, Links: 3 },
-	]
 
-	const totalUploads = uploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
-	const totalFiles = uploadData.reduce((sum, m) => sum + m.Files, 0)
-	const totalLinks = uploadData.reduce((sum, m) => sum + m.Links, 0)
-	const mostActive = uploadData.reduce((max, m) =>
-		m.Files + m.Links > max.Files + max.Links ? m : max
+export function AnalyticsDashboard() {
+	const { data: fileStats } = useQuery(trpc.content.getFileStats.queryOptions())
+
+	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions())
+
+	const { data: heatmapData } = useQuery(
+		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions()
 	)
 
-	const fileTypes = [
-		{ name: "DOCX", Amount: 15 },
-		{ name: "PDF", Amount: 6 },
-		{ name: "JPEG", Amount: 8 },
-		{ name: "PNG", Amount: 3 },
+	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
+
+	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions())
+
+	const COLORS = [
+		"violet.6",
+		"blue.6",
+		"teal.6",
+		"orange.6",
+		"red.6",
+		"green.6",
+		"pink.6",
+		"cyan.6",
 	]
 
+	const barData = (fileStats ?? []).map((item) => ({
+		type: item.type,
+		storage: item.totalSize,
+	}))
+
+	const pieData = (fileStats ?? []).map((item, i) => ({
+		name: item.type,
+		value: item.count,
+		color: COLORS[i % COLORS.length],
+	}))
+
+	const endDate = new Date().toISOString().slice(0, 10)
+	const startDate = new Date(new Date().setMonth(new Date().getMonth() - 6))
+		.toISOString()
+		.slice(0, 10)
+
+	const normalizedUploadData = (uploadStats ?? []).map((item, i) => {
+		const date = new Date()
+		date.setMonth(date.getMonth() - 11 + i)
+		return {
+			...item,
+			month: date.toLocaleString("default", { month: "short", year: "2-digit" }),
+		}
+	})
+
+	const totalUploads = normalizedUploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
+	const totalFiles = normalizedUploadData.reduce((sum, m) => sum + m.Files, 0)
+	const totalLinks = normalizedUploadData.reduce((sum, m) => sum + m.Links, 0)
+	const mostActive =
+		normalizedUploadData.length > 0
+			? normalizedUploadData.reduce((max, m) =>
+					m.Files + m.Links > max.Files + max.Links ? m : max
+				)
+			: { month: "-" }
+	const [timeOnSite, setTimeOnSite] = useState(0)
+
+	useEffect(() => {
+		const sessionStart = parseInt(localStorage.getItem("sessionStart") ?? Date.now().toString())
+		const interval = setInterval(() => {
+			const elapsed = Math.floor((Date.now() - sessionStart) / 1000)
+			setTimeOnSite(elapsed)
+		}, 1000)
+		return () => clearInterval(interval)
+	}, [])
+
+	function formatTime(seconds: number) {
+		const h = Math.floor(seconds / 3600)
+		const m = Math.floor((seconds % 3600) / 60)
+		const s = seconds % 60
+		if (h > 0) return `${h}h ${m}m`
+		if (m > 0) return `${m}m ${s}s`
+		return `${s}s`
+	}
+
 	const metrics = [
-		{ label: "Time On Site", value: "12h" },
+		{ label: "Time On Site", value: formatTime(timeOnSite) },
 		{ label: "Total Uploads", value: totalUploads },
 		{ label: "Files", value: totalFiles },
 		{ label: "Links", value: totalLinks },
 		{ label: "Top Month", value: mostActive.month },
-		{ label: "Employees", value: 14 },
+		{ label: "Employees", value: userStats?.employeeCount ?? "-" },
 	]
+
+	function getActivityLabel(path: string): { title: string; description: string } {
+		if (path.includes("content.list"))
+			return { title: "Content Viewed", description: "Browsed content library" }
+		if (path.includes("content.get"))
+			return { title: "File Accessed", description: "Opened a file" }
+		if (path.includes("content.download"))
+			return { title: "File Downloaded", description: "Downloaded a file" }
+		if (path.includes("content.create") || path.includes("forms.createContent"))
+			return { title: "File Uploaded", description: "Uploaded new content" }
+		if (path.includes("content.update") || path.includes("content.updateFile"))
+			return { title: "File Edited", description: "Updated content" }
+		if (path.includes("content.delete"))
+			return { title: "File Deleted", description: "Deleted content" }
+		if (path.includes("content.favorite"))
+			return { title: "Content Favorited", description: "Marked content as favorite" }
+		if (path.includes("content.unfavorite"))
+			return { title: "Content Unfavorited", description: "Marked content as unfavorite" }
+		if (path.includes("content.checkOut"))
+			return { title: "File Checked Out", description: "Checked out a file" }
+		if (path.includes("content.checkIn"))
+			return { title: "File Checked In", description: "Checked in a file" }
+		if (path.includes("admin.listUsers"))
+			return {
+				title: "Employee Management Page Viewed",
+				description: "Visited employee management",
+			}
+		if (path.includes("admin."))
+			return { title: "Analytics Dashboard Viewed", description: "Visited analytics dashboard" }
+		return { title: path, description: "" }
+	}
 
 	return (
 		<Stack mt="md" gap="lg">
@@ -72,13 +156,16 @@ export function AnalyticsDashboard() {
 						</Text>
 						<AreaChart
 							h={220}
-							data={uploadData}
+							data={normalizedUploadData}
 							dataKey="month"
 							series={[
 								{ name: "Files", color: "blue" },
 								{ name: "Links", color: "teal" },
 							]}
 							curveType="monotone"
+							xAxisProps={{
+								padding: { right: 20 },
+							}}
 						/>
 					</Paper>
 				</Grid.Col>
@@ -88,44 +175,82 @@ export function AnalyticsDashboard() {
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 							Recent User Activity
 						</Text>
+						<div style={{ maxHeight: 200, overflowY: "auto" }}>
+							<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
+								{(userData ?? []).map((activity, i) => {
+									const { title, description } = getActivityLabel(activity.path)
+									return (
+										<Timeline.Item
+											// biome-ignore lint/suspicious/noArrayIndexKey: foo
+											key={i}
+											bullet={<IconUserKey size={12} />}
+											title={title}
+										>
+											<Text size="sm" c="dimmed">
+												{activity.contentTitle
+													? `Uploaded "${activity.contentTitle}"`
+													: description}
+											</Text>
+											<Text size="xs" mt={4}>
+												{new Date(activity.timestamp).toLocaleTimeString()}
+											</Text>
+										</Timeline.Item>
+									)
+								})}
+							</Timeline>
+						</div>
+					</Paper>
+				</Grid.Col>
+			</Grid>
 
-						<Timeline active={3} bulletSize={24} lineWidth={2}>
-							<Timeline.Item bullet={<IconUserKey size={12} />} title="User logged in">
-								<Text size="sm" c="dimmed">
-									Michael Jordan signed into the dashboard
-								</Text>
-								<Text size="xs" mt={4}>
-									9:00 AM
-								</Text>
-							</Timeline.Item>
+			<Grid>
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper withBorder p="md" radius="md">
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							File Types
+						</Text>
+						{pieData.length > 0 ? (
+							<PieChart
+								size={200}
+								data={pieData}
+								withTooltip
+								tooltipDataSource="segment"
+								withLabels
+								withLabelsLine
+								labelsPosition="outside"
+								labelsType="value"
+								className="mx-auto"
+							/>
+						) : (
+							<Text c="dimmed" ta="center" mt="xl">
+								No file data available yet
+							</Text>
+						)}
+					</Paper>
+				</Grid.Col>
 
-							<Timeline.Item bullet={<IconFolderOpen size={12} />} title="File accessed">
-								<Text size="sm" c="dimmed">
-									Opened Quarterly_Report.pdf
-								</Text>
-								<Text size="xs" mt={4}>
-									9:12 AM
-								</Text>
-							</Timeline.Item>
-
-							<Timeline.Item bullet={<IconPencil size={12} />} title="File edited">
-								<Text size="sm" c="dimmed">
-									Updated Budget_Plan.xlsx
-								</Text>
-								<Text size="xs" mt={4}>
-									9:25 AM
-								</Text>
-							</Timeline.Item>
-
-							<Timeline.Item bullet={<IconUpload size={12} />} title="File uploaded">
-								<Text size="sm" c="dimmed">
-									Uploaded DesignMockup.png
-								</Text>
-								<Text size="xs" mt={4}>
-									9:40 AM
-								</Text>
-							</Timeline.Item>
-						</Timeline>
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper withBorder p="md" radius="md">
+						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							Storage Used by Type
+						</Text>
+						{barData.length > 0 ? (
+							<BarChart
+								h={300}
+								data={barData}
+								dataKey="type"
+								valueFormatter={(value) => {
+									if (value < 1024) return `${value} B`
+									if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`
+									return `${(value / (1024 * 1024)).toFixed(1)} MB`
+								}}
+								series={[{ name: "storage", color: "violet.6", label: "Storage Used" }]}
+							/>
+						) : (
+							<Text c="dimmed" ta="center" mt="xl">
+								No file data available yet
+							</Text>
+						)}
 					</Paper>
 				</Grid.Col>
 			</Grid>
@@ -134,13 +259,29 @@ export function AnalyticsDashboard() {
 				<Grid.Col span={12}>
 					<Paper withBorder p="md" radius="md">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-							File Types
+							User Activity Heatmap
 						</Text>
-						<BarChart
-							h={300}
-							data={fileTypes}
-							dataKey="name"
-							series={[{ name: "Amount", color: "violet.6" }]}
+						<Heatmap
+							data={heatmapData ?? {}}
+							startDate={startDate}
+							endDate={endDate}
+							colors={[
+								"var(--mantine-color-violet-2)",
+								"var(--mantine-color-violet-3)",
+								"var(--mantine-color-violet-4)",
+								"var(--mantine-color-violet-5)",
+							]}
+							withTooltip
+							withWeekdayLabels
+							weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
+							withMonthLabels
+							firstDayOfWeek={0}
+							rectSize={20}
+							rectRadius={20}
+							gap={5}
+							getTooltipLabel={({ date, value }) =>
+								`${dayjs(date).format("DD MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
+							}
 						/>
 					</Paper>
 				</Grid.Col>

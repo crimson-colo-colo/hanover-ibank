@@ -2,17 +2,23 @@ import { v4 as uuidv4 } from "uuid"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
-import { ContentType, EmployeeRole, TagCategory } from "../generated/prisma/browser.ts"
+import {
+	ContentStatus,
+	ContentType,
+	EmployeeRole,
+	TagCategory,
+} from "../generated/prisma/browser.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
-import { authProcedure, publicProcedure, router } from "../trpc.ts"
+import { authProcedure, router } from "../trpc.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
 	ownerId: z.string().max(320),
 	lastModifiedDate: z.iso.date(),
 	expirationDate: z.iso.date(),
+	status: z.enum(Object.values(ContentStatus)),
 	tags: z.array(
 		z.object({
 			category: z.enum(Object.values(TagCategory)),
@@ -34,7 +40,7 @@ const fileSchema = baseSchema.extend({
 const contentFormSchema = z.discriminatedUnion("contentType", [linkSchema, fileSchema])
 
 export const formsRouter = router({
-	createContent: publicProcedure.input(contentFormSchema).mutation(async (opts) => {
+	createContent: authProcedure.input(contentFormSchema).mutation(async (opts) => {
 		let objectId: string | undefined
 		if (opts.input.contentType === ContentType.Object) {
 			const buffer = Buffer.from(opts.input.file, "base64")
@@ -56,6 +62,7 @@ export const formsRouter = router({
 				lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
 				expirationDate: isoDateToTimestamp(opts.input.expirationDate),
 				ownerId: opts.input.ownerId,
+				status: opts.input.status,
 				url: opts.input.contentType === ContentType.Link ? opts.input.url : undefined,
 				objectId: objectId,
 				tags: {

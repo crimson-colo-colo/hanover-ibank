@@ -41,55 +41,58 @@ export async function uploadFilesToS3() {
 		fileNameToObjectId.set(path.basename(file), id)
 		objectIdToFileType.set(id, fileType)
 	}
+
+	const hanoverData = unzipSync(
+		await fs.readFile("prisma/seed-data/Hanover Data.zip").catch((err) => {
+			console.error("Error reading zip file:", err)
+			console.error(
+				"Make sure the file 'Hanover Data.zip' exists in the 'prisma/seed-data' directory. Download this file from Canvas if you don't have it."
+			)
+			process.exit(1)
+		})
+	)
+
+	for (const [filename, content] of Object.entries(hanoverData)) {
+		if (filename.endsWith("/")) continue // skip directories
+		const id = uuidv4()
+		console.log(`Uploading file ${filename} (${id}) to S3...`)
+		const buffer = Buffer.from(content)
+		const fileType = await getFileTypeFromFile(filename, buffer)
+		await s3.putObject({
+			Bucket: bucketName,
+			Key: id,
+			Body: buffer,
+			Metadata: {
+				filetype: fileType,
+			},
+		})
+		fileNameToObjectId.set(path.basename(filename), id)
+	}
 }
 
-const hanoverData = unzipSync(
-	await fs.readFile("prisma/seed-data/Hanover Data.zip").catch((err) => {
-		console.error("Error reading zip file:", err)
-		console.error(
-			"Make sure the file 'Hanover Data.zip' exists in the 'prisma/seed-data' directory. Download this file from Canvas if you don't have it."
-		)
-		process.exit(1)
+export function fileContentData() {
+	return [...fileNameToObjectId.entries()].map(([filename, id]) => {
+		const daysEditedAgo = Math.floor(Math.random() * 365)
+		const lastModifiedDate = new Date()
+		lastModifiedDate.setDate(lastModifiedDate.getDate() - daysEditedAgo)
+		const expiresInDays = 30 + Math.floor(Math.random() * 365)
+		const expirationDate = new Date()
+		expirationDate.setDate(expirationDate.getDate() + expiresInDays)
+		const status =
+			Math.random() < 0.33
+				? ContentStatus.Complete
+				: Math.random() < 0.5
+					? ContentStatus.Incomplete
+					: ContentStatus.UnderReview
+		return {
+			title: filename,
+			ownerId: randomUserId(),
+			lastModifiedDate,
+			expirationDate,
+			objectId: id,
+			type: ContentType.Object,
+			status: status,
+			createdAt: lastModifiedDate,
+		} satisfies Prisma.ContentCreateManyInput
 	})
-)
-
-for (const [filename, content] of Object.entries(hanoverData)) {
-	if (filename.endsWith("/")) continue // skip directories
-	const id = uuidv4()
-	console.log(`Uploading file ${filename} (${id}) to S3...`)
-	const buffer = Buffer.from(content)
-	const fileType = await getFileTypeFromFile(filename, buffer)
-	await s3.putObject({
-		Bucket: bucketName,
-		Key: id,
-		Body: buffer,
-		Metadata: {
-			filetype: fileType,
-		},
-	})
-	fileNameToObjectId.set(path.basename(filename), id)
 }
-
-export const fileContentData = [...fileNameToObjectId.entries()].map(([filename, id]) => {
-	const daysEditedAgo = Math.floor(Math.random() * 365)
-	const lastModifiedDate = new Date()
-	lastModifiedDate.setDate(lastModifiedDate.getDate() - daysEditedAgo)
-	const expiresInDays = 30 + Math.floor(Math.random() * 365)
-	const expirationDate = new Date()
-	expirationDate.setDate(expirationDate.getDate() + expiresInDays)
-	const status =
-		Math.random() < 0.33
-			? ContentStatus.Complete
-			: Math.random() < 0.5
-				? ContentStatus.Incomplete
-				: ContentStatus.UnderReview
-	return {
-		title: filename,
-		ownerId: randomUserId(),
-		lastModifiedDate,
-		expirationDate,
-		objectId: id,
-		type: ContentType.Object,
-		status: status,
-	} satisfies Prisma.ContentCreateManyInput
-})
