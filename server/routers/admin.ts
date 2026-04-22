@@ -132,5 +132,4 @@ export const adminRouter = router({
 		const employeeCount = await db.employee.count()
 		return { employeeCount }
 	}),
-
 })
