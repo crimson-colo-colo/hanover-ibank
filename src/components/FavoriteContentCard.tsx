@@ -1,6 +1,7 @@
 import { ActionIcon, Card, Divider, Flex, Menu, Text, Tooltip } from "@mantine/core"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
+import type { ContentListItem } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconDotsVertical,
@@ -14,7 +15,6 @@ import { useEffect, useRef, useState } from "react"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { isTruncated } from "@/lib/isTruncated.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentListItem } from "../../server/routers/content.ts"
 
 export function FavoriteContentCard({
 	contentId,

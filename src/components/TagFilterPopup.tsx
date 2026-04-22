@@ -11,11 +11,11 @@ import {
 	Text,
 } from "@mantine/core"
 import { type EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import type { ContentListItem } from "@shared/types.ts"
 import { IconFilter } from "@tabler/icons-react"
 import type { Column } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
 import { employeeRoleDisplayName, tagCategoryDisplayName } from "@/lib/enums.ts"
-import type { ContentListItem } from "../../server/routers/content.ts"
 
 type Tag = ContentListItem["tags"][number]
 
