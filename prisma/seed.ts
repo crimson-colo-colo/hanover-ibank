@@ -4,6 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg"
 import type { FileType } from "@shared/filetype.ts"
 import { auth0Management } from "../server/auth.ts"
 import {
+	ContentStatus,
 	EmployeeRole,
 	type Prisma,
 	PrismaClient,
@@ -49,6 +50,8 @@ async function main() {
 	await createFavoriteContent(linkContent, fileTypeToContent)
 
 	await createUserActivity()
+
+	await checkoutFiles(fileContent)
 }
 
 async function confirmOverwrite() {
@@ -292,4 +295,29 @@ async function createUserActivity() {
 
 	await prisma.userActivity.createMany({ data })
 	console.log(`Created ${data.length} user activity entries over the past year`)
+}
+
+async function checkoutFiles(
+	fileContent: { id: string; objectId: string | null; ownerId: string }[]
+) {
+	const numToCheckOut = Math.floor(fileContent.length * 0.2)
+	const toCheckOut = [...fileContent].sort(() => 0.5 - Math.random()).slice(0, numToCheckOut)
+	for (const content of toCheckOut) {
+		const roles = await prisma.contentTag
+			.findMany({
+				where: { contentId: content.id, tagCategory: TagCategory.IntendedAudience },
+				select: { tagName: true },
+			})
+			.then((tags) => tags.map((t) => t.tagName as EmployeeRole))
+		const eligibleEmployees = employeeData.filter((e) => roles.includes(e.role))
+		const employee = eligibleEmployees[Math.floor(Math.random() * eligibleEmployees.length)]
+		await prisma.content.update({
+			where: { id: content.id },
+			data: {
+				checkedOutById: employee.id,
+				status: ContentStatus.UnderReview,
+			},
+		})
+	}
+	console.log(`Checked out ${toCheckOut.length} files`)
 }

@@ -1,8 +1,8 @@
-import type { HeadObjectOutput } from "@aws-sdk/client-s3"
 import { ContentFilter } from "@shared/enum.ts"
 import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
 import z from "zod"
+import type { ContentList, ContentListItem } from "../../shared/types.ts"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
@@ -12,44 +12,6 @@ import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
-
-type User = {
-	id: string
-	name: string
-	email: string
-	username: string
-}
-
-export type ContentListItem = {
-	id: string
-	title: string
-	readonly owner: User
-	readonly checkedOutBy: User | null
-	favorited: boolean
-	ownerId: string
-	lastModifiedDate: Date
-	expirationDate: Date
-	status: ContentStatus
-	tags: {
-		category: TagCategory
-		name: string
-	}[]
-} & (
-	| {
-			type: (typeof ContentType)["Link"]
-			url: string
-	  }
-	| {
-			type: (typeof ContentType)["Object"]
-			objectId: string
-			object: HeadObjectOutput
-	  }
-)
-
-export interface ContentList {
-	role: EmployeeRole
-	content: ContentListItem[]
-}
 
 export const contentRouter = router({
 	list: authProcedure
@@ -131,6 +93,7 @@ export const contentRouter = router({
 							name: owner.name ?? owner.nickname ?? owner.username!,
 							email: owner.email!,
 							username: owner.username!,
+							role: content.owner.role,
 						} satisfies ContentListItem["owner"],
 						checkedOutBy: checkedOutByUser
 							? ({
@@ -141,6 +104,7 @@ export const contentRouter = router({
 										checkedOutByUser.username!,
 									email: checkedOutByUser.email!,
 									username: checkedOutByUser.username!,
+									role: content.checkedOutBy!.role,
 								} satisfies ContentListItem["checkedOutBy"])
 							: null,
 						tags: content.tags.map((tag) => ({
@@ -626,10 +590,11 @@ export const contentRouter = router({
 				return {
 					...content,
 					owner: {
-						...content.owner,
+						id: content.ownerId,
 						name: owner.name ?? owner.username!,
 						email: owner.email!,
 						username: owner.username!,
+						role: content.owner.role,
 					} satisfies ContentListItem["owner"],
 					checkedOutBy: checkedOutByUser
 						? ({
@@ -637,6 +602,7 @@ export const contentRouter = router({
 								name: checkedOutByUser.name ?? checkedOutByUser.username!,
 								email: checkedOutByUser.email!,
 								username: checkedOutByUser.username!,
+								role: content.checkedOutBy!.role,
 							} satisfies ContentListItem["checkedOutBy"])
 						: null,
 					favorited: true,
@@ -804,6 +770,7 @@ export const contentRouter = router({
 				name: owner.name ?? owner.username!,
 				email: owner.email!,
 				username: owner.username!,
+				role: content.owner.role,
 			} satisfies ContentListItem["owner"],
 			checkedOutBy: checkedOutByUser
 				? ({
@@ -811,6 +778,7 @@ export const contentRouter = router({
 						name: checkedOutByUser.name ?? checkedOutByUser.username!,
 						email: checkedOutByUser.email!,
 						username: checkedOutByUser.username!,
+						role: content.checkedOutBy!.role,
 					} satisfies ContentListItem["checkedOutBy"])
 				: null,
 			tags: content.tags.map((tag) => ({

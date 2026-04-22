@@ -54,7 +54,7 @@ function RootComponent() {
 							<Navigation />
 						</AppShell.Header>
 						{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
-						<AppShell.Main className={clsx(!isPreview && "mx-auto max-w-280")}>
+						<AppShell.Main className={clsx(!isPreview && "mx-auto max-w-325")}>
 							<HeadContent />
 							<Outlet />
 						</AppShell.Main>
