@@ -8,8 +8,11 @@ import {
 	Group,
 	Kbd,
 	Modal,
+	NumberInput,
+	Pagination,
 	Pill,
 	SegmentedControl,
+	Select,
 	Table,
 	Text,
 	TextInput,
@@ -41,6 +44,7 @@ import {
 	getFacetedRowModel,
 	getFacetedUniqueValues,
 	getFilteredRowModel,
+	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
@@ -136,7 +140,7 @@ export function ContentTable({
 				cell: (info) => (
 					<ActionIcon
 						size="sm"
-						onClick={async (e) => {
+						onClick={async () => {
 							if (!info.getValue()) {
 								await favoriteContent.mutateAsync({ id: info.row.original.id })
 							} else {
@@ -273,7 +277,7 @@ export function ContentTable({
 							<ActionIcon
 								variant="subtle"
 								size="sm"
-								onClick={(e) => {
+								onClick={() => {
 									openFileEditDialog(info.row.original)
 								}}
 							>
@@ -285,7 +289,7 @@ export function ContentTable({
 							<ActionIcon
 								variant="transparent"
 								size="sm"
-								onClick={(e) => {
+								onClick={() => {
 									if (info.row.original.type === ContentType.Link) {
 										window.open(info.row.original.url)
 									}
@@ -297,7 +301,7 @@ export function ContentTable({
 							<ActionIcon
 								variant="transparent"
 								size="sm"
-								onClick={async (e) => {
+								onClick={async () => {
 									const { url } = await trpcClient.content.download.query({
 										id: info.row.original.id,
 									})
@@ -313,12 +317,17 @@ export function ContentTable({
 		],
 		[allTags]
 	)
+	const [pagination, setPagination] = useState({
+		pageIndex: 0, //initial page index
+		pageSize: 10, //default page size
+	})
 
 	const table = useReactTable<ContentListItem>({
 		data: data.content,
 		columns: columns,
 		state: {
 			rowSelection,
+			pagination,
 			globalFilter: debouncedGlobalFilter,
 		},
 		enableGlobalFilter: true,
@@ -340,6 +349,10 @@ export function ContentTable({
 					desc: false,
 				},
 			],
+			pagination: {
+				pageIndex: 0, //custom initial page index
+				pageSize: 10, //custom default page size
+			},
 		},
 		enableSortingRemoval: false,
 		enableMultiSort: true,
@@ -347,6 +360,8 @@ export function ContentTable({
 		getSortedRowModel: getSortedRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		onPaginationChange: setPagination,
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
 	})
@@ -518,6 +533,57 @@ export function ContentTable({
 					</Button>
 				</Flex>
 			</Modal>
+			<Flex justify="space-between" direction="row" align="center" mt="md">
+				<Group>
+					<Pagination.Root
+						siblings={1}
+						boundaries={1}
+						defaultValue={table.getState().pagination.pageIndex}
+						total={table.getPageCount()}
+						value={table.getState().pagination.pageIndex + 1}
+						onChange={(newPage) => {
+							table.setPageIndex(newPage - 1)
+						}}
+					>
+						<Group gap={3} justify="center">
+							<Pagination.First />
+							<Pagination.Previous />
+							<Pagination.Items />
+							<Pagination.Next />
+							<Pagination.Last />
+						</Group>
+					</Pagination.Root>
+
+					<Text size="sm">Go to page:</Text>
+					<NumberInput
+						w={70}
+						placeholder="0"
+						defaultValue={table.getState().pagination.pageIndex}
+						value={table.getState().pagination.pageIndex + 1}
+						onChange={(value) => {
+							if (value === "" || value === null) return
+							const page = Number(value) - 1
+							if (page >= 0 && page < table.getPageCount()) {
+								table.setPageIndex(page)
+							}
+						}}
+						min={1}
+						max={table.getPageCount()}
+					/>
+				</Group>
+				<Group gap="xs" align="center">
+					<Text>Items per page:</Text>
+					<Select
+						size="sm"
+						value={table.getState().pagination.pageSize}
+						onChange={(value) => {
+							value && table.setPageSize(Number(value))
+						}}
+						data={[10, 20, 30, 40, 50]}
+						defaultValue={table.getState().pagination.pageSize}
+					></Select>
+				</Group>
+			</Flex>
 		</>
 	)
 }
