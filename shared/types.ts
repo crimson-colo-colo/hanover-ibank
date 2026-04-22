@@ -66,6 +66,7 @@ export type CheckOutMutationType = UseMutationResult<
 	TRPCClientErrorLike<AppRouter>,
 	CheckOutInput
 >
+
 export type Thread = Prisma.ContentTalkThreadGetPayload<{
 	include: {
 		createdBy: true
