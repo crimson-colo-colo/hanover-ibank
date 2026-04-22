@@ -1,5 +1,4 @@
 import {
-	Avatar,
 	Badge,
 	Box,
 	Button,
@@ -13,7 +12,9 @@ import {
 } from "@mantine/core"
 import { IconCheck, IconRefresh } from "@tabler/icons-react"
 import { useState } from "react"
+import { Avatar } from "@/components/Avatar.tsx"
 import type { Thread } from "@/components/discussion/ThreadCard.tsx"
+import type { trpc } from "@/lib/trpc.ts"
 
 function formatDate(date: Date) {
 	return new Intl.DateTimeFormat("en-US", {
@@ -24,6 +25,9 @@ function formatDate(date: Date) {
 	}).format(date)
 }
 
+export type Users =
+	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["users"]
+
 type Props = {
 	opened: boolean
 	thread: Thread | null
@@ -31,6 +35,7 @@ type Props = {
 	onReply: (threadId: string, body: string) => void
 	onResolve: (threadId: string) => void
 	onReopen: (threadId: string) => void
+	users: Users
 }
 
 export default function ThreadDrawer({
@@ -40,6 +45,7 @@ export default function ThreadDrawer({
 	onReply,
 	onResolve,
 	onReopen,
+	users,
 }: Props) {
 	const [reply, setReply] = useState("")
 
@@ -71,9 +77,9 @@ export default function ThreadDrawer({
 				<Paper withBorder radius="xl" p="md">
 					<Group justify="space-between" align="flex-start">
 						<Box>
-							{/*<Text size="sm">*/}
-							{/*	Started by <strong>{thread.createdBy.name}</strong>*/}
-							{/*</Text>*/}
+							<Text size="sm">
+								Started by <strong>{users.get(thread.createdBy.id)?.name}</strong>
+							</Text>
 							<Text size="xs" c="dimmed">
 								{formatDate(thread.createdAt)}
 							</Text>
@@ -105,12 +111,18 @@ export default function ThreadDrawer({
 						<div key={comment.id}>
 							<Paper withBorder radius="lg" p="md">
 								<Group align="flex-start" wrap="nowrap">
-									{/*<Avatar radius="xl" name={comment.author.name} />*/}
+									<Avatar
+										className="w-6 h-6 shrink-0"
+										width={24}
+										height={24}
+										radius="100%"
+										userId={comment.author.id}
+									/>
 									<Box style={{ flex: 1 }}>
 										<Group justify="space-between" mb={6}>
-											{/*<Text fw={600} size="sm">*/}
-											{/*	{comment.author.name}*/}
-											{/*</Text>*/}
+											<Text fw={600} size="sm">
+												{users.get(comment.author.id)?.name}
+											</Text>
 											<Text size="xs" c="dimmed">
 												{formatDate(comment.createdAt)}
 											</Text>

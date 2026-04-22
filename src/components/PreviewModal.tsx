@@ -1,8 +1,9 @@
 import { ActionIcon, Button, Flex, Indicator, Modal } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { FileType } from "@shared/filetype.ts"
-import { IconInfoCircle, IconLoader2, IconMessageCircle} from "@tabler/icons-react"
+import { IconInfoCircle, IconLoader2, IconMessageCircle } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
+import DiscussionPanel from "@/components/discussion/DiscussionPanel.tsx"
 import { FilePreview, FilePreviewControls, FilePreviewProvider } from "@/components/FilePreview.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { MetadataSidebar } from "@/components/MetadataSidebar.tsx"
@@ -17,6 +18,7 @@ export function PreviewModal({
 }) {
 	const contentQuery = useQuery(trpc.content.get.queryOptions({ id: contentId }))
 	const [sidebarOpen, { open: openSidebar, close: closeSidebar }] = useDisclosure(true)
+	const [discussionOpen, { open: openDiscussion, close: closeDiscussion }] = useDisclosure(false)
 
 	const content = contentQuery.data?.content
 	const fileType =
@@ -49,6 +51,10 @@ export function PreviewModal({
 						<ActionIcon
 							variant="subtle"
 							onClick={() => {
+								if (discussionOpen) {
+									closeDiscussion()
+								}
+
 								if (sidebarOpen) {
 									closeSidebar()
 								} else {
@@ -58,20 +64,28 @@ export function PreviewModal({
 						>
 							<IconInfoCircle size={30} />
 						</ActionIcon>
-						<Indicator color="red" size={12}>
-							<Button
-								onClick={}
-								leftSection={<IconMessageCircle />}
-							>
-								Discussion
-							</Button>
-						</Indicator>
+						<Button
+							leftSection={<IconMessageCircle />}
+							onClick={() => {
+								if (sidebarOpen) {
+									closeSidebar()
+								}
+								if (discussionOpen) {
+									closeDiscussion()
+								} else {
+									openDiscussion()
+								}
+							}}
+						>
+							Discussion
+						</Button>
 						<Modal.CloseButton size="lg" />
 					</Flex>
 				</Modal.Header>
 				<Flex gap="lg" className="flex-1 min-h-0 overflow-hidden z-1">
 					<FilePreview />
 					{sidebarOpen && <MetadataSidebar content={content} closePreview={closePreview} />}
+					{discussionOpen && <DiscussionPanel contentId={content.id} />}
 				</Flex>
 			</Modal.Content>
 		</FilePreviewProvider>

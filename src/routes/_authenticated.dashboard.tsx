@@ -12,7 +12,6 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import { ContentTable } from "@/components/ContentTable.tsx"
-import DiscussionPanel from "@/components/discussion/DiscussionPanel.tsx"
 import { EditContentForm } from "@/components/EditContentForm.tsx"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { PreviewModal } from "@/components/PreviewModal.tsx"
@@ -227,9 +226,6 @@ function RoleDashboard() {
 					)}
 				</Modal.Root>
 			</div>
-			<section className="mt-10">
-				<DiscussionPanel contentId="content-1" />
-			</section>
 		</main>
 	)
 }

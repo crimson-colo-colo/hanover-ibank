@@ -1,6 +1,5 @@
 import {
 	Badge,
-	Box,
 	Button,
 	Group,
 	Paper,
@@ -8,11 +7,10 @@ import {
 	Stack,
 	Text,
 	TextInput,
-	ThemeIcon,
 } from "@mantine/core"
-import { IconMessagePlus, IconSearch, IconSparkles } from "@tabler/icons-react"
+import { IconMessagePlus, IconSearch } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { useContext, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { trpc } from "@/lib/trpc.ts"
 import NewThreadModal from "./NewThreadModal.tsx"
 import ThreadCard, { type Thread } from "./ThreadCard.tsx"
@@ -50,7 +48,9 @@ export default function DiscussionPanel({ contentId }: Props) {
 	const filteredThreads = useMemo(() => {
 		return threads.data?.threads?.filter((thread) => {
 			const matchesFilter =
-				activeFilter === null ? true : thread.status.toLowerCase() === activeFilter
+				activeFilter === "all" || activeFilter === null
+					? true
+					: thread.status.toLowerCase() === activeFilter
 
 			const searchBlob = [
 				thread.title || "",
@@ -66,6 +66,7 @@ export default function DiscussionPanel({ contentId }: Props) {
 	}, [threads, activeFilter, query])
 
 	const openThread = (thread: Thread) => {
+		setSelectedThread(thread)
 		setDrawerOpened(true)
 	}
 
@@ -112,15 +113,12 @@ export default function DiscussionPanel({ contentId }: Props) {
 		threads.data?.threads?.find((thread) => thread.id === selectedThread?.id) ?? null
 
 	return (
-		<Box p="md">
+		<span>
 			<Paper radius="xl" p="xl" withBorder>
 				<Stack gap="xl">
 					<Group justify="space-between" align="flex-start">
 						<Stack gap={8}>
 							<Group gap="sm">
-								<ThemeIcon size="xl" radius="xl" variant="light">
-									<IconSparkles size={20} />
-								</ThemeIcon>
 								<Badge variant="light" radius="xl">
 									Discussion
 								</Badge>
@@ -169,26 +167,33 @@ export default function DiscussionPanel({ contentId }: Props) {
 
 					<Stack gap="md">
 						{filteredThreads?.map((thread) => (
-							<ThreadCard key={thread.id} thread={thread} onOpen={openThread} />
+							<ThreadCard
+								key={thread.id}
+								thread={thread}
+								onOpen={openThread}
+								user={threads.data!.users}
+							/>
 						))}
 					</Stack>
 				</Stack>
 			</Paper>
-
-			<ThreadDrawer
-				opened={drawerOpened}
-				thread={selectedThreadFresh}
-				onClose={() => setDrawerOpened(false)}
-				onReply={handleReply}
-				onResolve={handleResolve}
-				onReopen={handleReopen}
-			/>
+			{threads.data !== undefined && (
+				<ThreadDrawer
+					opened={drawerOpened}
+					thread={selectedThreadFresh}
+					onClose={() => setDrawerOpened(false)}
+					onReply={handleReply}
+					onResolve={handleResolve}
+					onReopen={handleReopen}
+					users={threads.data.users}
+				/>
+			)}
 
 			<NewThreadModal
 				opened={createOpened}
 				onClose={() => setCreateOpened(false)}
 				onCreate={handleCreateThread}
 			/>
-		</Box>
+		</span>
 	)
 }

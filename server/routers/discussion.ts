@@ -54,14 +54,14 @@ export const discussionRouter = router({
 					users.map(async ({ id }) => {
 						const v = await auth0Management.users.get(id)
 						return [
-							id as const,
+							id,
 							{
 								id: id,
 								name: v.name ?? v.nickname ?? v.username!,
 								email: v.email!,
 								username: v.username!,
 							},
-						]
+						] as const
 					})
 				)
 			)
@@ -107,7 +107,6 @@ export const discussionRouter = router({
 					updatedAt: new Date(),
 				},
 				include: {
-					id: true,
 					createdBy: true,
 					comments: {
 						include: {
@@ -161,7 +160,6 @@ export const discussionRouter = router({
 					},
 				},
 				include: {
-					id: true,
 					comments: {
 						include: {
 							author: true,

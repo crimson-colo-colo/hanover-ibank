@@ -1,8 +1,7 @@
-import { Avatar, Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core"
-import type { ContentTalkThread } from "@prisma/browser.ts"
+import { Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core"
 import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react"
+import { Avatar } from "@/components/Avatar.tsx"
 import type { trpc } from "@/lib/trpc.ts"
-import { auth0Api, auth0Management } from "../../../server/auth.ts"
 import type { ThreadStatus } from "./DiscussionPanel.tsx"
 
 function formatDate(date: Date) {
@@ -21,23 +20,18 @@ function getStatusColor(status: ThreadStatus) {
 }
 
 export type Thread =
-	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["threads"]
+	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["threads"][number]
 export type Users =
 	(typeof trpc.content.discussion.getThreadsByContentId)["~types"]["output"]["users"]
 
 type Props = {
 	thread: Thread
 	onOpen: (thread: Thread) => void
-	users: Users
+	user: Users
 }
 
-export default function ThreadCard({ thread, onOpen, users }: Props) {
+export default function ThreadCard({ thread, onOpen, user }: Props) {
 	const preview = thread.comments[thread.comments.length - 1]?.body ?? "No comments yet"
-
-	//Create four functions for the four things we need from a user: we need their display name
-	async function getDisplayName(userId: string) {
-		await users.get(userId)
-	}
 
 	return (
 		<Card
@@ -73,9 +67,15 @@ export default function ThreadCard({ thread, onOpen, users }: Props) {
 
 				<Group justify="space-between">
 					<Group gap="sm">
-						<Avatar radius="xl" name={thread.createdBy.name} />
+						<Avatar
+							className="w-6 h-6 shrink-0"
+							width={24}
+							height={24}
+							radius="100%"
+							userId={thread.createdBy.id}
+						/>
 						<Text size="sm" c="dimmed">
-							{thread.createdBy.name}
+							{user.get(thread.createdBy.id)?.name}
 						</Text>
 					</Group>
 
