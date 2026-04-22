@@ -280,7 +280,7 @@ export function AnalyticsDashboard() {
 							rectRadius={20}
 							gap={5}
 							getTooltipLabel={({ date, value }) =>
-								`${dayjs(date).format("DD MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
+								`${dayjs(date).format("D MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
 							}
 						/>
 					</Paper>

@@ -413,7 +413,7 @@ export function ContentTable({
 						leftSection={<IconCloudUpload size={16} stroke={1.5} />}
 						onClick={openCreateModal}
 					>
-						Create content
+						Upload content
 					</Button>
 
 					<Button
