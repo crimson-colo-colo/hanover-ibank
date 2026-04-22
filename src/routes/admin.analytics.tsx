@@ -72,12 +72,12 @@ export function AnalyticsDashboard() {
 	const totalUploads = normalizedUploadData.reduce((sum, m) => sum + m.Files + m.Links, 0)
 	const totalFiles = normalizedUploadData.reduce((sum, m) => sum + m.Files, 0)
 	const totalLinks = normalizedUploadData.reduce((sum, m) => sum + m.Links, 0)
-
 	const mostActive =
-		uploadData.length > 0
-			? uploadData.reduce((max, m) => (m.Files + m.Links > max.Files + max.Links ? m : max))
+		normalizedUploadData.length > 0
+			? normalizedUploadData.reduce((max, m) =>
+					m.Files + m.Links > max.Files + max.Links ? m : max
+				)
 			: { month: "-" }
-
 	const [timeOnSite, setTimeOnSite] = useState(0)
 
 	useEffect(() => {
