@@ -1,3 +1,5 @@
+import { UTCDate } from "@date-fns/utc"
+import { Temporal } from "@js-temporal/polyfill"
 import { PrismaPg } from "@prisma/adapter-pg"
 import type { FileType } from "@shared/filetype.ts"
 import { auth0Management } from "../server/auth.ts"
@@ -45,6 +47,8 @@ async function main() {
 	console.log(`Uploaded ${fileContent.length} files to S3 and created content rows for them`)
 
 	await createFavoriteContent(linkContent, fileTypeToContent)
+
+	await createUserActivity()
 }
 
 async function confirmOverwrite() {
@@ -102,16 +106,21 @@ async function createUsersAndAvatars() {
 			})
 		)
 	)
-	for (const employee of employeeData) {
-		const user = await auth0Management.users.get(employee.id)
-		const avatar = generateDefaultAvatar(user.name ?? user.email!)
-		console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
-		await s3.putObject({
-			Bucket: bucketName,
-			Key: `avatar/${employee.id}.png`,
-			Body: avatar,
+
+	const users = await auth0Management.users.list()
+
+	await Promise.all(
+		employeeData.map(async ({ id }) => {
+			const user = users.data.find((u) => u.user_id === id)!
+			const avatar = generateDefaultAvatar(user.name ?? user.email!)
+			console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
+			await s3.putObject({
+				Bucket: bucketName,
+				Key: `avatar/${id}.png`,
+				Body: avatar,
+			})
 		})
-	}
+	)
 
 	console.log(`Created ${employeeData.length} employee rows`)
 }
@@ -243,4 +252,44 @@ async function createFavoriteContent(
 	)
 
 	console.log(`Favorited ${thingsToFavorite.length} content items for each of the 3 users`)
+}
+
+async function createUserActivity() {
+	const activeWeekdays = [0.05, 0.9, 0.7, 0.8, 0.6, 0.4, 0.1] // Sunday to Saturday
+	const data: Prisma.UserActivityCreateManyInput[] = []
+	for (const { id } of employeeData) {
+		// insert activity for the past 365 days
+		for (let i = 1; i < 365; i++) {
+			const date = new UTCDate()
+			date.setHours(12, 0, 0, 0)
+			date.setDate(date.getDate() - i)
+			const weekday = date.getDay()
+			if (Math.random() < activeWeekdays[weekday]) {
+				const truncated = Temporal.Instant.fromEpochMilliseconds(date.getTime()).round({
+					roundingMode: "floor",
+					smallestUnit: "second",
+				})
+				const hour = truncated.round({
+					roundingMode: "floor",
+					smallestUnit: "hour",
+				})
+				const day = truncated.round({
+					roundingMode: "floor",
+					smallestUnit: "hour",
+					roundingIncrement: 24,
+				})
+				data.push({
+					employeeId: id,
+					day: new UTCDate(day.epochMilliseconds).toISOString(),
+					hour: new UTCDate(hour.epochMilliseconds).toISOString(),
+					path: `content.list`,
+					timestamp: new UTCDate(truncated.epochMilliseconds).toISOString(),
+					count: 1,
+				})
+			}
+		}
+	}
+
+	await prisma.userActivity.createMany({ data })
+	console.log(`Created ${data.length} user activity entries over the past year`)
 }
