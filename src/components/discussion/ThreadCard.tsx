@@ -1,7 +1,7 @@
-import { Avatar, Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core"
-import type { ContentTalkThread } from "@prisma/browser.ts"
-import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react"
-import type { Thread, ThreadStatus } from "./DiscussionPanel.tsx"
+import { Avatar, Badge, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
+import type { ContentTalkThread } from "@prisma/browser.ts";
+import { IconChevronRight, IconClock, IconMessageCircle } from "@tabler/icons-react";
+import type { Thread, ThreadStatus } from "./DiscussionPanel.tsx";
 
 function formatDate(date: string) {
 	return new Intl.DateTimeFormat("en-US", {
