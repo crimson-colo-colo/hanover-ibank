@@ -24,25 +24,6 @@ const fileNameToObjectId = new Map<string, string>()
 export const objectIdToFileType = new Map<string, FileType>()
 
 export async function uploadFilesToS3() {
-	for (const file of allFiles) {
-		const id = uuidv4()
-		const filePath = path.join(baseDir, file)
-		const f = await fs.readFile(filePath)
-		console.log(`Uploading file ${file} (${id}) to S3...`)
-		const buffer = Buffer.from(f)
-		const fileType = await getFileTypeFromFile(file, buffer)
-		await s3.putObject({
-			Bucket: bucketName,
-			Key: id,
-			Body: buffer,
-			Metadata: {
-				filetype: fileType,
-			},
-		})
-		fileNameToObjectId.set(path.basename(file), id)
-		objectIdToFileType.set(id, fileType)
-	}
-
 	const hanoverData = unzipSync(
 		await fs.readFile("prisma/seed-data/Hanover Data.zip").catch((err) => {
 			console.error("Error reading zip file:", err)
@@ -53,22 +34,43 @@ export async function uploadFilesToS3() {
 		})
 	)
 
-	for (const [filename, content] of Object.entries(hanoverData)) {
-		if (filename.endsWith("/")) continue // skip directories
-		const id = uuidv4()
-		console.log(`Uploading file ${filename} (${id}) to S3...`)
-		const buffer = Buffer.from(content)
-		const fileType = await getFileTypeFromFile(filename, buffer)
-		await s3.putObject({
-			Bucket: bucketName,
-			Key: id,
-			Body: buffer,
-			Metadata: {
-				filetype: fileType,
-			},
-		})
-		fileNameToObjectId.set(path.basename(filename), id)
-	}
+	await Promise.all([
+		...allFiles.map(async (file) => {
+			const id = uuidv4()
+			const filePath = path.join(baseDir, file)
+			const f = await fs.readFile(filePath)
+			console.log(`Uploading file ${file} (${id}) to S3...`)
+			const buffer = Buffer.from(f)
+			const fileType = await getFileTypeFromFile(file, buffer)
+			await s3.putObject({
+				Bucket: bucketName,
+				Key: id,
+				Body: buffer,
+				Metadata: {
+					filetype: fileType,
+				},
+			})
+			fileNameToObjectId.set(path.basename(file), id)
+			objectIdToFileType.set(id, fileType)
+		}),
+		...Object.entries(hanoverData).map(async ([filename, content]) => {
+			if (filename.endsWith("/")) return // skip directories
+			const id = uuidv4()
+			console.log(`Uploading file ${filename} (${id}) to S3...`)
+			const buffer = Buffer.from(content)
+			const fileType = await getFileTypeFromFile(filename, buffer)
+			await s3.putObject({
+				Bucket: bucketName,
+				Key: id,
+				Body: buffer,
+				Metadata: {
+					filetype: fileType,
+				},
+			})
+			fileNameToObjectId.set(path.basename(filename), id)
+			objectIdToFileType.set(id, fileType)
+		}),
+	])
 }
 
 export function fileContentData() {

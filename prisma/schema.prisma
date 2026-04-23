@@ -16,23 +16,32 @@ enum EmployeeRole {
     BusinessOperations
 }
 
+enum ThreadStatus {
+    Open
+    Resolved
+    Archived
+}
+
 model Employee {
-    id                String            @id
+    id                String              @id
     role              EmployeeRole
-    content           Content[]         @relation("Owner")
+    content           Content[]           @relation("Owner")
     favorite          FavoriteContent[]
-    checkedOutContent Content[]         @relation("CheckedOutContent")
+    checkedOutContent Content[]           @relation("CheckedOutContent")
     activity          UserActivity[]
+    threads           ContentTalkThread[] @relation("ThreadCreatedBy")
+    comments          TalkThreadComment[] @relation("CommentAuthor")
+    resolvedThreads   ContentTalkThread[]
 }
 
 model Content {
-    id               String            @id @default(cuid())
+    id               String              @id @default(cuid())
     title            String
     description      String?
-    status           ContentStatus     @default(Incomplete)
+    status           ContentStatus       @default(Incomplete)
     type             ContentType
-    createdAt        DateTime          @default(now())
-    updatedAt        DateTime          @updatedAt
+    createdAt        DateTime            @default(now())
+    updatedAt        DateTime            @updatedAt
     lastModifiedDate DateTime
     expirationDate   DateTime
     /// S3 Object ID
@@ -40,11 +49,42 @@ model Content {
     /// URL for links
     url              String?
     ownerId          String
-    owner            Employee          @relation("Owner", fields: [ownerId], references: [id])
+    owner            Employee            @relation("Owner", fields: [ownerId], references: [id])
     tags             ContentTag[]
     favoritedBy      FavoriteContent[]
     checkedOutById   String?
-    checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+    checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+    threads          ContentTalkThread[]
+}
+
+model ContentTalkThread {
+    id           String       @id @default(cuid())
+    title        String?
+    status       ThreadStatus @default(Open)
+    createdAt    DateTime     @default(now())
+    updatedAt    DateTime     @updatedAt
+    resolvedAt   DateTime?
+    resolvedById String?
+    resolvedBy   Employee?    @relation(fields: [resolvedById], references: [id])
+
+    createdById String
+    createdBy   Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
+    contentId   String
+    content     Content             @relation(fields: [contentId], references: [id], onDelete: Cascade)
+    comments    TalkThreadComment[]
+}
+
+model TalkThreadComment {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    body      String
+
+    threadId String
+    thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+    authorId String
+    author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
 }
 
 model Tag {

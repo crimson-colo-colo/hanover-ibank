@@ -11,7 +11,7 @@ export function CreateContentModal({ opened, onClose }: Props) {
 		<Modal
 			opened={opened}
 			onClose={onClose}
-			title="Create New Content"
+			title="Upload New Content"
 			size="md"
 			scrollAreaComponent={ScrollArea.Autosize}
 		>

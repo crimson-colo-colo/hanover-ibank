@@ -2,6 +2,7 @@ import type { HeadObjectOutput } from "@aws-sdk/client-s3"
 import type { UseMutationResult } from "@tanstack/react-query"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
+import type { Prisma } from "../server/generated/prisma/browser.ts"
 import type {
 	ContentStatus,
 	ContentType,
@@ -65,3 +66,18 @@ export type CheckOutMutationType = UseMutationResult<
 	TRPCClientErrorLike<AppRouter>,
 	CheckOutInput
 >
+
+export type Thread = Prisma.ContentTalkThreadGetPayload<{
+	include: {
+		createdBy: true
+		resolvedBy: true
+		comments: {
+			orderBy: {
+				updatedAt: "asc"
+			}
+			include: {
+				author: true
+			}
+		}
+	}
+}>

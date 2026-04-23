@@ -162,6 +162,9 @@ export type EmployeeWhereInput = {
   favorite?: Prisma.FavoriteContentListRelationFilter
   checkedOutContent?: Prisma.ContentListRelationFilter
   activity?: Prisma.UserActivityListRelationFilter
+  threads?: Prisma.ContentTalkThreadListRelationFilter
+  comments?: Prisma.TalkThreadCommentListRelationFilter
+  resolvedThreads?: Prisma.ContentTalkThreadListRelationFilter
 }
 
 export type EmployeeOrderByWithRelationInput = {
@@ -171,6 +174,9 @@ export type EmployeeOrderByWithRelationInput = {
   favorite?: Prisma.FavoriteContentOrderByRelationAggregateInput
   checkedOutContent?: Prisma.ContentOrderByRelationAggregateInput
   activity?: Prisma.UserActivityOrderByRelationAggregateInput
+  threads?: Prisma.ContentTalkThreadOrderByRelationAggregateInput
+  comments?: Prisma.TalkThreadCommentOrderByRelationAggregateInput
+  resolvedThreads?: Prisma.ContentTalkThreadOrderByRelationAggregateInput
 }
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
@@ -183,6 +189,9 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   favorite?: Prisma.FavoriteContentListRelationFilter
   checkedOutContent?: Prisma.ContentListRelationFilter
   activity?: Prisma.UserActivityListRelationFilter
+  threads?: Prisma.ContentTalkThreadListRelationFilter
+  comments?: Prisma.TalkThreadCommentListRelationFilter
+  resolvedThreads?: Prisma.ContentTalkThreadListRelationFilter
 }, "id">
 
 export type EmployeeOrderByWithAggregationInput = {
@@ -208,6 +217,9 @@ export type EmployeeCreateInput = {
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeUncheckedCreateInput = {
@@ -217,6 +229,9 @@ export type EmployeeUncheckedCreateInput = {
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeUpdateInput = {
@@ -226,6 +241,9 @@ export type EmployeeUpdateInput = {
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeUncheckedUpdateInput = {
@@ -235,6 +253,9 @@ export type EmployeeUncheckedUpdateInput = {
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeCreateManyInput = {
@@ -315,6 +336,50 @@ export type EmployeeUpdateOneWithoutCheckedOutContentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutCheckedOutContentInput, Prisma.EmployeeUpdateWithoutCheckedOutContentInput>, Prisma.EmployeeUncheckedUpdateWithoutCheckedOutContentInput>
 }
 
+export type EmployeeCreateNestedOneWithoutResolvedThreadsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutResolvedThreadsInput, Prisma.EmployeeUncheckedCreateWithoutResolvedThreadsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutResolvedThreadsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeCreateNestedOneWithoutThreadsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutThreadsInput, Prisma.EmployeeUncheckedCreateWithoutThreadsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutThreadsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneWithoutResolvedThreadsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutResolvedThreadsInput, Prisma.EmployeeUncheckedCreateWithoutResolvedThreadsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutResolvedThreadsInput
+  upsert?: Prisma.EmployeeUpsertWithoutResolvedThreadsInput
+  disconnect?: Prisma.EmployeeWhereInput | boolean
+  delete?: Prisma.EmployeeWhereInput | boolean
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutResolvedThreadsInput, Prisma.EmployeeUpdateWithoutResolvedThreadsInput>, Prisma.EmployeeUncheckedUpdateWithoutResolvedThreadsInput>
+}
+
+export type EmployeeUpdateOneRequiredWithoutThreadsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutThreadsInput, Prisma.EmployeeUncheckedCreateWithoutThreadsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutThreadsInput
+  upsert?: Prisma.EmployeeUpsertWithoutThreadsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutThreadsInput, Prisma.EmployeeUpdateWithoutThreadsInput>, Prisma.EmployeeUncheckedUpdateWithoutThreadsInput>
+}
+
+export type EmployeeCreateNestedOneWithoutCommentsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutCommentsInput, Prisma.EmployeeUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutCommentsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneRequiredWithoutCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutCommentsInput, Prisma.EmployeeUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutCommentsInput
+  upsert?: Prisma.EmployeeUpsertWithoutCommentsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutCommentsInput, Prisma.EmployeeUpdateWithoutCommentsInput>, Prisma.EmployeeUncheckedUpdateWithoutCommentsInput>
+}
+
 export type EmployeeCreateNestedOneWithoutFavoriteInput = {
   create?: Prisma.XOR<Prisma.EmployeeCreateWithoutFavoriteInput, Prisma.EmployeeUncheckedCreateWithoutFavoriteInput>
   connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutFavoriteInput
@@ -349,6 +414,9 @@ export type EmployeeCreateWithoutContentInput = {
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeUncheckedCreateWithoutContentInput = {
@@ -357,6 +425,9 @@ export type EmployeeUncheckedCreateWithoutContentInput = {
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeCreateOrConnectWithoutContentInput = {
@@ -370,6 +441,9 @@ export type EmployeeCreateWithoutCheckedOutContentInput = {
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
@@ -378,6 +452,9 @@ export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeCreateOrConnectWithoutCheckedOutContentInput = {
@@ -402,6 +479,9 @@ export type EmployeeUpdateWithoutContentInput = {
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutContentInput = {
@@ -410,6 +490,9 @@ export type EmployeeUncheckedUpdateWithoutContentInput = {
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeUpsertWithoutCheckedOutContentInput = {
@@ -429,6 +512,9 @@ export type EmployeeUpdateWithoutCheckedOutContentInput = {
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
@@ -437,6 +523,189 @@ export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
+}
+
+export type EmployeeCreateWithoutResolvedThreadsInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+}
+
+export type EmployeeUncheckedCreateWithoutResolvedThreadsInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type EmployeeCreateOrConnectWithoutResolvedThreadsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutResolvedThreadsInput, Prisma.EmployeeUncheckedCreateWithoutResolvedThreadsInput>
+}
+
+export type EmployeeCreateWithoutThreadsInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
+}
+
+export type EmployeeUncheckedCreateWithoutThreadsInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
+}
+
+export type EmployeeCreateOrConnectWithoutThreadsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutThreadsInput, Prisma.EmployeeUncheckedCreateWithoutThreadsInput>
+}
+
+export type EmployeeUpsertWithoutResolvedThreadsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutResolvedThreadsInput, Prisma.EmployeeUncheckedUpdateWithoutResolvedThreadsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutResolvedThreadsInput, Prisma.EmployeeUncheckedCreateWithoutResolvedThreadsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutResolvedThreadsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutResolvedThreadsInput, Prisma.EmployeeUncheckedUpdateWithoutResolvedThreadsInput>
+}
+
+export type EmployeeUpdateWithoutResolvedThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutResolvedThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type EmployeeUpsertWithoutThreadsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutThreadsInput, Prisma.EmployeeUncheckedUpdateWithoutThreadsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutThreadsInput, Prisma.EmployeeUncheckedCreateWithoutThreadsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutThreadsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutThreadsInput, Prisma.EmployeeUncheckedUpdateWithoutThreadsInput>
+}
+
+export type EmployeeUpdateWithoutThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
+}
+
+export type EmployeeCreateWithoutCommentsInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
+}
+
+export type EmployeeUncheckedCreateWithoutCommentsInput = {
+  id: string
+  role: $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
+}
+
+export type EmployeeCreateOrConnectWithoutCommentsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutCommentsInput, Prisma.EmployeeUncheckedCreateWithoutCommentsInput>
+}
+
+export type EmployeeUpsertWithoutCommentsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutCommentsInput, Prisma.EmployeeUncheckedUpdateWithoutCommentsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutCommentsInput, Prisma.EmployeeUncheckedCreateWithoutCommentsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutCommentsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutCommentsInput, Prisma.EmployeeUncheckedUpdateWithoutCommentsInput>
+}
+
+export type EmployeeUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeCreateWithoutFavoriteInput = {
@@ -445,6 +714,9 @@ export type EmployeeCreateWithoutFavoriteInput = {
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeUncheckedCreateWithoutFavoriteInput = {
@@ -453,6 +725,9 @@ export type EmployeeUncheckedCreateWithoutFavoriteInput = {
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeCreateOrConnectWithoutFavoriteInput = {
@@ -477,6 +752,9 @@ export type EmployeeUpdateWithoutFavoriteInput = {
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
@@ -485,6 +763,9 @@ export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeCreateWithoutActivityInput = {
@@ -493,6 +774,9 @@ export type EmployeeCreateWithoutActivityInput = {
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeUncheckedCreateWithoutActivityInput = {
@@ -501,6 +785,9 @@ export type EmployeeUncheckedCreateWithoutActivityInput = {
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
 }
 
 export type EmployeeCreateOrConnectWithoutActivityInput = {
@@ -525,6 +812,9 @@ export type EmployeeUpdateWithoutActivityInput = {
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutActivityInput = {
@@ -533,6 +823,9 @@ export type EmployeeUncheckedUpdateWithoutActivityInput = {
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
 }
 
 
@@ -545,6 +838,9 @@ export type EmployeeCountOutputType = {
   favorite: number
   checkedOutContent: number
   activity: number
+  threads: number
+  comments: number
+  resolvedThreads: number
 }
 
 export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -552,6 +848,9 @@ export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   favorite?: boolean | EmployeeCountOutputTypeCountFavoriteArgs
   checkedOutContent?: boolean | EmployeeCountOutputTypeCountCheckedOutContentArgs
   activity?: boolean | EmployeeCountOutputTypeCountActivityArgs
+  threads?: boolean | EmployeeCountOutputTypeCountThreadsArgs
+  comments?: boolean | EmployeeCountOutputTypeCountCommentsArgs
+  resolvedThreads?: boolean | EmployeeCountOutputTypeCountResolvedThreadsArgs
 }
 
 /**
@@ -592,6 +891,27 @@ export type EmployeeCountOutputTypeCountActivityArgs<ExtArgs extends runtime.Typ
   where?: Prisma.UserActivityWhereInput
 }
 
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountThreadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContentTalkThreadWhereInput
+}
+
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TalkThreadCommentWhereInput
+}
+
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountResolvedThreadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContentTalkThreadWhereInput
+}
+
 
 export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -600,6 +920,9 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   favorite?: boolean | Prisma.Employee$favoriteArgs<ExtArgs>
   checkedOutContent?: boolean | Prisma.Employee$checkedOutContentArgs<ExtArgs>
   activity?: boolean | Prisma.Employee$activityArgs<ExtArgs>
+  threads?: boolean | Prisma.Employee$threadsArgs<ExtArgs>
+  comments?: boolean | Prisma.Employee$commentsArgs<ExtArgs>
+  resolvedThreads?: boolean | Prisma.Employee$resolvedThreadsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -624,6 +947,9 @@ export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   favorite?: boolean | Prisma.Employee$favoriteArgs<ExtArgs>
   checkedOutContent?: boolean | Prisma.Employee$checkedOutContentArgs<ExtArgs>
   activity?: boolean | Prisma.Employee$activityArgs<ExtArgs>
+  threads?: boolean | Prisma.Employee$threadsArgs<ExtArgs>
+  comments?: boolean | Prisma.Employee$commentsArgs<ExtArgs>
+  resolvedThreads?: boolean | Prisma.Employee$resolvedThreadsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -636,6 +962,9 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     favorite: Prisma.$FavoriteContentPayload<ExtArgs>[]
     checkedOutContent: Prisma.$ContentPayload<ExtArgs>[]
     activity: Prisma.$UserActivityPayload<ExtArgs>[]
+    threads: Prisma.$ContentTalkThreadPayload<ExtArgs>[]
+    comments: Prisma.$TalkThreadCommentPayload<ExtArgs>[]
+    resolvedThreads: Prisma.$ContentTalkThreadPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1038,6 +1367,9 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
   favorite<T extends Prisma.Employee$favoriteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$favoriteArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   checkedOutContent<T extends Prisma.Employee$checkedOutContentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$checkedOutContentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   activity<T extends Prisma.Employee$activityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$activityArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  threads<T extends Prisma.Employee$threadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$threadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTalkThreadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  comments<T extends Prisma.Employee$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TalkThreadCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  resolvedThreads<T extends Prisma.Employee$resolvedThreadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$resolvedThreadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTalkThreadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1555,6 +1887,78 @@ export type Employee$activityArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.UserActivityScalarFieldEnum | Prisma.UserActivityScalarFieldEnum[]
+}
+
+/**
+ * Employee.threads
+ */
+export type Employee$threadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContentTalkThread
+   */
+  select?: Prisma.ContentTalkThreadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContentTalkThread
+   */
+  omit?: Prisma.ContentTalkThreadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentTalkThreadInclude<ExtArgs> | null
+  where?: Prisma.ContentTalkThreadWhereInput
+  orderBy?: Prisma.ContentTalkThreadOrderByWithRelationInput | Prisma.ContentTalkThreadOrderByWithRelationInput[]
+  cursor?: Prisma.ContentTalkThreadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContentTalkThreadScalarFieldEnum | Prisma.ContentTalkThreadScalarFieldEnum[]
+}
+
+/**
+ * Employee.comments
+ */
+export type Employee$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TalkThreadComment
+   */
+  select?: Prisma.TalkThreadCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TalkThreadComment
+   */
+  omit?: Prisma.TalkThreadCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TalkThreadCommentInclude<ExtArgs> | null
+  where?: Prisma.TalkThreadCommentWhereInput
+  orderBy?: Prisma.TalkThreadCommentOrderByWithRelationInput | Prisma.TalkThreadCommentOrderByWithRelationInput[]
+  cursor?: Prisma.TalkThreadCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TalkThreadCommentScalarFieldEnum | Prisma.TalkThreadCommentScalarFieldEnum[]
+}
+
+/**
+ * Employee.resolvedThreads
+ */
+export type Employee$resolvedThreadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContentTalkThread
+   */
+  select?: Prisma.ContentTalkThreadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContentTalkThread
+   */
+  omit?: Prisma.ContentTalkThreadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentTalkThreadInclude<ExtArgs> | null
+  where?: Prisma.ContentTalkThreadWhereInput
+  orderBy?: Prisma.ContentTalkThreadOrderByWithRelationInput | Prisma.ContentTalkThreadOrderByWithRelationInput[]
+  cursor?: Prisma.ContentTalkThreadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContentTalkThreadScalarFieldEnum | Prisma.ContentTalkThreadScalarFieldEnum[]
 }
 
 /**

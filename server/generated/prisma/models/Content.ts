@@ -250,6 +250,7 @@ export type ContentWhereInput = {
   tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
   checkedOutBy?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
+  threads?: Prisma.ContentTalkThreadListRelationFilter
 }
 
 export type ContentOrderByWithRelationInput = {
@@ -270,6 +271,7 @@ export type ContentOrderByWithRelationInput = {
   tags?: Prisma.ContentTagOrderByRelationAggregateInput
   favoritedBy?: Prisma.FavoriteContentOrderByRelationAggregateInput
   checkedOutBy?: Prisma.EmployeeOrderByWithRelationInput
+  threads?: Prisma.ContentTalkThreadOrderByRelationAggregateInput
 }
 
 export type ContentWhereUniqueInput = Prisma.AtLeast<{
@@ -293,6 +295,7 @@ export type ContentWhereUniqueInput = Prisma.AtLeast<{
   tags?: Prisma.ContentTagListRelationFilter
   favoritedBy?: Prisma.FavoriteContentListRelationFilter
   checkedOutBy?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
+  threads?: Prisma.ContentTalkThreadListRelationFilter
 }, "id">
 
 export type ContentOrderByWithAggregationInput = {
@@ -349,6 +352,7 @@ export type ContentCreateInput = {
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateInput = {
@@ -367,6 +371,7 @@ export type ContentUncheckedCreateInput = {
   checkedOutById?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentUpdateInput = {
@@ -385,6 +390,7 @@ export type ContentUpdateInput = {
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateInput = {
@@ -403,6 +409,7 @@ export type ContentUncheckedUpdateInput = {
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyInput = {
@@ -614,6 +621,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type ContentCreateNestedOneWithoutThreadsInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutThreadsInput, Prisma.ContentUncheckedCreateWithoutThreadsInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutThreadsInput
+  connect?: Prisma.ContentWhereUniqueInput
+}
+
+export type ContentUpdateOneRequiredWithoutThreadsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutThreadsInput, Prisma.ContentUncheckedCreateWithoutThreadsInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutThreadsInput
+  upsert?: Prisma.ContentUpsertWithoutThreadsInput
+  connect?: Prisma.ContentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutThreadsInput, Prisma.ContentUpdateWithoutThreadsInput>, Prisma.ContentUncheckedUpdateWithoutThreadsInput>
+}
+
 export type ContentCreateNestedOneWithoutTagsInput = {
   create?: Prisma.XOR<Prisma.ContentCreateWithoutTagsInput, Prisma.ContentUncheckedCreateWithoutTagsInput>
   connectOrCreate?: Prisma.ContentCreateOrConnectWithoutTagsInput
@@ -657,6 +678,7 @@ export type ContentCreateWithoutOwnerInput = {
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutOwnerInput = {
@@ -674,6 +696,7 @@ export type ContentUncheckedCreateWithoutOwnerInput = {
   checkedOutById?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutOwnerInput = {
@@ -701,6 +724,7 @@ export type ContentCreateWithoutCheckedOutByInput = {
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutCheckedOutByInput = {
@@ -718,6 +742,7 @@ export type ContentUncheckedCreateWithoutCheckedOutByInput = {
   ownerId: string
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutCheckedOutByInput = {
@@ -781,6 +806,94 @@ export type ContentUpdateManyWithWhereWithoutCheckedOutByInput = {
   data: Prisma.XOR<Prisma.ContentUpdateManyMutationInput, Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByInput>
 }
 
+export type ContentCreateWithoutThreadsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
+  checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+}
+
+export type ContentUncheckedCreateWithoutThreadsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  ownerId: string
+  checkedOutById?: string | null
+  tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+}
+
+export type ContentCreateOrConnectWithoutThreadsInput = {
+  where: Prisma.ContentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentCreateWithoutThreadsInput, Prisma.ContentUncheckedCreateWithoutThreadsInput>
+}
+
+export type ContentUpsertWithoutThreadsInput = {
+  update: Prisma.XOR<Prisma.ContentUpdateWithoutThreadsInput, Prisma.ContentUncheckedUpdateWithoutThreadsInput>
+  create: Prisma.XOR<Prisma.ContentCreateWithoutThreadsInput, Prisma.ContentUncheckedCreateWithoutThreadsInput>
+  where?: Prisma.ContentWhereInput
+}
+
+export type ContentUpdateToOneWithWhereWithoutThreadsInput = {
+  where?: Prisma.ContentWhereInput
+  data: Prisma.XOR<Prisma.ContentUpdateWithoutThreadsInput, Prisma.ContentUncheckedUpdateWithoutThreadsInput>
+}
+
+export type ContentUpdateWithoutThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
+  checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+}
+
+export type ContentUncheckedUpdateWithoutThreadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+}
+
 export type ContentCreateWithoutTagsInput = {
   id?: string
   title: string
@@ -796,6 +909,7 @@ export type ContentCreateWithoutTagsInput = {
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutTagsInput = {
@@ -813,6 +927,7 @@ export type ContentUncheckedCreateWithoutTagsInput = {
   ownerId: string
   checkedOutById?: string | null
   favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutTagsInput = {
@@ -846,6 +961,7 @@ export type ContentUpdateWithoutTagsInput = {
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutTagsInput = {
@@ -863,6 +979,7 @@ export type ContentUncheckedUpdateWithoutTagsInput = {
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateWithoutFavoritedByInput = {
@@ -880,6 +997,7 @@ export type ContentCreateWithoutFavoritedByInput = {
   owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
   tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
   checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutFavoritedByInput = {
@@ -897,6 +1015,7 @@ export type ContentUncheckedCreateWithoutFavoritedByInput = {
   ownerId: string
   checkedOutById?: string | null
   tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutFavoritedByInput = {
@@ -930,6 +1049,7 @@ export type ContentUpdateWithoutFavoritedByInput = {
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutFavoritedByInput = {
@@ -947,6 +1067,7 @@ export type ContentUncheckedUpdateWithoutFavoritedByInput = {
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyOwnerInput = {
@@ -994,6 +1115,7 @@ export type ContentUpdateWithoutOwnerInput = {
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
   checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutOwnerInput = {
@@ -1011,6 +1133,7 @@ export type ContentUncheckedUpdateWithoutOwnerInput = {
   checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutOwnerInput = {
@@ -1043,6 +1166,7 @@ export type ContentUpdateWithoutCheckedOutByInput = {
   owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
   tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutCheckedOutByInput = {
@@ -1060,6 +1184,7 @@ export type ContentUncheckedUpdateWithoutCheckedOutByInput = {
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
   favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutCheckedOutByInput = {
@@ -1085,11 +1210,13 @@ export type ContentUncheckedUpdateManyWithoutCheckedOutByInput = {
 export type ContentCountOutputType = {
   tags: number
   favoritedBy: number
+  threads: number
 }
 
 export type ContentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | ContentCountOutputTypeCountTagsArgs
   favoritedBy?: boolean | ContentCountOutputTypeCountFavoritedByArgs
+  threads?: boolean | ContentCountOutputTypeCountThreadsArgs
 }
 
 /**
@@ -1116,6 +1243,13 @@ export type ContentCountOutputTypeCountFavoritedByArgs<ExtArgs extends runtime.T
   where?: Prisma.FavoriteContentWhereInput
 }
 
+/**
+ * ContentCountOutputType without action
+ */
+export type ContentCountOutputTypeCountThreadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContentTalkThreadWhereInput
+}
+
 
 export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1135,6 +1269,7 @@ export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
   favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   checkedOutBy?: boolean | Prisma.Content$checkedOutByArgs<ExtArgs>
+  threads?: boolean | Prisma.Content$threadsArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
 
@@ -1196,6 +1331,7 @@ export type ContentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   tags?: boolean | Prisma.Content$tagsArgs<ExtArgs>
   favoritedBy?: boolean | Prisma.Content$favoritedByArgs<ExtArgs>
   checkedOutBy?: boolean | Prisma.Content$checkedOutByArgs<ExtArgs>
+  threads?: boolean | Prisma.Content$threadsArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1214,6 +1350,7 @@ export type $ContentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     tags: Prisma.$ContentTagPayload<ExtArgs>[]
     favoritedBy: Prisma.$FavoriteContentPayload<ExtArgs>[]
     checkedOutBy: Prisma.$EmployeePayload<ExtArgs> | null
+    threads: Prisma.$ContentTalkThreadPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1633,6 +1770,7 @@ export interface Prisma__ContentClient<T, Null = never, ExtArgs extends runtime.
   tags<T extends Prisma.Content$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   favoritedBy<T extends Prisma.Content$favoritedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$favoritedByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoriteContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   checkedOutBy<T extends Prisma.Content$checkedOutByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$checkedOutByArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  threads<T extends Prisma.Content$threadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$threadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTalkThreadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2140,6 +2278,30 @@ export type Content$checkedOutByArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.EmployeeInclude<ExtArgs> | null
   where?: Prisma.EmployeeWhereInput
+}
+
+/**
+ * Content.threads
+ */
+export type Content$threadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContentTalkThread
+   */
+  select?: Prisma.ContentTalkThreadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContentTalkThread
+   */
+  omit?: Prisma.ContentTalkThreadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContentTalkThreadInclude<ExtArgs> | null
+  where?: Prisma.ContentTalkThreadWhereInput
+  orderBy?: Prisma.ContentTalkThreadOrderByWithRelationInput | Prisma.ContentTalkThreadOrderByWithRelationInput[]
+  cursor?: Prisma.ContentTalkThreadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContentTalkThreadScalarFieldEnum | Prisma.ContentTalkThreadScalarFieldEnum[]
 }
 
 /**

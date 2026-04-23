@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
 })
 
-export function AnalyticsDashboard() {
+function AnalyticsDashboard() {
 	const { data: fileStats } = useQuery(trpc.content.getFileStats.queryOptions())
 
 	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions())
@@ -280,7 +280,7 @@ export function AnalyticsDashboard() {
 							rectRadius={20}
 							gap={5}
 							getTooltipLabel={({ date, value }) =>
-								`${dayjs(date).format("DD MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
+								`${dayjs(date).format("D MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
 							}
 						/>
 					</Paper>

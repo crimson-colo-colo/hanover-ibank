@@ -79,11 +79,13 @@ export const authProcedure = publicProcedure.use(async (opts) => {
 		roundingIncrement: 24,
 	})
 
-	// FIXME: fix this awful way to handle concurrent upserts
-	try {
-		await logActivity(auth, nowTruncated, opts, day, hour)
-	} catch {
-		await logActivity(auth, nowTruncated, opts, day, hour)
+	if (!opts.path.includes("getAvatarUrl")) {
+		// FIXME: fix this awful way to handle concurrent upserts
+		try {
+			await logActivity(auth, nowTruncated, opts, day, hour)
+		} catch {
+			await logActivity(auth, nowTruncated, opts, day, hour)
+		}
 	}
 
 	return opts.next({
