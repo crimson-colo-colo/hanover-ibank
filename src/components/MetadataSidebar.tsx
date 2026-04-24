@@ -131,6 +131,8 @@ export function MetadataSidebar({
 
 	const canEdit =
 		!isCheckedOutByOther && (isIntendedAudience || profile?.role === EmployeeRole.Admin)
+	const canTransferOwnership =
+		content.owner.id === profile?.id || profile?.role === EmployeeRole.Admin
 	const canCheckOut =
 		!content.checkedOutBy && (isIntendedAudience || profile?.role === EmployeeRole.Admin)
 	const canCheckIn =
@@ -303,6 +305,7 @@ export function MetadataSidebar({
 								<ActionIcon
 									className="metadata-edit"
 									variant="subtle"
+									disabled={!canTransferOwnership}
 									onClick={() => setEditingField("owner")}
 								>
 									<IconPencil />
