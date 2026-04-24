@@ -32,6 +32,7 @@ model Employee {
     threads           ContentTalkThread[] @relation("ThreadCreatedBy")
     comments          TalkThreadComment[] @relation("CommentAuthor")
     resolvedThreads   ContentTalkThread[]
+    pushSubscriptions PushSubscription[]
 }
 
 model Content {
@@ -145,4 +146,12 @@ model UserActivity {
     hour       DateTime // datetime truncated to the UTC hour it was created in
 
     @@id([timestamp, employeeId, path])
+}
+
+model PushSubscription {
+    endpoint   String   @id
+    p256dh     String
+    auth       String
+    employeeId String
+    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }

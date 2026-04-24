@@ -81,3 +81,8 @@ export type FavoriteContent = Prisma.FavoriteContentModel
  * 
  */
 export type UserActivity = Prisma.UserActivityModel
+/**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel
