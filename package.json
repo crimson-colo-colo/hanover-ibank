@@ -20,7 +20,7 @@
 		"db:stop": "docker compose -p cs3733 down",
 		"db:migrate": "dotenvx run -qf .env.development -- prisma migrate",
 		"db:seed": "NODE_ENV=development bun db:stop && (docker volume rm cs3733_minio_data cs3733_db_data || true) && bun db:start && bun ./scripts/sleep.ts && bun db:migrate deploy && bun ./prisma/seed.ts",
-		"cli": "API_URL='http://localhost:3000' bun run cli/cli.ts"
+		"cli": "bun run cli/cli.ts"
 	},
 	"dependencies": {
 		"@auth0/auth0-api-js": "^1.5.0",
@@ -48,6 +48,7 @@
 		"sharp": "^0.34.5",
 		"superjson": "^2.2.6",
 		"uuid": "^13.0.0",
+		"web-push": "^3.6.7",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
@@ -94,6 +95,7 @@
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"@types/uuid": "^11.0.0",
+		"@types/web-push": "^3.6.4",
 		"@vitejs/plugin-react": "^6.0.1",
 		"babel-plugin-react-compiler": "^1.0.0",
 		"clsx": "^2.1.1",
@@ -102,6 +104,7 @@
 		"docx": "^9.6.1",
 		"docx-preview": "^0.3.7",
 		"exceljs": "^4.4.0",
+		"idb-keyval": "^6.2.2",
 		"jsdom": "^29.0.2",
 		"lucide-react": "^1.8.0",
 		"pdfjs-dist": "5.4.296",

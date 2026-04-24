@@ -1,6 +1,7 @@
 import { Cli } from "clipanion"
 import { ContentCommand } from "./commands/content.ts"
-import { CreateUsersCommand, UsersCommand } from "./commands/users.ts"
+import { ListPushSubscriptionsCommand, SendPushCommand } from "./commands/push.ts"
+import { UsersCommand } from "./commands/users.ts"
 
 const [node, app, ...args] = process.argv
 
@@ -11,6 +12,7 @@ const cli = new Cli({
 })
 
 cli.register(UsersCommand)
-cli.register(CreateUsersCommand)
 cli.register(ContentCommand)
+cli.register(ListPushSubscriptionsCommand)
+cli.register(SendPushCommand)
 cli.runExit(args)

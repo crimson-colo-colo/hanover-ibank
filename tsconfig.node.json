@@ -2,6 +2,7 @@
 	"include": [
 		"vite.config.ts",
 		"server/**/*.ts",
+		"cli/**/*.ts",
 		"prisma/**/*.ts",
 		"shared/**/*.ts",
 		"scripts/**/*.ts"
