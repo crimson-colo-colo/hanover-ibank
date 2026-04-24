@@ -138,8 +138,6 @@ function TeamCard({ name, role, photo, alt }: TeamMember) {
 }
 
 function AboutPage() {
-	const { auth0 } = Route.useRouteContext()
-
 	return (
 		<main>
 			<header className="w-full p-4 text-white rounded-lg bg-primary">
@@ -150,7 +148,7 @@ function AboutPage() {
 			</header>
 
 			{rows.map((row, rowIndex) => (
-				<Grid mt="md" gap="md" key={rowIndex}>
+				<Grid mt="md" gap="md" key={row[0].name}>
 					{row.map((member) => (
 						<Grid.Col span={12 / row.length} key={member.name}>
 							<TeamCard {...member} />
