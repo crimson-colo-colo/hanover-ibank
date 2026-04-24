@@ -237,7 +237,6 @@ export function ContentTable({
 											arrowSize={8}
 											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
 										>
-											link
 											<IconPencilOff className="checked-out-icon" size={24} />
 										</Tooltip>
 									))}
