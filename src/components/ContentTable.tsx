@@ -3,6 +3,7 @@ import {
 	Anchor,
 	Button,
 	Checkbox,
+	Chip,
 	Flex,
 	Group,
 	HoverCard,
@@ -36,8 +37,11 @@ import {
 	IconDoorExit,
 	IconDotsVertical,
 	IconDownload,
+	IconEye,
+	IconHourglassEmpty,
 	IconLoader2,
 	IconMessageCircleUser,
+	IconPencil,
 	IconPencilCheck,
 	IconPencilOff,
 	IconProgress,
@@ -69,6 +73,7 @@ import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
 import { formatBytes } from "@/lib/content.ts"
 import {
+	type ContentViews,
 	contentStatusDisplayName,
 	employeeRoleDisplayName,
 	tagCategoryDisplayName,
@@ -96,12 +101,14 @@ export function ContentTable({
 	openFilePreview,
 	filter,
 	changeFilter,
+	view,
 }: {
 	loading: boolean
 	data: ContentList
 	openFilePreview: (item: ContentListItem, type: FileType) => void
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
+	view: ContentViews
 }) {
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
@@ -476,6 +483,8 @@ export function ContentTable({
 		pageSize: 10, //default page size
 	})
 
+	const [activeView, setActiveView] = useState<typeof view>(view)
+
 	const table = useReactTable<ContentListItem>({
 		data: data.content,
 		columns: columns,
@@ -588,6 +597,93 @@ export function ContentTable({
 					/>
 				</Flex>
 			</Flex>
+			<Chip.Group value={activeView} onChange={setActiveView}>
+				<Group justify="left">
+					<Chip
+						icon={null}
+						value="default"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						Default
+					</Chip>
+					<Chip
+						icon={null}
+						value="expiringSoon"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconHourglassEmpty size="1rem" />
+							Expiring Soon
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="recentlyViewed"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconEye size="1rem" />
+							Recently Viewed
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="recentlyEdited"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconPencil size="1rem" />
+							Recently Edited
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="checkedOut"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconDoorExit size="1rem" />
+							Checked Out
+						</Group>
+					</Chip>
+				</Group>
+			</Chip.Group>
+			<br />
 			<Table>
 				<Table.Thead>
 					{table.getHeaderGroups().map((headerGroup) => (

@@ -16,6 +16,7 @@ import { Route as AdminManageUsersRouteImport } from './routes/admin.manage-user
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedContentTableRouteImport } from './routes/_authenticated.content-table'
 import { Route as AuthenticatedPreviewContentIdRouteImport } from './routes/_authenticated.preview.$contentId'
 
 const AdminRoute = AdminRouteImport.update({
@@ -52,6 +53,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedContentTableRoute =
+  AuthenticatedContentTableRouteImport.update({
+    id: '/content-table',
+    path: '/content-table',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPreviewContentIdRoute =
   AuthenticatedPreviewContentIdRouteImport.update({
     id: '/preview/$contentId',
@@ -62,6 +69,7 @@ const AuthenticatedPreviewContentIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/content-table': typeof AuthenticatedContentTableRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -71,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/content-table': typeof AuthenticatedContentTableRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -82,6 +91,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/_authenticated/content-table': typeof AuthenticatedContentTableRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -93,6 +103,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/content-table'
     | '/dashboard'
     | '/profile'
     | '/admin/analytics'
@@ -102,6 +113,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/content-table'
     | '/dashboard'
     | '/profile'
     | '/admin/analytics'
@@ -112,6 +124,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/admin'
+    | '/_authenticated/content-table'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/admin/analytics'
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/content-table': {
+      id: '/_authenticated/content-table'
+      path: '/content-table'
+      fullPath: '/content-table'
+      preLoaderRoute: typeof AuthenticatedContentTableRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/preview/$contentId': {
       id: '/_authenticated/preview/$contentId'
       path: '/preview/$contentId'
@@ -187,12 +207,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedContentTableRoute: typeof AuthenticatedContentTableRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedPreviewContentIdRoute: typeof AuthenticatedPreviewContentIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedContentTableRoute: AuthenticatedContentTableRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedPreviewContentIdRoute: AuthenticatedPreviewContentIdRoute,
