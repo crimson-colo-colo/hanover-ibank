@@ -12,6 +12,8 @@ export function EditableTextField({
 	setEditingField,
 	onFieldEdit,
 	ref,
+	ableToEdit,
+	disabledTooltip
 }: {
 	enabled: boolean
 	value: string
@@ -20,6 +22,8 @@ export function EditableTextField({
 	setEditingField: (field: EditableField | null) => void
 	onFieldEdit: (field: EditableField, value: string) => void
 	ref: React.RefObject<HTMLInputElement | null>
+	ableToEdit: boolean
+	disabledTooltip: boolean
 }) {
 	const contentRef = useRef<HTMLElement>(null)
 	const [truncated, setTruncated] = useState(false)
@@ -36,14 +40,17 @@ export function EditableTextField({
 					{value}
 				</span>
 			</Tooltip>
-			<ActionIcon
+			{ableToEdit && (
+				<Tooltip label="Please check out this content in order to edit it" withArrow arrowSize={8} disabled={disabledTooltip}>
+					<ActionIcon
 				className="metadata-edit"
 				variant="subtle"
 				onClick={() => setEditingField(field)}
 				disabled={!enabled}
 			>
-				<IconPencil />
+				<IconPencil/>
 			</ActionIcon>
+				</Tooltip>)}
 		</>
 	) : (
 		<input

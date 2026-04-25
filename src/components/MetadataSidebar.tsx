@@ -10,6 +10,7 @@ import {
 	Stack,
 	Text,
 	Title,
+	Tooltip
 } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useForm } from "@mantine/form"
@@ -34,6 +35,7 @@ import {
 	IconTag,
 	IconTrash,
 	IconUser,
+	IconUserShare,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
@@ -44,7 +46,7 @@ import { EditableTextField } from "@/components/EditableTextField.tsx"
 import { contentStatusDisplayName } from "@/lib/enums.ts"
 import { stringifyTagList, unstringifyTagList } from "@/lib/tags.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentListItem } from "../../shared/types.ts"
+import type { ContentListItem } from "@shared/types.ts"
 
 export type EditableField =
 	| "title"
@@ -122,6 +124,8 @@ export function MetadataSidebar({
 		})
 	)
 
+	const [pendingOwner, setPendingOwner] = useState<{ id: string; name: string } | null>(null)
+
 	const isIntendedAudience =
 		content.tags.some((tag) => tag.category === TagCategory.IntendedAudience) &&
 		content.tags.some(
@@ -129,8 +133,10 @@ export function MetadataSidebar({
 		)
 	const isCheckedOutByOther = content.checkedOutBy && content.checkedOutBy.id !== profile?.id
 
-	const canEdit =
+	const ableToEdit =
 		!isCheckedOutByOther && (isIntendedAudience || profile?.role === EmployeeRole.Admin)
+	const isCheckedOut = content.checkedOutBy !== null
+	const canEdit = ableToEdit && isCheckedOut
 	const canTransferOwnership =
 		content.owner.id === profile?.id || profile?.role === EmployeeRole.Admin
 	const canCheckOut =
@@ -144,8 +150,9 @@ export function MetadataSidebar({
 		content.type !== "Link" &&
 		(content.checkedOutBy?.id === profile?.id ||
 			(content.checkedOutBy?.id && profile?.role === EmployeeRole.Admin))
-	const canDelete =
+	const ableToDelete =
 		profile?.role === EmployeeRole.Admin || (!isCheckedOutByOther && isIntendedAudience)
+	const canDelete = ableToDelete && isCheckedOut
 
 	const [confirmCheckoutOpen, { open: openConfirmCheckout, close: closeConfirmCheckout }] =
 		useDisclosure(false)
@@ -154,6 +161,8 @@ export function MetadataSidebar({
 	const [confirmDeleteOpen, { open: openConfirmDelete, close: closeConfirmDelete }] =
 		useDisclosure(false)
 	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
+		useDisclosure(false)
+	const [confirmOwnerOpen, { open: openConfirmOwner, close: closeConfirmOwner }] =
 		useDisclosure(false)
 
 	const titleRef = useRef<HTMLInputElement>(null)
@@ -222,7 +231,7 @@ export function MetadataSidebar({
 							p={0}
 							m={0}
 							className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
-							data-enabled={canEdit}
+							data-enabled={ableToEdit}
 						>
 							<EditableTextField
 								enabled={canEdit}
@@ -232,13 +241,15 @@ export function MetadataSidebar({
 								setEditingField={setEditingField}
 								onFieldEdit={onFieldEdit}
 								ref={titleRef}
+								ableToEdit={ableToEdit}
+								disabledTooltip={canEdit}
 							/>
 						</Title>
 
 						<ActionIcon
 							variant="transparent"
 							loading={favoriteContent.isPending || unfavoriteContent.isPending}
-							onClick={async (e) => {
+							onClick={async () => {
 								if (content.favorited) {
 									await unfavoriteContent.mutateAsync({ id: content.id })
 								} else {
@@ -286,10 +297,9 @@ export function MetadataSidebar({
 				)}
 				<Popover
 					shadow="md"
-					data-enabled={canEdit}
 					opened={editingField === "owner"}
 					onDismiss={() => {
-						onFieldEdit("owner", form.getValues().ownerId)
+						setEditingField(null)
 					}}
 					closeOnClickOutside
 					withArrow
@@ -302,19 +312,29 @@ export function MetadataSidebar({
 							</div>
 							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
 								<span>{content.owner.name}</span>
-								<ActionIcon
-									className="metadata-edit"
-									variant="subtle"
-									disabled={!canTransferOwnership}
-									onClick={() => setEditingField("owner")}
-								>
-									<IconPencil />
-								</ActionIcon>
+								{ableToEdit && <CannotEditToolTip disabled={canEdit}>
+										<ActionIcon
+											className="metadata-edit"
+											variant="subtle"
+											disabled={!canTransferOwnership || !canEdit}
+											onClick={() => setEditingField("owner")}
+										>
+											<IconPencil />
+										</ActionIcon>
+								</CannotEditToolTip>}
 							</div>
 						</div>
 					</Popover.Target>
 					<Popover.Dropdown w="300px">
-						<ContentOwnerSelect form={form} initialSearchValue={content.owner.email} />
+						<ContentOwnerSelect
+							form={form}
+							initialSearchValue={content.owner.email}
+							onSelect={(id, name) => {
+								setPendingOwner({ id, name })
+								setEditingField(null)
+								openConfirmOwner()
+							}}
+						/>
 					</Popover.Dropdown>
 				</Popover>
 				<EditableDateField
@@ -325,6 +345,8 @@ export function MetadataSidebar({
 					editingField={editingField}
 					setEditingField={setEditingField}
 					onFieldEdit={onFieldEdit}
+					ableToEdit={ableToEdit}
+					disabledTooltip={canEdit}
 				/>
 				<EditableDateField
 					enabled={canEdit}
@@ -334,6 +356,8 @@ export function MetadataSidebar({
 					editingField={editingField}
 					setEditingField={setEditingField}
 					onFieldEdit={onFieldEdit}
+					ableToEdit={ableToEdit}
+					disabledTooltip={canEdit}
 				/>
 				<Menu
 					opened={editingField === "status"}
@@ -344,7 +368,7 @@ export function MetadataSidebar({
 					<Menu.Target>
 						<div
 							className="flex flex-col @xs:flex-row items-start @xs:items-center @xs:gap-2 text-gray-800 dark:text-gray-300 metadata-field"
-							data-enabled={canEdit}
+							data-enabled={ableToEdit}
 						>
 							<div className="@xs:contents flex items-center gap-2">
 								{contentStatusDisplayName[content.status] === "Incomplete" ? (
@@ -358,14 +382,16 @@ export function MetadataSidebar({
 							</div>
 							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
 								<span>{contentStatusDisplayName[content.status]}</span>
-								<ActionIcon
-									className="metadata-edit"
-									variant="subtle"
-									onClick={() => setEditingField("status")}
-									disabled={!canEdit}
-								>
-									<IconPencil />
-								</ActionIcon>
+								{ableToEdit && <CannotEditToolTip disabled={canEdit}>
+										<ActionIcon
+											className="metadata-edit"
+											variant="subtle"
+											onClick={() => setEditingField("status")}
+											disabled={!canEdit}
+										>
+											<IconPencil />
+										</ActionIcon>
+								</CannotEditToolTip>}
 							</div>
 						</div>
 					</Menu.Target>
@@ -609,6 +635,54 @@ export function MetadataSidebar({
 					</div>
 				</Dropzone>
 			</Modal>
+			<Modal
+				opened={confirmOwnerOpen}
+				onClose={() => {
+					closeConfirmOwner()
+					setPendingOwner(null)
+				}}
+				title="Transfer ownership"
+			>
+				<Text>Are you sure you want to transfer ownership to{" "}
+					<strong>{pendingOwner?.name}</strong>? They will be the new owner of this content.</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={() => {
+							closeConfirmOwner()
+							setPendingOwner(null)
+						}}
+						disabled={updateOwner.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={updateOwner.isPending}
+						onClick={async () => {
+							if (!pendingOwner) return
+							await onFieldEdit("owner", pendingOwner.id)
+							closeConfirmOwner()
+							setPendingOwner(null)
+						}}
+						leftSection={<IconUserShare />}
+					>
+						Transfer ownership
+					</Button>
+				</Flex>
+			</Modal>
 		</>
+	)
+}
+function CannotEditToolTip({
+							   children, disabled
+						   } : {
+	children: React.ReactNode,
+	disabled: boolean
+}) {
+	return (
+		<Tooltip label="Please check out this content in order to edit it" withArrow arrowSize={8} disabled={disabled} >
+			{children}
+		</Tooltip>
 	)
 }
