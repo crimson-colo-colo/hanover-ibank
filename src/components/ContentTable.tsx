@@ -52,6 +52,7 @@ import {
 	IconTrash,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import {
 	createColumnHelper,
 	flexRender,
@@ -483,7 +484,16 @@ export function ContentTable({
 		pageSize: 10, //default page size
 	})
 
-	const [activeView, setActiveView] = useState<typeof view>(view)
+	const [activeView, _setActiveView] = useState<typeof view>(view)
+	const navigate = useNavigate()
+
+	function setActiveView(value: ContentViews) {
+		_setActiveView(value)
+		navigate({
+			from: "/content-table",
+			search: (prev) => ({ ...prev, view: value }),
+		})
+	}
 
 	const table = useReactTable<ContentListItem>({
 		data: data.content,
@@ -597,7 +607,12 @@ export function ContentTable({
 					/>
 				</Flex>
 			</Flex>
-			<Chip.Group value={activeView} onChange={setActiveView}>
+			<Chip.Group
+				value={activeView}
+				onChange={(value) => {
+					setActiveView(value)
+				}}
+			>
 				<Group justify="left">
 					<Chip
 						icon={null}
