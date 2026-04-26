@@ -56,7 +56,8 @@ export const ModelName = {
   Tag: 'Tag',
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
-  UserActivity: 'UserActivity'
+  UserActivity: 'UserActivity',
+  Embedding: 'Embedding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -87,16 +88,16 @@ export const ContentScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  status: 'status',
   type: 'type',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  lastModifiedDate: 'lastModifiedDate',
-  expirationDate: 'expirationDate',
   objectId: 'objectId',
   url: 'url',
   ownerId: 'ownerId',
-  checkedOutById: 'checkedOutById'
+  expirationDate: 'expirationDate',
+  lastModifiedDate: 'lastModifiedDate',
+  status: 'status',
+  createdAt: 'createdAt',
+  checkedOutById: 'checkedOutById',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
@@ -137,6 +138,13 @@ export const UserActivityScalarFieldEnum = {
 } as const
 
 export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[keyof typeof UserActivityScalarFieldEnum]
+
+
+export const EmbeddingScalarFieldEnum = {
+  sourcehash: 'sourcehash'
+} as const
+
+export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
 
 
 export const SortOrder = {

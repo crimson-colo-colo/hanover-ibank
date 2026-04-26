@@ -389,7 +389,8 @@ export const ModelName = {
   Tag: 'Tag',
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
-  UserActivity: 'UserActivity'
+  UserActivity: 'UserActivity',
+  Embedding: 'Embedding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "employee" | "content" | "tag" | "contentTag" | "favoriteContent" | "userActivity"
+    modelProps: "employee" | "content" | "tag" | "contentTag" | "favoriteContent" | "userActivity" | "embedding"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -853,6 +854,64 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Embedding: {
+      payload: Prisma.$EmbeddingPayload<ExtArgs>
+      fields: Prisma.EmbeddingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmbeddingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmbeddingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        findFirst: {
+          args: Prisma.EmbeddingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmbeddingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        findMany: {
+          args: Prisma.EmbeddingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>[]
+        }
+        delete: {
+          args: Prisma.EmbeddingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        update: {
+          args: Prisma.EmbeddingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmbeddingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmbeddingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmbeddingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>[]
+        }
+        aggregate: {
+          args: Prisma.EmbeddingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmbedding>
+        }
+        groupBy: {
+          args: Prisma.EmbeddingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmbeddingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmbeddingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmbeddingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -904,16 +963,16 @@ export const ContentScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  status: 'status',
   type: 'type',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  lastModifiedDate: 'lastModifiedDate',
-  expirationDate: 'expirationDate',
   objectId: 'objectId',
   url: 'url',
   ownerId: 'ownerId',
-  checkedOutById: 'checkedOutById'
+  expirationDate: 'expirationDate',
+  lastModifiedDate: 'lastModifiedDate',
+  status: 'status',
+  createdAt: 'createdAt',
+  checkedOutById: 'checkedOutById',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
@@ -954,6 +1013,13 @@ export const UserActivityScalarFieldEnum = {
 } as const
 
 export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[keyof typeof UserActivityScalarFieldEnum]
+
+
+export const EmbeddingScalarFieldEnum = {
+  sourcehash: 'sourcehash'
+} as const
+
+export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1015,20 +1081,6 @@ export type ListEnumEmployeeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
- * Reference to a field of type 'ContentStatus'
- */
-export type EnumContentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentStatus'>
-    
-
-
-/**
- * Reference to a field of type 'ContentStatus[]'
- */
-export type ListEnumContentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentStatus[]'>
-    
-
-
-/**
  * Reference to a field of type 'ContentType'
  */
 export type EnumContentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentType'>
@@ -1053,6 +1105,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ContentStatus'
+ */
+export type EnumContentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ContentStatus[]'
+ */
+export type ListEnumContentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentStatus[]'>
     
 
 
@@ -1198,6 +1264,7 @@ export type GlobalOmitConfig = {
   contentTag?: Prisma.ContentTagOmit
   favoriteContent?: Prisma.FavoriteContentOmit
   userActivity?: Prisma.UserActivityOmit
+  embedding?: Prisma.EmbeddingOmit
 }
 
 /* Types for Logging */

@@ -47,3 +47,8 @@ export type FavoriteContent = Prisma.FavoriteContentModel
  * 
  */
 export type UserActivity = Prisma.UserActivityModel
+/**
+ * Model Embedding
+ * 
+ */
+export type Embedding = Prisma.EmbeddingModel

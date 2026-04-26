@@ -9,6 +9,7 @@ import { env } from "../env.ts"
 import type { Tag } from "../generated/prisma/client.ts"
 import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
+import { pdfText } from "../lib/pdf-extractor.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
@@ -408,6 +409,12 @@ export const contentRouter = router({
 					filetype: fileType,
 				},
 			})
+			if (fileType === "pdf") {
+				const text = await pdfText(
+					buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
+				)
+				console.log(text)
+			}
 			await db.content.update({
 				where: { id: opts.input.id },
 				data: {

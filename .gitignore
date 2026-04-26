@@ -14,3 +14,4 @@ __unconfig*
 todos.json
 /prisma/seed-data/*.zip
 /prisma/seed-data/generated
+/*.traineddata

@@ -1,108 +1,109 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../server/generated/prisma"
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
 }
 
 datasource db {
-    provider = "postgresql"
-}
-
-enum EmployeeRole {
-    BusinessAnalyst
-    Underwriter
-    Admin
-    ActuarialAnalyst
-    ExlOperations
-    BusinessOperations
+  provider = "postgresql"
 }
 
 model Employee {
-    id                String            @id
-    role              EmployeeRole
-    content           Content[]         @relation("Owner")
-    favorite          FavoriteContent[]
-    checkedOutContent Content[]         @relation("CheckedOutContent")
-    activity          UserActivity[]
+  id                String            @id
+  role              EmployeeRole
+  checkedOutContent Content[]         @relation("CheckedOutContent")
+  content           Content[]         @relation("Owner")
+  favorite          FavoriteContent[]
+  activity          UserActivity[]
 }
 
 model Content {
-    id               String            @id @default(cuid())
-    title            String
-    description      String?
-    status           ContentStatus     @default(Incomplete)
-    type             ContentType
-    createdAt        DateTime          @default(now())
-    updatedAt        DateTime          @updatedAt
-    lastModifiedDate DateTime
-    expirationDate   DateTime
-    /// S3 Object ID
-    objectId         String?
-    /// URL for links
-    url              String?
-    ownerId          String
-    owner            Employee          @relation("Owner", fields: [ownerId], references: [id])
-    tags             ContentTag[]
-    favoritedBy      FavoriteContent[]
-    checkedOutById   String?
-    checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+  id               String            @id @default(cuid())
+  title            String
+  description      String?
+  type             ContentType
+  /// S3 Object ID
+  objectId         String?
+  /// URL for links
+  url              String?
+  ownerId          String
+  expirationDate   DateTime
+  lastModifiedDate DateTime
+  status           ContentStatus     @default(Incomplete)
+  createdAt        DateTime          @default(now())
+  checkedOutById   String?
+  updatedAt        DateTime          @updatedAt
+  checkedOutBy     Employee?         @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+  owner            Employee          @relation("Owner", fields: [ownerId], references: [id])
+  tags             ContentTag[]
+  favoritedBy      FavoriteContent[]
 }
 
 model Tag {
-    name     String
-    category TagCategory
+  name     String
+  category TagCategory
+  contents ContentTag[]
 
-    contents ContentTag[]
-
-    @@id([category, name])
+  @@id([category, name])
 }
 
 model ContentTag {
-    content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
-    contentId   String
-    tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
-    tagCategory TagCategory
-    tagName     String
+  contentId   String
+  tagCategory TagCategory
+  tagName     String
+  content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
 
-    @@id([contentId, tagCategory, tagName])
-}
-
-enum TagCategory {
-    DocumentType // Workflow or Reference
-    IntendedAudience // Underwriter or Business Analyst
-    Custom // Custom tag created by user
+  @@id([contentId, tagCategory, tagName])
 }
 
 model FavoriteContent {
-    content    Content  @relation(fields: [contentId], references: [id])
-    contentId  String
-    employee   Employee @relation(fields: [employeeId], references: [id])
-    employeeId String
+  contentId  String
+  employeeId String
+  content    Content  @relation(fields: [contentId], references: [id])
+  employee   Employee @relation(fields: [employeeId], references: [id])
 
-    @@id([contentId, employeeId])
-}
-
-enum ContentStatus {
-    Incomplete
-    UnderReview
-    Complete
-}
-
-enum ContentType {
-    Object
-    Link
+  @@id([contentId, employeeId])
 }
 
 model UserActivity {
-    timestamp  DateTime
-    // no default timestamp because we want to prefer using the server's time for this. This avoids
-    // the server and db being significantly out of sync even if improbable. This timestamp is also
-    // truncated to the second it was generated and must be manually done
-    employeeId String
-    employee   Employee @relation(fields: [employeeId], references: [id])
-    path       String
-    count      Int      @default(1)
-    day        DateTime // datetime truncated to the UTC day it was created in
-    hour       DateTime // datetime truncated to the UTC hour it was created in
+  timestamp  DateTime
+  employeeId String
+  path       String
+  count      Int      @default(1)
+  day        DateTime
+  hour       DateTime
+  employee   Employee @relation(fields: [employeeId], references: [id])
 
-    @@id([timestamp, employeeId, path])
+  @@id([timestamp, employeeId, path])
+}
+
+model Embedding {
+  sourcehash Int                   @id
+  embedding  Unsupported("vector")
+}
+
+enum EmployeeRole {
+  BusinessAnalyst
+  Underwriter
+  Admin
+  ActuarialAnalyst
+  ExlOperations
+  BusinessOperations
+}
+
+enum TagCategory {
+  DocumentType
+  IntendedAudience
+  Custom
+}
+
+enum ContentStatus {
+  Incomplete
+  UnderReview
+  Complete
+}
+
+enum ContentType {
+  Object
+  Link
 }
