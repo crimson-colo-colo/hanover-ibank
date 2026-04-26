@@ -1,20 +1,85 @@
+// noinspection UnnecessaryLocalVariableJS
+
 import { ContentFilter } from "@shared/enum.ts"
+import { FileType } from "@shared/filetype.ts"
+import type { ContentList, ContentListItem } from "@shared/types.ts"
 import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
 import z from "zod"
-import type { ContentList, ContentListItem } from "../../shared/types.ts"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { Tag } from "../generated/prisma/client.ts"
 import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
+import { embed, search } from "../lib/openrouter.ts"
 import { pdfText } from "../lib/pdf-extractor.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
+import { convertToPDF } from "./preview.ts"
 
-export const contentRouter = router({
+export async function embedPDF(
+	content: Pick<
+		Awaited<ReturnType<typeof db.content.findFirstOrThrow<{ include: { tags: true } }>>>,
+		"id" | "lastModifiedDate" | "title" | "status" | "objectId" | "expirationDate" | "tags"
+	>
+) {
+	const object = await s3.getObject({
+		Bucket: bucketName,
+		Key: content.objectId!,
+	})
+	const buffer = await object.Body?.transformToByteArray()
+	const s3ObjectId = content.objectId
+	const fileTypeUnfiltered = object.Metadata?.filetype
+	const fileType: FileType =
+		fileTypeUnfiltered !== undefined
+			? Object.values(FileType)
+					.map((value) => value.toString())
+					.includes(fileTypeUnfiltered)
+				? (fileTypeUnfiltered as FileType)
+				: "unknown"
+			: "unknown"
+	if (fileType === undefined || s3ObjectId === null || buffer === undefined) return
+	let pdfBuffer: ArrayBuffer | undefined
+	if (fileType === "pdf") {
+		const buf = Buffer.from(buffer)
+		pdfBuffer = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength)
+	} else if (
+		(fileType === "docx" || fileType === "pptx" || fileType === "xlsx") &&
+		typeof s3ObjectId === "string"
+	) {
+		const request = await convertToPDF(s3ObjectId, `file.${fileType}`)
+		const pdf = request.ok && (await request.blob())
+		if (pdf !== false) pdfBuffer = await pdf.arrayBuffer()
+	}
+	let text: string | undefined
+	if (fileType === "plaintext") text = Buffer.from(buffer).toString("utf-8")
+	if (pdfBuffer !== undefined) {
+		text = await pdfText(pdfBuffer)
+	}
+	if (text !== undefined && text.length > 50000) {
+		return text.match(/^.{25000}/) + "..." + text.match(/.{25000}$/)
+	}
+	const formattedText = `title: ${content.title.substring(0, 3000)}
+status: ${content.status}
+expiration date: ${content.expirationDate.toDateString()}
+tags: ${content.tags
+		.map((v) => `${v.tagCategory} - ${v.tagName.substring(0, 500)}`)
+		.join(", ")
+		.substring(0, 5000)}
+---
+${text}`
+	const embedding = await embed(formattedText)
+	await db.content.update({
+		where: { id: content.id },
+		data: {
+			embeddings: { set: [{ hash: embedding.hash }] },
+		},
+	})
+}
+
+const contentRouter = router({
 	list: authProcedure
 		.input(z.object({ filter: z.enum(Object.values(ContentFilter)) }))
 		.query(async (opts): Promise<ContentList> => {
@@ -182,7 +247,9 @@ export const contentRouter = router({
 						},
 					},
 				},
+				include: { tags: true },
 			})
+			await embedPDF(updated)
 			return updated
 		}),
 
@@ -199,7 +266,9 @@ export const contentRouter = router({
 				data: {
 					title: opts.input.title,
 				},
+				include: { tags: true },
 			})
+			await embedPDF(updated)
 			return updated
 		}),
 
@@ -211,13 +280,15 @@ export const contentRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const updated = await db.content.update({
+			const update = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
 					lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
 				},
+				include: { tags: true },
 			})
-			return updated
+			await embedPDF(update)
+			return update
 		}),
 
 	updateExpirationDate: authProcedure
@@ -233,28 +304,36 @@ export const contentRouter = router({
 				data: {
 					expirationDate: isoDateToTimestamp(opts.input.expirationDate),
 				},
+				include: {
+					tags: true,
+				},
 			})
+			await embedPDF(updated)
 			return updated
 		}),
 	updateOwner: authProcedure
 		.input(z.object({ id: z.string(), ownerId: z.string() }))
 		.mutation(async (opts) => {
-			await db.content.update({
+			const content = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
 					ownerId: opts.input.ownerId,
 				},
+				include: { tags: true },
 			})
+			await embedPDF(content)
 		}),
 	updateStatus: authProcedure
 		.input(z.object({ id: z.string(), status: z.enum(Object.values(ContentStatus)) }))
 		.mutation(async (opts) => {
-			await db.content.update({
+			const content = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
 					status: opts.input.status,
 				},
+				include: { tags: true },
 			})
+			await embedPDF(content)
 		}),
 	updateTags: authProcedure
 		.input(
@@ -269,7 +348,7 @@ export const contentRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			await db.content.update({
+			const content = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
 					tags: {
@@ -307,7 +386,11 @@ export const contentRouter = router({
 						},
 					},
 				},
+				include: {
+					tags: true,
+				},
 			})
+			await embedPDF(content)
 		}),
 
 	download: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
@@ -409,12 +492,6 @@ export const contentRouter = router({
 					filetype: fileType,
 				},
 			})
-			if (fileType === "pdf") {
-				const text = await pdfText(
-					buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
-				)
-				console.log(text)
-			}
 			await db.content.update({
 				where: { id: opts.input.id },
 				data: {
@@ -422,7 +499,12 @@ export const contentRouter = router({
 					size: buffer.length,
 					mimeType: fileType,
 				},
+				select: {
+					objectId: true,
+					lastModifiedDate: true,
+				},
 			})
+			await embedPDF(content)
 		}),
 
 	updateLink: authProcedure
@@ -486,13 +568,15 @@ export const contentRouter = router({
 				})
 			}
 
-			await db.content.update({
+			const embedContent = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
 					url: opts.input.url,
 					lastModifiedDate: new Date(),
 				},
+				include: { tags: true },
 			})
+			await embedPDF(embedContent)
 		}),
 
 	delete: authProcedure.input(z.object({ ids: z.array(z.string()) })).mutation(async (opts) => {
@@ -802,6 +886,18 @@ export const contentRouter = router({
 		}
 	}),
 
+	search: authProcedure.input(z.object({ query: z.string() })).query(async (opts) => {
+		const results = await search(opts.input.query)
+		const out = (
+			await Promise.all(
+				results.map(({ id }) => {
+					return db.content.findFirst({ where: { id } })
+				})
+			)
+		).filter((value) => value !== null)
+		return out
+	}),
+
 	getFileStats: authProcedure.query(async (opts) => {
 		const content = await db.content.findMany({
 			where: {
@@ -898,3 +994,4 @@ export const contentRouter = router({
 		}))
 	}),
 })
+export default contentRouter

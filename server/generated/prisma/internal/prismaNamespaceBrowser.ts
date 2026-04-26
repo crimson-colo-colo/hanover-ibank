@@ -141,7 +141,7 @@ export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[k
 
 
 export const EmbeddingScalarFieldEnum = {
-  sourcehash: 'sourcehash'
+  hash: 'hash'
 } as const
 
 export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]

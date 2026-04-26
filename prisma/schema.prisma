@@ -36,6 +36,7 @@ model Content {
   owner            Employee          @relation("Owner", fields: [ownerId], references: [id])
   tags             ContentTag[]
   favoritedBy      FavoriteContent[]
+  embeddings       Embedding[]
 }
 
 model Tag {
@@ -78,8 +79,9 @@ model UserActivity {
 }
 
 model Embedding {
-  sourcehash Int                   @id
-  embedding  Unsupported("vector")
+  hash      Bytes                 @id
+  embedding Unsupported("vector")
+  content  Content[]
 }
 
 enum EmployeeRole {

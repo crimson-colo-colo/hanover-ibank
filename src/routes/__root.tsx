@@ -1,5 +1,5 @@
 import type { Auth0ContextInterface, User } from "@auth0/auth0-react"
-import { AppShell, localStorageColorSchemeManager, MantineProvider } from "@mantine/core"
+import { AppShell, localStorageColorSchemeManager, MantineProvider, Text } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
 import { DevSupport } from "@react-buddy/ide-toolbox"
 import { TanStackDevtools } from "@tanstack/react-devtools"
@@ -30,6 +30,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 	head: () => ({
 		meta: [{ title: "iBank" }],
 	}),
+	errorComponent: ({ error, info }) => {
+		const colorSchemeManager = localStorageColorSchemeManager({
+			key: "mantine-color-scheme",
+		})
+		return (
+			<MantineProvider theme={theme} colorSchemeManager={colorSchemeManager}>
+				<Text>A pretty big error occurred.</Text>
+				<Text>{error.name}</Text>
+				<Text>{error.message}</Text>
+				<Text>{error.stack}</Text>
+				<Text>{info?.componentStack}</Text>
+			</MantineProvider>
+		)
+	},
 })
 
 function RootComponent() {
