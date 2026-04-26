@@ -1,5 +1,6 @@
 import { Cli } from "clipanion"
 import { ContentCommand } from "./commands/content.ts"
+import { SendEmailCommand } from "./commands/email.ts"
 import { ListPushSubscriptionsCommand, SendPushCommand } from "./commands/push.ts"
 import { UsersCommand } from "./commands/users.ts"
 
@@ -15,4 +16,5 @@ cli.register(UsersCommand)
 cli.register(ContentCommand)
 cli.register(ListPushSubscriptionsCommand)
 cli.register(SendPushCommand)
+cli.register(SendEmailCommand)
 cli.runExit(args)
