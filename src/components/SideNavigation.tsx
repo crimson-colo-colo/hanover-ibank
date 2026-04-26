@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Button, Group, Menu, Stack, Text } from "@mantine/core"
+import { Button, Menu, Stack, Text } from "@mantine/core"
 import {
 	IconBolt,
 	IconBuildingBank,
