@@ -74,7 +74,11 @@ export type CheckOutMutationType = UseMutationResult<
 
 type recentlyViewedOutput = RouterOutput["content"]["updateRecentlyViewedTimestamp"]
 type recentlyViewedInput = RouterInput["content"]["updateRecentlyViewedTimestamp"]
-export type recentlyViewedType = UseMutationResult<recentlyViewedOutput, TRPCClientErrorLike<AppRouter>, recentlyViewedInput>
+export type recentlyViewedType = UseMutationResult<
+	recentlyViewedOutput,
+	TRPCClientErrorLike<AppRouter>,
+	recentlyViewedInput
+>
 
 export type Thread = Prisma.ContentTalkThreadGetPayload<{
 	include: {

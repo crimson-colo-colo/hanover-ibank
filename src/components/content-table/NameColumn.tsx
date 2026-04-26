@@ -19,7 +19,7 @@ export function NameColumn({
 	info,
 	openFilePreview,
 	profile,
-	recentlyViewed
+	recentlyViewed,
 }: {
 	info: CellContext<ContentListItem, string>
 	openFilePreview: (item: ContentListItem, type: FileType) => void

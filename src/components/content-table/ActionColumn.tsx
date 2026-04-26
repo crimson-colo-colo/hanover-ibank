@@ -26,13 +26,13 @@ export function ActionColumn({
 	openCheckOutModal,
 	openCheckInModal,
 	profile,
-	recentlyViewed
+	recentlyViewed,
 }: {
 	info: CellContext<ContentListItem, unknown>
 	selectContentForCheckout: Dispatch<SetStateAction<ContentListItem | null>>
 	openCheckOutModal: () => void
 	openCheckInModal: () => void
-	profile: profileType | undefined,
+	profile: profileType | undefined
 	recentlyViewed: recentlyViewedType
 }) {
 	return (

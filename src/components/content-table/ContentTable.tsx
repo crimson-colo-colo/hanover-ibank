@@ -129,7 +129,9 @@ export function ContentTable({
 		null
 	)
 
-	const recentlyViewed = useMutation(trpc.content.updateRecentlyViewedTimestamp.mutationOptions(mutationOptions))
+	const recentlyViewed = useMutation(
+		trpc.content.updateRecentlyViewedTimestamp.mutationOptions(mutationOptions)
+	)
 
 	const defaultColumns = {
 		checkbox: true,
@@ -231,7 +233,12 @@ export function ContentTable({
 				sortingFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => (
-					<NameColumn info={info} openFilePreview={openFilePreview} profile={profile} recentlyViewed={recentlyViewed} />
+					<NameColumn
+						info={info}
+						openFilePreview={openFilePreview}
+						profile={profile}
+						recentlyViewed={recentlyViewed}
+					/>
 				),
 			}),
 			columnHelper.accessor((row) => `${row.owner.name} ${row.owner.email}`, {
@@ -274,25 +281,24 @@ export function ContentTable({
 				header: () => <span className="min-w-max">Last Viewed Date</span>,
 				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
 					const getTime = (row: Row<ContentListItem>) =>
-						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyViewed ?? new Date(0)
+						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)
+							?.recentlyViewed ?? new Date(0)
 
 					return getTime(rowB).getTime() - getTime(rowA).getTime()
 				},
 				cell: (info) => {
-					const time = info.row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyViewed
+					const time = info.row.original.recentTimestamps.find(
+						(entry) => entry.employeeId === profile?.id
+					)?.recentlyViewed
 
 					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
 					if (!time) return new Date("1970-01-01")
 
-					const elapsedTime = formatDistanceToNow(new Date(time), {addSuffix: true}).replace(
+					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
 						/^(in )?about /,
 						"$1"
 					)
-					return (
-						<span title={new Date(time).toLocaleString()}>
-							{elapsedTime}
-						</span>
-					)
+					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
 				},
 			}),
 
@@ -301,25 +307,24 @@ export function ContentTable({
 				header: () => <span className="min-w-max">Last Edited Date</span>,
 				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
 					const getTime = (row: Row<ContentListItem>) =>
-						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyEdited ?? new Date(0)
+						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)
+							?.recentlyEdited ?? new Date(0)
 
 					return getTime(rowB).getTime() - getTime(rowA).getTime()
 				},
 				cell: (info) => {
-					const time = info.row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyEdited
+					const time = info.row.original.recentTimestamps.find(
+						(entry) => entry.employeeId === profile?.id
+					)?.recentlyEdited
 
 					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
 					if (!time) return new Date("1970-01-01")
 
-					const elapsedTime = formatDistanceToNow(new Date(time), {addSuffix: true}).replace(
+					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
 						/^(in )?about /,
 						"$1"
 					)
-					return (
-						<span title={new Date(time).toLocaleString()}>
-							{elapsedTime}
-						</span>
-					)
+					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
 				},
 			}),
 			columnHelper.accessor(
@@ -445,7 +450,7 @@ export function ContentTable({
 			setColumnVisibility({
 				...defaultColumns,
 				recentlyViewed: true,
-				lastModified: false
+				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 		}
@@ -455,7 +460,7 @@ export function ContentTable({
 			setColumnVisibility({
 				...defaultColumns,
 				recentlyEdited: true,
-				lastModified:false
+				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 		}
