@@ -13,6 +13,7 @@ import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 import { discussionRouter } from "./discussion.ts"
+import { logAction } from "../activityLogger.ts"
 
 export const contentRouter = router({
 	discussion: discussionRouter,
@@ -182,6 +183,16 @@ export const contentRouter = router({
 							})),
 						},
 					},
+				},
+			})
+			await logAction({
+				employeeId: opts.ctx.auth.sub,
+				action: "UPDATE_CONTENT",
+				entity: "Content",
+				entityId: updated.id,
+				metadata: {
+					title: opts.input.title,
+					status: opts.input.status,
 				},
 			})
 			return updated
@@ -505,6 +516,16 @@ export const contentRouter = router({
 			}),
 			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
 		])
+		await logAction({
+			employeeId: opts.ctx.auth.sub,
+			action: "DELETE_CONTENT",
+			entity: "Content",
+			entityId: opts.input.ids.join(","),
+			metadata: {
+				ids: opts.input.ids,
+				titles: contents.map((content) => content.title),
+			},
+		})
 	}),
 	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const favorite = await db.favoriteContent.upsert({
@@ -667,6 +688,15 @@ export const contentRouter = router({
 			where: { id: opts.input.id },
 			data: { checkedOutById: user.id },
 		})
+		await logAction({
+			employeeId: opts.ctx.auth.sub,
+			action: "CHECK_OUT_CONTENT",
+			entity: "Content",
+			entityId: updated.id,
+			metadata: {
+				title: content.title,
+			},
+		})
 		return updated
 	}),
 	checkIn: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
@@ -709,6 +739,15 @@ export const contentRouter = router({
 		const updated = await db.content.update({
 			where: { id: opts.input.id },
 			data: { checkedOutById: null },
+		})
+		await logAction({
+			employeeId: opts.ctx.auth.sub,
+			action: "CHECK_IN_CONTENT",
+			entity: "Content",
+			entityId: updated.id,
+			metadata: {
+				title: content.title,
+			},
 		})
 		return updated
 	}),
