@@ -5,8 +5,6 @@ import {
 	Menu,
 	Stack,
 	Text,
-	Collapse,
-	AppShell,
 	Tooltip,
 	NavLink
 } from "@mantine/core"
@@ -44,7 +42,7 @@ const routeLinks = [
 	{pathName: "/admin/analytics", name: "Analytics", icon: IconChartBarPopular, admin: true},
 ]
 
-function AdminLinks({isLoading, isAdmin, collapsed}: {isLoading: boolean, isAdmin: boolean | undefined, collapsed: boolean},) {
+function AdminLinks({isAdmin, collapsed}: {isAdmin: boolean | undefined, collapsed: boolean},) {
 	const location = useLocation()
 
 	const adminNavLinks = routeLinks.filter((link) => link.admin).map((link) => (
@@ -125,7 +123,7 @@ export function SideNavigation({collapsed, toggleCollapsed} : sideNavigationProp
 				<Stack gap={0}>
 					{navLinks}
 				</Stack>
-				{<AdminLinks isLoading={isAdmin.isFetching} isAdmin={isAdmin.data} collapsed={collapsed}></AdminLinks>}
+				{<AdminLinks isAdmin={isAdmin.data} collapsed={collapsed}></AdminLinks>}
 
 			{!collapsed &&
 				<div>

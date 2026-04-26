@@ -20,9 +20,7 @@ import { queryClient } from "@/lib/trpc.ts"
 import { theme } from "@/theme.ts"
 import "../styles.css"
 import clsx from "clsx"
-import {useDisclosure} from "@mantine/hooks";
 import {useState} from "react";
-import type sideNavigationProps from "@/components/SideNavigation.tsx"
 
 interface RouterContext {
 	auth0: Auth0ContextInterface<User>
