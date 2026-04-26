@@ -315,8 +315,7 @@ function CreditsPage() {
 			<header className="w-full p-4 text-white rounded-lg bg-primary">
 				<Title>Technologies</Title>
 				<small className="mb-3 font-semibold tracking-wider text-gray-200 uppercase">
-					All the software tools, software libraries, and frameworks that this application has
-					incorporated.
+					Software tools, software libraries, and frameworks that this application has incorporated.
 				</small>
 			</header>
 			<SimpleGrid cols={{ base: 2, sm: 4 }}>
