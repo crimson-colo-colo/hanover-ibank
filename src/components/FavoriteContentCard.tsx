@@ -1,4 +1,5 @@
-import { ActionIcon, Card, Divider, Flex, Menu, Text, Tooltip } from "@mantine/core"
+import { ActionIcon, Card, Divider, Flex, Image, Menu, Text, Tooltip } from "@mantine/core"
+import { ContentType } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import type { ContentListItem } from "@shared/types.ts"
@@ -10,12 +11,13 @@ import {
 	IconLoader2,
 	IconStarFilled,
 } from "@tabler/icons-react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
+import { Document, Thumbnail } from "react-pdf"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { isTruncated } from "@/lib/isTruncated.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-
 export function FavoriteContentCard({
 	contentId,
 	contentUrl,
@@ -53,6 +55,42 @@ export function FavoriteContentCard({
 			},
 		})
 	)
+	const { data: contentThumbnail, isFetching } = useQuery(
+		trpc.preview.getContentUrl.queryOptions(
+			{ id: item.id },
+			{ enabled: item.type === ContentType.Object }
+		)
+	)
+	const containerRef = useRef<HTMLDivElement>(null)
+	const [thumbWidth, setThumbWidth] = useState<number>(200)
+
+	useEffect(() => {
+		if (containerRef.current) {
+			setThumbWidth(containerRef.current.offsetWidth)
+		}
+	}, [])
+	let thumbnail: React.ReactNode
+
+	if (isFetching) {
+		thumbnail = <IconLoader2 className={clsx("animate-spin", "text-white")} size={40} />
+	} else if (contentType === FileType.Image) {
+		thumbnail = (
+			<Image src={contentThumbnail?.url} alt="thumbnail" className="w-full h-full object-cover" />
+		)
+	} else if (
+		contentType === FileType.Pdf ||
+		contentType === FileType.WordDocument ||
+		contentType === FileType.Excel ||
+		contentType === FileType.Powerpoint
+	) {
+		thumbnail = (
+			<div className="w-full h-full overflow-hidden flex items-center justify-center bg-white">
+				<Document file={contentThumbnail?.url}>
+					<Thumbnail pageNumber={1} width={containerRef.current?.offsetWidth ?? thumbWidth} />
+				</Document>
+			</div>
+		)
+	}
 
 	return (
 		<Card
@@ -135,9 +173,9 @@ export function FavoriteContentCard({
 				</Flex>
 			</Card.Section>
 			<Card.Section className="bg-white dark:bg-gray-950" bdrs="md" mt="xs">
-				<Flex justify="center" align="center" h={120}>
-					<FileTypeIcon fileType={contentType} size={40} strokeWidth={1.5} />
-				</Flex>
+				<div className="w-full" style={{ aspectRatio: "1" }}>
+					{thumbnail}
+				</div>
 			</Card.Section>
 		</Card>
 	)
