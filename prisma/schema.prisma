@@ -157,5 +157,5 @@ model RecentTimestamps {
   contentId      String
   content        Content  @relation(fields: [contentId], references: [id])
 
-  @@id([recentlyEdited, recentlyViewed, employeeId, contentId])
+  @@id([employeeId, contentId])
 }

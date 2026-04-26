@@ -188,7 +188,7 @@ export type RecentTimestampsOrderByWithRelationInput = {
 }
 
 export type RecentTimestampsWhereUniqueInput = Prisma.AtLeast<{
-  recentlyEdited_recentlyViewed_employeeId_contentId?: Prisma.RecentTimestampsRecentlyEditedRecentlyViewedEmployeeIdContentIdCompoundUniqueInput
+  employeeId_contentId?: Prisma.RecentTimestampsEmployeeIdContentIdCompoundUniqueInput
   AND?: Prisma.RecentTimestampsWhereInput | Prisma.RecentTimestampsWhereInput[]
   OR?: Prisma.RecentTimestampsWhereInput[]
   NOT?: Prisma.RecentTimestampsWhereInput | Prisma.RecentTimestampsWhereInput[]
@@ -198,7 +198,7 @@ export type RecentTimestampsWhereUniqueInput = Prisma.AtLeast<{
   contentId?: Prisma.StringFilter<"RecentTimestamps"> | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   content?: Prisma.XOR<Prisma.ContentScalarRelationFilter, Prisma.ContentWhereInput>
-}, "recentlyEdited_recentlyViewed_employeeId_contentId">
+}, "employeeId_contentId">
 
 export type RecentTimestampsOrderByWithAggregationInput = {
   recentlyEdited?: Prisma.SortOrder
@@ -277,9 +277,7 @@ export type RecentTimestampsOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type RecentTimestampsRecentlyEditedRecentlyViewedEmployeeIdContentIdCompoundUniqueInput = {
-  recentlyEdited: Date | string
-  recentlyViewed: Date | string
+export type RecentTimestampsEmployeeIdContentIdCompoundUniqueInput = {
   employeeId: string
   contentId: string
 }

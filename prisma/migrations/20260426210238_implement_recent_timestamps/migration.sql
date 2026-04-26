@@ -5,7 +5,7 @@ CREATE TABLE "RecentTimestamps" (
     "employeeId" TEXT NOT NULL,
     "contentId" TEXT NOT NULL,
 
-    CONSTRAINT "RecentTimestamps_pkey" PRIMARY KEY ("recentlyEdited","recentlyViewed","employeeId","contentId")
+    CONSTRAINT "RecentTimestamps_pkey" PRIMARY KEY ("employeeId","contentId")
 );
 
 -- AddForeignKey
