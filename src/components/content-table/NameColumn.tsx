@@ -1,7 +1,7 @@
 import { Anchor, Tooltip } from "@mantine/core"
 import type { EmployeeRole } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
-import type { ContentListItem } from "@shared/types.ts"
+import type { ContentListItem, recentlyViewedType } from "@shared/types.ts"
 import { IconPencilCheck, IconPencilOff } from "@tabler/icons-react"
 import type { CellContext } from "@tanstack/react-table"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
@@ -19,10 +19,12 @@ export function NameColumn({
 	info,
 	openFilePreview,
 	profile,
+	recentlyViewed
 }: {
 	info: CellContext<ContentListItem, string>
 	openFilePreview: (item: ContentListItem, type: FileType) => void
 	profile: profileType | undefined
+	recentlyViewed: recentlyViewedType
 }) {
 	const item = info.row.original
 	if (item.type === "Link") {
@@ -35,6 +37,7 @@ export function NameColumn({
 					className="font-semibold m-0 truncate min-w-0 max-w-[30ch]"
 					title={item.title}
 					onClick={async () => {
+						await recentlyViewed.mutateAsync({ id: info.row.original.id })
 						openFilePreview(item, FileType.Link)
 					}}
 				>
@@ -70,6 +73,7 @@ export function NameColumn({
 					title={item.title}
 					onClick={async () => {
 						openFilePreview(item, fileType ?? FileType.Unknown)
+						await recentlyViewed.mutateAsync({ id: info.row.original.id })
 					}}
 				>
 					{item.title}

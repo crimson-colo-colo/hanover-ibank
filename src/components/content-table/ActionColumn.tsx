@@ -1,6 +1,6 @@
 import { ActionIcon, Flex, Menu } from "@mantine/core"
 import { ContentType, type EmployeeRole } from "@prisma/browser.ts"
-import type { ContentListItem } from "@shared/types.ts"
+import type { ContentListItem, recentlyViewedType } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconDoorEnter,
@@ -26,12 +26,14 @@ export function ActionColumn({
 	openCheckOutModal,
 	openCheckInModal,
 	profile,
+	recentlyViewed
 }: {
 	info: CellContext<ContentListItem, unknown>
 	selectContentForCheckout: Dispatch<SetStateAction<ContentListItem | null>>
 	openCheckOutModal: () => void
 	openCheckInModal: () => void
-	profile: profileType | undefined
+	profile: profileType | undefined,
+	recentlyViewed: recentlyViewedType
 }) {
 	return (
 		<Flex className="content-actions w-max" gap="2px" justify="flex-end">
@@ -39,9 +41,10 @@ export function ActionColumn({
 				<ActionIcon
 					variant="subtle"
 					size="sm"
-					onClick={() => {
+					onClick={async () => {
 						if (info.row.original.type === ContentType.Link) {
 							window.open(info.row.original.url)
+							await recentlyViewed.mutateAsync({ id: info.row.original.id })
 						}
 					}}
 				>
@@ -56,6 +59,7 @@ export function ActionColumn({
 							id: info.row.original.id,
 						})
 						window.open(url, "_blank", "noopener")
+						await recentlyViewed.mutateAsync({ id: info.row.original.id })
 					}}
 				>
 					<IconDownload />
@@ -77,6 +81,7 @@ export function ActionColumn({
 									id: info.row.original.id,
 								})
 								window.open(url, "_blank", "noopener")
+								await recentlyViewed.mutateAsync({ id: info.row.original.id })
 							}}
 						>
 							Download
@@ -85,10 +90,11 @@ export function ActionColumn({
 						<Menu.Item
 							leftSection={<IconCircleArrowUpRight size={22} />}
 							variant="subtle"
-							onClick={() => {
+							onClick={async () => {
 								if (info.row.original.type === ContentType.Link) {
 									window.open(info.row.original.url)
 								}
+								await recentlyViewed.mutateAsync({ id: info.row.original.id })
 							}}
 						>
 							Open link

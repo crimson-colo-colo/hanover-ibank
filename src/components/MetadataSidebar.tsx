@@ -122,6 +122,8 @@ export function MetadataSidebar({
 		})
 	)
 
+	const recentlyEditedTimestamp = useMutation(trpc.content.updateRecentlyEditedTimestamp.mutationOptions(options))
+
 	const isIntendedAudience =
 		content.tags.some((tag) => tag.category === TagCategory.IntendedAudience) &&
 		content.tags.some(
@@ -193,6 +195,7 @@ export function MetadataSidebar({
 		} else if (field === "tags") {
 			await updateTags.mutateAsync({ id: content.id, tags: unstringifyTagList(value) })
 		}
+		await recentlyEditedTimestamp.mutateAsync({id: content.id})
 	}
 
 	const form = useForm({
@@ -579,6 +582,7 @@ export function MetadataSidebar({
 							id: content.id,
 							file: new Uint8Array(await files[0].arrayBuffer()).toBase64(),
 						})
+						await recentlyEditedTimestamp.mutateAsync({id: content.id})
 						closeFileEditDialog()
 						notifications.show({
 							title: "File updated",

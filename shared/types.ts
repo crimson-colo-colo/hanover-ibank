@@ -32,6 +32,7 @@ export type ContentListItem = {
 	recentTimestamps: {
 		recentlyViewed: Date
 		recentlyEdited: Date
+		employeeId: string
 	}[]
 	tags: {
 		category: TagCategory
@@ -70,6 +71,10 @@ export type CheckOutMutationType = UseMutationResult<
 	TRPCClientErrorLike<AppRouter>,
 	CheckOutInput
 >
+
+type recentlyViewedOutput = RouterOutput["content"]["updateRecentlyViewedTimestamp"]
+type recentlyViewedInput = RouterInput["content"]["updateRecentlyViewedTimestamp"]
+export type recentlyViewedType = UseMutationResult<recentlyViewedOutput, TRPCClientErrorLike<AppRouter>, recentlyViewedInput>
 
 export type Thread = Prisma.ContentTalkThreadGetPayload<{
 	include: {

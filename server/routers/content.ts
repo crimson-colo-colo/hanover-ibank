@@ -98,6 +98,7 @@ export const contentRouter = router({
 						recentTimestamps: content.recentTimestamps.map((timestamp) => ({
 							recentlyViewed: timestamp.recentlyViewed,
 							recentlyEdited: timestamp.recentlyEdited,
+							employeeId: opts.ctx.auth.sub
 						})),
 						owner: {
 							id: content.ownerId,
@@ -463,8 +464,6 @@ export const contentRouter = router({
 				where: { id: opts.input.id },
 				data: {
 					lastModifiedDate: new Date(),
-					size: buffer.length,
-					mimeType: fileType,
 				},
 			})
 		}),
@@ -664,7 +663,8 @@ export const contentRouter = router({
 					favorited: true,
 					recentTimestamps: content.recentTimestamps.map((timestamp) => ({
 						recentlyViewed: timestamp.recentlyViewed,
-						recentlyEdited: timestamp.recentlyEdited
+						recentlyEdited: timestamp.recentlyEdited,
+						employeeId: opts.ctx.auth.sub
 					})),
 					tags: content.tags.map((tag) => ({
 						category: tag.tagCategory,
@@ -852,7 +852,8 @@ export const contentRouter = router({
 			})),
 			recentTimestamps: content.recentTimestamps.map((timestamp) => ({
 				recentlyViewed: timestamp.recentlyViewed,
-				recentlyEdited: timestamp.recentlyEdited
+				recentlyEdited: timestamp.recentlyEdited,
+				employeeId: opts.ctx.auth.sub
 			})),
 			type: content.type as "Object",
 			objectId: content.objectId!,

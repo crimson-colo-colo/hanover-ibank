@@ -51,6 +51,7 @@ import {
 	getFilteredRowModel,
 	getPaginationRowModel,
 	getSortedRowModel,
+	type Row,
 	type SortingState,
 	useReactTable,
 	type VisibilityState,
@@ -128,6 +129,8 @@ export function ContentTable({
 		null
 	)
 
+	const recentlyViewed = useMutation(trpc.content.updateRecentlyViewedTimestamp.mutationOptions(mutationOptions))
+
 	const defaultColumns = {
 		checkbox: true,
 		status: true,
@@ -135,6 +138,8 @@ export function ContentTable({
 		owner: true,
 		lastModified: true,
 		expirationDate: false,
+		recentlyViewed: false,
+		recentlyEdited: false,
 		tags: true,
 		actions: true,
 		checkedOutBy: false,
@@ -226,7 +231,7 @@ export function ContentTable({
 				sortingFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => (
-					<NameColumn info={info} openFilePreview={openFilePreview} profile={profile} />
+					<NameColumn info={info} openFilePreview={openFilePreview} profile={profile} recentlyViewed={recentlyViewed} />
 				),
 			}),
 			columnHelper.accessor((row) => `${row.owner.name} ${row.owner.email}`, {
@@ -264,6 +269,59 @@ export function ContentTable({
 					</span>
 				),
 			}),
+			columnHelper.accessor("recentTimestamps", {
+				id: "recentlyViewed",
+				header: () => <span className="min-w-max">Last Viewed Date</span>,
+				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
+					const getTime = (row: Row<ContentListItem>) =>
+						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyViewed ?? new Date(0)
+
+					return getTime(rowB).getTime() - getTime(rowA).getTime()
+				},
+				cell: (info) => {
+					const time = info.row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyViewed
+
+					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
+					if (!time) return new Date("1970-01-01")
+
+					const elapsedTime = formatDistanceToNow(new Date(time), {addSuffix: true}).replace(
+						/^(in )?about /,
+						"$1"
+					)
+					return (
+						<span title={new Date(time).toLocaleString()}>
+							{elapsedTime}
+						</span>
+					)
+				},
+			}),
+
+			columnHelper.accessor("recentTimestamps", {
+				id: "recentlyEdited",
+				header: () => <span className="min-w-max">Last Edited Date</span>,
+				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
+					const getTime = (row: Row<ContentListItem>) =>
+						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyEdited ?? new Date(0)
+
+					return getTime(rowB).getTime() - getTime(rowA).getTime()
+				},
+				cell: (info) => {
+					const time = info.row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)?.recentlyEdited
+
+					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
+					if (!time) return new Date("1970-01-01")
+
+					const elapsedTime = formatDistanceToNow(new Date(time), {addSuffix: true}).replace(
+						/^(in )?about /,
+						"$1"
+					)
+					return (
+						<span title={new Date(time).toLocaleString()}>
+							{elapsedTime}
+						</span>
+					)
+				},
+			}),
 			columnHelper.accessor(
 				(row) =>
 					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
@@ -285,6 +343,7 @@ export function ContentTable({
 						openCheckOutModal={openCheckOutModal}
 						openCheckInModal={openCheckInModal}
 						profile={profile}
+						recentlyViewed={recentlyViewed}
 					/>
 				),
 			}),
@@ -382,11 +441,23 @@ export function ContentTable({
 		}
 
 		if (activeView === "recentlyViewed") {
-			// TODO: this
+			setSorting([{ id: "recentlyViewed", desc: false }])
+			setColumnVisibility({
+				...defaultColumns,
+				recentlyViewed: true,
+				lastModified: false
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 		}
 
 		if (activeView === "recentlyEdited") {
-			// TODO: this
+			setSorting([{ id: "recentlyEdited", desc: false }])
+			setColumnVisibility({
+				...defaultColumns,
+				recentlyEdited: true,
+				lastModified:false
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 		}
 
 		if (activeView === "checkedOut") {
