@@ -27,6 +27,11 @@ app.use(
 
 // serve vite build
 app.use(express.static(staticDir))
+
+app.use("/email-assets", (req, res) => {
+	res.status(404).end()
+})
+
 // serve SPA fallback
 app.get("*any", (req, res) => {
 	res.sendFile(path.join(staticDir, "index.html"))
