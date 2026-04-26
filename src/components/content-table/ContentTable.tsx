@@ -433,6 +433,7 @@ export function ContentTable({
 				...defaultColumns,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
 		}
 
 		if (activeView === "expiringSoon") {
@@ -443,6 +444,7 @@ export function ContentTable({
 				expirationDate: true,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
 		}
 
 		if (activeView === "recentlyViewed") {
@@ -453,6 +455,7 @@ export function ContentTable({
 				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
 		}
 
 		if (activeView === "recentlyEdited") {
@@ -463,6 +466,7 @@ export function ContentTable({
 				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
 		}
 
 		if (activeView === "checkedOut") {
@@ -471,6 +475,7 @@ export function ContentTable({
 				...defaultColumns,
 				lastModified: false,
 			})
+			table.setPageIndex(0)
 		}
 	}, [activeView])
 
