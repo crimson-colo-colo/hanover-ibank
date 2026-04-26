@@ -14,10 +14,52 @@ import {
 	IconUsers,
 } from "@tabler/icons-react"
 import { Link, useLocation } from "@tanstack/react-router"
+import { trpc } from "@/lib/trpc.ts"
 import { Avatar } from "@/components/Avatar.tsx"
+import {useQuery} from "@tanstack/react-query";
+
+function AdminLinks({isLoading, isAdmin}: {isLoading: boolean, isAdmin: boolean | undefined}) {
+	const location = useLocation();
+
+	return (
+		<>
+			{isAdmin && (
+				<div>
+					<hr />
+					<Stack>
+						<Text c="dimmed" className="pl-5">
+							Administration
+						</Text>
+						<Button
+							component={Link}
+							variant={location.pathname === "/admin/manage-users" ? "light" : "subtle"}
+							to="/admin/manage-users"
+							rightSection={<IconChevronRight />}
+							justify="space-between"
+						>
+							<IconUsers />
+							<span className="p-2">Employees</span>
+						</Button>
+						<Button
+							component={Link}
+							variant={location.pathname === "/admin/analytics" ? "light" : "subtle"}
+							to="/admin/analytics"
+							rightSection={<IconChevronRight />}
+							justify="space-between"
+						>
+							<IconChartBarPopular />
+							<span className="p-2">Analytics</span>
+						</Button>
+					</Stack>
+				</div>
+			)}
+		</>
+	)
+}
 
 export function SideNavigation() {
 	const auth0 = useAuth0()
+	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const location = useLocation()
 
 	return (
@@ -83,32 +125,7 @@ export function SideNavigation() {
 					<span className="p-2">Technology</span>
 				</Button>
 			</Stack>
-			<hr />
-			<Stack>
-				<Text c="dimmed" className="pl-5">
-					Administration
-				</Text>
-				<Button
-					component={Link}
-					variant={location.pathname === "/admin/manage-users" ? "light" : "subtle"}
-					to="/admin/manage-users"
-					rightSection={<IconChevronRight />}
-					justify="space-between"
-				>
-					<IconUsers />
-					<span className="p-2">Employees</span>
-				</Button>
-				<Button
-					component={Link}
-					variant={location.pathname === "/admin/analytics" ? "light" : "subtle"}
-					to="/admin/analytics"
-					rightSection={<IconChevronRight />}
-					justify="space-between"
-				>
-					<IconChartBarPopular />
-					<span className="p-2">Analytics</span>
-				</Button>
-			</Stack>
+			{<AdminLinks isLoading={isAdmin.isFetching} isAdmin={isAdmin.data}></AdminLinks>}
 			<hr />
 			<Stack>
 				<Text c="dimmed" className="pl-5">
@@ -125,6 +142,7 @@ export function SideNavigation() {
 								variant="subtle"
 								color="gray"
 								fullWidth
+								className="h-12"
 							>
 								<div className="flex items-center gap-2 px-2 py-1">
 									<Avatar userId={auth0.user.sub!} h={32} />
