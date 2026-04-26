@@ -4,7 +4,7 @@ import z from "zod"
 export const env = createEnv({
 	server: {
 		PORT: z.coerce.number().default(3000),
-		APP_URL: z.url().optional(),
+		APP_URL: z.url(),
 		APP_SECRET: z.string().min(32),
 		DATABASE_URL: z.string(),
 		NODE_ENV: z.enum(["development", "production"]).default("development"),
@@ -25,6 +25,9 @@ export const env = createEnv({
 		VAPID_PRIVATE_KEY: z.string(),
 		VAPID_CONTACT_EMAIL: z.email(),
 		CLI_TOKEN: z.string().min(32).optional(),
+		EMAIL_GATEWAY: z.url().optional(),
+		EMAIL_CLIENT_ID: z.string().optional(),
+		EMAIL_CLIENT_SECRET: z.string().optional(),
 	},
 	runtimeEnv: process.env,
 })

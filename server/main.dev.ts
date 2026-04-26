@@ -63,5 +63,11 @@ app.listen(env.PORT, () => {
 })
 
 if (env.CLI_TOKEN) {
-	console.warn("[cli] CLI_TOKEN is set, CLI access is enabled")
+	console.warn("[environ] CLI access is enabled")
+}
+
+if (env.EMAIL_GATEWAY && env.EMAIL_CLIENT_ID && env.EMAIL_CLIENT_SECRET) {
+	console.warn("[environ] email sending is enabled")
+} else {
+	console.warn("[environ] email sending is disabled, missing configuration")
 }

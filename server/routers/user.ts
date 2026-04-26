@@ -4,7 +4,7 @@ import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
-import { sendPushNotification } from "../lib/notifications.ts"
+import { sendPushNotification } from "../lib/notifications.tsx"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
