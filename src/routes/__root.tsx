@@ -14,6 +14,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import Navigation from "@/components/Navigation.tsx"
 import { ScrollToTopButton, useRouteScrollToTop } from "@/components/ScrollToTopButton.tsx"
+import SideNavigation from "@/components/SideNavigation.tsx"
 import { useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
 import { theme } from "@/theme.ts"
@@ -47,13 +48,16 @@ function RootComponent() {
 				<DevSupport ComponentPreviews={() => null} useInitialHook={useInitial}>
 					<AppShell
 						padding={isPreview ? 0 : "md"}
-						header={{ height: 56 }}
+						//header={{ height: 56 }}
+						navbar={{ width: 250, breakpoint: "sm" }}
 						className={clsx(isPreview && "not-dark:bg-gray-100")}
 					>
-						<AppShell.Header>
+						{/*<AppShell.Header>
 							<Navigation />
-						</AppShell.Header>
-						{/*<AppShell.Navbar>Navbar</AppShell.Navbar>*/}
+						</AppShell.Header>*/}
+						<AppShell.Navbar>
+							<SideNavigation />
+						</AppShell.Navbar>
 						<AppShell.Main className={clsx(!isPreview && "mx-auto max-w-325")}>
 							<HeadContent />
 							<Outlet />
