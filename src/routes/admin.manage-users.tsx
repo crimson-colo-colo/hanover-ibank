@@ -176,7 +176,7 @@ function RouteComponent() {
 
 	return (
 		<div>
-			<Group justify="space-between" className="flex-col sm:flex-row">
+			<Group id="manage-users-header" justify="space-between" className="flex-col sm:flex-row">
 				<Title order={2} className="self-start">
 					Manage Users
 				</Title>
@@ -193,6 +193,7 @@ function RouteComponent() {
 						Delete selected
 					</Button>
 					<Button
+						id="add-user-btn"
 						leftSection={<IconPlus />}
 						onClick={() => {
 							openCreateDialog()

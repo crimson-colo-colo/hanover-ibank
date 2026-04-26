@@ -133,7 +133,7 @@ function AnalyticsDashboard() {
 		<Stack mt="md" gap="lg">
 			<Title order={2}>Analytics Dashboard</Title>
 
-			<Grid align="stretch" grow={true}>
+			<Grid id="analytics-metrics" align="stretch" grow={true}>
 				{metrics.map((m) => (
 					<Grid.Col key={m.label} span={{ base: 12, sm: 6, md: 4, lg: 2 }} align="stretch">
 						<Paper withBorder p="md" radius="md">
@@ -148,7 +148,7 @@ function AnalyticsDashboard() {
 				))}
 			</Grid>
 
-			<Grid>
+			<Grid id="analytics-uploads-chart">
 				<Grid.Col span={{ base: 12, md: 7 }}>
 					<Paper withBorder p="md" radius="md" h="100%">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
@@ -203,7 +203,7 @@ function AnalyticsDashboard() {
 				</Grid.Col>
 			</Grid>
 
-			<Grid>
+			<Grid id="analytics-file-charts">
 				<Grid.Col span={{ base: 12, md: 6 }}>
 					<Paper withBorder p="md" radius="md">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
@@ -255,7 +255,7 @@ function AnalyticsDashboard() {
 				</Grid.Col>
 			</Grid>
 
-			<Grid>
+			<Grid id="analytics-heatmap">
 				<Grid.Col span={12}>
 					<Paper withBorder p="md" radius="md">
 						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">

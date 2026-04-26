@@ -112,7 +112,7 @@ export function ProfilePage() {
 	}
 
 	return (
-		<Stack maw={480} mx="auto" mt="md" gap="xl">
+		<Stack id="profile-page" maw={480} mx="auto" mt="md" gap="xl">
 			<Group justify="space-between" align="center">
 				<Title order={2}>Profile</Title>
 				<Button
@@ -131,7 +131,7 @@ export function ProfilePage() {
 				</Button>
 			</Group>
 
-			<Group align="center" gap="md">
+			<Group id="profile-avatar-section" align="center" gap="md">
 				<div style={{ position: "relative", display: "inline-block" }}>
 					<Avatar userId={user!.sub!} w={80} h={80} />
 					<Button
@@ -178,7 +178,7 @@ export function ProfilePage() {
 				</Stack>
 			</Group>
 
-			<form onSubmit={form.onSubmit(onSubmit)}>
+			<form id="profile-form" onSubmit={form.onSubmit(onSubmit)}>
 				<Stack gap="sm">
 					<TextInput
 						label="Full name"

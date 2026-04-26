@@ -548,6 +548,7 @@ export function ContentTable({
 
 				<Flex gap="sm">
 					<SegmentedControl
+						id="content-filter-control"
 						data={[
 							{ label: "For You", value: ContentFilter.Own },
 							{ label: "Show All", value: ContentFilter.All },
@@ -557,6 +558,7 @@ export function ContentTable({
 					/>
 
 					<Button
+						id="upload-content-btn"
 						leftSection={<IconCloudUpload size={16} stroke={1.5} />}
 						onClick={openCreateModal}
 					>
@@ -588,7 +590,7 @@ export function ContentTable({
 					/>
 				</Flex>
 			</Flex>
-			<Table>
+			<Table id="content-table">
 				<Table.Thead>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<Table.Tr key={headerGroup.id}>

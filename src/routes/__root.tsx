@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import Navigation from "@/components/Navigation.tsx"
+import { NewUserTutorial } from "@/components/new.user.tutorial.tsx"
 import { ScrollToTopButton, useRouteScrollToTop } from "@/components/ScrollToTopButton.tsx"
 import { useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
@@ -60,6 +61,7 @@ function RootComponent() {
 						</AppShell.Main>
 					</AppShell>
 					<Notifications />
+					<NewUserTutorial />
 					<ScrollToTopButton threshold={50} />
 					<TanStackDevtools
 						config={{

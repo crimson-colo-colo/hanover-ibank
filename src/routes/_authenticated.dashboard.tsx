@@ -41,7 +41,7 @@ function RoleDashboard() {
 
 	return (
 		<main>
-			<header className="w-full p-4 text-white rounded-lg bg-primary">
+so			<header id="dashboard-welcome" className="w-full p-4 text-white rounded-lg bg-primary">
 				<Title>
 					Welcome,{" "}
 					{auth0.user?.name ?? auth0.user?.nickname ?? auth0.user?.preferred_username ?? "User"}
@@ -51,7 +51,7 @@ function RoleDashboard() {
 				</small>
 			</header>
 
-			<div>
+			<div id="dashboard-favorites">
 				<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
 					Your Favorites {favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
 				</Title>
@@ -89,7 +89,7 @@ function RoleDashboard() {
 			</div>
 
 			<div>
-				<section>
+				<section id="dashboard-content-section">
 					{content.isError ? (
 						<Alert color="red" title="Failed to load content" icon={<IconAlertOctagon />}>
 							Failed to load content: {content.error.message}
