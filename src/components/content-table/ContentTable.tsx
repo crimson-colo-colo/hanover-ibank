@@ -59,7 +59,7 @@ import clsx from "clsx"
 import { formatDate, formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
-import { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
+import { TagFilterPopup } from "@/components/content-table/TagFilterPopup.tsx"
 import {
 	type ContentViews,
 	contentStatusDisplayName,
