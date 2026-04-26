@@ -9,13 +9,13 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import z from "zod"
-import { ContentTable } from "@/components/ContentTable.tsx"
+import { ContentTable } from "@/components/content-table/ContentTable.tsx"
 import { PreviewModal } from "@/components/PreviewModal.tsx"
 import { ContentViews } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
 
 const searchParamSchema = z.object({
-	view: z.enum(Object.values(ContentViews)),
+	view: z.enum(Object.values(ContentViews)).default("default"),
 })
 
 export const Route = createFileRoute("/_authenticated/content-table")({
