@@ -1,8 +1,7 @@
-import { useAuth0 } from "@auth0/auth0-react"
 import { Button } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
 	ACTIONS,
 	type Controls,
@@ -13,12 +12,6 @@ import {
 	useJoyride,
 } from "react-joyride"
 import { trpc } from "@/lib/trpc.ts"
-
-const TUTORIAL_STORAGE_KEY = "ibank-tutorial-completed"
-
-function tutorialKey(userId: string) {
-	return `${TUTORIAL_STORAGE_KEY}-${userId}`
-}
 
 const DASHBOARD_STEPS: Step[] = [
 	{
@@ -149,13 +142,29 @@ const NON_ADMIN_BOUNDARIES: PageBoundary[] = [
 
 const ADMIN_BOUNDARIES: PageBoundary[] = [
 	{ steps: DASHBOARD_STEPS, path: "/dashboard" },
-	{ steps: PROFILE_STEPS, path: "/profile" },
 	{ steps: ADMIN_ANALYTICS_STEPS, path: "/admin/analytics" },
 	{ steps: MANAGE_USERS_STEPS, path: "/admin/manage-users" },
+	{ steps: PROFILE_STEPS, path: "/profile" },
 ]
 
+function waitForTarget(selector: string, timeout = 3000): Promise<boolean> {
+	return new Promise((resolve) => {
+		if (document.querySelector(selector)) return resolve(true)
+		const observer = new MutationObserver(() => {
+			if (document.querySelector(selector)) {
+				observer.disconnect()
+				resolve(true)
+			}
+		})
+		observer.observe(document.body, { childList: true, subtree: true })
+		setTimeout(() => {
+			observer.disconnect()
+			resolve(false)
+		}, timeout)
+	})
+}
+
 export function NewUserTutorial() {
-	const { user } = useAuth0()
 	const navigate = useNavigate()
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 
@@ -163,28 +172,29 @@ export function NewUserTutorial() {
 	const [stepIndex, setStepIndex] = useState(0)
 	const [pageIndex, setPageIndex] = useState(0)
 	const [showPrompt, setShowPrompt] = useState(false)
+	const navigatingRef = useRef(false)
 
 	const boundaries = isAdmin.data ? ADMIN_BOUNDARIES : NON_ADMIN_BOUNDARIES
 	const currentSteps = boundaries[pageIndex]?.steps ?? []
 	const isLastPage = pageIndex >= boundaries.length - 1
 
 	useEffect(() => {
-		if (!user?.sub || isAdmin.isLoading) return
-		if (!localStorage.getItem(tutorialKey(user.sub))) {
-			setShowPrompt(true)
-		}
-	}, [user?.sub, isAdmin.isLoading])
+		if (isAdmin.isLoading) return
+		setShowPrompt(true)
+	}, [isAdmin.isLoading])
 
 	function completeTutorial() {
-		if (user?.sub) localStorage.setItem(tutorialKey(user.sub), "true")
+		// no-op: always show tutorial on page load during testing
 	}
 
 	function startTutorial() {
 		setShowPrompt(false)
 		setPageIndex(0)
 		setStepIndex(0)
-		navigate({ to: "/dashboard" }).then(() => {
-			setTimeout(() => setRun(true), 400)
+		navigate({ to: "/dashboard" }).then(async () => {
+			const firstTarget = boundaries[0]?.steps[0]?.target as string
+			if (firstTarget) await waitForTarget(firstTarget)
+			setRun(true)
 		})
 	}
 
@@ -202,13 +212,15 @@ export function NewUserTutorial() {
 				completeTutorial()
 				return
 			}
-			controls.stop()
+			navigatingRef.current = true
+			setRun(false)
 			setPageIndex(nextPageIndex)
 			setStepIndex(0)
-			navigate({ to: next.path as "/" }).then(() => {
-				setTimeout(() => {
-					setRun(true)
-				}, 500)
+			navigate({ to: next.path as "/" }).then(async () => {
+				const firstTarget = next.steps[0]?.target as string
+				if (firstTarget) await waitForTarget(firstTarget)
+				navigatingRef.current = false
+				setRun(true)
 			})
 		},
 		[boundaries, pageIndex, navigate]
@@ -219,14 +231,16 @@ export function NewUserTutorial() {
 			const prevPageIndex = pageIndex - 1
 			const prev = boundaries[prevPageIndex]
 			if (!prev) return
-			controls.stop()
+			navigatingRef.current = true
+			setRun(false)
 			setPageIndex(prevPageIndex)
 			const lastStepIndex = prev.steps.length - 1
 			setStepIndex(lastStepIndex)
-			navigate({ to: prev.path as "/" }).then(() => {
-				setTimeout(() => {
-					setRun(true)
-				}, 500)
+			navigate({ to: prev.path as "/" }).then(async () => {
+				const lastTarget = prev.steps[lastStepIndex]?.target as string
+				if (lastTarget) await waitForTarget(lastTarget)
+				navigatingRef.current = false
+				setRun(true)
 			})
 		},
 		[boundaries, pageIndex, navigate]
@@ -254,7 +268,7 @@ export function NewUserTutorial() {
 				}
 			}
 
-			if (status === STATUS.SKIPPED || status === STATUS.FINISHED) {
+			if (status === STATUS.SKIPPED || (status === STATUS.FINISHED && !navigatingRef.current)) {
 				setRun(false)
 				completeTutorial()
 			}
