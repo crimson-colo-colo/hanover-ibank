@@ -13,6 +13,8 @@ import {
 } from "react-joyride"
 import { trpc } from "@/lib/trpc.ts"
 
+const TUTORIAL_STORAGE_KEY = "ibank-tutorial-completed"
+
 const DASHBOARD_STEPS: Step[] = [
 	{
 		target: "#dashboard-welcome",
@@ -180,11 +182,12 @@ export function NewUserTutorial() {
 
 	useEffect(() => {
 		if (isAdmin.isLoading) return
-		setShowPrompt(true)
+		const completed = localStorage.getItem(TUTORIAL_STORAGE_KEY) === "true"
+		if (!completed) setShowPrompt(true)
 	}, [isAdmin.isLoading])
 
 	function completeTutorial() {
-		// no-op: always show tutorial on page load during testing
+		localStorage.setItem(TUTORIAL_STORAGE_KEY, "true")
 	}
 
 	function startTutorial() {
