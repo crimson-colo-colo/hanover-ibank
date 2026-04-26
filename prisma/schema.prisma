@@ -23,16 +23,18 @@ enum ThreadStatus {
 }
 
 model Employee {
-    id                String              @id
-    role              EmployeeRole
-    content           Content[]           @relation("Owner")
-    favorite          FavoriteContent[]
-    checkedOutContent Content[]           @relation("CheckedOutContent")
-    activity          UserActivity[]
-    threads           ContentTalkThread[] @relation("ThreadCreatedBy")
-    comments          TalkThreadComment[] @relation("CommentAuthor")
-    resolvedThreads   ContentTalkThread[]
-    pushSubscriptions PushSubscription[]
+    id                 String              @id
+    role               EmployeeRole
+    emailNotifications Boolean             @default(true)
+    pushNotifications  Boolean             @default(true)
+    content            Content[]           @relation("Owner")
+    favorite           FavoriteContent[]
+    checkedOutContent  Content[]           @relation("CheckedOutContent")
+    activity           UserActivity[]
+    threads            ContentTalkThread[] @relation("ThreadCreatedBy")
+    comments           TalkThreadComment[] @relation("CommentAuthor")
+    resolvedThreads    ContentTalkThread[]
+    pushSubscriptions  PushSubscription[]
 }
 
 model Content {

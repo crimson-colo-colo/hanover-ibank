@@ -1119,7 +1119,9 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const EmployeeScalarFieldEnum = {
   id: 'id',
-  role: 'role'
+  role: 'role',
+  emailNotifications: 'emailNotifications',
+  pushNotifications: 'pushNotifications'
 } as const
 
 export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
@@ -1273,6 +1275,13 @@ export type EnumEmployeeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'EmployeeRole[]'
  */
 export type ListEnumEmployeeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmployeeRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

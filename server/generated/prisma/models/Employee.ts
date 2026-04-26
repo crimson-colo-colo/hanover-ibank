@@ -27,16 +27,22 @@ export type AggregateEmployee = {
 export type EmployeeMinAggregateOutputType = {
   id: string | null
   role: $Enums.EmployeeRole | null
+  emailNotifications: boolean | null
+  pushNotifications: boolean | null
 }
 
 export type EmployeeMaxAggregateOutputType = {
   id: string | null
   role: $Enums.EmployeeRole | null
+  emailNotifications: boolean | null
+  pushNotifications: boolean | null
 }
 
 export type EmployeeCountAggregateOutputType = {
   id: number
   role: number
+  emailNotifications: number
+  pushNotifications: number
   _all: number
 }
 
@@ -44,16 +50,22 @@ export type EmployeeCountAggregateOutputType = {
 export type EmployeeMinAggregateInputType = {
   id?: true
   role?: true
+  emailNotifications?: true
+  pushNotifications?: true
 }
 
 export type EmployeeMaxAggregateInputType = {
   id?: true
   role?: true
+  emailNotifications?: true
+  pushNotifications?: true
 }
 
 export type EmployeeCountAggregateInputType = {
   id?: true
   role?: true
+  emailNotifications?: true
+  pushNotifications?: true
   _all?: true
 }
 
@@ -132,6 +144,8 @@ export type EmployeeGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type EmployeeGroupByOutputType = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications: boolean
+  pushNotifications: boolean
   _count: EmployeeCountAggregateOutputType | null
   _min: EmployeeMinAggregateOutputType | null
   _max: EmployeeMaxAggregateOutputType | null
@@ -158,6 +172,8 @@ export type EmployeeWhereInput = {
   NOT?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
   id?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.EnumEmployeeRoleFilter<"Employee"> | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFilter<"Employee"> | boolean
+  pushNotifications?: Prisma.BoolFilter<"Employee"> | boolean
   content?: Prisma.ContentListRelationFilter
   favorite?: Prisma.FavoriteContentListRelationFilter
   checkedOutContent?: Prisma.ContentListRelationFilter
@@ -171,6 +187,8 @@ export type EmployeeWhereInput = {
 export type EmployeeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  pushNotifications?: Prisma.SortOrder
   content?: Prisma.ContentOrderByRelationAggregateInput
   favorite?: Prisma.FavoriteContentOrderByRelationAggregateInput
   checkedOutContent?: Prisma.ContentOrderByRelationAggregateInput
@@ -187,6 +205,8 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.EmployeeWhereInput[]
   NOT?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
   role?: Prisma.EnumEmployeeRoleFilter<"Employee"> | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFilter<"Employee"> | boolean
+  pushNotifications?: Prisma.BoolFilter<"Employee"> | boolean
   content?: Prisma.ContentListRelationFilter
   favorite?: Prisma.FavoriteContentListRelationFilter
   checkedOutContent?: Prisma.ContentListRelationFilter
@@ -200,6 +220,8 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
 export type EmployeeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  pushNotifications?: Prisma.SortOrder
   _count?: Prisma.EmployeeCountOrderByAggregateInput
   _max?: Prisma.EmployeeMaxOrderByAggregateInput
   _min?: Prisma.EmployeeMinOrderByAggregateInput
@@ -211,11 +233,15 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   NOT?: Prisma.EmployeeScalarWhereWithAggregatesInput | Prisma.EmployeeScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   role?: Prisma.EnumEmployeeRoleWithAggregatesFilter<"Employee"> | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolWithAggregatesFilter<"Employee"> | boolean
+  pushNotifications?: Prisma.BoolWithAggregatesFilter<"Employee"> | boolean
 }
 
 export type EmployeeCreateInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
@@ -229,6 +255,8 @@ export type EmployeeCreateInput = {
 export type EmployeeUncheckedCreateInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
@@ -242,6 +270,8 @@ export type EmployeeUncheckedCreateInput = {
 export type EmployeeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
@@ -255,6 +285,8 @@ export type EmployeeUpdateInput = {
 export type EmployeeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
@@ -268,31 +300,43 @@ export type EmployeeUncheckedUpdateInput = {
 export type EmployeeCreateManyInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
 }
 
 export type EmployeeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type EmployeeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type EmployeeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  pushNotifications?: Prisma.SortOrder
 }
 
 export type EmployeeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  pushNotifications?: Prisma.SortOrder
 }
 
 export type EmployeeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  emailNotifications?: Prisma.SortOrder
+  pushNotifications?: Prisma.SortOrder
 }
 
 export type EmployeeScalarRelationFilter = {
@@ -311,6 +355,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type EnumEmployeeRoleFieldUpdateOperationsInput = {
   set?: $Enums.EmployeeRole
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type EmployeeCreateNestedOneWithoutContentInput = {
@@ -432,6 +480,8 @@ export type EmployeeUpdateOneRequiredWithoutPushSubscriptionsNestedInput = {
 export type EmployeeCreateWithoutContentInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
@@ -444,6 +494,8 @@ export type EmployeeCreateWithoutContentInput = {
 export type EmployeeUncheckedCreateWithoutContentInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
@@ -461,6 +513,8 @@ export type EmployeeCreateOrConnectWithoutContentInput = {
 export type EmployeeCreateWithoutCheckedOutContentInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
@@ -473,6 +527,8 @@ export type EmployeeCreateWithoutCheckedOutContentInput = {
 export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
@@ -501,6 +557,8 @@ export type EmployeeUpdateToOneWithWhereWithoutContentInput = {
 export type EmployeeUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
@@ -513,6 +571,8 @@ export type EmployeeUpdateWithoutContentInput = {
 export type EmployeeUncheckedUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -536,6 +596,8 @@ export type EmployeeUpdateToOneWithWhereWithoutCheckedOutContentInput = {
 export type EmployeeUpdateWithoutCheckedOutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
@@ -548,6 +610,8 @@ export type EmployeeUpdateWithoutCheckedOutContentInput = {
 export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -560,6 +624,8 @@ export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
 export type EmployeeCreateWithoutResolvedThreadsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
@@ -572,6 +638,8 @@ export type EmployeeCreateWithoutResolvedThreadsInput = {
 export type EmployeeUncheckedCreateWithoutResolvedThreadsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
@@ -589,6 +657,8 @@ export type EmployeeCreateOrConnectWithoutResolvedThreadsInput = {
 export type EmployeeCreateWithoutThreadsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
@@ -601,6 +671,8 @@ export type EmployeeCreateWithoutThreadsInput = {
 export type EmployeeUncheckedCreateWithoutThreadsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
@@ -629,6 +701,8 @@ export type EmployeeUpdateToOneWithWhereWithoutResolvedThreadsInput = {
 export type EmployeeUpdateWithoutResolvedThreadsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
@@ -641,6 +715,8 @@ export type EmployeeUpdateWithoutResolvedThreadsInput = {
 export type EmployeeUncheckedUpdateWithoutResolvedThreadsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
@@ -664,6 +740,8 @@ export type EmployeeUpdateToOneWithWhereWithoutThreadsInput = {
 export type EmployeeUpdateWithoutThreadsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
@@ -676,6 +754,8 @@ export type EmployeeUpdateWithoutThreadsInput = {
 export type EmployeeUncheckedUpdateWithoutThreadsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
@@ -688,6 +768,8 @@ export type EmployeeUncheckedUpdateWithoutThreadsInput = {
 export type EmployeeCreateWithoutCommentsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
@@ -700,6 +782,8 @@ export type EmployeeCreateWithoutCommentsInput = {
 export type EmployeeUncheckedCreateWithoutCommentsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
@@ -728,6 +812,8 @@ export type EmployeeUpdateToOneWithWhereWithoutCommentsInput = {
 export type EmployeeUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
@@ -740,6 +826,8 @@ export type EmployeeUpdateWithoutCommentsInput = {
 export type EmployeeUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
@@ -752,6 +840,8 @@ export type EmployeeUncheckedUpdateWithoutCommentsInput = {
 export type EmployeeCreateWithoutFavoriteInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
@@ -764,6 +854,8 @@ export type EmployeeCreateWithoutFavoriteInput = {
 export type EmployeeUncheckedCreateWithoutFavoriteInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
   activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
@@ -792,6 +884,8 @@ export type EmployeeUpdateToOneWithWhereWithoutFavoriteInput = {
 export type EmployeeUpdateWithoutFavoriteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
@@ -804,6 +898,8 @@ export type EmployeeUpdateWithoutFavoriteInput = {
 export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
   activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -816,6 +912,8 @@ export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
 export type EmployeeCreateWithoutActivityInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
@@ -828,6 +926,8 @@ export type EmployeeCreateWithoutActivityInput = {
 export type EmployeeUncheckedCreateWithoutActivityInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
@@ -856,6 +956,8 @@ export type EmployeeUpdateToOneWithWhereWithoutActivityInput = {
 export type EmployeeUpdateWithoutActivityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
@@ -868,6 +970,8 @@ export type EmployeeUpdateWithoutActivityInput = {
 export type EmployeeUncheckedUpdateWithoutActivityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
@@ -880,6 +984,8 @@ export type EmployeeUncheckedUpdateWithoutActivityInput = {
 export type EmployeeCreateWithoutPushSubscriptionsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
@@ -892,6 +998,8 @@ export type EmployeeCreateWithoutPushSubscriptionsInput = {
 export type EmployeeUncheckedCreateWithoutPushSubscriptionsInput = {
   id: string
   role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
   favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
   checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
@@ -920,6 +1028,8 @@ export type EmployeeUpdateToOneWithWhereWithoutPushSubscriptionsInput = {
 export type EmployeeUpdateWithoutPushSubscriptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
@@ -932,6 +1042,8 @@ export type EmployeeUpdateWithoutPushSubscriptionsInput = {
 export type EmployeeUncheckedUpdateWithoutPushSubscriptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
   favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
   checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
@@ -1038,6 +1150,8 @@ export type EmployeeCountOutputTypeCountPushSubscriptionsArgs<ExtArgs extends ru
 export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   role?: boolean
+  emailNotifications?: boolean
+  pushNotifications?: boolean
   content?: boolean | Prisma.Employee$contentArgs<ExtArgs>
   favorite?: boolean | Prisma.Employee$favoriteArgs<ExtArgs>
   checkedOutContent?: boolean | Prisma.Employee$checkedOutContentArgs<ExtArgs>
@@ -1052,19 +1166,25 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   role?: boolean
+  emailNotifications?: boolean
+  pushNotifications?: boolean
 }, ExtArgs["result"]["employee"]>
 
 export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   role?: boolean
+  emailNotifications?: boolean
+  pushNotifications?: boolean
 }, ExtArgs["result"]["employee"]>
 
 export type EmployeeSelectScalar = {
   id?: boolean
   role?: boolean
+  emailNotifications?: boolean
+  pushNotifications?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "emailNotifications" | "pushNotifications", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   content?: boolean | Prisma.Employee$contentArgs<ExtArgs>
   favorite?: boolean | Prisma.Employee$favoriteArgs<ExtArgs>
@@ -1094,6 +1214,8 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     role: $Enums.EmployeeRole
+    emailNotifications: boolean
+    pushNotifications: boolean
   }, ExtArgs["result"]["employee"]>
   composites: {}
 }
@@ -1527,6 +1649,8 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
 export interface EmployeeFieldRefs {
   readonly id: Prisma.FieldRef<"Employee", 'String'>
   readonly role: Prisma.FieldRef<"Employee", 'EmployeeRole'>
+  readonly emailNotifications: Prisma.FieldRef<"Employee", 'Boolean'>
+  readonly pushNotifications: Prisma.FieldRef<"Employee", 'Boolean'>
 }
     
 
