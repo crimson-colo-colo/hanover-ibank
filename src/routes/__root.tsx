@@ -18,9 +18,11 @@ import SideNavigation from "@/components/SideNavigation.tsx"
 import { useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
 import { theme } from "@/theme.ts"
-
 import "../styles.css"
 import clsx from "clsx"
+import {useDisclosure} from "@mantine/hooks";
+import {useState} from "react";
+import type sideNavigationProps from "@/components/SideNavigation.tsx"
 
 interface RouterContext {
 	auth0: Auth0ContextInterface<User>
@@ -37,6 +39,7 @@ function RootComponent() {
 	useRouteScrollToTop({ smooth: false })
 	const location = useLocation()
 	const isPreview = location.pathname.startsWith("/preview")
+	const [collapsed, toggleCollapsed] = useState(false)
 
 	const colorSchemeManager = localStorageColorSchemeManager({
 		key: "mantine-color-scheme",
@@ -49,14 +52,16 @@ function RootComponent() {
 					<AppShell
 						padding={isPreview ? 0 : "md"}
 						//header={{ height: 56 }}
-						navbar={{ width: 250, breakpoint: "sm" }}
+						navbar={{ width: collapsed ? "80" : "260", breakpoint: "sm" }}
+						//transitionDuration={1000}
+						//transitionTimingFunction="ease"
 						className={clsx(isPreview && "not-dark:bg-gray-100")}
 					>
 						{/*<AppShell.Header>
 							<Navigation />
 						</AppShell.Header>*/}
 						<AppShell.Navbar>
-							<SideNavigation />
+							<SideNavigation collapsed={collapsed} toggleCollapsed={() => toggleCollapsed((c) => !c)} />
 						</AppShell.Navbar>
 						<AppShell.Main className={clsx(!isPreview && "mx-auto max-w-325")}>
 							<HeadContent />
