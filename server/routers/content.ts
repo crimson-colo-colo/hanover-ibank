@@ -53,6 +53,11 @@ export const contentRouter = router({
 						},
 					},
 					tags: true,
+					recentTimestamps: {
+						where: {
+							employeeId: opts.ctx.auth.sub,
+						},
+					}
 				},
 			})
 
@@ -90,6 +95,10 @@ export const contentRouter = router({
 					return {
 						...content,
 						favorited: content.favoritedBy.length > 0,
+						recentTimestamps: content.recentTimestamps.map((timestamp) => ({
+							recentlyViewed: timestamp.recentlyViewed,
+							recentlyEdited: timestamp.recentlyEdited,
+						})),
 						owner: {
 							id: content.ownerId,
 							name: owner.name ?? owner.nickname ?? owner.username!,
@@ -307,6 +316,46 @@ export const contentRouter = router({
 							})),
 						},
 					},
+				},
+			})
+		}),
+
+	updateRecentlyViewedTimestamp: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			})
+		)
+		.mutation(async (opts) => {
+			await db.recentTimestamps.update({
+				where: {
+					employeeId_contentId: {
+						contentId: opts.input.id,
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
+				data: {
+					recentlyViewed: new Date()
+				},
+			})
+		}),
+
+	updateRecentlyEditedTimestamp: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			})
+		)
+		.mutation(async (opts) => {
+			await db.recentTimestamps.update({
+				where: {
+					employeeId_contentId: {
+						contentId: opts.input.id,
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
+				data: {
+					recentlyEdited: new Date()
 				},
 			})
 		}),
@@ -557,6 +606,11 @@ export const contentRouter = router({
 				owner: true,
 				tags: true,
 				checkedOutBy: true,
+				recentTimestamps: {
+					where: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				}
 			},
 		})
 
@@ -608,6 +662,10 @@ export const contentRouter = router({
 							} satisfies ContentListItem["checkedOutBy"])
 						: null,
 					favorited: true,
+					recentTimestamps: content.recentTimestamps.map((timestamp) => ({
+						recentlyViewed: timestamp.recentlyViewed,
+						recentlyEdited: timestamp.recentlyEdited
+					})),
 					tags: content.tags.map((tag) => ({
 						category: tag.tagCategory,
 						name: tag.tagName,
@@ -736,6 +794,11 @@ export const contentRouter = router({
 					},
 				},
 				tags: true,
+				recentTimestamps: {
+					where: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				}
 			},
 		})
 
@@ -786,6 +849,10 @@ export const contentRouter = router({
 			tags: content.tags.map((tag) => ({
 				category: tag.tagCategory,
 				name: tag.tagName,
+			})),
+			recentTimestamps: content.recentTimestamps.map((timestamp) => ({
+				recentlyViewed: timestamp.recentlyViewed,
+				recentlyEdited: timestamp.recentlyEdited
 			})),
 			type: content.type as "Object",
 			objectId: content.objectId!,

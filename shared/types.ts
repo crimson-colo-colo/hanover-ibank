@@ -29,6 +29,10 @@ export type ContentListItem = {
 	lastModifiedDate: Date
 	expirationDate: Date
 	status: ContentStatus
+	recentTimestamps: {
+		recentlyViewed: Date
+		recentlyEdited: Date
+	}[]
 	tags: {
 		category: TagCategory
 		name: string
