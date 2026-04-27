@@ -39,3 +39,13 @@ export const fileTypeDisplayName: Record<FileType, string> = {
 	[FileType.Video]: "Video",
 	[FileType.Link]: "Link",
 }
+
+export const ContentViews = {
+	Default: "default",
+	ExpiringSoon: "expiringSoon",
+	RecentlyViewed: "recentlyViewed",
+	RecentlyEdited: "recentlyEdited",
+	CheckedOut: "checkedOut",
+} as const
+
+export type ContentViews = (typeof ContentViews)[keyof typeof ContentViews]

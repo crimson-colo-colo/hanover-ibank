@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Alert, Modal, SimpleGrid, Text, Title } from "@mantine/core"
+import { Alert, SimpleGrid, Text, Title } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { ContentType, type EmployeeRole } from "@prisma/browser.ts"
+import { ContentType } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import type { ContentListItem } from "@shared/types.ts"
@@ -9,9 +9,7 @@ import { IconAlertOctagon, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
-import { ContentTable } from "@/components/ContentTable.tsx"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
-import { PreviewModal } from "@/components/PreviewModal.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
 
@@ -27,12 +25,6 @@ function RoleDashboard() {
 	const [filePreviewOpen, { open: openFilePreviewModal, close: _closeFilePreview }] =
 		useDisclosure(false)
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
-
-	function closeFilePreview() {
-		setSelectedContent(null)
-		setSelectedContentFileType(null)
-		_closeFilePreview()
-	}
 
 	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
 	const [selectedContentFileType, setSelectedContentFileType] = useState<FileType | null>(null)
@@ -86,45 +78,6 @@ function RoleDashboard() {
 						})
 					)}
 				</SimpleGrid>
-			</div>
-
-			<div>
-				<section>
-					{content.isError ? (
-						<Alert color="red" title="Failed to load content" icon={<IconAlertOctagon />}>
-							Failed to load content: {content.error.message}
-						</Alert>
-					) : (
-						<ContentTable
-							loading={content.isFetching}
-							data={
-								content.data ?? {
-									content: [],
-									role: "Employee" as EmployeeRole,
-								}
-							}
-							filter={contentFilter}
-							changeFilter={setContentFilter}
-							openFilePreview={(file, type) => {
-								setSelectedContent(file)
-								setSelectedContentFileType(type)
-								openFilePreviewModal()
-							}}
-						/>
-					)}
-				</section>
-				<Modal.Root
-					opened={filePreviewOpen}
-					onClose={closeFilePreview}
-					fullScreen
-					shadow="none"
-					transitionProps={{ transition: "fade", duration: 200 }}
-				>
-					<Modal.Overlay backgroundOpacity={0.55} blur={3} />
-					{selectedContent && selectedContentFileType && (
-						<PreviewModal closePreview={closeFilePreview} contentId={selectedContent.id} />
-					)}
-				</Modal.Root>
 			</div>
 		</main>
 	)
