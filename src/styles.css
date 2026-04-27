@@ -108,11 +108,6 @@ button[aria-label='Open TanStack Devtools'] {
     visibility: visible;
 }
 
-.checked-out-icon:hover {
-    @apply bg-red-500;
-    @apply rounded-md;
-}
-
 .metadata-edit {
     visibility: hidden;
 }
