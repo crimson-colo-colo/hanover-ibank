@@ -13,7 +13,7 @@ export function EditableDateField({
 	setEditingField,
 	onFieldEdit,
 	ableToEdit,
-	disabledTooltip
+	disabledTooltip,
 }: {
 	enabled: boolean
 	field: "lastModifiedDate" | "expirationDate"
@@ -22,7 +22,7 @@ export function EditableDateField({
 	editingField: EditableField | null
 	setEditingField: (field: EditableField | null) => void
 	onFieldEdit: (field: EditableField, value: string) => void
-	ableToEdit: boolean,
+	ableToEdit: boolean
 	disabledTooltip: boolean
 }) {
 	return (
@@ -45,8 +45,13 @@ export function EditableDateField({
 					</div>
 					<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
 						<span>{new UTCDate(value).toDateString()}</span>
-						{ableToEdit &&
-							<Tooltip label="Please check out this content in order to edit it" withArrow arrowSize={8} disabled={disabledTooltip}>
+						{ableToEdit && (
+							<Tooltip
+								label="Please check out this content in order to edit it"
+								withArrow
+								arrowSize={8}
+								disabled={disabledTooltip}
+							>
 								<ActionIcon
 									className="metadata-edit"
 									variant="subtle"
@@ -55,7 +60,8 @@ export function EditableDateField({
 								>
 									<IconPencil />
 								</ActionIcon>
-							</Tooltip>}
+							</Tooltip>
+						)}
 					</div>
 				</div>
 			</Popover.Target>

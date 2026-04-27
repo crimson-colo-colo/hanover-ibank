@@ -13,7 +13,7 @@ export function EditableTextField({
 	onFieldEdit,
 	ref,
 	ableToEdit,
-	disabledTooltip
+	disabledTooltip,
 }: {
 	enabled: boolean
 	value: string
@@ -41,16 +41,22 @@ export function EditableTextField({
 				</span>
 			</Tooltip>
 			{ableToEdit && (
-				<Tooltip label="Please check out this content in order to edit it" withArrow arrowSize={8} disabled={disabledTooltip}>
+				<Tooltip
+					label="Please check out this content in order to edit it"
+					withArrow
+					arrowSize={8}
+					disabled={disabledTooltip}
+				>
 					<ActionIcon
-				className="metadata-edit"
-				variant="subtle"
-				onClick={() => setEditingField(field)}
-				disabled={!enabled}
-			>
-				<IconPencil/>
-			</ActionIcon>
-				</Tooltip>)}
+						className="metadata-edit"
+						variant="subtle"
+						onClick={() => setEditingField(field)}
+						disabled={!enabled}
+					>
+						<IconPencil />
+					</ActionIcon>
+				</Tooltip>
+			)}
 		</>
 	) : (
 		<input
