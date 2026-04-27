@@ -278,7 +278,7 @@ export function ContentTable({
 			}),
 			columnHelper.accessor("recentTimestamps", {
 				id: "recentlyViewed",
-				header: () => <span className="min-w-max">Last Viewed Date</span>,
+				header: () => <span className="min-w-max">Last Viewed</span>,
 				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
 					const getTime = (row: Row<ContentListItem>) =>
 						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)
@@ -304,7 +304,7 @@ export function ContentTable({
 
 			columnHelper.accessor("recentTimestamps", {
 				id: "recentlyEdited",
-				header: () => <span className="min-w-max">Last Edited Date</span>,
+				header: () => <span className="min-w-max">Last Edited</span>,
 				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
 					const getTime = (row: Row<ContentListItem>) =>
 						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)
@@ -610,7 +610,7 @@ export function ContentTable({
 					>
 						<Group wrap="nowrap">
 							<IconPencil size="1rem" />
-							Recently Edited
+							Recently Edited By You
 						</Group>
 					</Chip>
 					<Chip
