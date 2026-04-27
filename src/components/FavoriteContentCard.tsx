@@ -55,38 +55,84 @@ export function FavoriteContentCard({
 			},
 		})
 	)
+
 	const { data: contentThumbnail, isFetching } = useQuery(
 		trpc.preview.getContentUrl.queryOptions(
 			{ id: item.id },
 			{ enabled: item.type === ContentType.Object }
 		)
 	)
-	const containerRef = useRef<HTMLDivElement>(null)
-	const [thumbWidth, setThumbWidth] = useState<number>(200)
+	const { data: plaintextThumbnail, isFetching: isPlaintextFetching } = useQuery(
+		trpc.preview.getPlaintextContent.queryOptions(
+			{ id: item.id },
+			{ enabled: contentType === FileType.Plaintext }
+		)
+	)
 
-	useEffect(() => {
-		if (containerRef.current) {
-			setThumbWidth(containerRef.current.offsetWidth)
-		}
-	}, [])
 	let thumbnail: React.ReactNode
 
-	if (isFetching) {
+	if (isFetching || isPlaintextFetching) {
 		thumbnail = <IconLoader2 className={clsx("animate-spin", "text-white")} size={40} />
+	} else if (
+		contentType === FileType.Link ||
+		contentType === FileType.Audio ||
+		contentType === FileType.Video
+	) {
+		thumbnail = (
+			<div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+				<FileTypeIcon
+					fileType={contentType}
+					size={32}
+					strokeWidth={1.5}
+					className="text-gray-400 dark:text-gray-500"
+				/>
+				<Text size="xs" c="dimmed" tt="capitalize">
+					{contentType}
+				</Text>
+			</div>
+		)
 	} else if (contentType === FileType.Image) {
 		thumbnail = (
-			<Image src={contentThumbnail?.url} alt="thumbnail" className="w-full h-full object-cover" />
+			<Image
+				src={contentThumbnail?.url}
+				alt="thumbnail"
+				className="absolute inset-0 w-full h-full object-cover"
+			/>
 		)
 	} else if (
 		contentType === FileType.Pdf ||
 		contentType === FileType.WordDocument ||
-		contentType === FileType.Excel ||
-		contentType === FileType.Powerpoint
+		contentType === FileType.Excel
 	) {
 		thumbnail = (
-			<div className="w-full h-full overflow-hidden flex items-center justify-center bg-white">
+			<div className="absolute inset-0 overflow-hidden">
+				<div className="origin-top-left scale-120">
+					<Document file={contentThumbnail?.url}>
+						<Thumbnail pageNumber={1} width={200} />
+					</Document>
+				</div>
+			</div>
+		)
+	} else if (contentType === FileType.Plaintext) {
+		thumbnail = plaintextThumbnail?.text ? (
+			<div className="absolute inset-0 overflow-hidden p-2.5">
+				<p
+					className="text-9px leading-relaxed text-gray-500 dark:text-gray-400
+                  line-clamp-22 m-0"
+				>
+					{plaintextThumbnail?.text}
+				</p>
+			</div>
+		) : (
+			<div className="w-full h-full flex items-center justify-center p-4 bg-white rounded-md dark:bg-[#242424]">
+				<IconLoader2 className="animate-spin" size={48} />
+			</div>
+		)
+	} else if (contentType === FileType.Powerpoint) {
+		thumbnail = (
+			<div className="absolute inset-0 w-full flex justify-center">
 				<Document file={contentThumbnail?.url}>
-					<Thumbnail pageNumber={1} width={containerRef.current?.offsetWidth ?? thumbWidth} />
+					<Thumbnail pageNumber={1} />
 				</Document>
 			</div>
 		)
@@ -173,9 +219,7 @@ export function FavoriteContentCard({
 				</Flex>
 			</Card.Section>
 			<Card.Section className="bg-white dark:bg-gray-950" bdrs="md" mt="xs">
-				<div className="w-full" style={{ aspectRatio: "1" }}>
-					{thumbnail}
-				</div>
+				<div className="aspect-square relative overflow-hidden rounded-md">{thumbnail}</div>
 			</Card.Section>
 		</Card>
 	)
