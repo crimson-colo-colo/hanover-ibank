@@ -111,7 +111,7 @@ button[aria-label='Open TanStack Devtools'] {
 .metadata-edit {
     visibility: hidden;
 }
-.metadata-field[data-enabled=true]:hover .metadata-edit {
+.metadata-field:hover .metadata-edit {
     visibility: visible;
 }
 

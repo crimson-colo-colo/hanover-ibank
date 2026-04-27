@@ -10,9 +10,11 @@ import { trpc } from "@/lib/trpc.ts"
 export function ContentOwnerSelect({
 	form,
 	initialSearchValue,
+	onSelect,
 }: {
 	form: UseFormReturnType<{ ownerId: string }>
 	initialSearchValue?: string
+	onSelect?: (id: string, name: string) => void
 }) {
 	const [searchValue, setSearchValue] = useState(initialSearchValue || "")
 	const [debouncedSearchValue] = useDebouncedValue(searchValue, 300)
@@ -53,9 +55,11 @@ export function ContentOwnerSelect({
 				store={combobox}
 				withinPortal={false}
 				onOptionSubmit={(val) => {
+					const user = searchResults.data?.find((user) => user.id === val)
 					form.setFieldValue("ownerId", val)
-					setSearchValue(searchResults.data?.find((user) => user.id === val)?.email || val)
+					setSearchValue(user?.email || val)
 					combobox.closeDropdown()
+					onSelect?.(val, user?.name ?? "")
 				}}
 			>
 				<Combobox.Target>
@@ -78,6 +82,17 @@ export function ContentOwnerSelect({
 						rightSectionPointerEvents="none"
 						value={searchValue}
 						placeholder="Search users..."
+						onKeyDown={(event) => {
+							if (event.key === "Enter") {
+								const firstResult = searchResults.data?.[0]
+								if (firstResult) {
+									form.setFieldValue("ownerId", firstResult.id)
+									setSearchValue(firstResult.email)
+									combobox.closeDropdown()
+									onSelect?.(firstResult.id, firstResult.name)
+								}
+							}
+						}}
 					/>
 				</Combobox.Target>
 

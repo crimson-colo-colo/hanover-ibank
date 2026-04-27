@@ -241,17 +241,9 @@ async function createFavoriteContent(
 	linkContent: { id: string; ownerId: string }[],
 	fileTypeToContent: Map<FileType, string[]>
 ) {
-	const [admin, emp1, emp2] = await Promise.all(
-		["cccadmin@calebc.co", "cccemp1@calebc.co", "cccemp2@calebc.co"].map((email) =>
-			auth0Management.users.listUsersByEmail({ email }).then((users) => users[0])
-		)
-	)
-	if (!admin || !emp1 || !emp2) {
-		console.error(
-			"Could not find one or more required users in Auth0. Make sure these users exist before running the seed script."
-		)
-		process.exit(1)
-	}
+	const admin = "auth0|69d57cf83f6e9b609fe8a92f"
+	const emp1 = "auth0|69d57d03e7bf39d172e84921"
+	const emp2 = "auth0|69d57d0af36c0b4100640b0a"
 
 	const thingsToFavorite = [
 		...linkContent.slice(0, 3).map((c) => c.id),
@@ -259,12 +251,12 @@ async function createFavoriteContent(
 	]
 
 	await Promise.all(
-		[admin, emp1, emp2].flatMap((user) =>
+		[admin, emp1, emp2].flatMap((userId) =>
 			thingsToFavorite.map((contentId) =>
 				prisma.favoriteContent.create({
 					data: {
 						contentId,
-						employeeId: user.user_id!,
+						employeeId: userId,
 					},
 				})
 			)
