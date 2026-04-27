@@ -56,6 +56,8 @@ async function main() {
 	await checkoutFiles(fileContent)
 
 	await createContentThreads()
+
+	await createTimestamps()
 }
 
 async function confirmOverwrite() {
@@ -89,6 +91,7 @@ async function wipeDBandS3() {
 		prisma.tag.deleteMany(),
 		prisma.content.deleteMany(),
 		prisma.employee.deleteMany(),
+		prisma.recentTimestamps.deleteMany(),
 	])
 
 	console.log("Emptied database tables")
@@ -408,4 +411,32 @@ async function createContentThreads() {
 	})
 
 	console.log(`Created ${commentData.flat().length} comments across all threads`)
+}
+
+async function createTimestamps() {
+	const contentItems = await prisma.content.findMany({
+		select: { id: true },
+	})
+	for (const content of contentItems) {
+		for (const employee of employeeData) {
+			const employeeId = employee.id
+			const contentId = content.id
+			const ONE_DAY = 24 * 60 * 60 * 1000
+			// within the past 30 days, at least one day ago
+			const recentlyViewed = new Date(
+				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
+			)
+			const recentlyEdited = new Date(
+				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
+			)
+			await prisma.recentTimestamps.create({
+				data: {
+					recentlyViewed: recentlyViewed,
+					recentlyEdited: recentlyEdited,
+					employeeId: employeeId,
+					contentId: contentId,
+				},
+			})
+		}
+	}
 }

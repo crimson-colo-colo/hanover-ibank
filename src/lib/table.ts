@@ -1,12 +1,13 @@
 import type { ContentListItem } from "@shared/types.ts"
 import { compareItems, type RankingInfo, rankItem } from "@tanstack/match-sorter-utils"
-import { type FilterFn, type SortingFn, sortingFns } from "@tanstack/react-table"
-import type { FilterOptions } from "../components/TagFilterPopup.tsx"
+import { type FilterFn, type Row, type SortingFn, sortingFns } from "@tanstack/react-table"
+import type { FilterOptions } from "../components/content-table/TagFilterPopup.tsx"
 
 declare module "@tanstack/react-table" {
 	interface FilterFns {
 		fuzzy: FilterFn<unknown>
 		tagFilterFn: FilterFn<unknown>
+		checkedOutByFilterFn: FilterFn<unknown>
 	}
 	interface SortingFns {
 		fuzzy: SortingFn<unknown>
@@ -61,4 +62,22 @@ export const tagFilterFn: FilterFn<ContentListItem> = (
 	}
 
 	return false
+}
+
+export const customFilterFunction = (
+	row: Row<ContentListItem>,
+	columnId: string,
+	filterValue: string
+) => {
+	const value = row.getValue(columnId)
+	//Just for status column use equals logic
+	if (columnId === "status") {
+		return value?.toString().toLowerCase() === filterValue.toLowerCase()
+	}
+	//For all other columns use fuzzier includes logic
+	return value?.toString().toLowerCase().includes(filterValue.toLowerCase()) ?? false
+}
+
+export const checkedOutByFilterFn: FilterFn<ContentListItem> = (row) => {
+	return row.original.checkedOutBy !== null
 }

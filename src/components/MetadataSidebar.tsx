@@ -119,6 +119,9 @@ export function MetadataSidebar({
 					queryClient.invalidateQueries({
 						queryKey: trpc.preview.getContentUrl.queryKey({ id: content.id }),
 					}),
+					queryClient.invalidateQueries({
+						queryKey: trpc.preview.getPlaintextContent.queryKey({ id: content.id }),
+					}),
 				])
 			},
 		})
