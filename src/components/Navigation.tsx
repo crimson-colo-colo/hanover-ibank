@@ -3,24 +3,29 @@ import {
 	ActionIcon,
 	Burger,
 	Button,
+	Code,
 	Container,
 	Divider,
 	Drawer,
 	Group,
 	Image,
+	Indicator,
 	Menu,
 	NavLink,
 	ScrollArea,
 	Text,
+	TextInput,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
+	IconBell,
 	IconBuildingBank,
 	IconChartBar,
 	IconChevronRight,
 	IconHome,
 	IconLayoutSidebarLeftExpand,
 	IconMoon,
+	IconSearch,
 	IconSun,
 	IconUser,
 	IconUsers,
@@ -31,31 +36,27 @@ import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
-function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
+function NavLinks() {
 	const location = useLocation()
 
 	return (
-		<>
-			{isAdmin && (
-				<div>
-					<Button
-						component={Link}
-						variant={location.pathname === "/admin/manage-users" ? "light" : "subtle"}
-						to="/admin/manage-users"
-					>
-						Manage Employees
-					</Button>
+		<div>
+			<Button
+				component={Link}
+				variant={location.pathname === "/about" ? "light" : "subtle"}
+				to="/about"
+			>
+				About
+			</Button>
 
-					<Button
-						component={Link}
-						variant={location.pathname === "/admin/analytics" ? "light" : "subtle"}
-						to="/admin/analytics"
-					>
-						Analytics Dashboard
-					</Button>
-				</div>
-			)}
-		</>
+			<Button
+				component={Link}
+				variant={location.pathname === "/technology" ? "light" : "subtle"}
+				to="/technology"
+			>
+				Technology
+			</Button>
+		</div>
 	)
 }
 
@@ -158,9 +159,7 @@ function DrawerUserMenu() {
 
 export function Navigation() {
 	const auth0 = useAuth0()
-	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const [opened, { toggle, close }] = useDisclosure(false)
-
 	const { colorScheme, toggleColorScheme } = useColorScheme()
 
 	return (
@@ -178,15 +177,24 @@ export function Navigation() {
 				</Group>
 
 				<Group gap={5} visibleFrom="xs">
-					<Link
-						to="/"
-						className="flex items-center gap-2 mr-4 no-underline active:text-primary-hover"
-					>
-						<IconBuildingBank />
-						<span className="text-xl font-semibold font-display">iBank</span>
-					</Link>
-					{auth0.isAuthenticated && (
-						<NavLinks isLoading={isAdmin.isFetching} isAdmin={isAdmin.data} />
+					{!auth0.isAuthenticated && !auth0.user ? (
+						<>
+							<Link
+								to="/"
+								className="flex items-center gap-2 mr-4 no-underline active:text-primary-hover"
+							>
+								<IconBuildingBank />
+								<span className="text-xl font-semibold font-display">iBank</span>
+							</Link>
+							<NavLinks />
+						</>
+					) : (
+						<TextInput
+							placeholder="Search anything"
+							leftSection={<IconSearch size={18} />}
+							rightSectionWidth={70}
+							rightSection={<Code>Ctrl+K</Code>}
+						></TextInput>
 					)}
 				</Group>
 
@@ -195,41 +203,49 @@ export function Navigation() {
 						{colorScheme === "dark" ? <IconSun /> : <IconMoon />}
 					</ActionIcon>
 					{auth0.isAuthenticated && auth0.user ? (
-						<Menu trigger="click" position="bottom-end">
-							<Menu.Target>
-								<Button variant="subtle" color="gray" p="0" className="h-max">
-									<div className="flex items-center gap-2 px-2 py-1">
-										<div className="flex flex-col items-end">
-											<Text size="sm" fw={500}>
-												{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
-											</Text>
-											<Text size="xs" c="gray">
-												{auth0.user.email}
-											</Text>
+						<>
+							<Indicator label={undefined}>
+								<ActionIcon variant="subtle" onClick={undefined}>
+									<IconBell />
+								</ActionIcon>
+							</Indicator>
+
+							<Menu trigger="click" position="bottom-end">
+								<Menu.Target>
+									<Button variant="subtle" color="gray" p="0" className="h-max">
+										<div className="flex items-center gap-2 px-2 py-1">
+											<div className="flex flex-col items-end">
+												<Text size="sm" fw={500}>
+													{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
+												</Text>
+												<Text size="xs" c="gray">
+													{auth0.user.email}
+												</Text>
+											</div>
+											<Avatar userId={auth0.user.sub!} h={32} />
 										</div>
-										<Avatar userId={auth0.user.sub!} h={32} />
-									</div>
-								</Button>
-							</Menu.Target>
-							<Menu.Dropdown className="shadow-sm">
-								<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
-									Profile
-								</Menu.Item>
-								<Menu.Item
-									leftSection={<IconLayoutSidebarLeftExpand />}
-									onClick={() =>
-										auth0.logout({
-											logoutParams: {
-												returnTo: window.location.origin,
-											},
-										})
-									}
-									color="red"
-								>
-									Sign Out
-								</Menu.Item>
-							</Menu.Dropdown>
-						</Menu>
+									</Button>
+								</Menu.Target>
+								<Menu.Dropdown className="shadow-sm">
+									<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
+										Profile
+									</Menu.Item>
+									<Menu.Item
+										leftSection={<IconLayoutSidebarLeftExpand />}
+										onClick={() =>
+											auth0.logout({
+												logoutParams: {
+													returnTo: window.location.origin,
+												},
+											})
+										}
+										color="red"
+									>
+										Sign Out
+									</Menu.Item>
+								</Menu.Dropdown>
+							</Menu>
+						</>
 					) : (
 						<Button onClick={() => auth0.loginWithRedirect()}>Login</Button>
 					)}
@@ -254,14 +270,14 @@ export function Navigation() {
 					body: "flex flex-col flex-grow-1",
 				}}
 			>
-				<ScrollArea className="flex-1">
+				{/*<ScrollArea className="flex-1">
 					<Divider mb="sm" />
 					<DrawerNavLinks
 						isLoading={isAdmin.isFetching}
 						isAdmin={isAdmin.data}
 						closeDrawer={close}
 					/>
-				</ScrollArea>
+				</ScrollArea>*/}
 				<DrawerUserMenu />
 			</Drawer>
 		</header>
