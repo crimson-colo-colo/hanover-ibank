@@ -120,7 +120,7 @@ function TeamCard({ name, role, photo, alt }: TeamMember) {
 				w={120}
 				h="auto"
 				fit="cover"
-				style={{ flexShrink: 0, borderRadius: 4 }}
+				style={{ flexShrink: 0, borderRadius: 60 }}
 			/>
 			<div
 				style={{
