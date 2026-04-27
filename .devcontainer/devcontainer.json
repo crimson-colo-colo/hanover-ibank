@@ -29,7 +29,7 @@
 			}
 		}
 	},
-	"postCreateCommand": "(bun install &) && docker compose pull --ignore-pull-failures && docker compose up -d",
+	"postCreateCommand": "bun install & bun_pid=$!; docker compose pull --ignore-pull-failures & docker_pid=$!; wait \"$bun_pid\" \"$docker_pid\"; bun run db:seed",
 	"remoteEnv": {
 		"VITE_AUTH0_DOMAIN": "${localEnv:VITE_AUTH0_DOMAIN}",
 		"VITE_AUTH0_CLIENT_ID": "${localEnv:VITE_AUTH0_CLIENT_ID}",

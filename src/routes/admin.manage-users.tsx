@@ -1,4 +1,17 @@
-import { ActionIcon, Button, Checkbox, Flex, Group, Modal, Table, Text, Title } from "@mantine/core"
+import {
+	ActionIcon,
+	Button,
+	Checkbox,
+	Flex,
+	Group,
+	Modal,
+	NumberInput,
+	Pagination,
+	Select,
+	Table,
+	Text,
+	Title,
+} from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import {
@@ -15,6 +28,7 @@ import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
+	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
@@ -42,6 +56,10 @@ function RouteComponent() {
 	const deleteUser = useMutation(trpc.admin.deleteUsers.mutationOptions())
 
 	const [rowSelection, setRowSelection] = useState({})
+	const [pagination, setPagination] = useState({
+		pageIndex: 0, //initial page index
+		pageSize: 10, //default page size
+	})
 
 	const columnHelper = createColumnHelper<NonNullable<(typeof users)["data"]>[number]>()
 
@@ -112,6 +130,10 @@ function RouteComponent() {
 		data: users.data ?? [],
 		initialState: {
 			sorting: [{ id: "name", desc: false }],
+			pagination: {
+				pageIndex: 0, //custom initial page index
+				pageSize: 10, //custom default page size
+			},
 		},
 		filterFns: {
 			fuzzy: fuzzyFilter,
@@ -126,9 +148,12 @@ function RouteComponent() {
 		getSortedRowModel: getSortedRowModel(),
 		state: {
 			rowSelection,
+			pagination,
 		},
 		enableRowSelection: true,
 		onRowSelectionChange: setRowSelection,
+		getPaginationRowModel: getPaginationRowModel(),
+		onPaginationChange: setPagination,
 	})
 
 	if (users.isLoading) {
@@ -248,6 +273,57 @@ function RouteComponent() {
 				</Table.Thead>
 				<Table.Tbody>{rows}</Table.Tbody>
 			</Table>
+			<Flex justify="space-between" direction="row" align="center" mt="md">
+				<Group>
+					<Pagination.Root
+						siblings={1}
+						boundaries={1}
+						defaultValue={table.getState().pagination.pageIndex}
+						total={table.getPageCount()}
+						value={table.getState().pagination.pageIndex + 1}
+						onChange={(newPage) => {
+							table.setPageIndex(newPage - 1)
+						}}
+					>
+						<Group gap={3} justify="center">
+							<Pagination.First />
+							<Pagination.Previous />
+							<Pagination.Items />
+							<Pagination.Next />
+							<Pagination.Last />
+						</Group>
+					</Pagination.Root>
+
+					<Text size="sm">Go to page:</Text>
+					<NumberInput
+						w={70}
+						placeholder="0"
+						defaultValue={table.getState().pagination.pageIndex}
+						value={table.getState().pagination.pageIndex + 1}
+						onChange={(value) => {
+							if (value === "" || value === null) return
+							const page = Number(value) - 1
+							if (page >= 0 && page < table.getPageCount()) {
+								table.setPageIndex(page)
+							}
+						}}
+						min={1}
+						max={table.getPageCount()}
+					/>
+				</Group>
+				<Group gap="xs" align="center">
+					<Text>Items per page:</Text>
+					<Select
+						size="sm"
+						value={table.getState().pagination.pageSize}
+						onChange={(value) => {
+							value && table.setPageSize(Number(value))
+						}}
+						data={[10, 20, 30, 40, 50]}
+						defaultValue={table.getState().pagination.pageSize}
+					></Select>
+				</Group>
+			</Flex>
 			<Modal opened={updateOpened} onClose={closeUpdateDialog} title="Edit User">
 				{selectedUserForUpdate && (
 					<UpdateUserForm

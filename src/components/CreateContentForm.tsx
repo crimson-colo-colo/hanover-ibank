@@ -98,8 +98,8 @@ export function CreateContentForm({ onSuccess }: Props) {
 			},
 		})
 		notifications.show({
-			title: "Content created",
-			message: "The content has been successfully created.",
+			title: "Content uploaded",
+			message: "The content has been successfully uploaded.",
 			color: "emerald",
 		})
 		onSuccess()
@@ -191,27 +191,6 @@ export function CreateContentForm({ onSuccess }: Props) {
 				{...form.getInputProps("name")}
 			/>
 
-			{/* <MultiSelect
-				mt="sm"
-				withAsterisk={false}
-				label={
-					<LabelWithTooltip
-						tooltip="Select the employee roles that are the intended audience. This helps route content to the appropriate people."
-						required
-					>
-						Intended Audience
-					</LabelWithTooltip>
-				}
-				placeholder="Select..."
-				data={Object.values(EmployeeRole).map((role) => ({
-					value: role,
-					label: employeeRoleDisplayName[role],
-				}))}
-				required
-				key={form.key("intendedAudience")}
-				{...form.getInputProps("intendedAudience")}
-			/> */}
-
 			<InputLabel mt="sm">
 				<LabelWithTooltip tooltip="Search for the owner of this content by name or email." required>
 					Content Owner
@@ -293,7 +272,7 @@ export function CreateContentForm({ onSuccess }: Props) {
 					disabled={createContent.isPending}
 					leftSection={<IconCloudUpload size={20} stroke={1.5} />}
 				>
-					{createContent.isPending ? "Creating..." : "Create Content"}
+					{createContent.isPending ? "Uploading..." : "Upload Content"}
 				</Button>
 			</Group>
 		</form>

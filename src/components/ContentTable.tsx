@@ -237,7 +237,6 @@ export function ContentTable({
 											arrowSize={8}
 											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
 										>
-											link
 											<IconPencilOff className="checked-out-icon" size={24} />
 										</Tooltip>
 									))}
@@ -519,6 +518,7 @@ export function ContentTable({
 		onPaginationChange: setPagination,
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
+		autoResetPageIndex: false,
 	})
 
 	useEffect(() => {
@@ -560,7 +560,7 @@ export function ContentTable({
 						leftSection={<IconCloudUpload size={16} stroke={1.5} />}
 						onClick={openCreateModal}
 					>
-						Create content
+						Upload content
 					</Button>
 
 					<Button

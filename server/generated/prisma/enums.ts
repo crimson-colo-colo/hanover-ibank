@@ -9,6 +9,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const ThreadStatus = {
+  Open: 'Open',
+  Resolved: 'Resolved',
+  Archived: 'Archived'
+} as const
+
+export type ThreadStatus = (typeof ThreadStatus)[keyof typeof ThreadStatus]
+
+
 export const EmployeeRole = {
   BusinessAnalyst: 'BusinessAnalyst',
   Underwriter: 'Underwriter',

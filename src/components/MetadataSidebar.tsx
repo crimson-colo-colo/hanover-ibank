@@ -6,7 +6,6 @@ import {
 	Flex,
 	Menu,
 	Modal,
-	Paper,
 	Popover,
 	Stack,
 	Text,
@@ -37,7 +36,6 @@ import {
 	IconUser,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
 import { ContentOwnerSelect } from "@/components/ContentOwnerSelect.tsx"
 import { ContentTagsInput } from "@/components/ContentTagsInput.tsx"
@@ -213,16 +211,14 @@ export function MetadataSidebar({
 	}, [content])
 
 	return (
-		<Paper
-			w={insideModal ? "350px" : "300px"}
-			className={clsx("min-h-0 shrink-0", !insideModal ? "h-max" : "h-full")}
-			p="md"
-		>
+		<>
 			<Stack gap="md" className="h-full @container">
 				{insideModal && (
 					<Flex gap="sm" justify="space-between">
 						<Title
 							order={4}
+							p={0}
+							m={0}
 							className="flex items-center gap-2 px-1 leading-tight truncate metadata-field"
 							data-enabled={canEdit}
 						>
@@ -610,6 +606,6 @@ export function MetadataSidebar({
 					</div>
 				</Dropzone>
 			</Modal>
-		</Paper>
+		</>
 	)
 }

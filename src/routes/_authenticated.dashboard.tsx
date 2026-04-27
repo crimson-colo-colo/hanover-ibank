@@ -12,6 +12,7 @@ import { useState } from "react"
 import { ContentTable } from "@/components/ContentTable.tsx"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { PreviewModal } from "@/components/PreviewModal.tsx"
+import Search from "@/components/Search.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
 
@@ -41,6 +42,8 @@ function RoleDashboard() {
 
 	return (
 		<main>
+			<Search />
+
 			<header className="w-full p-4 text-white rounded-lg bg-primary">
 				<Title>
 					Welcome,{" "}

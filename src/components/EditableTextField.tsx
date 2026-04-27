@@ -32,7 +32,7 @@ export function EditableTextField({
 	return editingField !== field || !enabled ? (
 		<>
 			<Tooltip label={value} withArrow disabled={!truncated || editingField === "title"}>
-				<span className="px-1 py-1 truncate metadata-content" ref={contentRef}>
+				<span className="truncate metadata-content" ref={contentRef}>
 					{value}
 				</span>
 			</Tooltip>

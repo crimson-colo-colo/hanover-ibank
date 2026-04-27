@@ -9,6 +9,7 @@ services:
       - '5432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
+    cpus: "0.000"
   minio:
     image: pgsty/minio
     environment:
@@ -24,6 +25,7 @@ services:
     image: gotenberg/gotenberg:8
     ports:
       - '9002:3000'
+    cpus: "0.000"
 volumes:
   db_data:
   minio_data:

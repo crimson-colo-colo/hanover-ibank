@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Employee: 'Employee',
   Content: 'Content',
+  ContentTalkThread: 'ContentTalkThread',
+  TalkThreadComment: 'TalkThreadComment',
   Tag: 'Tag',
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
@@ -88,19 +90,46 @@ export const ContentScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  status: 'status',
   type: 'type',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastModifiedDate: 'lastModifiedDate',
+  expirationDate: 'expirationDate',
   objectId: 'objectId',
   url: 'url',
   ownerId: 'ownerId',
-  expirationDate: 'expirationDate',
-  lastModifiedDate: 'lastModifiedDate',
-  status: 'status',
-  createdAt: 'createdAt',
-  checkedOutById: 'checkedOutById',
-  updatedAt: 'updatedAt'
+  checkedOutById: 'checkedOutById'
 } as const
 
 export type ContentScalarFieldEnum = (typeof ContentScalarFieldEnum)[keyof typeof ContentScalarFieldEnum]
+
+
+export const ContentTalkThreadScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  resolvedAt: 'resolvedAt',
+  resolvedById: 'resolvedById',
+  createdById: 'createdById',
+  contentId: 'contentId'
+} as const
+
+export type ContentTalkThreadScalarFieldEnum = (typeof ContentTalkThreadScalarFieldEnum)[keyof typeof ContentTalkThreadScalarFieldEnum]
+
+
+export const TalkThreadCommentScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  body: 'body',
+  threadId: 'threadId',
+  authorId: 'authorId'
+} as const
+
+export type TalkThreadCommentScalarFieldEnum = (typeof TalkThreadCommentScalarFieldEnum)[keyof typeof TalkThreadCommentScalarFieldEnum]
 
 
 export const TagScalarFieldEnum = {
