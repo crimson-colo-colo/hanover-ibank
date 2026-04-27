@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Button, Group, Loader, Stack, TextInput, Title } from "@mantine/core"
+import { Button, Group, Loader, Stack, TextInput, Title, Switch} from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { IconCamera, IconDeviceFloppy, IconMoon, IconSun } from "@tabler/icons-react"
@@ -8,7 +8,6 @@ import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useRef } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
-import { PushTest } from "@/components/PushTest.tsx"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
@@ -16,6 +15,8 @@ const schema = z.object({
 	name: z.string().min(3).max(100),
 	email: z.email(),
 	username: z.string().min(3).max(100),
+	emailNotifications: z.boolean(),
+  	pushNotifications: z.boolean(),
 })
 
 export function ProfilePage() {
@@ -35,6 +36,15 @@ export function ProfilePage() {
 			},
 		})
 	)
+	const updateNotifications = useMutation(
+		trpc.user.notifications.mutationOptions({
+			async onSuccess() {
+				await queryClient.invalidateQueries({
+					queryKey: trpc.user.notifications.queryKey({ userId: user!.sub! }),
+				})
+			},
+		})
+	)
 	const uploadAvatar = useMutation(
 		trpc.user.uploadAvatar.mutationOptions({
 			async onSuccess() {
@@ -50,9 +60,18 @@ export function ProfilePage() {
 			name: user!.name!,
 			email: user!.email!,
 			username: "",
+			emailNotifications: true,
+			pushNotifications: true,
 		},
 		validate: schemaResolver(schema, { sync: true }),
 		transformValues: schema.parse,
+	})
+
+	const notificationsForm = useForm({
+		initialValues: {
+			emailNotifications: true,
+			pushNotifications: true,
+		},
 	})
 
 	useEffect(() => {
@@ -61,6 +80,8 @@ export function ProfilePage() {
 				name: profileQuery.data.name,
 				username: profileQuery.data.username,
 				email: profileQuery.data.email,
+				emailNotifications: profileQuery.data.emailNotifications,
+      			pushNotifications: profileQuery.data.pushNotifications,
 			})
 		}
 	}, [profileQuery.data])
@@ -69,7 +90,7 @@ export function ProfilePage() {
 		await getAccessTokenSilently({ cacheMode: "off" })
 	}
 
-	async function onSubmit(values: { name: string; email: string; username: string }) {
+	async function onSubmit(values: { name: string; email: string; username: string , emailNotifications: boolean; pushNotifications: boolean }) {
 		const result = await updateProfile.mutateAsync(values)
 		if (result.error) {
 			notifications.show({
@@ -177,10 +198,24 @@ export function ProfilePage() {
 						{user?.email}
 					</p>
 				</Stack>
+				<Stack gap="sm">
+					<Title order={4}>Notifications</Title>
+
+					<Switch
+						label="Enable Push Notifications"
+						{...form.getInputProps("pushNotifications", { type: "checkbox" })}
+					/>
+
+					<Switch
+						label="Enable Email Notifications"
+						{...form.getInputProps("emailNotifications", { type: "checkbox" })}
+					/>
+    	</Stack>
 			</Group>
 
 			<form onSubmit={form.onSubmit(onSubmit)}>
 				<Stack gap="sm">
+					<Title order={4}>Profile Information</Title>
 					<TextInput
 						label="Full name"
 						placeholder="John Doe"
@@ -199,6 +234,17 @@ export function ProfilePage() {
 						key={form.key("email")}
 						{...form.getInputProps("email")}
 					/>
+					<Title order={4}>Notifications</Title>
+
+					<Switch
+						label="Enable Push Notifications"
+						{...form.getInputProps("pushNotifications", { type: "checkbox" })}
+					/>
+
+					<Switch
+						label="Enable Email Notifications"
+						{...form.getInputProps("emailNotifications", { type: "checkbox" })}
+					/>
 
 					<Group justify="flex-end" mt="md">
 						<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/" })}>
@@ -212,10 +258,9 @@ export function ProfilePage() {
 							Save changes
 						</Button>
 					</Group>
+					
 				</Stack>
 			</form>
-
-			<PushTest />
 		</Stack>
 	)
 }
