@@ -12,6 +12,7 @@ import {
 	useLocation,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import clsx from "clsx"
 import Navigation from "@/components/Navigation.tsx"
 import { ScrollToTopButton, useRouteScrollToTop } from "@/components/ScrollToTopButton.tsx"
 import { useInitial } from "@/dev/index.ts"
@@ -19,7 +20,7 @@ import { queryClient } from "@/lib/trpc.ts"
 import { theme } from "@/theme.ts"
 
 import "../styles.css"
-import clsx from "clsx"
+import { AppSpotlight } from "@/components/AppSpotlight.tsx"
 
 interface RouterContext {
 	auth0: Auth0ContextInterface<User>
@@ -57,6 +58,7 @@ function RootComponent() {
 						<AppShell.Main className={clsx(!isPreview && "mx-auto max-w-325")}>
 							<HeadContent />
 							<Outlet />
+							<AppSpotlight />
 						</AppShell.Main>
 					</AppShell>
 					<Notifications />

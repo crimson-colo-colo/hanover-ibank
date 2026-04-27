@@ -1,4 +1,5 @@
 import type { ContentStatus, ContentType, EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { FileType } from "@shared/filetype.ts"
 
 export const employeeRoleDisplayName: Record<EmployeeRole, string> = {
 	BusinessAnalyst: "Business Analyst",
@@ -16,7 +17,7 @@ export const contentStatusDisplayName: Record<ContentStatus, string> = {
 }
 
 export const contentTypeDisplayName: Record<ContentType, string> = {
-	Link: "URL",
+	Link: "Link",
 	Object: "File",
 }
 
@@ -24,4 +25,17 @@ export const tagCategoryDisplayName: Record<TagCategory, string> = {
 	IntendedAudience: "Intended Audience",
 	DocumentType: "Document Type",
 	Custom: "Custom",
+}
+
+export const fileTypeDisplayName: Record<FileType, string> = {
+	[FileType.WordDocument]: "Word Document",
+	[FileType.Pdf]: "PDF",
+	[FileType.Excel]: "Excel Spreadsheet",
+	[FileType.Powerpoint]: "PowerPoint Presentation",
+	[FileType.Plaintext]: "Text",
+	[FileType.Image]: "Image",
+	[FileType.Unknown]: "Unknown",
+	[FileType.Audio]: "Audio",
+	[FileType.Video]: "Video",
+	[FileType.Link]: "Link",
 }

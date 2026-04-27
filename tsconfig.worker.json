@@ -1,16 +1,15 @@
 {
 	"include": [
-		"src/**/*.ts",
-		"src/**/*.tsx",
 		"shared/**/*.ts",
-		"server/generated/prisma/browser.ts"
+		"server/generated/prisma/browser.ts",
+		"sw.ts",
+		"src/**/*.worker.ts"
 	],
-	"exclude": ["src/**/*.worker.ts"],
 	"compilerOptions": {
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 		"target": "esnext",
 		"useDefineForClassFields": true,
-		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"lib": ["ESNext", "WebWorker"],
 		"module": "ESNext",
 		"types": ["vite/client"],
 		"skipLibCheck": true,
