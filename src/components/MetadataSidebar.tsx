@@ -125,6 +125,7 @@ export function MetadataSidebar({
 	)
 
 	const [pendingOwner, setPendingOwner] = useState<{ id: string; name: string } | null>(null)
+	const [pendingTagChange, setPendingTagChange] = useState<{ stringifiedTags: string } | null>(null)
 
 	const isIntendedAudience =
 		content.tags.some((tag) => tag.category === TagCategory.IntendedAudience) &&
@@ -163,6 +164,9 @@ export function MetadataSidebar({
 	const [fileEditDialogOpen, { open: openFileEditDialog, close: closeFileEditDialog }] =
 		useDisclosure(false)
 	const [confirmOwnerOpen, { open: openConfirmOwner, close: closeConfirmOwner }] =
+		useDisclosure(false)
+
+	const [confirmTagChange, { open: openConfirmTagChange, close: closeConfirmTagChange }] =
 		useDisclosure(false)
 
 	const titleRef = useRef<HTMLInputElement>(null)
@@ -438,7 +442,16 @@ export function MetadataSidebar({
 						enabled={canEdit}
 						value={content.tags}
 						onChange={(tags) => {
-							onFieldEdit("tags", stringifyTagList(tags))
+							const stringifiedTags = stringifyTagList(tags)
+							if (profile?.role !== undefined) {
+								if (!stringifiedTags.includes(profile.role)) {
+									setPendingTagChange({ stringifiedTags: stringifyTagList(tags) })
+									setEditingField(null)
+									openConfirmTagChange()
+								} else {
+									onFieldEdit("tags", stringifyTagList(tags))
+								}
+							}
 						}}
 					/>
 				</div>
@@ -681,6 +694,45 @@ export function MetadataSidebar({
 						leftSection={<IconUserShare />}
 					>
 						Transfer ownership
+					</Button>
+				</Flex>
+			</Modal>
+			<Modal
+				opened={confirmTagChange}
+				onClose={() => {
+					closeConfirmTagChange()
+					setPendingTagChange(null)
+				}}
+				title={<strong>Warning</strong>}
+			>
+				<Text>
+					By removing this tag you will lose the ability to edit the metadata of this content item!
+				</Text>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={() => {
+							closeConfirmTagChange()
+							setPendingTagChange(null)
+						}}
+						disabled={updateTags.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={updateOwner.isPending || checkInContent.isPending}
+						onClick={async () => {
+							if (pendingTagChange?.stringifiedTags !== undefined) {
+								onFieldEdit("tags", pendingTagChange?.stringifiedTags)
+								await checkInContent.mutateAsync({ id: content.id })
+							}
+							closeConfirmTagChange()
+							setPendingTagChange(null)
+						}}
+						leftSection={<IconCheck />}
+					>
+						Confirm
 					</Button>
 				</Flex>
 			</Modal>
