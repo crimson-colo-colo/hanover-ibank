@@ -1,8 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Alert, SimpleGrid, Text, Title } from "@mantine/core"
+import { Alert, Modal, SimpleGrid, Text, Title } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { ContentType } from "@prisma/browser.ts"
-import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import type { ContentListItem } from "@shared/types.ts"
 import { IconAlertOctagon, IconLoader2 } from "@tabler/icons-react"
@@ -10,6 +9,7 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
+import { PreviewModal } from "@/components/PreviewModal.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
 
@@ -19,17 +19,18 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function RoleDashboard() {
 	const auth0 = useAuth0()
-	const [contentFilter, setContentFilter] = useState<ContentFilter>(ContentFilter.Own)
-	const ownContent = useQuery(trpc.content.list.queryOptions({ filter: ContentFilter.Own }))
-	const allContent = useQuery(trpc.content.list.queryOptions({ filter: ContentFilter.All }))
+	const profile = useQuery(trpc.user.getProfile.queryOptions())
+	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
 	const [filePreviewOpen, { open: openFilePreviewModal, close: _closeFilePreview }] =
 		useDisclosure(false)
-	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
-
 	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
 	const [selectedContentFileType, setSelectedContentFileType] = useState<FileType | null>(null)
 
-	const content = contentFilter === ContentFilter.Own ? ownContent : allContent
+	function closeFilePreview() {
+		setSelectedContent(null)
+		setSelectedContentFileType(null)
+		_closeFilePreview()
+	}
 
 	return (
 		<main>
@@ -39,7 +40,7 @@ function RoleDashboard() {
 					{auth0.user?.name ?? auth0.user?.nickname ?? auth0.user?.preferred_username ?? "User"}
 				</Title>
 				<small className="mb-3 font-semibold tracking-wider text-gray-200 uppercase">
-					{content.data ? employeeRoleDisplayName[content.data.role] : ""}
+					{profile.data ? employeeRoleDisplayName[profile.data.role!] : ""}
 				</small>
 			</header>
 
@@ -79,6 +80,18 @@ function RoleDashboard() {
 					)}
 				</SimpleGrid>
 			</div>
+			<Modal.Root
+				opened={filePreviewOpen}
+				onClose={closeFilePreview}
+				fullScreen
+				shadow="none"
+				transitionProps={{ transition: "fade", duration: 200 }}
+			>
+				<Modal.Overlay backgroundOpacity={0.55} blur={3} />
+				{selectedContent && selectedContentFileType && (
+					<PreviewModal closePreview={closeFilePreview} contentId={selectedContent.id} />
+				)}
+			</Modal.Root>
 		</main>
 	)
 }
