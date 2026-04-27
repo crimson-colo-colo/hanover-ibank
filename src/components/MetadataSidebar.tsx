@@ -10,7 +10,7 @@ import {
 	Stack,
 	Text,
 	Title,
-	Tooltip
+	Tooltip,
 } from "@mantine/core"
 import { Dropzone } from "@mantine/dropzone"
 import { useForm } from "@mantine/form"
@@ -19,6 +19,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { type ContentStatus, EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
+import type { ContentListItem } from "@shared/types.ts"
 import {
 	IconCheck,
 	IconCircleArrowUpRight,
@@ -46,7 +47,6 @@ import { EditableTextField } from "@/components/EditableTextField.tsx"
 import { contentStatusDisplayName } from "@/lib/enums.ts"
 import { stringifyTagList, unstringifyTagList } from "@/lib/tags.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-import type { ContentListItem } from "@shared/types.ts"
 
 export type EditableField =
 	| "title"
@@ -312,16 +312,25 @@ export function MetadataSidebar({
 							</div>
 							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
 								<span>{content.owner.name}</span>
-								{ableToEdit && <CannotEditToolTip disabled={canEdit}>
-										<ActionIcon
-											className="metadata-edit"
-											variant="subtle"
-											disabled={!canTransferOwnership || !canEdit}
-											onClick={() => setEditingField("owner")}
+								{ableToEdit && (
+									<CannotEditToolTip disabled={canEdit}>
+										<Tooltip
+											label="You must be the content owner to transfer ownership"
+											withArrow
+											arrowSize={8}
+											disabled={canTransferOwnership || !canEdit}
 										>
-											<IconPencil />
-										</ActionIcon>
-								</CannotEditToolTip>}
+											<ActionIcon
+												className="metadata-edit"
+												variant="subtle"
+												disabled={!canTransferOwnership || !canEdit}
+												onClick={() => setEditingField("owner")}
+											>
+												<IconPencil />
+											</ActionIcon>
+										</Tooltip>
+									</CannotEditToolTip>
+								)}
 							</div>
 						</div>
 					</Popover.Target>
@@ -382,7 +391,8 @@ export function MetadataSidebar({
 							</div>
 							<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
 								<span>{contentStatusDisplayName[content.status]}</span>
-								{ableToEdit && <CannotEditToolTip disabled={canEdit}>
+								{ableToEdit && (
+									<CannotEditToolTip disabled={canEdit}>
 										<ActionIcon
 											className="metadata-edit"
 											variant="subtle"
@@ -391,7 +401,8 @@ export function MetadataSidebar({
 										>
 											<IconPencil />
 										</ActionIcon>
-								</CannotEditToolTip>}
+									</CannotEditToolTip>
+								)}
 							</div>
 						</div>
 					</Menu.Target>
@@ -643,8 +654,10 @@ export function MetadataSidebar({
 				}}
 				title="Transfer ownership"
 			>
-				<Text>Are you sure you want to transfer ownership to{" "}
-					<strong>{pendingOwner?.name}</strong>? They will be the new owner of this content.</Text>
+				<Text>
+					Are you sure you want to transfer ownership to <strong>{pendingOwner?.name}</strong>? They
+					will be the new owner of this content.
+				</Text>
 				<Flex gap="md" justify="flex-end" mt="md">
 					<Button
 						variant="subtle"
@@ -675,13 +688,19 @@ export function MetadataSidebar({
 	)
 }
 function CannotEditToolTip({
-							   children, disabled
-						   } : {
-	children: React.ReactNode,
+	children,
+	disabled,
+}: {
+	children: React.ReactNode
 	disabled: boolean
 }) {
 	return (
-		<Tooltip label="Please check out this content in order to edit it" withArrow arrowSize={8} disabled={disabled} >
+		<Tooltip
+			label="Please check out this content in order to edit it"
+			withArrow
+			arrowSize={8}
+			disabled={disabled}
+		>
 			{children}
 		</Tooltip>
 	)
