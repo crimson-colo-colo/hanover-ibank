@@ -5,14 +5,12 @@ import {
 	Button,
 	Code,
 	Container,
-	Divider,
 	Drawer,
 	Group,
 	Image,
 	Indicator,
 	Menu,
 	NavLink,
-	ScrollArea,
 	Text,
 	TextInput,
 } from "@mantine/core"
@@ -30,10 +28,8 @@ import {
 	IconUser,
 	IconUsers,
 } from "@tabler/icons-react"
-import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import { Avatar } from "@/components/Avatar.tsx"
-import { trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
 function NavLinks() {

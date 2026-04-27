@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { ActionIcon, Button, Group, Menu, NavLink, Stack, Text, Tooltip } from "@mantine/core"
+import { ActionIcon, Button, Stack, Text, Tooltip } from "@mantine/core"
 import { useHover } from "@mantine/hooks"
 import {
 	IconBolt,
@@ -13,7 +13,6 @@ import {
 	IconList,
 	IconPointFilled,
 	IconStar,
-	IconUser,
 	IconUsers,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
