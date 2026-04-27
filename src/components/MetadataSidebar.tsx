@@ -24,6 +24,7 @@ import {
 	IconCheck,
 	IconCircleArrowUpRight,
 	IconCircleCheck,
+	IconDeviceFloppy,
 	IconDoorEnter,
 	IconDoorExit,
 	IconDownload,
@@ -709,7 +710,8 @@ export function MetadataSidebar({
 				title={<strong>Warning</strong>}
 			>
 				<Text>
-					By removing this tag you will lose the ability to edit the metadata of this content item!
+					Removing your role from the intended audience will remove your access to edit this
+					content. Continue anyway?
 				</Text>
 				<Flex gap="md" justify="flex-end" mt="md">
 					<Button
@@ -733,9 +735,10 @@ export function MetadataSidebar({
 							closeConfirmTagChange()
 							setPendingTagChange(null)
 						}}
-						leftSection={<IconCheck />}
+						leftSection={<IconDeviceFloppy />}
+						color="red"
 					>
-						Confirm
+						Continue
 					</Button>
 				</Flex>
 			</Modal>
