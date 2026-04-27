@@ -204,7 +204,7 @@ export function Navigation() {
 					</ActionIcon>
 					{auth0.isAuthenticated && auth0.user ? (
 						<>
-							<Indicator label={undefined}>
+							<Indicator label={undefined} className="flex justify-items-center">
 								<ActionIcon variant="subtle" onClick={undefined}>
 									<IconBell />
 								</ActionIcon>

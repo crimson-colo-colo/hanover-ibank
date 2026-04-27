@@ -55,8 +55,6 @@ function RootComponent() {
 							width: auth0.isAuthenticated && auth0.user ? (collapsed ? "70" : "260") : "0",
 							breakpoint: "sm",
 						}}
-						//transitionDuration={1000}
-						//transitionTimingFunction="ease"
 						className={clsx(isPreview && "not-dark:bg-gray-100")}
 					>
 						<AppShell.Header>
