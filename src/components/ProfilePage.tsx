@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Button, Group, Loader, Stack, TextInput, Title } from "@mantine/core"
+import { Button, Group, Loader, Stack, TextInput, Title, Text } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { IconCamera, IconDeviceFloppy, IconMoon, IconSun } from "@tabler/icons-react"
@@ -10,6 +10,7 @@ import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
+import { HelpHint } from "@/components/help.hint.tsx"
 
 const schema = z.object({
 	name: z.string().min(3).max(100),
@@ -164,6 +165,7 @@ export function ProfilePage() {
 					/>
 				</div>
 				<Stack gap={2}>
+					<Group gap={6} align="center">
 					<p
 						style={{
 							margin: 0,
@@ -172,6 +174,19 @@ export function ProfilePage() {
 					>
 						{user?.name}
 					</p>
+						<HelpHint
+							feature="your profile picture"
+							steps={[
+								{
+									target: "#profile-avatar-section",
+									title: "Your Profile Picture",
+									content:
+										"Click the camera icon to upload a custom avatar. Your picture appears next to your name throughout the app.",
+									placement: "bottom",
+								},
+							]}
+						/>
+					</Group>
 					<p style={{ margin: 0, fontSize: 14, color: "var(--mantine-color-dimmed)" }}>
 						{user?.email}
 					</p>
@@ -179,6 +194,21 @@ export function ProfilePage() {
 			</Group>
 
 			<form id="profile-form" onSubmit={form.onSubmit(onSubmit)}>
+				<Group gap="xs" mb="xs">
+					<Text size="sm" fw="600">Account Details</Text>
+					<HelpHint
+						feature="profile settings"
+						steps={[
+							{
+								target: "#profile-form",
+								title: "Profile Settings",
+								content:
+									"Update your display name, username, and email address here. Changes are reflected immediately across the platform.",
+								placement: "top",
+							},
+						]}
+					/>
+				</Group>
 				<Stack gap="sm">
 					<TextInput
 						label="Full name"

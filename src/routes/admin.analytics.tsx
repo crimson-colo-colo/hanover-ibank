@@ -1,5 +1,6 @@
 import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
-import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import { Grid, Paper, Stack, Text, Timeline, Title, Group } from "@mantine/core"
+import { HelpHint } from "@/components/help.hint.tsx";
 import { IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
@@ -132,7 +133,24 @@ function AnalyticsDashboard() {
 	return (
 		<Stack mt="md" gap="lg">
 			<Title order={2}>Analytics Dashboard</Title>
-
+			<div>
+				<Group gap="xs" mb="xs">
+					<Text size="sm" fw={600}>
+						Key Metrics
+					</Text>
+					<HelpHint
+						feature="key metrics"
+						steps={[
+							{
+								target: "#analytics-metrics",
+								title: "Key Metrics",
+								content:
+									"A quick snapshot of platform activity: time on site, total uploads, file and link counts, your busiest month, and total employee count.",
+								placement: "bottom",
+							},
+						]}
+					/>
+				</Group>
 			<Grid id="analytics-metrics" align="stretch" grow={true}>
 				{metrics.map((m) => (
 					<Grid.Col key={m.label} span={{ base: 12, sm: 6, md: 4, lg: 2 }} align="stretch">
@@ -147,7 +165,25 @@ function AnalyticsDashboard() {
 					</Grid.Col>
 				))}
 			</Grid>
-
+			</div>
+			<div>
+			<Group gap="xs" mb="xs">
+				<Text size="sm" fw={600}>
+					Uploads & Activity
+				</Text>
+				<HelpHint
+					feature="uploads and recent activity"
+					steps={[
+						{
+							target: "#analytics-uploads-chart",
+							title: "Uploads Over Time & Recent Activity",
+							content:
+								"The area chart tracks file and link uploads over the last 12 months. The timeline on the right shows the most recent actions taken by any user on the platform.",
+							placement: "top",
+						},
+					]}
+				/>
+			</Group>
 			<Grid id="analytics-uploads-chart">
 				<Grid.Col span={{ base: 12, md: 7 }}>
 					<Paper withBorder p="md" radius="md" h="100%">
@@ -202,7 +238,25 @@ function AnalyticsDashboard() {
 					</Paper>
 				</Grid.Col>
 			</Grid>
-
+			</div>
+			<div>
+				<Group gap="xs" mb="xs">
+					<Text size="sm" fw={600}>
+						File Type Breakdown
+					</Text>
+					<HelpHint
+						feature="the file type charts"
+						steps={[
+							{
+								target: "#analytics-file-charts",
+								title: "File Type Breakdown",
+								content:
+									"The pie chart shows the distribution of content types, and the bar chart compares how much storage each type is consuming.",
+								placement: "top",
+							},
+						]}
+					/>
+				</Group>
 			<Grid id="analytics-file-charts">
 				<Grid.Col span={{ base: 12, md: 6 }}>
 					<Paper withBorder p="md" radius="md">
@@ -254,7 +308,25 @@ function AnalyticsDashboard() {
 					</Paper>
 				</Grid.Col>
 			</Grid>
-
+			</div>
+			<div>
+				<Group gap="xs" mb="xs">
+					<Text size="sm" fw={600}>
+						Activity Heatmap
+					</Text>
+					<HelpHint
+						feature="the activity heatmap"
+						steps={[
+							{
+								target: "#analytics-heatmap",
+								title: "User Activity Heatmap",
+								content:
+									"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
+								placement: "top",
+							},
+						]}
+					/>
+				</Group>
 			<Grid id="analytics-heatmap">
 				<Grid.Col span={12}>
 					<Paper withBorder p="md" radius="md">
@@ -286,6 +358,7 @@ function AnalyticsDashboard() {
 					</Paper>
 				</Grid.Col>
 			</Grid>
+			</div>
 		</Stack>
 	)
 }

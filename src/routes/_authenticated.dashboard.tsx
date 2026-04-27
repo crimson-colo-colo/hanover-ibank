@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Alert, Modal, SimpleGrid, Text, Title } from "@mantine/core"
+import { Alert, Modal, SimpleGrid, Text, Title, Group } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { ContentType, type EmployeeRole } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
@@ -14,6 +14,7 @@ import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
 import { PreviewModal } from "@/components/PreviewModal.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
+import { HelpHint } from "@/components/help.hint.tsx"
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
@@ -41,7 +42,7 @@ function RoleDashboard() {
 
 	return (
 		<main>
-so			<header id="dashboard-welcome" className="w-full p-4 text-white rounded-lg bg-primary">
+			<header id="dashboard-welcome" className="w-full p-4 text-white rounded-lg bg-primary">
 				<Title>
 					Welcome,{" "}
 					{auth0.user?.name ?? auth0.user?.nickname ?? auth0.user?.preferred_username ?? "User"}
@@ -54,6 +55,29 @@ so			<header id="dashboard-welcome" className="w-full p-4 text-white rounded-lg 
 			<div id="dashboard-favorites">
 				<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
 					Your Favorites {favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
+					<HelpHint
+						feature="favorites"
+						steps={[
+							{
+								target: "#dashboard-favorites",
+								title: "Your Favorites",
+								content:
+									"Pinned content you've marked as a favorite appears here for quick access. Star any file or link in the table below to add it.",
+								placement: "bottom",
+							},
+							...(favoriteContent.data?.content.length
+								? [
+									{
+										target: "#dashboard-favorites .mantine-Card-root",
+										title: "Favorite Cards",
+										content:
+											"Click anywhere on a card to preview the file. Use the ⋮ menu in the top-right of each card to unfavorite, open the link, or download it.",
+										placement: "bottom" as const,
+									},
+								]
+								: []),
+						]}
+					/>
 				</Title>
 				<SimpleGrid minColWidth={250} spacing="md">
 					{favoriteContent.isLoading ? null : favoriteContent.isError ? (
@@ -90,6 +114,21 @@ so			<header id="dashboard-welcome" className="w-full p-4 text-white rounded-lg 
 
 			<div>
 				<section id="dashboard-content-section">
+					<Group gap="xs" mt="lg" mb="sm">
+						<Title order={3}>Content Library</Title>
+						<HelpHint
+							feature="the content library"
+							steps={[
+								{
+									target: "#dashboard-content-section",
+									title: "Content Library",
+									content:
+										"This table lists all the content available to you — files, documents, and links. You can sort, filter, search, and manage everything from here.",
+									placement: "top",
+								},
+							]}
+						/>
+					</Group>
 					{content.isError ? (
 						<Alert color="red" title="Failed to load content" icon={<IconAlertOctagon />}>
 							Failed to load content: {content.error.message}

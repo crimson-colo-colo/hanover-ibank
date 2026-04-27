@@ -110,7 +110,7 @@ const ADMIN_ANALYTICS_STEPS: Step[] = [
 		target: "#analytics-heatmap",
 		title: "User Activity Heatmap",
 		content:
-			"Each square represents a day. Darker squares mean more active users that day. Hover a square for an exact count.",
+			"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
 		placement: "top",
 	},
 ]
@@ -184,6 +184,7 @@ export function NewUserTutorial() {
 		if (isAdmin.isLoading) return
 		const completed = localStorage.getItem(TUTORIAL_STORAGE_KEY) === "true"
 		if (!completed) setShowPrompt(true)
+		//setShowPrompt(true) -> if you want the tutorial to always appear, as like a test thingy then uncomment this line, and comment the two above out
 	}, [isAdmin.isLoading])
 
 	function completeTutorial() {
