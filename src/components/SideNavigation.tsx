@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { ActionIcon, Button, Group, Menu, NavLink, Stack, Text, Tooltip } from "@mantine/core"
+import { useHover } from "@mantine/hooks"
 import {
 	IconBolt,
 	IconBuildingBank,
@@ -41,7 +42,13 @@ function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; coll
 	const adminNavLinks = routeLinks
 		.filter((link) => link.admin)
 		.map((link) => (
-			<Tooltip label={link.name} position="right" withArrow arrowSize={8} disabled={!collapsed}>
+			<Tooltip
+				label={link.name}
+				position="right"
+				withArrow={true}
+				arrowSize={8}
+				disabled={!collapsed}
+			>
 				<Button
 					component={Link}
 					variant={location.pathname === link.pathName ? "light" : "subtle"}
@@ -87,11 +94,18 @@ export function SideNavigation({ collapsed, toggleCollapsed }: sideNavigationPro
 	const auth0 = useAuth0()
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const location = useLocation()
+	const { hovered, ref } = useHover()
 
 	const navLinks = routeLinks
 		.filter((link) => !link.admin)
 		.map((link) => (
-			<Tooltip label={link.name} position="right" withArrow arrowSize={8} disabled={!collapsed}>
+			<Tooltip
+				label={link.name}
+				position="right"
+				withArrow={true}
+				arrowSize={8}
+				disabled={!collapsed}
+			>
 				<Button
 					component={Link}
 					variant={location.pathname === link.pathName ? "light" : "subtle"}
@@ -108,24 +122,33 @@ export function SideNavigation({ collapsed, toggleCollapsed }: sideNavigationPro
 
 	return (
 		<header className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
-			<div className="p-4">
-				<Link
-					to="/"
-					className={`flex items-center ${collapsed && "justify-center"} gap-2 mb-4 no-underline active:text-primary-hover`}
+			<div className="flex p-4 mb-2 justify-center">
+				{!collapsed && (
+					<Link
+						to="/"
+						className={`flex items-center ${collapsed && "justify-center"} gap-2 no-underline active:text-primary-hover`}
+					>
+						<IconBuildingBank />
+						<span className="text-xl font-semibold font-display">iBank</span>
+					</Link>
+				)}
+				<ActionIcon
+					variant="subtle"
+					size="md"
+					onClick={toggleCollapsed}
+					ref={ref}
+					className={`${!collapsed && "absolute right-0 mr-2"}`}
 				>
-					<IconBuildingBank />
-					{!collapsed && <span className="text-xl font-semibold font-display">iBank</span>}
-				</Link>
-				<ActionIcon variant="subtle" size="md" onClick={toggleCollapsed}>
 					{collapsed ? (
-						<IconLayoutSidebarLeftExpand size={26} />
+						hovered ? (
+							<IconLayoutSidebarLeftExpand size={26} />
+						) : (
+							<IconBuildingBank size={26} />
+						)
 					) : (
 						<IconLayoutSidebarRightExpand size={26} />
 					)}
 				</ActionIcon>
-				{/*<div className={collapsed ? "flex justify-center" : "flex justify-end-safe"}>
-
-				</div>*/}
 			</div>
 			<Stack gap={0}>{navLinks}</Stack>
 			{<AdminLinks isAdmin={isAdmin.data} collapsed={collapsed}></AdminLinks>}
