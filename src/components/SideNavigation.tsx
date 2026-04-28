@@ -125,7 +125,10 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 		))
 
 	return (
-		<header className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700 flex flex-col">
+		<header
+			className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700 flex flex-col"
+			ref={ref}
+		>
 			<div className={`flex py-4 mb-2 ${collapsed ? "justify-center" : "px-4"}`}>
 				{!collapsed && (
 					<Link to="/" className="flex items-center gap-2 no-underline active:text-primary-hover">
@@ -137,7 +140,6 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 					variant="subtle"
 					size="md"
 					onClick={toggleCollapsed}
-					ref={ref}
 					className={`${!collapsed && "absolute right-3"}`}
 				>
 					{collapsed ? (
