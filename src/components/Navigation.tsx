@@ -7,7 +7,6 @@ import {
 	Container,
 	Drawer,
 	Group,
-	Image,
 	Indicator,
 	Menu,
 	NavLink,
@@ -17,19 +16,17 @@ import {
 import { useDisclosure } from "@mantine/hooks"
 import {
 	IconBell,
+	IconBolt,
 	IconBuildingBank,
-	IconChartBar,
 	IconChevronRight,
-	IconHome,
+	IconInfoCircle,
 	IconLayoutSidebarLeftExpand,
 	IconMoon,
 	IconSearch,
 	IconSun,
 	IconUser,
-	IconUsers,
 } from "@tabler/icons-react"
 import { Link, useLocation } from "@tanstack/react-router"
-import { createPortal } from "react-dom"
 import { Avatar } from "@/components/Avatar.tsx"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
@@ -57,100 +54,32 @@ function NavLinks() {
 	)
 }
 
-function DrawerNavLinks({
-	isLoading,
-	isAdmin,
-	closeDrawer,
-}: {
-	isLoading: boolean
-	isAdmin: boolean | undefined
-	closeDrawer: () => void
-}) {
+function DrawerNavLinks({ closeDrawer }: { closeDrawer: () => void }) {
 	const location = useLocation()
 
 	return (
 		<>
 			<NavLink
 				component={Link}
-				to="/"
-				label="Dashboard"
+				to="/about"
+				label="About"
 				variant="filled"
-				leftSection={<IconHome size={16} />}
+				leftSection={<IconInfoCircle size={16} />}
 				rightSection={<IconChevronRight size={12} />}
-				active={location.pathname === "/"}
+				active={location.pathname === "/about"}
 				onClick={closeDrawer}
 			/>
 			<NavLink
 				component={Link}
-				to="/analytics"
-				label="Analytics"
+				to="/technology"
+				label="Technology"
 				variant="filled"
-				leftSection={<IconChartBar size={16} />}
+				leftSection={<IconBolt size={16} />}
 				rightSection={<IconChevronRight size={12} />}
-				active={location.pathname === "/analytics"}
+				active={location.pathname === "/technology"}
 				onClick={closeDrawer}
 			/>
-			{isAdmin && (
-				<NavLink
-					component={Link}
-					to="/admin/manage-users"
-					label="Manage Employees"
-					variant="filled"
-					leftSection={<IconUsers size={16} />}
-					rightSection={<IconChevronRight size={12} />}
-					active={location.pathname === "/admin/manage-users"}
-					onClick={closeDrawer}
-				/>
-			)}
 		</>
-	)
-}
-
-function DrawerUserMenu() {
-	const auth0 = useAuth0()
-	if (!auth0.user) {
-		return null
-	}
-
-	return (
-		<Menu trigger="click" position="top-start">
-			<Menu.Target>
-				<Button
-					variant="subtle"
-					color="gray"
-					p="4"
-					className="border-t border-t-gray-200 hover:bg-gray-100 h-max"
-					justify="start"
-				>
-					<div className="flex items-center gap-2 px-2 py-1">
-						<Image
-							h={32}
-							bdrs="100%"
-							className="cursor-pointer"
-							src={auth0.user.picture}
-							alt={auth0.user.name}
-						/>
-						<div className="flex flex-col items-start">
-							<Text size="sm" fw={500}>
-								{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
-							</Text>
-							<Text size="xs" c="gray">
-								{auth0.user.email}
-							</Text>
-						</div>
-					</div>
-				</Button>
-			</Menu.Target>
-			<Menu.Dropdown>
-				<Menu.Item
-					leftSection={<IconLayoutSidebarLeftExpand />}
-					onClick={() => auth0.logout()}
-					color="red"
-				>
-					Sign Out
-				</Menu.Item>
-			</Menu.Dropdown>
-		</Menu>
 	)
 }
 
@@ -271,15 +200,7 @@ export function Navigation() {
 					body: "flex flex-col flex-grow-1",
 				}}
 			>
-				{/*<ScrollArea className="flex-1">
-					<Divider mb="sm" />
-					<DrawerNavLinks
-						isLoading={isAdmin.isFetching}
-						isAdmin={isAdmin.data}
-						closeDrawer={close}
-					/>
-				</ScrollArea>*/}
-				<DrawerUserMenu />
+				<DrawerNavLinks closeDrawer={close} />
 			</Drawer>
 		</header>
 	)
