@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
+import type { HeadObjectCommandOutput } from "@aws-sdk/client-s3"
 import {
 	Alert,
 	Button,
@@ -31,15 +32,32 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
 })
 
+type viewTotalsType =
+	| {
+			title: string | undefined
+			contentId: string
+			_sum: {
+				viewCount: number | null
+			}
+			metadata: HeadObjectCommandOutput | undefined
+	  }[]
+	| undefined
+
 function RoleDashboard() {
 	const auth0 = useAuth0()
 	const profile = useQuery(trpc.user.getProfile.queryOptions())
 	const favoriteContent = useQuery(trpc.content.listFavorites.queryOptions())
 	const allContent = useQuery(trpc.content.list.queryOptions({ filter: ContentFilter.All }))
+	const linkViewTotals = useQuery(
+		trpc.content.getContentViewTotals.queryOptions({ type: ContentType.Link })
+	).data
+	const fileViewTotals = useQuery(
+		trpc.content.getContentViewTotals.queryOptions({ type: ContentType.Object })
+	).data
 
 	const [filePreviewOpen, { open: openFilePreviewModal, close: _closeFilePreview }] =
 		useDisclosure(false)
-	const [selectedContent, setSelectedContent] = useState<ContentListItem | null>(null)
+	const [selectedContent, setSelectedContent] = useState<string | null>(null)
 	const [selectedContentFileType, setSelectedContentFileType] = useState<FileType | null>(null)
 
 	function closeFilePreview() {
@@ -65,14 +83,26 @@ function RoleDashboard() {
 					favoriteContent={favoriteContent}
 					setSelectedContent={setSelectedContent}
 					setSelectedContentFileType={setSelectedContentFileType}
-					openFilePreviewModule={openFilePreviewModal}
+					openFilePreviewModel={openFilePreviewModal}
 				/>
 				<RecentlyViewedModule
 					allContent={allContent}
 					profile={profile.data}
 					setSelectedContent={setSelectedContent}
 					setSelectedContentFileType={setSelectedContentFileType}
-					openFilePreviewModule={openFilePreviewModal}
+					openFilePreviewModel={openFilePreviewModal}
+				/>
+				<PopularLinksModule
+					popularLinks={linkViewTotals}
+					setSelectedContent={setSelectedContent}
+					setSelectedContentFileType={setSelectedContentFileType}
+					openFilePreviewModel={openFilePreviewModal}
+				/>
+				<PopularFilesModule
+					popularFiles={fileViewTotals}
+					setSelectedContent={setSelectedContent}
+					setSelectedContentFileType={setSelectedContentFileType}
+					openFilePreviewModel={openFilePreviewModal}
 				/>
 				<Modal.Root
 					opened={filePreviewOpen}
@@ -83,19 +113,9 @@ function RoleDashboard() {
 				>
 					<Modal.Overlay backgroundOpacity={0.55} blur={3} />
 					{selectedContent && selectedContentFileType && (
-						<PreviewModal closePreview={closeFilePreview} contentId={selectedContent.id} />
+						<PreviewModal closePreview={closeFilePreview} contentId={selectedContent} />
 					)}
 				</Modal.Root>
-				<div>
-					<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
-						Popular Links {favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
-					</Title>
-				</div>
-				<div>
-					<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
-						Popular Files {favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
-					</Title>
-				</div>
 				<div>
 					<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
 						Expiring Content{" "}
@@ -116,12 +136,12 @@ function FavoriteContentModule({
 	favoriteContent,
 	setSelectedContent,
 	setSelectedContentFileType,
-	openFilePreviewModule,
+	openFilePreviewModel,
 }: {
 	favoriteContent: listFavoritesType
-	setSelectedContent: (param: React.SetStateAction<ContentListItem | null>) => void
+	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
-	openFilePreviewModule: () => void
+	openFilePreviewModel: () => void
 }) {
 	return (
 		<Paper className="mt-4" p="lg" withBorder>
@@ -154,9 +174,9 @@ function FavoriteContentModule({
 								}
 								item={item}
 								openFilePreview={(file, type) => {
-									setSelectedContent(file)
+									setSelectedContent(file.id)
 									setSelectedContentFileType(type)
-									openFilePreviewModule()
+									openFilePreviewModel()
 								}}
 							/>
 						)
@@ -197,13 +217,13 @@ function RecentlyViewedModule({
 	profile,
 	setSelectedContent,
 	setSelectedContentFileType,
-	openFilePreviewModule,
+	openFilePreviewModel,
 }: {
 	allContent: listFavoritesType
 	profile: profileType | undefined
-	setSelectedContent: (param: React.SetStateAction<ContentListItem | null>) => void
+	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
-	openFilePreviewModule: () => void
+	openFilePreviewModel: () => void
 }) {
 	const recentlyViewedContent = allContent.data?.content.sort(
 		(a: ContentListItem, b: ContentListItem) => {
@@ -242,9 +262,9 @@ function RecentlyViewedModule({
 							justify="flex-start"
 							h={70}
 							onClick={() => {
-								setSelectedContent(item)
+								setSelectedContent(item.id)
 								setSelectedContentFileType(contentType)
-								openFilePreviewModule()
+								openFilePreviewModel()
 							}}
 						>
 							<FileTypeIcon
@@ -260,6 +280,91 @@ function RecentlyViewedModule({
 									{ addSuffix: true }
 								).replace(/^(in )?about /, "$1")}
 							</Text>
+						</Button>
+					)
+				})}
+			</Stack>
+		</Paper>
+	)
+}
+
+function PopularLinksModule({
+	popularLinks,
+	setSelectedContent,
+	setSelectedContentFileType,
+	openFilePreviewModel,
+}: {
+	popularLinks: viewTotalsType
+	setSelectedContent: (param: React.SetStateAction<string | null>) => void
+	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
+	openFilePreviewModel: () => void
+}) {
+	const mostPopularLinks = popularLinks?.sort((a, b) =>
+		a._sum.viewCount !== null && b._sum.viewCount !== null ? b._sum.viewCount - a._sum.viewCount : 0
+	)
+	const topFiveLinks = mostPopularLinks?.slice(0, 5)
+	return (
+		<Paper className="mt-4" p="lg" withBorder>
+			<Title order={3}>Popular Links</Title>
+			<Stack h="90%" gap={4} align="stretch">
+				{topFiveLinks?.map((entry) => {
+					return (
+						<Button
+							variant="subtle"
+							justify="flex-start"
+							key={entry.contentId}
+							h={70}
+							onClick={() => {
+								setSelectedContent(entry.contentId)
+								setSelectedContentFileType(FileType.Link)
+								openFilePreviewModel()
+							}}
+						>
+							<FileTypeIcon className="size-14 pr-5" fileType={FileType.Link} />
+							<Text className="text-lg pr-4 font-bold truncate">{entry.title}</Text>
+						</Button>
+					)
+				})}
+			</Stack>
+		</Paper>
+	)
+}
+
+function PopularFilesModule({
+	popularFiles,
+	setSelectedContent,
+	setSelectedContentFileType,
+	openFilePreviewModel,
+}: {
+	popularFiles: viewTotalsType
+	setSelectedContent: (param: React.SetStateAction<string | null>) => void
+	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
+	openFilePreviewModel: () => void
+}) {
+	const mostPopularFiles = popularFiles?.sort((a, b) =>
+		a._sum.viewCount !== null && b._sum.viewCount !== null ? b._sum.viewCount - a._sum.viewCount : 0
+	)
+	const topFiveFiles = mostPopularFiles?.slice(0, 5)
+	return (
+		<Paper className="mt-4" p="lg" withBorder>
+			<Title order={3}>Popular Files</Title>
+			<Stack h="90%" gap={4} align="stretch">
+				{topFiveFiles?.map((entry) => {
+					const fileType = (entry.metadata?.Metadata?.filetype as FileType) ?? FileType.Unknown
+					return (
+						<Button
+							variant="subtle"
+							justify="flex-start"
+							key={entry.contentId}
+							h={70}
+							onClick={() => {
+								setSelectedContent(entry.contentId)
+								setSelectedContentFileType(fileType)
+								openFilePreviewModel()
+							}}
+						>
+							<FileTypeIcon className="size-14 pr-5" fileType={fileType} />
+							<Text className="text-lg pr-4 font-bold truncate">{entry.title}</Text>
 						</Button>
 					)
 				})}
