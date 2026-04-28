@@ -828,14 +828,10 @@ export const contentRouter = router({
 
 	search: authProcedure.input(z.object({ query: z.string() })).query(async (opts) => {
 		const results = await search(opts.input.query)
-		const out = (
-			await Promise.all(
-				results.map(({ id }) => {
-					return db.content.findFirst({ where: { id } })
-				})
-			)
-		).filter((value) => value !== null)
-		return out
+		const ids = results.map(({ id }) => id)
+		const rows = await db.content.findMany({ where: { id: { in: ids } } })
+		const byId = new Map(rows.map((r) => [r.id, r]))
+		return ids.map((id) => byId.get(id)).filter((r) => r !== undefined)
 	}),
 
 	getFileStats: authProcedure.query(async (opts) => {

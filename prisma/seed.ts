@@ -57,6 +57,7 @@ async function main() {
 	await checkoutFiles(fileContent)
 
 	await createContentThreads()
+
 	await embedAllContent()
 }
 
@@ -416,6 +417,6 @@ async function createContentThreads() {
 async function embedAllContent() {
 	console.log("beginning embedding")
 	const allContent = await prisma.content.findMany({ include: { tags: true } })
-	Promise.all(allContent.map(embedPDF))
+	await Promise.all(allContent.map(embedPDF))
 	console.log("embedding complete")
 }

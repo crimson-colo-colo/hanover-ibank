@@ -31,7 +31,7 @@ async function setEmbedding(value: string): Promise<Embedding> {
 		requestBody: {
 			user: "server",
 			encodingFormat: "float",
-			model: "qwen/qwen3-embedding-8b",
+			model: "perplexity/pplx-embed-v1-4b",
 			dimensions: 1024,
 			input: [{ content: [{ type: "text", text: value }] }],
 		},
