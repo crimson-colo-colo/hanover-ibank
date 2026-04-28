@@ -54,7 +54,7 @@ function RootComponent() {
 						header={{ height: 56 }}
 						navbar={{
 							width: auth0.isAuthenticated && auth0.user ? (collapsed ? "70" : "260") : "0",
-							breakpoint: "sm",
+							breakpoint: "xs",
 						}}
 						className={clsx(isPreview && "not-dark:bg-gray-100")}
 					>
