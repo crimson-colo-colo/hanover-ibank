@@ -83,6 +83,7 @@ async function confirmOverwrite() {
 
 async function wipeDBandS3() {
 	await prisma.$transaction([
+		prisma.recentTimestamps.deleteMany(),
 		prisma.talkThreadComment.deleteMany(),
 		prisma.contentTalkThread.deleteMany(),
 		prisma.userActivity.deleteMany(),
