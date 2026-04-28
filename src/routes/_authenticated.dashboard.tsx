@@ -1,10 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import type { HeadObjectCommandOutput } from "@aws-sdk/client-s3"
 import {
 	Alert,
 	Button,
 	Card,
 	Flex,
+	Group,
 	Modal,
 	Paper,
 	SimpleGrid,
@@ -16,7 +16,12 @@ import { useDisclosure } from "@mantine/hooks"
 import { ContentType } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
-import type { ContentListItem, listFavoritesType, profileType } from "@shared/types.ts"
+import type {
+	ContentListItem,
+	listFavoritesType,
+	profileType,
+	viewTotalsQuery,
+} from "@shared/types.ts"
 import { IconAlertOctagon, IconArrowBigRightLineFilled, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
@@ -33,17 +38,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 	component: RoleDashboard,
 })
 
-type viewTotalsType =
-	| {
-			title: string | undefined
-			contentId: string
-			_sum: {
-				viewCount: number | null
-			}
-			metadata: HeadObjectCommandOutput | undefined
-	  }[]
-	| undefined
-
 function RoleDashboard() {
 	const auth0 = useAuth0()
 	const profile = useQuery(trpc.user.getProfile.queryOptions())
@@ -51,10 +45,10 @@ function RoleDashboard() {
 	const allContent = useQuery(trpc.content.list.queryOptions({ filter: ContentFilter.All }))
 	const linkViewTotals = useQuery(
 		trpc.content.getContentViewTotals.queryOptions({ type: ContentType.Link })
-	).data
+	)
 	const fileViewTotals = useQuery(
 		trpc.content.getContentViewTotals.queryOptions({ type: ContentType.Object })
-	).data
+	)
 
 	const [filePreviewOpen, { open: openFilePreviewModal, close: _closeFilePreview }] =
 		useDisclosure(false)
@@ -249,6 +243,7 @@ function RecentlyViewedModule({
 				className="no-underline text-inherit flex items-center mb-4 gap-2 w-fit hover:underline"
 			>
 				<Title order={3}>Recently Viewed</Title>
+				{allContent.isFetching && <IconLoader2 className="animate-spin" size={24} />}
 			</Link>
 			<Stack h="90%" gap={4} align="stretch">
 				{topFiveRecentlyViewedContent?.map((item) => {
@@ -295,18 +290,22 @@ function PopularLinksModule({
 	setSelectedContentFileType,
 	openFilePreviewModal,
 }: {
-	popularLinks: viewTotalsType
+	popularLinks: viewTotalsQuery
 	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
 	openFilePreviewModal: () => void
 }) {
-	const mostPopularLinks = popularLinks?.sort((a, b) =>
+	const mostPopularLinks = popularLinks.data?.sort((a, b) =>
 		a._sum.viewCount !== null && b._sum.viewCount !== null ? b._sum.viewCount - a._sum.viewCount : 0
 	)
 	const topFiveLinks = mostPopularLinks?.slice(0, 5)
 	return (
 		<Paper className="mt-4" p="lg" withBorder>
-			<Title order={3}>Popular Links</Title>
+			<Group>
+				<Title order={3}>Popular Links</Title>
+				{popularLinks.isFetching && <IconLoader2 className="animate-spin flex" size={24} />}
+			</Group>
+
 			<Stack h="90%" gap={4} align="stretch">
 				{topFiveLinks?.map((entry) => {
 					return (
@@ -341,18 +340,21 @@ function PopularFilesModule({
 	setSelectedContentFileType,
 	openFilePreviewModal,
 }: {
-	popularFiles: viewTotalsType
+	popularFiles: viewTotalsQuery
 	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
 	openFilePreviewModal: () => void
 }) {
-	const mostPopularFiles = popularFiles?.sort((a, b) =>
+	const mostPopularFiles = popularFiles.data?.sort((a, b) =>
 		a._sum.viewCount !== null && b._sum.viewCount !== null ? b._sum.viewCount - a._sum.viewCount : 0
 	)
 	const topFiveFiles = mostPopularFiles?.slice(0, 5)
 	return (
 		<Paper className="mt-4" p="lg" withBorder>
-			<Title order={3}>Popular Files</Title>
+			<Group>
+				<Title order={3}>Popular Files</Title>
+				{popularFiles.isFetching && <IconLoader2 className="animate-spin" size={24} />}
+			</Group>
 			<Stack h="90%" gap={4} align="stretch">
 				{topFiveFiles?.map((entry) => {
 					const fileType = (entry.metadata?.Metadata?.filetype as FileType) ?? FileType.Unknown
@@ -405,6 +407,7 @@ function ExpiringContentModule({
 				className="no-underline text-inherit flex items-center mb-4 gap-2 w-fit hover:underline"
 			>
 				<Title order={3}>Expiring Content</Title>
+				{allContent.isFetching && <IconLoader2 className="animate-spin" size={24} />}
 			</Link>
 			<Stack h="90%" gap={4} align="stretch">
 				{topFiveExpiring?.map((item) => {

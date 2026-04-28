@@ -1,4 +1,4 @@
-import type { HeadObjectOutput } from "@aws-sdk/client-s3"
+import type { HeadObjectCommandOutput, HeadObjectOutput } from "@aws-sdk/client-s3"
 import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
@@ -72,7 +72,19 @@ export type CheckOutMutationType = UseMutationResult<
 	CheckOutInput
 >
 
+type viewTotalsType =
+	| {
+			title: string | undefined
+			contentId: string
+			_sum: {
+				viewCount: number | null
+			}
+			metadata: HeadObjectCommandOutput | undefined
+	  }[]
+	| undefined
+
 export type listFavoritesType = UseQueryResult<ContentList, TRPCClientErrorLike<AppRouter>>
+export type viewTotalsQuery = UseQueryResult<viewTotalsType, TRPCClientErrorLike<AppRouter>>
 
 export type profileType = {
 	id: string
