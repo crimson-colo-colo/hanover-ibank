@@ -20,6 +20,7 @@ import type { ContentListItem, listFavoritesType, profileType } from "@shared/ty
 import { IconAlertOctagon, IconArrowBigRightLineFilled, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
+import clsx from "clsx"
 import { formatDistanceToNow } from "date-fns"
 import { useState } from "react"
 import { FavoriteContentCard } from "@/components/FavoriteContentCard.tsx"
@@ -83,26 +84,32 @@ function RoleDashboard() {
 					favoriteContent={favoriteContent}
 					setSelectedContent={setSelectedContent}
 					setSelectedContentFileType={setSelectedContentFileType}
-					openFilePreviewModel={openFilePreviewModal}
+					openFilePreviewModal={openFilePreviewModal}
 				/>
 				<RecentlyViewedModule
 					allContent={allContent}
 					profile={profile.data}
 					setSelectedContent={setSelectedContent}
 					setSelectedContentFileType={setSelectedContentFileType}
-					openFilePreviewModel={openFilePreviewModal}
+					openFilePreviewModal={openFilePreviewModal}
 				/>
 				<PopularLinksModule
 					popularLinks={linkViewTotals}
 					setSelectedContent={setSelectedContent}
 					setSelectedContentFileType={setSelectedContentFileType}
-					openFilePreviewModel={openFilePreviewModal}
+					openFilePreviewModal={openFilePreviewModal}
 				/>
 				<PopularFilesModule
 					popularFiles={fileViewTotals}
 					setSelectedContent={setSelectedContent}
 					setSelectedContentFileType={setSelectedContentFileType}
-					openFilePreviewModel={openFilePreviewModal}
+					openFilePreviewModal={openFilePreviewModal}
+				/>
+				<ExpiringContentModule
+					allContent={allContent}
+					setSelectedContent={setSelectedContent}
+					setSelectedContentFileType={setSelectedContentFileType}
+					openFilePreviewModal={openFilePreviewModal}
 				/>
 				<Modal.Root
 					opened={filePreviewOpen}
@@ -118,12 +125,6 @@ function RoleDashboard() {
 				</Modal.Root>
 				<div>
 					<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
-						Expiring Content{" "}
-						{favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
-					</Title>
-				</div>
-				<div>
-					<Title order={3} className="mt-6 mb-4 flex items-center gap-3">
 						Statistics {favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
 					</Title>
 				</div>
@@ -136,12 +137,12 @@ function FavoriteContentModule({
 	favoriteContent,
 	setSelectedContent,
 	setSelectedContentFileType,
-	openFilePreviewModel,
+	openFilePreviewModal,
 }: {
 	favoriteContent: listFavoritesType
 	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
-	openFilePreviewModel: () => void
+	openFilePreviewModal: () => void
 }) {
 	return (
 		<Paper className="mt-4" p="lg" withBorder>
@@ -176,7 +177,7 @@ function FavoriteContentModule({
 								openFilePreview={(file, type) => {
 									setSelectedContent(file.id)
 									setSelectedContentFileType(type)
-									openFilePreviewModel()
+									openFilePreviewModal()
 								}}
 							/>
 						)
@@ -217,13 +218,13 @@ function RecentlyViewedModule({
 	profile,
 	setSelectedContent,
 	setSelectedContentFileType,
-	openFilePreviewModel,
+	openFilePreviewModal,
 }: {
 	allContent: listFavoritesType
 	profile: profileType | undefined
 	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
-	openFilePreviewModel: () => void
+	openFilePreviewModal: () => void
 }) {
 	const recentlyViewedContent = allContent.data?.content.sort(
 		(a: ContentListItem, b: ContentListItem) => {
@@ -264,7 +265,7 @@ function RecentlyViewedModule({
 							onClick={() => {
 								setSelectedContent(item.id)
 								setSelectedContentFileType(contentType)
-								openFilePreviewModel()
+								openFilePreviewModal()
 							}}
 						>
 							<FileTypeIcon
@@ -292,12 +293,12 @@ function PopularLinksModule({
 	popularLinks,
 	setSelectedContent,
 	setSelectedContentFileType,
-	openFilePreviewModel,
+	openFilePreviewModal,
 }: {
 	popularLinks: viewTotalsType
 	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
-	openFilePreviewModel: () => void
+	openFilePreviewModal: () => void
 }) {
 	const mostPopularLinks = popularLinks?.sort((a, b) =>
 		a._sum.viewCount !== null && b._sum.viewCount !== null ? b._sum.viewCount - a._sum.viewCount : 0
@@ -317,10 +318,14 @@ function PopularLinksModule({
 							onClick={() => {
 								setSelectedContent(entry.contentId)
 								setSelectedContentFileType(FileType.Link)
-								openFilePreviewModel()
+								openFilePreviewModal()
 							}}
 						>
-							<FileTypeIcon className="size-14 pr-5" fileType={FileType.Link} />
+							<FileTypeIcon
+								style={{ flexShrink: 0 }}
+								className="size-14 pr-5"
+								fileType={FileType.Link}
+							/>
 							<Text className="text-lg pr-4 font-bold truncate">{entry.title}</Text>
 						</Button>
 					)
@@ -334,12 +339,12 @@ function PopularFilesModule({
 	popularFiles,
 	setSelectedContent,
 	setSelectedContentFileType,
-	openFilePreviewModel,
+	openFilePreviewModal,
 }: {
 	popularFiles: viewTotalsType
 	setSelectedContent: (param: React.SetStateAction<string | null>) => void
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
-	openFilePreviewModel: () => void
+	openFilePreviewModal: () => void
 }) {
 	const mostPopularFiles = popularFiles?.sort((a, b) =>
 		a._sum.viewCount !== null && b._sum.viewCount !== null ? b._sum.viewCount - a._sum.viewCount : 0
@@ -360,10 +365,14 @@ function PopularFilesModule({
 							onClick={() => {
 								setSelectedContent(entry.contentId)
 								setSelectedContentFileType(fileType)
-								openFilePreviewModel()
+								openFilePreviewModal()
 							}}
 						>
-							<FileTypeIcon className="size-14 pr-5" fileType={fileType} />
+							<FileTypeIcon
+								style={{ flexShrink: 0 }}
+								className="size-14 pr-5"
+								fileType={fileType}
+							/>
 							<Text className="text-lg pr-4 font-bold truncate">{entry.title}</Text>
 						</Button>
 					)
@@ -371,4 +380,77 @@ function PopularFilesModule({
 			</Stack>
 		</Paper>
 	)
+}
+
+function ExpiringContentModule({
+	allContent,
+	setSelectedContent,
+	setSelectedContentFileType,
+	openFilePreviewModal,
+}: {
+	allContent: listFavoritesType
+	setSelectedContent: (param: React.SetStateAction<string | null>) => void
+	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
+	openFilePreviewModal: () => void
+}) {
+	const sortByExpiration = allContent.data?.content.sort((a, b) => {
+		return a.expirationDate.getTime() - b.expirationDate.getTime()
+	})
+	const topFiveExpiring = sortByExpiration?.slice(0, 5)
+	return (
+		<Paper className="mt-4" p="lg" withBorder>
+			<Link
+				to="/content-table"
+				search={{ view: "expiringSoon" }}
+				className="no-underline text-inherit flex items-center mb-4 gap-2 w-fit hover:underline"
+			>
+				<Title order={3}>Expiring Content</Title>
+			</Link>
+			<Stack h="90%" gap={4} align="stretch">
+				{topFiveExpiring?.map((item) => {
+					const contentType =
+						item.type === "Link"
+							? FileType.Link
+							: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
+					return (
+						<Button
+							variant="subtle"
+							justify="flex-start"
+							key={item.id}
+							h={70}
+							onClick={() => {
+								setSelectedContent(item.id)
+								setSelectedContentFileType(contentType)
+								openFilePreviewModal()
+							}}
+						>
+							<FileTypeIcon
+								className="size-14 pr-5"
+								style={{ flexShrink: 0 }}
+								fileType={contentType}
+							/>
+							<Text className="text-lg pr-4 font-bold truncate">{item.title}</Text>
+							<Text
+								className={clsx(
+									"w-40",
+									item.expirationDate.getTime() < Date.now() && "text-red-600"
+								)}
+							>
+								{addWordExpired(
+									formatDistanceToNow(item.expirationDate, { addSuffix: true }).replace(
+										/^(in )?about /,
+										"$1"
+									)
+								)}
+							</Text>
+						</Button>
+					)
+				})}
+			</Stack>
+		</Paper>
+	)
+}
+
+function addWordExpired(input: string): string {
+	return input.includes("ago") ? `expired ${input}` : input
 }
