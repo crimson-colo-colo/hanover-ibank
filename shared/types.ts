@@ -72,7 +72,7 @@ export type CheckOutMutationType = UseMutationResult<
 	CheckOutInput
 >
 
-type viewTotalsType =
+type ViewTotals =
 	| {
 			title: string | undefined
 			contentId: string
@@ -83,10 +83,10 @@ type viewTotalsType =
 	  }[]
 	| undefined
 
-export type listFavoritesType = UseQueryResult<ContentList, TRPCClientErrorLike<AppRouter>>
-export type viewTotalsQuery = UseQueryResult<viewTotalsType, TRPCClientErrorLike<AppRouter>>
+export type ListFavoritesQuery = UseQueryResult<ContentList, TRPCClientErrorLike<AppRouter>>
+export type ViewTotalsQuery = UseQueryResult<ViewTotals, TRPCClientErrorLike<AppRouter>>
 
-export type profileType = {
+export type Profile = {
 	id: string
 	name: string
 	email: string

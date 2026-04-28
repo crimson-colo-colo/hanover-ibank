@@ -3,11 +3,11 @@ import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
 import z from "zod"
 import type { ContentList, ContentListItem } from "../../shared/types.ts"
-import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { Tag } from "../generated/prisma/client.ts"
 import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
+import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -44,91 +44,33 @@ export const contentRouter = router({
 									},
 								},
 							},
+				include: getContentInclude(opts.ctx.auth.sub),
+			})
+
+			return {
+				role: user.role,
+				content: await fetchAndTransformToContentListItems(data, opts.ctx.auth.sub),
+			}
+		}),
+
+	getRecentlyViewed: authProcedure
+		.input(z.object({ limit: z.number().nonnegative().max(10) }))
+		.query(async (opts): Promise<ContentListItem[]> => {
+			const recentlyViewed = await db.recentTimestamps.findMany({
+				where: { employeeId: opts.ctx.auth.sub },
+				orderBy: { recentlyViewed: "desc" },
+				take: opts.input.limit,
 				include: {
-					owner: true,
-					checkedOutBy: true,
-					favoritedBy: {
-						where: {
-							employeeId: opts.ctx.auth.sub,
-						},
-					},
-					tags: true,
-					recentTimestamps: {
-						where: {
-							employeeId: opts.ctx.auth.sub,
-						},
+					content: {
+						include: getContentInclude(opts.ctx.auth.sub),
 					},
 				},
 			})
 
-			const users = await auth0Management.users.list()
-
-			const metadata = new Map(
-				await Promise.all(
-					data
-						.filter((content) => content.type === "Object")
-						.map(
-							async (content) =>
-								[
-									content.id,
-									await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
-								] as const
-						)
-				)
+			return fetchAndTransformToContentListItems(
+				recentlyViewed.map((r) => r.content),
+				opts.ctx.auth.sub
 			)
-
-			return {
-				role: user.role,
-				content: data.map((content) => {
-					const unknownUser = {
-						name: "Unknown User",
-						email: "unknown",
-						username: "unknown",
-						avatarUrl: "",
-						nickname: null,
-						picture: null,
-					}
-					const owner = users.data.find((u) => u.user_id === content.ownerId) ?? unknownUser
-					const checkedOutByUser = content.checkedOutBy
-						? (users.data.find((u) => u.user_id === content.checkedOutById) ?? unknownUser)
-						: null
-					return {
-						...content,
-						favorited: content.favoritedBy.length > 0,
-						recentTimestamps: content.recentTimestamps.map((timestamp) => ({
-							recentlyViewed: timestamp.recentlyViewed,
-							recentlyEdited: timestamp.recentlyEdited,
-							employeeId: opts.ctx.auth.sub,
-						})),
-						owner: {
-							id: content.ownerId,
-							name: owner.name ?? owner.nickname ?? owner.username!,
-							email: owner.email!,
-							username: owner.username!,
-							role: content.owner.role,
-						} satisfies ContentListItem["owner"],
-						checkedOutBy: checkedOutByUser
-							? ({
-									id: content.checkedOutById!,
-									name:
-										checkedOutByUser.name ??
-										checkedOutByUser.nickname ??
-										checkedOutByUser.username!,
-									email: checkedOutByUser.email!,
-									username: checkedOutByUser.username!,
-									role: content.checkedOutBy!.role,
-								} satisfies ContentListItem["checkedOutBy"])
-							: null,
-						tags: content.tags.map((tag) => ({
-							category: tag.tagCategory,
-							name: tag.tagName,
-						})),
-						type: content.type as "Object",
-						objectId: content.objectId!,
-						object: metadata.get(content.id)!,
-					} satisfies ContentListItem
-				}),
-			}
 		}),
 
 	update: authProcedure
@@ -766,80 +708,12 @@ export const contentRouter = router({
 					},
 				},
 			},
-			include: {
-				owner: true,
-				tags: true,
-				checkedOutBy: true,
-				recentTimestamps: {
-					where: {
-						employeeId: opts.ctx.auth.sub,
-					},
-				},
-			},
+			include: getContentInclude(opts.ctx.auth.sub),
 		})
-
-		const metadata = new Map(
-			await Promise.all(
-				data
-					.filter((content) => content.type === "Object")
-					.map(
-						async (content) =>
-							[
-								content.id,
-								await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
-							] as const
-					)
-			)
-		)
-
-		const users = await auth0Management.users.list()
 
 		return {
 			role: user.role,
-			content: data.map((content) => {
-				const unknownUser = {
-					name: "Unknown User",
-					email: "unknown",
-					username: "unknown",
-					avatarUrl: "",
-				}
-				const owner = users.data.find((u) => u.user_id === content.ownerId) ?? unknownUser
-				const checkedOutByUser = content.checkedOutBy
-					? (users.data.find((u) => u.user_id === content.checkedOutById) ?? unknownUser)
-					: null
-				return {
-					...content,
-					owner: {
-						id: content.ownerId,
-						name: owner.name ?? owner.username!,
-						email: owner.email!,
-						username: owner.username!,
-						role: content.owner.role,
-					} satisfies ContentListItem["owner"],
-					checkedOutBy: checkedOutByUser
-						? ({
-								id: content.checkedOutById!,
-								name: checkedOutByUser.name ?? checkedOutByUser.username!,
-								email: checkedOutByUser.email!,
-								username: checkedOutByUser.username!,
-								role: content.checkedOutBy!.role,
-							} satisfies ContentListItem["checkedOutBy"])
-						: null,
-					favorited: true,
-					recentTimestamps: content.recentTimestamps.map((timestamp) => ({
-						recentlyViewed: timestamp.recentlyViewed,
-						recentlyEdited: timestamp.recentlyEdited,
-						employeeId: opts.ctx.auth.sub,
-					})),
-					tags: content.tags.map((tag) => ({
-						category: tag.tagCategory,
-						name: tag.tagName,
-					})),
-					type: content.type as "Object",
-					objectId: content.objectId!,
-					object: metadata.get(content.id)!,
-				} satisfies ContentListItem
-			}),
+			content: await fetchAndTransformToContentListItems(data, opts.ctx.auth.sub),
 		}
 	}),
 	checkOut: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
@@ -950,21 +824,7 @@ export const contentRouter = router({
 	get: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },
-			include: {
-				owner: true,
-				checkedOutBy: true,
-				favoritedBy: {
-					where: {
-						employeeId: opts.ctx.auth.sub,
-					},
-				},
-				tags: true,
-				recentTimestamps: {
-					where: {
-						employeeId: opts.ctx.auth.sub,
-					},
-				},
-			},
+			include: getContentInclude(opts.ctx.auth.sub),
 		})
 
 		if (!content) {
@@ -974,59 +834,10 @@ export const contentRouter = router({
 			})
 		}
 
-		const users = await auth0Management.users.list()
-
-		const objectMetadata =
-			content.type === "Object"
-				? await s3.headObject({ Bucket: bucketName, Key: content.objectId! })
-				: null
-
-		const unknownUser = {
-			name: "Unknown User",
-			email: "unknown",
-			username: "unknown",
-			avatarUrl: "",
-		}
-		const owner = users.data.find((u) => u.user_id === content.ownerId) ?? unknownUser
-		const checkedOutByUser = content.checkedOutBy
-			? (users.data.find((u) => u.user_id === content.checkedOutById) ?? unknownUser)
-			: null
-
-		const contentItem = {
-			...content,
-			favorited: content.favoritedBy.length > 0,
-			owner: {
-				id: content.ownerId,
-				name: owner.name ?? owner.username!,
-				email: owner.email!,
-				username: owner.username!,
-				role: content.owner.role,
-			} satisfies ContentListItem["owner"],
-			checkedOutBy: checkedOutByUser
-				? ({
-						id: content.checkedOutById!,
-						name: checkedOutByUser.name ?? checkedOutByUser.username!,
-						email: checkedOutByUser.email!,
-						username: checkedOutByUser.username!,
-						role: content.checkedOutBy!.role,
-					} satisfies ContentListItem["checkedOutBy"])
-				: null,
-			tags: content.tags.map((tag) => ({
-				category: tag.tagCategory,
-				name: tag.tagName,
-			})),
-			recentTimestamps: content.recentTimestamps.map((timestamp) => ({
-				recentlyViewed: timestamp.recentlyViewed,
-				recentlyEdited: timestamp.recentlyEdited,
-				employeeId: opts.ctx.auth.sub,
-			})),
-			type: content.type as "Object",
-			objectId: content.objectId!,
-			object: objectMetadata!,
-		} satisfies ContentListItem
+		const contentItems = await fetchAndTransformToContentListItems([content], opts.ctx.auth.sub)
 
 		return {
-			content: contentItem,
+			content: contentItems[0],
 		}
 	}),
 
@@ -1125,6 +936,7 @@ export const contentRouter = router({
 			Links: grouped.get(month)?.Links ?? 0,
 		}))
 	}),
+
 	getContentViewTotals: authProcedure
 		.input(z.object({ type: z.enum(Object.values(ContentType)) }))
 		.query(async (opts) => {
@@ -1138,38 +950,36 @@ export const contentRouter = router({
 				_sum: {
 					viewCount: true,
 				},
+				orderBy: {
+					_sum: {
+						viewCount: "desc",
+					},
+				},
+				take: 10,
 			})
+
 			const contentDetails = await db.content.findMany({
 				where: {
 					id: { in: sums.map((entry) => entry.contentId) },
 				},
-				select: {
-					title: true,
-					id: true,
-					type: true,
-					objectId: true,
-				},
+				include: getContentInclude(opts.ctx.auth.sub),
 			})
 
-			const metadata = new Map(
-				await Promise.all(
-					contentDetails
-						.filter((content) => content.type === "Object")
-						.map(
-							async (content) =>
-								[
-									content.id,
-									await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
-								] as const
-						)
-				)
-			)
-
-			const result = sums.map((entry) => ({
-				...entry,
-				title: contentDetails.find((item) => item.id === entry.contentId)?.title,
-				metadata: metadata.get(entry.contentId),
-			}))
-			return result
+			return await fetchAndTransformToContentListItems(contentDetails, opts.ctx.auth.sub)
 		}),
+
+	getExpiringContent: authProcedure.query(async (opts) => {
+		const expiringContent = await db.content.findMany({
+			where: {
+				ownerId: opts.ctx.auth.sub,
+			},
+			orderBy: {
+				expirationDate: "asc",
+			},
+			take: 10,
+			include: getContentInclude(opts.ctx.auth.sub),
+		})
+
+		return await fetchAndTransformToContentListItems(expiringContent, opts.ctx.auth.sub)
+	}),
 })

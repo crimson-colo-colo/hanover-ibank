@@ -1,6 +1,6 @@
 import { ActionIcon, Flex, Menu } from "@mantine/core"
 import { ContentType } from "@prisma/browser.ts"
-import type { ContentListItem, profileType } from "@shared/types.ts"
+import type { ContentListItem, Profile } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconDoorEnter,
@@ -24,7 +24,7 @@ export function ActionColumn({
 	selectContentForCheckout: Dispatch<SetStateAction<ContentListItem | null>>
 	openCheckOutModal: () => void
 	openCheckInModal: () => void
-	profile: profileType | undefined
+	profile: Profile | undefined
 }) {
 	const recentlyViewed = useMutation(trpc.content.updateRecentlyViewedTimestamp.mutationOptions())
 	const incrementViewCount = useMutation(trpc.content.incrementContentViewCount.mutationOptions())

@@ -1,3 +1,4 @@
+import { FileType } from "@shared/filetype.ts"
 import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
@@ -113,7 +114,7 @@ export const userRouter = router({
 			}),
 			db.content.findMany({
 				where: { ownerId: userId },
-				select: { id: true, type: true, objectId: true },
+				select: { id: true, title: true, type: true, objectId: true },
 			}),
 		])
 
@@ -122,38 +123,38 @@ export const userRouter = router({
 
 		const fileMetadata = await Promise.all(
 			fileItems.map(async (item) => {
-				try {
-					const head = await s3.headObject({
-						Bucket: bucketName,
-						Key: item.objectId!,
-					})
+				const head = await s3.headObject({
+					Bucket: bucketName,
+					Key: item.objectId!,
+				})
 
-					return {
-						size: head.ContentLength ?? 0,
-						mimeType: head.ContentType ?? "application/octet-stream",
-					}
-				} catch {
-					return null
+				return {
+					name: item.title,
+					size: head.ContentLength ?? 0,
+					fileType: (head.Metadata?.filetype as FileType) ?? FileType.Unknown,
 				}
 			})
 		)
 
-		const fileTypes = new Map<string, number>()
-
+		const filesByFileType: Record<FileType, { name: string; size: number }[]> = {} as Record<
+			FileType,
+			{ name: string; size: number }[]
+		>
 		for (const file of fileMetadata) {
-			if (!file) continue
-
-			fileTypes.set(file.mimeType, (fileTypes.get(file.mimeType) ?? 0) + file.size)
+			if (!filesByFileType[file.fileType]) {
+				filesByFileType[file.fileType] = []
+			}
+			filesByFileType[file.fileType].push({
+				name: file.name,
+				size: Math.log(file.size),
+			})
 		}
 
 		return {
 			fileCount: fileItems.length,
 			linkCount,
 			accountCreatedAt: employee.createdAt,
-			fileTypes: Array.from(fileTypes.entries()).map(([mimeType, totalSize]) => ({
-				mimeType,
-				totalSize,
-			})),
+			fileStorage: filesByFileType,
 		}
 	}),
 })

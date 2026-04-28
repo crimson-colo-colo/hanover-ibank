@@ -1,6 +1,6 @@
 import { Anchor, Tooltip } from "@mantine/core"
 import { FileType } from "@shared/filetype.ts"
-import type { ContentListItem, profileType } from "@shared/types.ts"
+import type { ContentListItem, Profile } from "@shared/types.ts"
 import { IconPencilCheck, IconPencilOff } from "@tabler/icons-react"
 import type { CellContext } from "@tanstack/react-table"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
@@ -13,7 +13,7 @@ export function NameColumn({
 }: {
 	info: CellContext<ContentListItem, string>
 	openFilePreview: (item: ContentListItem, type: FileType) => void
-	profile: profileType | undefined
+	profile: Profile | undefined
 }) {
 	const item = info.row.original
 	if (item.type === "Link") {
