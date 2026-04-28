@@ -25,12 +25,12 @@ function TechPage() {
 					Software tools, libraries, and frameworks that power this project
 				</small>
 			</header>
-			<SimpleGrid cols={{ base: 2, sm: 4 }}>
+			<SimpleGrid cols={{ base: 2, sm: 4 }} mt="md">
 				{pernStack.map((pernStack) => (
 					<PernCard key={pernStack.category} {...pernStack} />
 				))}
 			</SimpleGrid>
-			<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+			<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} mt="md">
 				{technology.map((tech) => (
 					<TechCard key={tech.category} {...tech} />
 				))}
@@ -272,6 +272,7 @@ const technology = [
 		],
 	},
 ]
+
 interface ToolItemProps {
 	name: string
 	description: string
@@ -294,6 +295,7 @@ function ToolItem({ name, description, url, icon, isLast }: ToolItemProps) {
 		</Box>
 	)
 }
+
 function PernCard({
 	category,
 	items,
@@ -302,7 +304,7 @@ function PernCard({
 	items: { name: string; description: string; url: string; icon: string }[]
 }) {
 	return (
-		<Card mt="md" withBorder className="hover:-translate-y-1.5 transition hover:shadow-sm">
+		<Card withBorder className="hover:-translate-y-1.5 transition hover:shadow-sm">
 			<Group justify="center" className="mb-md">
 				<Text
 					key={category}
@@ -336,7 +338,6 @@ function TechCard({
 	return (
 		<Card
 			padding="md"
-			mt="md"
 			withBorder
 			h="100%"
 			className="hover:-translate-y-1.5 transition hover:shadow-sm"
