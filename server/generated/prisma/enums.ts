@@ -18,6 +18,15 @@ export const ThreadStatus = {
 export type ThreadStatus = (typeof ThreadStatus)[keyof typeof ThreadStatus]
 
 
+export const EmbeddingType = {
+  Query: 'Query',
+  Content: 'Content',
+  Unknown: 'Unknown'
+} as const
+
+export type EmbeddingType = (typeof EmbeddingType)[keyof typeof EmbeddingType]
+
+
 export const EmployeeRole = {
   BusinessAnalyst: 'BusinessAnalyst',
   Underwriter: 'Underwriter',

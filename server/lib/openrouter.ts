@@ -2,6 +2,7 @@ import { OpenRouter } from "@openrouter/sdk"
 import hash from "object-hash"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
+import type { EmbeddingType } from "../generated/prisma/enums.ts"
 
 const openrouterInternal = new OpenRouter({
 	apiKey: env.OPENROUTER_API_KEY,
@@ -49,10 +50,13 @@ async function setEmbedding(value: string): Promise<Embedding> {
 	}
 }
 
-export async function embed(value: string): Promise<Embedding> {
-	const embedding = await getEmbedding(value)
-	if (embedding === null) return await setEmbedding(value)
-	else return embedding
+export async function embed(value: string, type: EmbeddingType = "Content"): Promise<Embedding> {
+	const embedding = (await getEmbedding(value)) ?? (await setEmbedding(value))
+	await db.embedding.update({
+		where: { hash: embedding.hash, AND: { NOT: { type: { has: type } } } },
+		data: { type: { push: type } },
+	})
+	return embedding
 }
 
 function buildInstructionTemplate(task_description: string, query: string): string {
@@ -64,6 +68,7 @@ async function findSimilarByHash(hash: Uint8Array): Promise<Uint8Array[]> {
 	const rows = await db.$queryRaw<{ hash: Buffer }[]>`
 		SELECT hash
 		FROM "Embedding"
+		WHERE type @> ARRAY['Content']::"EmbeddingType"[]
 		ORDER BY embedding <=> (SELECT embedding FROM "Embedding" WHERE hash = ${Buffer.from(hash)} LIMIT 1)
 		LIMIT 500
 	`
@@ -77,7 +82,8 @@ export async function search(query: string) {
 		buildInstructionTemplate(
 			"Given a web search query, retrieve relevant passages that answer the query",
 			query
-		)
+		),
+		"Query"
 	)
 	const similar = await findSimilarByHash(embedding.hash)
 	const rankByHash = new Map(similar.map((hash, i) => [Buffer.from(hash).toString("hex"), i]))

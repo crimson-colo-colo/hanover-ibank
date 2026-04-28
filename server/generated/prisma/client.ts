@@ -86,3 +86,8 @@ export type UserActivity = Prisma.UserActivityModel
  * 
  */
 export type Embedding = Prisma.EmbeddingModel
+/**
+ * Model TextExtractionCache
+ * 
+ */
+export type TextExtractionCache = Prisma.TextExtractionCacheModel

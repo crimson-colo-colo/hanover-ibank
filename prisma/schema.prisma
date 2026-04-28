@@ -122,6 +122,22 @@ model Embedding {
   hash      Bytes                 @id
   embedding Unsupported("vector")
   content  Content[]
+  type     EmbeddingType[]        @default([Unknown])
+}
+
+enum EmbeddingType {
+  Query
+  Content
+  Unknown
+}
+
+model TextExtractionCache {
+  hash Bytes
+  skipRecPDFTextNative Boolean
+  skipRecPDFTextOCR Boolean
+  text String
+
+  @@id([hash, skipRecPDFTextNative, skipRecPDFTextOCR])
 }
 
 enum EmployeeRole {

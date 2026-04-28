@@ -34,6 +34,7 @@ export type EmbeddingMaxAggregateOutputType = {
 
 export type EmbeddingCountAggregateOutputType = {
   hash: number
+  type: number
   _all: number
 }
 
@@ -48,6 +49,7 @@ export type EmbeddingMaxAggregateInputType = {
 
 export type EmbeddingCountAggregateInputType = {
   hash?: true
+  type?: true
   _all?: true
 }
 
@@ -125,6 +127,7 @@ export type EmbeddingGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 
 export type EmbeddingGroupByOutputType = {
   hash: runtime.Bytes
+  type: $Enums.EmbeddingType[]
   _count: EmbeddingCountAggregateOutputType | null
   _min: EmbeddingMinAggregateOutputType | null
   _max: EmbeddingMaxAggregateOutputType | null
@@ -150,11 +153,13 @@ export type EmbeddingWhereInput = {
   OR?: Prisma.EmbeddingWhereInput[]
   NOT?: Prisma.EmbeddingWhereInput | Prisma.EmbeddingWhereInput[]
   hash?: Prisma.BytesFilter<"Embedding"> | runtime.Bytes
+  type?: Prisma.EnumEmbeddingTypeNullableListFilter<"Embedding">
   content?: Prisma.ContentListRelationFilter
 }
 
 export type EmbeddingOrderByWithRelationInput = {
   hash?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   content?: Prisma.ContentOrderByRelationAggregateInput
 }
 
@@ -163,11 +168,13 @@ export type EmbeddingWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.EmbeddingWhereInput | Prisma.EmbeddingWhereInput[]
   OR?: Prisma.EmbeddingWhereInput[]
   NOT?: Prisma.EmbeddingWhereInput | Prisma.EmbeddingWhereInput[]
+  type?: Prisma.EnumEmbeddingTypeNullableListFilter<"Embedding">
   content?: Prisma.ContentListRelationFilter
 }, "hash">
 
 export type EmbeddingOrderByWithAggregationInput = {
   hash?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   _count?: Prisma.EmbeddingCountOrderByAggregateInput
   _max?: Prisma.EmbeddingMaxOrderByAggregateInput
   _min?: Prisma.EmbeddingMinOrderByAggregateInput
@@ -178,24 +185,29 @@ export type EmbeddingScalarWhereWithAggregatesInput = {
   OR?: Prisma.EmbeddingScalarWhereWithAggregatesInput[]
   NOT?: Prisma.EmbeddingScalarWhereWithAggregatesInput | Prisma.EmbeddingScalarWhereWithAggregatesInput[]
   hash?: Prisma.BytesWithAggregatesFilter<"Embedding"> | runtime.Bytes
+  type?: Prisma.EnumEmbeddingTypeNullableListFilter<"Embedding">
 }
 
 export type EmbeddingUpdateInput = {
   hash?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  type?: Prisma.EmbeddingUpdatetypeInput | $Enums.EmbeddingType[]
   content?: Prisma.ContentUpdateManyWithoutEmbeddingsNestedInput
 }
 
 export type EmbeddingUncheckedUpdateInput = {
   hash?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  type?: Prisma.EmbeddingUpdatetypeInput | $Enums.EmbeddingType[]
   content?: Prisma.ContentUncheckedUpdateManyWithoutEmbeddingsNestedInput
 }
 
 export type EmbeddingUpdateManyMutationInput = {
   hash?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  type?: Prisma.EmbeddingUpdatetypeInput | $Enums.EmbeddingType[]
 }
 
 export type EmbeddingUncheckedUpdateManyInput = {
   hash?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  type?: Prisma.EmbeddingUpdatetypeInput | $Enums.EmbeddingType[]
 }
 
 export type EmbeddingListRelationFilter = {
@@ -208,8 +220,17 @@ export type EmbeddingOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type EnumEmbeddingTypeNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.EmbeddingType[] | Prisma.ListEnumEmbeddingTypeFieldRefInput<$PrismaModel> | null
+  has?: $Enums.EmbeddingType | Prisma.EnumEmbeddingTypeFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.EmbeddingType[] | Prisma.ListEnumEmbeddingTypeFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.EmbeddingType[] | Prisma.ListEnumEmbeddingTypeFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type EmbeddingCountOrderByAggregateInput = {
   hash?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type EmbeddingMaxOrderByAggregateInput = {
@@ -252,6 +273,11 @@ export type BytesFieldUpdateOperationsInput = {
   set?: runtime.Bytes
 }
 
+export type EmbeddingUpdatetypeInput = {
+  set?: $Enums.EmbeddingType[]
+  push?: $Enums.EmbeddingType | $Enums.EmbeddingType[]
+}
+
 export type EmbeddingUpdateWithWhereUniqueWithoutContentInput = {
   where: Prisma.EmbeddingWhereUniqueInput
   data: Prisma.XOR<Prisma.EmbeddingUpdateWithoutContentInput, Prisma.EmbeddingUncheckedUpdateWithoutContentInput>
@@ -267,18 +293,22 @@ export type EmbeddingScalarWhereInput = {
   OR?: Prisma.EmbeddingScalarWhereInput[]
   NOT?: Prisma.EmbeddingScalarWhereInput | Prisma.EmbeddingScalarWhereInput[]
   hash?: Prisma.BytesFilter<"Embedding"> | runtime.Bytes
+  type?: Prisma.EnumEmbeddingTypeNullableListFilter<"Embedding">
 }
 
 export type EmbeddingUpdateWithoutContentInput = {
   hash?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  type?: Prisma.EmbeddingUpdatetypeInput | $Enums.EmbeddingType[]
 }
 
 export type EmbeddingUncheckedUpdateWithoutContentInput = {
   hash?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  type?: Prisma.EmbeddingUpdatetypeInput | $Enums.EmbeddingType[]
 }
 
 export type EmbeddingUncheckedUpdateManyWithoutContentInput = {
   hash?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  type?: Prisma.EmbeddingUpdatetypeInput | $Enums.EmbeddingType[]
 }
 
 
@@ -314,6 +344,7 @@ export type EmbeddingCountOutputTypeCountContentArgs<ExtArgs extends runtime.Typ
 
 export type EmbeddingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   hash?: boolean
+  type?: boolean
   content?: boolean | Prisma.Embedding$contentArgs<ExtArgs>
   _count?: boolean | Prisma.EmbeddingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["embedding"]>
@@ -321,13 +352,15 @@ export type EmbeddingSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type EmbeddingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   hash?: boolean
+  type?: boolean
 }, ExtArgs["result"]["embedding"]>
 
 export type EmbeddingSelectScalar = {
   hash?: boolean
+  type?: boolean
 }
 
-export type EmbeddingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"hash", ExtArgs["result"]["embedding"]>
+export type EmbeddingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"hash" | "type", ExtArgs["result"]["embedding"]>
 export type EmbeddingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   content?: boolean | Prisma.Embedding$contentArgs<ExtArgs>
   _count?: boolean | Prisma.EmbeddingCountOutputTypeDefaultArgs<ExtArgs>
@@ -341,6 +374,7 @@ export type $EmbeddingPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     hash: runtime.Bytes
+    type: $Enums.EmbeddingType[]
   }, ExtArgs["result"]["embedding"]>
   composites: {}
 }
@@ -695,6 +729,7 @@ export interface Prisma__EmbeddingClient<T, Null = never, ExtArgs extends runtim
  */
 export interface EmbeddingFieldRefs {
   readonly hash: Prisma.FieldRef<"Embedding", 'Bytes'>
+  readonly type: Prisma.FieldRef<"Embedding", 'EmbeddingType[]'>
 }
     
 

@@ -392,7 +392,8 @@ export const ModelName = {
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
   UserActivity: 'UserActivity',
-  Embedding: 'Embedding'
+  Embedding: 'Embedding',
+  TextExtractionCache: 'TextExtractionCache'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "employee" | "content" | "contentTalkThread" | "talkThreadComment" | "tag" | "contentTag" | "favoriteContent" | "userActivity" | "embedding"
+    modelProps: "employee" | "content" | "contentTalkThread" | "talkThreadComment" | "tag" | "contentTag" | "favoriteContent" | "userActivity" | "embedding" | "textExtractionCache"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1062,6 +1063,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TextExtractionCache: {
+      payload: Prisma.$TextExtractionCachePayload<ExtArgs>
+      fields: Prisma.TextExtractionCacheFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TextExtractionCacheFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TextExtractionCacheFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        findFirst: {
+          args: Prisma.TextExtractionCacheFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TextExtractionCacheFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        findMany: {
+          args: Prisma.TextExtractionCacheFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>[]
+        }
+        create: {
+          args: Prisma.TextExtractionCacheCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        createMany: {
+          args: Prisma.TextExtractionCacheCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TextExtractionCacheCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>[]
+        }
+        delete: {
+          args: Prisma.TextExtractionCacheDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        update: {
+          args: Prisma.TextExtractionCacheUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        deleteMany: {
+          args: Prisma.TextExtractionCacheDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TextExtractionCacheUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TextExtractionCacheUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>[]
+        }
+        upsert: {
+          args: Prisma.TextExtractionCacheUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        aggregate: {
+          args: Prisma.TextExtractionCacheAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTextExtractionCache>
+        }
+        groupBy: {
+          args: Prisma.TextExtractionCacheGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TextExtractionCacheGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TextExtractionCacheCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TextExtractionCacheCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1193,10 +1268,21 @@ export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[k
 
 
 export const EmbeddingScalarFieldEnum = {
-  hash: 'hash'
+  hash: 'hash',
+  type: 'type'
 } as const
 
 export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
+
+
+export const TextExtractionCacheScalarFieldEnum = {
+  hash: 'hash',
+  skipRecPDFTextNative: 'skipRecPDFTextNative',
+  skipRecPDFTextOCR: 'skipRecPDFTextOCR',
+  text: 'text'
+} as const
+
+export type TextExtractionCacheScalarFieldEnum = (typeof TextExtractionCacheScalarFieldEnum)[keyof typeof TextExtractionCacheScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1356,6 +1442,27 @@ export type ListBytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
 
 
 /**
+ * Reference to a field of type 'EmbeddingType[]'
+ */
+export type ListEnumEmbeddingTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmbeddingType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EmbeddingType'
+ */
+export type EnumEmbeddingTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmbeddingType'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1472,6 +1579,7 @@ export type GlobalOmitConfig = {
   favoriteContent?: Prisma.FavoriteContentOmit
   userActivity?: Prisma.UserActivityOmit
   embedding?: Prisma.EmbeddingOmit
+  textExtractionCache?: Prisma.TextExtractionCacheOmit
 }
 
 /* Types for Logging */

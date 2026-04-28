@@ -59,7 +59,8 @@ export const ModelName = {
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
   UserActivity: 'UserActivity',
-  Embedding: 'Embedding'
+  Embedding: 'Embedding',
+  TextExtractionCache: 'TextExtractionCache'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -170,10 +171,21 @@ export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[k
 
 
 export const EmbeddingScalarFieldEnum = {
-  hash: 'hash'
+  hash: 'hash',
+  type: 'type'
 } as const
 
 export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
+
+
+export const TextExtractionCacheScalarFieldEnum = {
+  hash: 'hash',
+  skipRecPDFTextNative: 'skipRecPDFTextNative',
+  skipRecPDFTextOCR: 'skipRecPDFTextOCR',
+  text: 'text'
+} as const
+
+export type TextExtractionCacheScalarFieldEnum = (typeof TextExtractionCacheScalarFieldEnum)[keyof typeof TextExtractionCacheScalarFieldEnum]
 
 
 export const SortOrder = {
