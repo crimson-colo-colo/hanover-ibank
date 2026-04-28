@@ -125,7 +125,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 		))
 
 	return (
-		<header className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+		<header className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700 flex flex-col">
 			<div className={`flex py-4 mb-2 ${collapsed ? "justify-center" : "px-4"}`}>
 				{!collapsed && (
 					<Link to="/" className="flex items-center gap-2 no-underline active:text-primary-hover">
@@ -167,6 +167,8 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 				</div>
 			)}
 
+			<div className="flex-1" />
+
 			{auth0.isAuthenticated && auth0.user && (
 				<Button
 					component={Link}
@@ -174,13 +176,18 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 					justify="left"
 					variant="subtle"
 					color="gray"
-					className={`h-14 absolute bottom-0 left-0 right-0 flex items-center justify-center ${!collapsed ? "border-0 border-t border-gray-500 gap-3 py-1" : "px-0"}`}
+					className={clsx(
+						"h-14",
+						!collapsed
+							? "border-0 border-t border-gray-500 gap-3 py-1"
+							: "px-0 flex items-center justify-center"
+					)}
 					radius={0}
-					fullWidth
+					fullWidth={!collapsed}
 				>
 					<Avatar userId={auth0.user.sub!} w={collapsed ? "30" : "32"} />
 					{!collapsed && (
-						<div className="flex flex-col items-start">
+						<div className="flex flex-col items-start ml-3">
 							<Text size="sm" fw={500}>
 								{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
 							</Text>
