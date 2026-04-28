@@ -60,7 +60,8 @@ export const ModelName = {
   FavoriteContent: 'FavoriteContent',
   UserActivity: 'UserActivity',
   Embedding: 'Embedding',
-  TextExtractionCache: 'TextExtractionCache'
+  TextExtractionCache: 'TextExtractionCache',
+  RecentTimestamps: 'RecentTimestamps'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -186,6 +187,16 @@ export const TextExtractionCacheScalarFieldEnum = {
 } as const
 
 export type TextExtractionCacheScalarFieldEnum = (typeof TextExtractionCacheScalarFieldEnum)[keyof typeof TextExtractionCacheScalarFieldEnum]
+
+
+export const RecentTimestampsScalarFieldEnum = {
+  recentlyEdited: 'recentlyEdited',
+  recentlyViewed: 'recentlyViewed',
+  employeeId: 'employeeId',
+  contentId: 'contentId'
+} as const
+
+export type RecentTimestampsScalarFieldEnum = (typeof RecentTimestampsScalarFieldEnum)[keyof typeof RecentTimestampsScalarFieldEnum]
 
 
 export const SortOrder = {

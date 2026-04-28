@@ -393,7 +393,8 @@ export const ModelName = {
   FavoriteContent: 'FavoriteContent',
   UserActivity: 'UserActivity',
   Embedding: 'Embedding',
-  TextExtractionCache: 'TextExtractionCache'
+  TextExtractionCache: 'TextExtractionCache',
+  RecentTimestamps: 'RecentTimestamps'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "employee" | "content" | "contentTalkThread" | "talkThreadComment" | "tag" | "contentTag" | "favoriteContent" | "userActivity" | "embedding" | "textExtractionCache"
+    modelProps: "employee" | "content" | "contentTalkThread" | "talkThreadComment" | "tag" | "contentTag" | "favoriteContent" | "userActivity" | "embedding" | "textExtractionCache" | "recentTimestamps"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1137,6 +1138,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RecentTimestamps: {
+      payload: Prisma.$RecentTimestampsPayload<ExtArgs>
+      fields: Prisma.RecentTimestampsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RecentTimestampsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RecentTimestampsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>
+        }
+        findFirst: {
+          args: Prisma.RecentTimestampsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RecentTimestampsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>
+        }
+        findMany: {
+          args: Prisma.RecentTimestampsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>[]
+        }
+        create: {
+          args: Prisma.RecentTimestampsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>
+        }
+        createMany: {
+          args: Prisma.RecentTimestampsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RecentTimestampsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>[]
+        }
+        delete: {
+          args: Prisma.RecentTimestampsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>
+        }
+        update: {
+          args: Prisma.RecentTimestampsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>
+        }
+        deleteMany: {
+          args: Prisma.RecentTimestampsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RecentTimestampsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RecentTimestampsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>[]
+        }
+        upsert: {
+          args: Prisma.RecentTimestampsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecentTimestampsPayload>
+        }
+        aggregate: {
+          args: Prisma.RecentTimestampsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRecentTimestamps>
+        }
+        groupBy: {
+          args: Prisma.RecentTimestampsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecentTimestampsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RecentTimestampsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecentTimestampsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1283,6 +1358,16 @@ export const TextExtractionCacheScalarFieldEnum = {
 } as const
 
 export type TextExtractionCacheScalarFieldEnum = (typeof TextExtractionCacheScalarFieldEnum)[keyof typeof TextExtractionCacheScalarFieldEnum]
+
+
+export const RecentTimestampsScalarFieldEnum = {
+  recentlyEdited: 'recentlyEdited',
+  recentlyViewed: 'recentlyViewed',
+  employeeId: 'employeeId',
+  contentId: 'contentId'
+} as const
+
+export type RecentTimestampsScalarFieldEnum = (typeof RecentTimestampsScalarFieldEnum)[keyof typeof RecentTimestampsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1580,6 +1665,7 @@ export type GlobalOmitConfig = {
   userActivity?: Prisma.UserActivityOmit
   embedding?: Prisma.EmbeddingOmit
   textExtractionCache?: Prisma.TextExtractionCacheOmit
+  recentTimestamps?: Prisma.RecentTimestampsOmit
 }
 
 /* Types for Logging */

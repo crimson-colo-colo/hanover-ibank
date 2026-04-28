@@ -78,7 +78,7 @@ export function fileContentData() {
 		const daysEditedAgo = Math.floor(Math.random() * 365)
 		const lastModifiedDate = new Date()
 		lastModifiedDate.setDate(lastModifiedDate.getDate() - daysEditedAgo)
-		const expiresInDays = 30 + Math.floor(Math.random() * 365)
+		const expiresInDays = -100 + Math.floor(Math.random() * 200)
 		const expirationDate = new Date()
 		expirationDate.setDate(expirationDate.getDate() + expiresInDays)
 		const status =

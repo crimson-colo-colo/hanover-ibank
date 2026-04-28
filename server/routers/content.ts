@@ -57,6 +57,11 @@ export const contentRouter = router({
 						},
 					},
 					tags: true,
+					recentTimestamps: {
+						where: {
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
 				},
 			})
 
@@ -94,6 +99,11 @@ export const contentRouter = router({
 					return {
 						...content,
 						favorited: content.favoritedBy.length > 0,
+						recentTimestamps: content.recentTimestamps.map((timestamp) => ({
+							recentlyViewed: timestamp.recentlyViewed,
+							recentlyEdited: timestamp.recentlyEdited,
+							employeeId: opts.ctx.auth.sub,
+						})),
 						owner: {
 							id: content.ownerId,
 							name: owner.name ?? owner.nickname ?? owner.username!,
@@ -201,15 +211,36 @@ export const contentRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const updated = await db.content.update({
+			const beforeTitle = await db.content.findUnique({
 				where: { id: opts.input.id },
-				data: {
-					title: opts.input.title,
+				select: {
+					title: true,
 				},
-				include: { tags: true },
 			})
-			await embedPDF(updated)
-			return updated
+			if (opts.input.title !== beforeTitle?.title) {
+				const updated = await db.content.update({
+					where: { id: opts.input.id },
+					data: {
+						title: opts.input.title,
+					},
+					include: { tags: true },
+				})
+				await embedPDF(updated)
+
+				await db.recentTimestamps.update({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					data: {
+						recentlyEdited: new Date(),
+					},
+				})
+
+				return updated
+			}
 		}),
 
 	updateLastModifiedDate: authProcedure
@@ -220,15 +251,38 @@ export const contentRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const update = await db.content.update({
+			const beforeLastModifiedDate = await db.content.findUnique({
 				where: { id: opts.input.id },
-				data: {
-					lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
+				select: {
+					lastModifiedDate: true,
 				},
-				include: { tags: true },
 			})
-			await embedPDF(update)
-			return update
+			if (
+				opts.input.lastModifiedDate !==
+				beforeLastModifiedDate?.lastModifiedDate.toISOString().split("T")[0]
+			) {
+				const update = await db.content.update({
+					where: { id: opts.input.id },
+					data: {
+						lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
+					},
+					include: { tags: true },
+				})
+				await db.recentTimestamps.update({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					data: {
+						recentlyEdited: new Date(),
+					},
+				})
+
+				await embedPDF(update)
+				return update
+			}
 		}),
 
 	updateExpirationDate: authProcedure
@@ -239,41 +293,99 @@ export const contentRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const updated = await db.content.update({
+			const beforeExpirationDate = await db.content.findUnique({
 				where: { id: opts.input.id },
-				data: {
-					expirationDate: isoDateToTimestamp(opts.input.expirationDate),
-				},
-				include: {
-					tags: true,
-				},
+				select: { expirationDate: true },
 			})
-			await embedPDF(updated)
-			return updated
+			if (
+				opts.input.expirationDate !==
+				beforeExpirationDate?.expirationDate.toISOString().split("T")[0]
+			) {
+				const updated = await db.content.update({
+					where: { id: opts.input.id },
+					data: {
+						expirationDate: isoDateToTimestamp(opts.input.expirationDate),
+					},
+					include: {
+						tags: true,
+					},
+				})
+
+				await db.recentTimestamps.update({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					data: {
+						recentlyEdited: new Date(),
+					},
+				})
+
+				await embedPDF(updated)
+				return updated
+			}
 		}),
 	updateOwner: authProcedure
 		.input(z.object({ id: z.string(), ownerId: z.string() }))
 		.mutation(async (opts) => {
-			const content = await db.content.update({
+			const beforeOwnerId = await db.content.findUnique({
 				where: { id: opts.input.id },
-				data: {
-					ownerId: opts.input.ownerId,
-				},
-				include: { tags: true },
+				select: { ownerId: true },
 			})
-			await embedPDF(content)
+			if (opts.input.ownerId !== beforeOwnerId?.ownerId) {
+				const updated = await db.content.update({
+					where: { id: opts.input.id },
+					data: {
+						ownerId: opts.input.ownerId,
+					},
+					include: { tags: true },
+				})
+				await db.recentTimestamps.update({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					data: {
+						recentlyEdited: new Date(),
+					},
+				})
+				await embedPDF(updated)
+				return updated
+			}
 		}),
 	updateStatus: authProcedure
 		.input(z.object({ id: z.string(), status: z.enum(Object.values(ContentStatus)) }))
 		.mutation(async (opts) => {
-			const content = await db.content.update({
+			const beforeStatus = await db.content.findUnique({
 				where: { id: opts.input.id },
-				data: {
-					status: opts.input.status,
-				},
-				include: { tags: true },
+				select: { status: true },
 			})
-			await embedPDF(content)
+			if (opts.input.status !== beforeStatus?.status) {
+				const updated = await db.content.update({
+					where: { id: opts.input.id },
+					data: {
+						status: opts.input.status,
+					},
+					include: { tags: true },
+				})
+				await db.recentTimestamps.update({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					data: {
+						recentlyEdited: new Date(),
+					},
+				})
+				await embedPDF(updated)
+				return updated
+			}
 		}),
 	updateTags: authProcedure
 		.input(
@@ -288,49 +400,96 @@ export const contentRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const content = await db.content.update({
+			const beforeTags = await db.content.findUnique({
 				where: { id: opts.input.id },
-				data: {
-					tags: {
-						connectOrCreate: opts.input.tags.map((tag) => ({
-							where: {
-								contentId_tagCategory_tagName: {
-									contentId: opts.input.id,
-									tagCategory: tag.category,
-									tagName: tag.name,
+				select: { tags: true },
+			})
+			const changed =
+				beforeTags?.tags.length !== opts.input.tags.length
+					? true
+					: beforeTags?.tags.every(
+							(item, i) =>
+								item.tagCategory === opts.input.tags[i].category &&
+								item.tagName === opts.input.tags[i].name
+						)
+
+			if (changed) {
+				const updated = await db.content.update({
+					where: { id: opts.input.id },
+					data: {
+						tags: {
+							connectOrCreate: opts.input.tags.map((tag) => ({
+								where: {
+									contentId_tagCategory_tagName: {
+										contentId: opts.input.id,
+										tagCategory: tag.category,
+										tagName: tag.name,
+									},
 								},
-							},
-							create: {
-								tag: {
-									connectOrCreate: {
-										where: {
-											category_name: {
+								create: {
+									tag: {
+										connectOrCreate: {
+											where: {
+												category_name: {
+													category: tag.category,
+													name: tag.name,
+												},
+											},
+											create: {
 												category: tag.category,
 												name: tag.name,
 											},
 										},
-										create: {
-											category: tag.category,
-											name: tag.name,
-										},
 									},
 								},
-							},
-						})),
-						deleteMany: {
-							contentId: opts.input.id,
-							NOT: opts.input.tags.map((tag) => ({
-								tagCategory: tag.category,
-								tagName: tag.name,
 							})),
+							deleteMany: {
+								contentId: opts.input.id,
+								NOT: opts.input.tags.map((tag) => ({
+									tagCategory: tag.category,
+									tagName: tag.name,
+								})),
+							},
 						},
 					},
+					include: {
+						tags: true,
+					},
+				})
+				await db.recentTimestamps.update({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					data: {
+						recentlyEdited: new Date(),
+					},
+				})
+				await embedPDF(updated)
+				return updated
+			}
+		}),
+
+	updateRecentlyViewedTimestamp: authProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			})
+		)
+		.mutation(async (opts) => {
+			await db.recentTimestamps.update({
+				where: {
+					employeeId_contentId: {
+						contentId: opts.input.id,
+						employeeId: opts.ctx.auth.sub,
+					},
 				},
-				include: {
-					tags: true,
+				data: {
+					recentlyViewed: new Date(),
 				},
 			})
-			await embedPDF(content)
 		}),
 
 	download: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
@@ -436,11 +595,21 @@ export const contentRouter = router({
 				where: { id: opts.input.id },
 				data: {
 					lastModifiedDate: new Date(),
-					size: buffer.length,
-					mimeType: fileType,
+				},
+			})
+
+			await db.recentTimestamps.update({
+				where: {
+					employeeId_contentId: {
+						contentId: opts.input.id,
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
+				data: {
+					recentlyEdited: new Date(),
 				},
 				select: {
-					objectId: true,
+					contentId: true,
 					lastModifiedDate: true,
 				},
 			})
@@ -586,6 +755,11 @@ export const contentRouter = router({
 				owner: true,
 				tags: true,
 				checkedOutBy: true,
+				recentTimestamps: {
+					where: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
 			},
 		})
 
@@ -637,6 +811,11 @@ export const contentRouter = router({
 							} satisfies ContentListItem["checkedOutBy"])
 						: null,
 					favorited: true,
+					recentTimestamps: content.recentTimestamps.map((timestamp) => ({
+						recentlyViewed: timestamp.recentlyViewed,
+						recentlyEdited: timestamp.recentlyEdited,
+						employeeId: opts.ctx.auth.sub,
+					})),
 					tags: content.tags.map((tag) => ({
 						category: tag.tagCategory,
 						name: tag.tagName,
@@ -765,6 +944,11 @@ export const contentRouter = router({
 					},
 				},
 				tags: true,
+				recentTimestamps: {
+					where: {
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
 			},
 		})
 
@@ -815,6 +999,11 @@ export const contentRouter = router({
 			tags: content.tags.map((tag) => ({
 				category: tag.tagCategory,
 				name: tag.tagName,
+			})),
+			recentTimestamps: content.recentTimestamps.map((timestamp) => ({
+				recentlyViewed: timestamp.recentlyViewed,
+				recentlyEdited: timestamp.recentlyEdited,
+				employeeId: opts.ctx.auth.sub,
 			})),
 			type: content.type as "Object",
 			objectId: content.objectId!,

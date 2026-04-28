@@ -91,3 +91,8 @@ export type Embedding = Prisma.EmbeddingModel
  * 
  */
 export type TextExtractionCache = Prisma.TextExtractionCacheModel
+/**
+ * Model RecentTimestamps
+ * 
+ */
+export type RecentTimestamps = Prisma.RecentTimestampsModel
