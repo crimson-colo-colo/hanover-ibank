@@ -30,11 +30,11 @@ export default defineConfig({
 			],
 		}),
 	],
-
 	resolve: {
 		tsconfigPaths: true,
 	},
 	server: {
 		middlewareMode: true,
+		host: "0.0.0.0",
 	},
 })

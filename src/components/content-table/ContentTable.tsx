@@ -1,21 +1,16 @@
 import {
 	ActionIcon,
-	Anchor,
 	Button,
 	Checkbox,
+	Chip,
 	Flex,
 	Group,
-	HoverCard,
-	Image,
 	Kbd,
-	Menu,
 	Modal,
 	NumberInput,
 	Pagination,
-	Pill,
 	SegmentedControl,
 	Select,
-	Stack,
 	Table,
 	Text,
 	TextInput,
@@ -24,22 +19,20 @@ import {
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { ContentStatus, ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { ContentStatus, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
-import { FileType } from "@shared/filetype.ts"
+import type { FileType } from "@shared/filetype.ts"
 import type { ContentList, ContentListItem } from "@shared/types.ts"
 import {
-	IconCircleArrowUpRight,
 	IconCircleCheck,
 	IconCloudUpload,
 	IconDoorEnter,
 	IconDoorExit,
-	IconDotsVertical,
-	IconDownload,
+	IconEye,
+	IconHourglassEmpty,
 	IconLoader2,
 	IconMessageCircleUser,
-	IconPencilCheck,
-	IconPencilOff,
+	IconPencil,
 	IconProgress,
 	IconSortAscending2,
 	IconSortDescending2,
@@ -48,6 +41,7 @@ import {
 	IconTrash,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import {
 	createColumnHelper,
 	flexRender,
@@ -58,23 +52,32 @@ import {
 	getPaginationRowModel,
 	getSortedRowModel,
 	type Row,
+	type SortingState,
 	useReactTable,
+	type VisibilityState,
 } from "@tanstack/react-table"
 import clsx from "clsx"
-import { formatDate } from "date-fns"
+import { formatDate, formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
-import { Avatar } from "@/components/Avatar.tsx"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
-import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
-import { TagFilterPopup } from "@/components/TagFilterPopup.tsx"
-import { formatBytes } from "@/lib/content.ts"
+import { TagFilterPopup } from "@/components/content-table/TagFilterPopup.tsx"
 import {
+	type ContentViews,
 	contentStatusDisplayName,
 	employeeRoleDisplayName,
-	tagCategoryDisplayName,
 } from "@/lib/enums.ts"
-import { fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
-import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
+import {
+	checkedOutByFilterFn,
+	customFilterFunction,
+	fuzzyFilter,
+	fuzzySort,
+	tagFilterFn,
+} from "@/lib/table.ts"
+import { queryClient, trpc } from "@/lib/trpc.ts"
+import { ActionColumn } from "./ActionColumn.tsx"
+import { NameColumn } from "./NameColumn.tsx"
+import { OwnerColumn } from "./OwnerColumn.tsx"
+import { TagColumn } from "./TagColumn.tsx"
 
 const mutationOptions = {
 	async onSettled() {
@@ -96,12 +99,14 @@ export function ContentTable({
 	openFilePreview,
 	filter,
 	changeFilter,
+	view: initialView,
 }: {
 	loading: boolean
 	data: ContentList
 	openFilePreview: (item: ContentListItem, type: FileType) => void
 	filter: ContentFilter
 	changeFilter: Dispatch<SetStateAction<ContentFilter>>
+	view: ContentViews
 }) {
 	const columnHelper = createColumnHelper<ContentListItem>()
 	const [rowSelection, setRowSelection] = useState({})
@@ -123,6 +128,27 @@ export function ContentTable({
 	const [contentSelectedForCheckout, selectContentForCheckout] = useState<ContentListItem | null>(
 		null
 	)
+
+	const recentlyViewed = useMutation(
+		trpc.content.updateRecentlyViewedTimestamp.mutationOptions(mutationOptions)
+	)
+
+	const defaultColumns = {
+		checkbox: true,
+		status: true,
+		title: true,
+		owner: true,
+		lastModified: true,
+		expirationDate: false,
+		recentlyViewed: false,
+		recentlyEdited: false,
+		tags: true,
+		actions: true,
+		checkedOutBy: false,
+	}
+
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(defaultColumns)
+	const [sorting, setSorting] = useState<SortingState>([])
 
 	const allTags = useMemo(
 		() => [
@@ -206,79 +232,14 @@ export function ContentTable({
 				filterFn: "fuzzy",
 				sortingFn: "fuzzy",
 				enableSorting: true,
-				cell: (info) => {
-					const item = info.row.original
-					if (item.type === "Link") {
-						const host = new URL(item.url).hostname
-						return (
-							<div className="flex items-center gap-2">
-								<FileTypeIcon fileType={FileType.Link} size={22} strokeWidth={1.5} />
-								<Anchor
-									c="var(--mantine-color-bright)"
-									className="font-semibold m-0 truncate max-w-[30ch]"
-									title={item.title}
-									onClick={async () => {
-										openFilePreview(item, FileType.Link)
-									}}
-								>
-									{item.title}
-								</Anchor>
-								<span className="ml-2 text-xs text-gray-500 truncate" title={item.url}>
-									{host.replace(/^www\./, "")}
-								</span>
-								{info.row.original.checkedOutBy !== null &&
-									(info.row.original.checkedOutBy.id === profile?.id ? (
-										<Tooltip withArrow arrowSize={8} label="You have this link checked out">
-											<IconPencilCheck size={24} />
-										</Tooltip>
-									) : (
-										<Tooltip
-											withArrow
-											arrowSize={8}
-											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
-										>
-											link
-											<IconPencilOff className="checked-out-icon" size={24} />
-										</Tooltip>
-									))}
-							</div>
-						)
-					} else if (item.type === "Object") {
-						const size = formatBytes(item.object.ContentLength ?? 0)
-						const fileType = item.object.Metadata?.filetype as FileType | undefined
-						return (
-							<div className="flex items-center gap-2">
-								<FileTypeIcon fileType={fileType ?? FileType.Unknown} size={22} strokeWidth={1.5} />
-								<button
-									className="font-semibold m-0 truncate max-w-[30ch] hover:underline p-0 border-none bg-transparent text-base cursor-pointer"
-									title={item.title}
-									onClick={async () => {
-										openFilePreview(item, fileType ?? FileType.Unknown)
-									}}
-								>
-									{item.title}
-								</button>
-								<span className="ml-2 text-xs text-gray-500 truncate" title={size}>
-									{size}
-								</span>
-								{info.row.original.checkedOutBy !== null &&
-									(info.row.original.checkedOutBy.id === profile?.id ? (
-										<Tooltip withArrow arrowSize={8} label="You have this file checked out">
-											<IconPencilCheck size={24} />
-										</Tooltip>
-									) : (
-										<Tooltip
-											withArrow
-											arrowSize={8}
-											label={`Checked out by ${info.row.original.checkedOutBy.name}`}
-										>
-											<IconPencilOff className="checked-out-icon" size={24} />
-										</Tooltip>
-									))}
-							</div>
-						)
-					}
-				},
+				cell: (info) => (
+					<NameColumn
+						info={info}
+						openFilePreview={openFilePreview}
+						profile={profile}
+						recentlyViewed={recentlyViewed}
+					/>
+				),
 			}),
 			columnHelper.accessor((row) => `${row.owner.name} ${row.owner.email}`, {
 				id: "owner",
@@ -286,46 +247,85 @@ export function ContentTable({
 				filterFn: "fuzzy",
 				sortingFn: "fuzzy",
 				enableSorting: true,
-				cell: (info) => (
-					<HoverCard openDelay={250} withArrow>
-						<HoverCard.Target>
-							<Avatar
-								userId={info.row.original.owner.id}
-								alt={info.row.original.owner.name}
-								width={24}
-								height={24}
-								radius="100%"
-								className="w-6 h-6 shrink-0"
-							/>
-						</HoverCard.Target>
-						<HoverCard.Dropdown className="shadow-sm">
-							<Flex gap="md">
-								<Image src={`/avatar/${info.row.original.owner.id}`} radius="100%" h={40} w={40} />
-								<Stack gap={0} justify="center">
-									<Text size="sm" fw={500}>
-										{info.row.original.owner.name}
-									</Text>
-									<Text size="xs" c="gray">
-										{info.row.original.owner.email} ·{" "}
-										{employeeRoleDisplayName[info.row.original.owner.role]}
-									</Text>
-								</Stack>
-							</Flex>
-						</HoverCard.Dropdown>
-					</HoverCard>
-				),
+				cell: (info) => <OwnerColumn info={info} />,
 			}),
 			columnHelper.accessor("lastModifiedDate", {
-				header: "Last Modified",
+				id: "lastModified",
+				header: () => <span className="min-w-max">Last Modified</span>,
 				enableSorting: true,
 				sortingFn: "datetime",
 				cell: (info) => (
-					<span title={info.getValue().toLocaleString()}>
-						{info.getValue().getFullYear() === new Date().getFullYear()
-							? formatDate(info.getValue(), "MMM d")
-							: formatDate(info.getValue(), "MMM d yyyy")}
+					<span title={info.getValue().toLocaleString()} className="w-40">
+						{formatDate(info.getValue(), "MMM d yyyy")}
 					</span>
 				),
+			}),
+			columnHelper.accessor("expirationDate", {
+				id: "expirationDate",
+				header: () => <span className="min-w-max">Expiration Date</span>,
+				// size: 150,
+				cell: (info) => (
+					<span
+						title={info.getValue().toLocaleString()}
+						className={clsx("w-40", info.getValue().getTime() < Date.now() && "text-red-600")}
+					>
+						{formatDistanceToNow(info.getValue(), { addSuffix: true }).replace(
+							/^(in )?about /,
+							"$1"
+						)}
+					</span>
+				),
+			}),
+			columnHelper.accessor("recentTimestamps", {
+				id: "recentlyViewed",
+				header: () => <span className="min-w-max">Last Viewed</span>,
+				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
+					const getTime = (row: Row<ContentListItem>) =>
+						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)
+							?.recentlyViewed ?? new Date(0)
+
+					return getTime(rowB).getTime() - getTime(rowA).getTime()
+				},
+				cell: (info) => {
+					const time = info.row.original.recentTimestamps.find(
+						(entry) => entry.employeeId === profile?.id
+					)?.recentlyViewed
+
+					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
+					if (!time) return new Date("1970-01-01")
+
+					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
+						/^(in )?about /,
+						"$1"
+					)
+					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
+				},
+			}),
+
+			columnHelper.accessor("recentTimestamps", {
+				id: "recentlyEdited",
+				header: () => <span className="min-w-max">Last Edited</span>,
+				sortingFn: (rowA: Row<ContentListItem>, rowB: Row<ContentListItem>) => {
+					const getTime = (row: Row<ContentListItem>) =>
+						row.original.recentTimestamps.find((entry) => entry.employeeId === profile?.id)
+							?.recentlyEdited ?? new Date(0)
+
+					return getTime(rowB).getTime() - getTime(rowA).getTime()
+				},
+				cell: (info) => {
+					const time = info.row.original.recentTimestamps.find(
+						(entry) => entry.employeeId === profile?.id
+					)?.recentlyEdited
+
+					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
+					if (!time) return new Date("1970-01-01")
+
+					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
+						/^(in )?about /,
+						"$1"
+					)
+					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
+				},
 			}),
 			columnHelper.accessor(
 				(row) =>
@@ -336,142 +336,33 @@ export function ContentTable({
 					filterFn: "tagFilterFn",
 					sortingFn: "fuzzy",
 					enableSorting: false,
-					cell: (info) => (
-						<Group gap={4}>
-							{info.row.original.tags.map((tag) => (
-								<Tooltip
-									withArrow
-									arrowSize={8}
-									key={`${tag.category}-${tag.name}`}
-									label={`${tagCategoryDisplayName[tag.category]}: ${
-										tag.category === TagCategory.IntendedAudience
-											? employeeRoleDisplayName[tag.name as EmployeeRole]
-											: tag.name
-									}`}
-								>
-									<Pill key={`${tag.category}-${tag.name}`} size="xs" color="gray">
-										{tag.category === TagCategory.IntendedAudience
-											? employeeRoleDisplayName[tag.name as EmployeeRole]
-											: tag.name}
-									</Pill>
-								</Tooltip>
-							))}
-						</Group>
-					),
+					cell: (info) => <TagColumn info={info} />,
 				}
 			),
 			columnHelper.display({
 				id: "actions",
 				cell: (info) => (
-					<Flex className="content-actions" gap="2px" justify="flex-end">
-						{info.row.original.type === "Link" ? (
-							<ActionIcon
-								variant="subtle"
-								size="sm"
-								onClick={() => {
-									if (info.row.original.type === ContentType.Link) {
-										window.open(info.row.original.url)
-									}
-								}}
-							>
-								<IconCircleArrowUpRight />
-							</ActionIcon>
-						) : (
-							<ActionIcon
-								variant="subtle"
-								size="sm"
-								onClick={async () => {
-									const { url } = await trpcClient.content.download.query({
-										id: info.row.original.id,
-									})
-									window.open(url, "_blank", "noopener")
-								}}
-							>
-								<IconDownload />
-							</ActionIcon>
-						)}
-						<Menu width={140} closeOnItemClick={true} position="bottom-end">
-							<Menu.Target>
-								<ActionIcon variant="subtle" size="sm">
-									<IconDotsVertical />
-								</ActionIcon>
-							</Menu.Target>
-							<Menu.Dropdown>
-								{info.row.original.type === "Object" ? (
-									<Menu.Item
-										leftSection={<IconDownload size={22} />}
-										variant="subtle"
-										onClick={async () => {
-											const { url } = await trpcClient.content.download.query({
-												id: info.row.original.id,
-											})
-											window.open(url, "_blank", "noopener")
-										}}
-									>
-										Download
-									</Menu.Item>
-								) : (
-									<Menu.Item
-										leftSection={<IconCircleArrowUpRight size={22} />}
-										variant="subtle"
-										onClick={() => {
-											if (info.row.original.type === ContentType.Link) {
-												window.open(info.row.original.url)
-											}
-										}}
-									>
-										Open link
-									</Menu.Item>
-								)}
-								{info.row.original.checkedOutBy === null ? (
-									<Menu.Item
-										leftSection={<IconDoorExit size={22} />}
-										variant="subtle"
-										onClick={() => {
-											selectContentForCheckout(info.row.original)
-											openCheckOutModal()
-										}}
-									>
-										Check Out
-									</Menu.Item>
-								) : info.row.original.checkedOutBy.id === profile?.id ? (
-									<Menu.Item
-										leftSection={<IconDoorEnter size={22} />}
-										variant="subtle"
-										onClick={() => {
-											selectContentForCheckout(info.row.original)
-											openCheckInModal()
-										}}
-									>
-										Check In
-									</Menu.Item>
-								) : (
-									<Menu.Item leftSection={<IconDoorExit size={22} />} variant="subtle" disabled>
-										Check Out
-									</Menu.Item>
-								)}
-							</Menu.Dropdown>
-						</Menu>
-					</Flex>
+					<ActionColumn
+						info={info}
+						selectContentForCheckout={selectContentForCheckout}
+						openCheckOutModal={openCheckOutModal}
+						openCheckInModal={openCheckInModal}
+						profile={profile}
+						recentlyViewed={recentlyViewed}
+					/>
 				),
+			}),
+			columnHelper.accessor("checkedOutBy", {
+				id: "checkedOutBy",
+				header: "checkedOut?",
+				enableSorting: false,
+				cell: (info) => info.row.original.checkedOutBy?.name,
+				filterFn: "checkedOutByFilterFn",
 			}),
 		],
 		[profile, allTags]
 	)
 
-	const customFilterFunction = (
-		row: Row<ContentListItem>,
-		columnId: string,
-		filterValue: string
-	) => {
-		const value = row.getValue(columnId)
-		//Just for status column use equals logic
-		if (columnId === "status") {
-			return value?.toString().toLowerCase() === filterValue.toLowerCase()
-		}
-		//For all other columns use fuzzier includes logic
-		return value?.toString().toLowerCase().includes(filterValue.toLowerCase()) ?? false
-	}
 	const [pagination, setPagination] = useState({
 		pageIndex: 0, //initial page index
 		pageSize: 10, //default page size
@@ -480,23 +371,6 @@ export function ContentTable({
 	const table = useReactTable<ContentListItem>({
 		data: data.content,
 		columns: columns,
-		state: {
-			rowSelection,
-			pagination,
-			globalFilter: debouncedGlobalFilter,
-		},
-		enableGlobalFilter: true,
-		enableSorting: true,
-		enableRowSelection: true,
-		onGlobalFilterChange: setGlobalFilter,
-		globalFilterFn: customFilterFunction,
-		sortingFns: {
-			fuzzy: fuzzySort,
-		},
-		filterFns: {
-			fuzzy: fuzzyFilter,
-			tagFilterFn: tagFilterFn,
-		},
 		initialState: {
 			sorting: [
 				{
@@ -509,6 +383,26 @@ export function ContentTable({
 				pageSize: 10, //custom default page size
 			},
 		},
+		state: {
+			rowSelection,
+			pagination,
+			globalFilter: debouncedGlobalFilter,
+			columnVisibility,
+			sorting,
+		},
+		enableGlobalFilter: true,
+		enableSorting: true,
+		enableRowSelection: true,
+		onGlobalFilterChange: setGlobalFilter,
+		globalFilterFn: customFilterFunction,
+		sortingFns: {
+			fuzzy: fuzzySort,
+		},
+		filterFns: {
+			fuzzy: fuzzyFilter,
+			tagFilterFn: tagFilterFn,
+			checkedOutByFilterFn: checkedOutByFilterFn,
+		},
 		enableSortingRemoval: false,
 		enableMultiSort: true,
 		getCoreRowModel: getCoreRowModel(),
@@ -520,7 +414,70 @@ export function ContentTable({
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
 		autoResetPageIndex: false,
+		onColumnVisibilityChange: setColumnVisibility,
+		onSortingChange: setSorting,
 	})
+
+	const [activeView, setActiveView] = useState<ContentViews>(initialView ?? "default")
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		navigate({
+			from: "/content-table",
+			search: (prev) => ({ ...prev, view: activeView }),
+		})
+
+		if (activeView === "default") {
+			setSorting([{ id: "title", desc: false }])
+			setColumnVisibility({
+				...defaultColumns,
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "expiringSoon") {
+			setSorting([{ id: "expirationDate", desc: false }])
+			setColumnVisibility({
+				...defaultColumns,
+				lastModified: false,
+				expirationDate: true,
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "recentlyViewed") {
+			setSorting([{ id: "recentlyViewed", desc: false }])
+			setColumnVisibility({
+				...defaultColumns,
+				recentlyViewed: true,
+				lastModified: false,
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "recentlyEdited") {
+			setSorting([{ id: "recentlyEdited", desc: false }])
+			setColumnVisibility({
+				...defaultColumns,
+				recentlyEdited: true,
+				lastModified: false,
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "checkedOut") {
+			table.getColumn("checkedOutBy")?.setFilterValue("active")
+			setColumnVisibility({
+				...defaultColumns,
+				lastModified: false,
+			})
+			table.setPageIndex(0)
+		}
+	}, [activeView])
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -589,7 +546,94 @@ export function ContentTable({
 					/>
 				</Flex>
 			</Flex>
-			<Table>
+			<Chip.Group value={activeView} onChange={setActiveView}>
+				<Group justify="left">
+					<Chip
+						icon={null}
+						value="default"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						Default
+					</Chip>
+					<Chip
+						icon={null}
+						value="expiringSoon"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconHourglassEmpty size="1rem" />
+							Expiring Content
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="recentlyViewed"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconEye size="1rem" />
+							Recently Viewed
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="recentlyEdited"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconPencil size="1rem" />
+							Recently Edited By You
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="checkedOut"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconDoorExit size="1rem" />
+							Checked Out
+						</Group>
+					</Chip>
+				</Group>
+			</Chip.Group>
+			<br />
+			<Table className="w-full">
 				<Table.Thead>
 					{table.getHeaderGroups().map((headerGroup) => (
 						<Table.Tr key={headerGroup.id}>
@@ -598,22 +642,23 @@ export function ContentTable({
 									key={header.id}
 									colSpan={header.colSpan}
 									className={clsx(
+										"text-left hover:underline w-max",
 										header.column.getCanSort() ? "cursor-pointer select-none" : "",
-										"text-left hover:underline"
+										header.column.id === "actions" && "pl-0"
 									)}
 									onClick={header.column.getToggleSortingHandler()}
 								>
-									<Group gap="sm">
+									<Flex gap="sm">
 										{header.isPlaceholder
 											? null
 											: flexRender(header.column.columnDef.header, header.getContext())}
 										{header.column.id !== "favorited" &&
 											(header.column.getIsSorted() === "asc" ? (
-												<IconSortAscending2 className="inline" size={20} />
+												<IconSortAscending2 className="inline shrink-0" size={20} />
 											) : header.column.getIsSorted() === "desc" ? (
-												<IconSortDescending2 className="inline" size={20} />
+												<IconSortDescending2 className="inline shrink-0" size={20} />
 											) : null)}
-									</Group>
+									</Flex>
 								</Table.Th>
 							))}
 						</Table.Tr>
@@ -631,7 +676,10 @@ export function ContentTable({
 							>
 								{row.getVisibleCells().map((cell) => {
 									return (
-										<Table.Td key={cell.id}>
+										<Table.Td
+											key={cell.id}
+											className={clsx(cell.column.id === "actions" && "pl-0")}
+										>
 											{flexRender(cell.column.columnDef.cell, cell.getContext())}
 										</Table.Td>
 									)
@@ -731,6 +779,13 @@ export function ContentTable({
 					<Text>Items per page:</Text>
 					<Select
 						size="sm"
+						className="w-25"
+						classNames={
+							{
+								// TODO: right align
+								// input: "text-right",
+							}
+						}
 						value={table.getState().pagination.pageSize}
 						onChange={(value) => {
 							value && table.setPageSize(Number(value))
@@ -752,84 +807,84 @@ export function ContentTable({
 			/>
 		</>
 	)
+}
 
-	function CheckInModal({
-		opened,
-		onClose,
-		content,
-	}: {
-		opened: boolean
-		onClose: () => void
-		content: ContentListItem | null
-	}) {
-		const checkInMutation = useMutation(trpc.content.checkIn.mutationOptions(mutationOptions))
-		return (
-			<Modal opened={opened} onClose={onClose} title="Confirm check in">
-				<Text>
-					Ready to check this content back in? Others will be able to edit it once it's checked in.
-				</Text>
-				<Flex gap="md" justify="flex-end" mt="md">
-					<Button
-						variant="subtle"
-						color="gray"
-						onClick={onClose}
-						disabled={checkInMutation.isPending}
-					>
-						Cancel
-					</Button>
-					<Button
-						loading={checkInMutation.isPending}
-						onClick={async () => {
-							if (content !== null) {
-								await checkInMutation.mutateAsync({ id: content.id })
-								onClose()
-							}
-						}}
-						leftSection={<IconDoorEnter />}
-					>
-						Check in
-					</Button>
-				</Flex>
-			</Modal>
-		)
-	}
+function CheckInModal({
+	opened,
+	onClose,
+	content,
+}: {
+	opened: boolean
+	onClose: () => void
+	content: ContentListItem | null
+}) {
+	const checkInMutation = useMutation(trpc.content.checkIn.mutationOptions(mutationOptions))
+	return (
+		<Modal opened={opened} onClose={onClose} title="Confirm check in">
+			<Text>
+				Ready to check this content back in? Others will be able to edit it once it's checked in.
+			</Text>
+			<Flex gap="md" justify="flex-end" mt="md">
+				<Button
+					variant="subtle"
+					color="gray"
+					onClick={onClose}
+					disabled={checkInMutation.isPending}
+				>
+					Cancel
+				</Button>
+				<Button
+					loading={checkInMutation.isPending}
+					onClick={async () => {
+						if (content !== null) {
+							await checkInMutation.mutateAsync({ id: content.id })
+							onClose()
+						}
+					}}
+					leftSection={<IconDoorEnter />}
+				>
+					Check in
+				</Button>
+			</Flex>
+		</Modal>
+	)
+}
 
-	function CheckOutModal({
-		opened,
-		onClose,
-		content,
-	}: {
-		opened: boolean
-		onClose: () => void
-		content: ContentListItem | null
-	}) {
-		const checkOutMutation = useMutation(trpc.content.checkOut.mutationOptions(mutationOptions))
-		return (
-			<Modal opened={opened} onClose={onClose} title="Confirm check out">
-				<Text>Checking out this content will lock it out for editing by other users.</Text>
-				<Flex gap="md" justify="flex-end" mt="md">
-					<Button
-						variant="subtle"
-						color="gray"
-						onClick={onClose}
-						disabled={checkOutMutation.isPending}
-					>
-						Cancel
-					</Button>
-					<Button
-						loading={checkOutMutation.isPending}
-						onClick={async () => {
-							if (content !== null) {
-								await checkOutMutation.mutateAsync({ id: content.id })
-								onClose()
-							}
-						}}
-						leftSection={<IconDoorExit />}
-					>
-						Check out
-					</Button>
-				</Flex>
-			</Modal>
-		)
-	}
+function CheckOutModal({
+	opened,
+	onClose,
+	content,
+}: {
+	opened: boolean
+	onClose: () => void
+	content: ContentListItem | null
+}) {
+	const checkOutMutation = useMutation(trpc.content.checkOut.mutationOptions(mutationOptions))
+	return (
+		<Modal opened={opened} onClose={onClose} title="Confirm check out">
+			<Text>Checking out this content will lock it out for editing by other users.</Text>
+			<Flex gap="md" justify="flex-end" mt="md">
+				<Button
+					variant="subtle"
+					color="gray"
+					onClick={onClose}
+					disabled={checkOutMutation.isPending}
+				>
+					Cancel
+				</Button>
+				<Button
+					loading={checkOutMutation.isPending}
+					onClick={async () => {
+						if (content !== null) {
+							await checkOutMutation.mutateAsync({ id: content.id })
+							onClose()
+						}
+					}}
+					leftSection={<IconDoorExit />}
+				>
+					Check out
+				</Button>
+			</Flex>
+		</Modal>
+	)
 }

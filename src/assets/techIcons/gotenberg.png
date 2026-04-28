@@ -1,0 +1,16 @@
+--2026-04-28 12:07:33--  https://gotenberg.dev/img/logo.png
+Loaded CA certificate '/etc/ssl/certs/ca-certificates.crt'
+Resolving gotenberg.dev (gotenberg.dev)... 185.199.111.153, 185.199.108.153, 185.199.109.153, ...
+Connecting to gotenberg.dev (gotenberg.dev)|185.199.111.153|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 234321 (229K) [image/png]
+Saving to: ‘logo.png’
+
+     0K .......... .......... .......... .......... .......... 21%  491K 0s
+    50K .......... .......... .......... .......... .......... 43%  678K 0s
+   100K .......... .......... .......... .......... .......... 65%  626K 0s
+   150K .......... .......... .......... .......... .......... 87% 82.9M 0s
+   200K .......... .......... ........                        100%  358K=0.3s
+
+2026-04-28 12:07:33 (680 KB/s) - ‘logo.png’ saved [234321/234321]
+
