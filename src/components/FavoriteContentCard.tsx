@@ -29,7 +29,7 @@ export function FavoriteContentCard({
 	contentType: FileType
 	fileName: string
 	openFilePreview: (info: ContentListItem, type: FileType) => void
-	item: ContentListItem,
+	item: ContentListItem
 }) {
 	const titleRef = useRef<HTMLParagraphElement>(null)
 	const [titleTruncated, setTitleTruncated] = useState(false)
@@ -56,7 +56,7 @@ export function FavoriteContentCard({
 
 	return (
 		<Card
-			style={{width: '100%'}}
+			style={{ width: "100%" }}
 			rel="noopener noreferrer"
 			p="28"
 			className="transition duration-75 cursor-pointer bg-gray-light hover:bg-gray-light-hover hover:shadow-sm"
