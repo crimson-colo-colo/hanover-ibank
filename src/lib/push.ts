@@ -2,6 +2,7 @@ import { notifications } from "@mantine/notifications"
 import { PushSubscription } from "@shared/types.ts"
 import type z from "zod"
 import { env } from "@/env.ts"
+import { trpcClient } from "@/lib/trpc.ts"
 
 export async function isPushAvailable() {
 	if (!("serviceWorker" in navigator)) {
@@ -10,14 +11,14 @@ export async function isPushAvailable() {
 	return Notification.permission !== "denied"
 }
 
-export async function subscribePush(): Promise<z.infer<typeof PushSubscription> | null> {
+export async function subscribePush(): Promise<boolean> {
 	if (!("serviceWorker" in navigator)) {
 		notifications.show({
 			title: "Error",
 			message: "Push notifications are not supported in this browser.",
 			color: "red",
 		})
-		return null
+		return false
 	}
 
 	try {
@@ -26,12 +27,14 @@ export async function subscribePush(): Promise<z.infer<typeof PushSubscription> 
 			userVisibleOnly: true,
 			applicationServerKey: env.VITE_VAPID_PUBLIC_KEY,
 		})
+		const sub = PushSubscription.parse(subscription.toJSON())
+		await trpcClient.user.createPushSubscription.mutate(sub)
 		notifications.show({
 			title: "Subscribed",
 			message: "You have successfully subscribed to push notifications.",
 			color: "green",
 		})
-		return PushSubscription.parse(subscription.toJSON())
+		return true
 	} catch (err) {
 		notifications.show({
 			title: "Error",
@@ -39,7 +42,7 @@ export async function subscribePush(): Promise<z.infer<typeof PushSubscription> 
 			color: "red",
 		})
 		console.error("Failed to subscribe to push notifications:", err)
-		return null
+		return false
 	}
 }
 
@@ -54,7 +57,9 @@ export async function getPushSubscription(): Promise<z.infer<typeof PushSubscrip
 		if (!subscription) {
 			return null
 		}
-
+		await trpcClient.user.createPushSubscription.mutate(
+			PushSubscription.parse(subscription.toJSON())
+		)
 		return PushSubscription.parse(subscription.toJSON())
 	} catch (err) {
 		console.error("Failed to get push subscription:", err)
@@ -88,6 +93,7 @@ export async function unsubscribePush() {
 		if (!success) {
 			throw new Error("unsubscribe returned false")
 		}
+		await trpcClient.user.deletePushSubscription.mutate({ endpoint: subscription.endpoint })
 
 		notifications.show({
 			title: "Unsubscribed",

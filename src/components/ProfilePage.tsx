@@ -1,13 +1,14 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Button, Group, Loader, Stack, Switch, TextInput, Title } from "@mantine/core"
+import { Button, Group, Loader, Stack, Switch, Text, TextInput, Title } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { IconCamera, IconDeviceFloppy, IconMoon, IconSun } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
+import { getPushSubscription, subscribePush, unsubscribePush } from "@/lib/push.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
@@ -24,8 +25,30 @@ export function ProfilePage() {
 	const navigate = useNavigate()
 	const avatarInputRef = useRef<HTMLInputElement>(null)
 	const { colorScheme, toggleColorScheme } = useColorScheme()
-
+	const [pushSubscription, setPushSubscription] = useState<z.infer<typeof PushSubscription> | null>(
+		null
+	)
 	const profileQuery = useQuery(trpc.user.getProfile.queryOptions())
+	const [subscribePending, setSubscribePending] = useState(false)
+
+	useEffect(() => {
+		getPushSubscription().then(setPushSubscription)
+	}, [])
+
+	async function handleSubscribePush() {
+		setSubscribePending(true)
+		await subscribePush()
+		const sub = await getPushSubscription()
+		setPushSubscription(sub)
+		setSubscribePending(false)
+	}
+
+	async function handleUnsubscribePush() {
+		setSubscribePending(true)
+		unsubscribePush()
+		setPushSubscription(null)
+		setSubscribePending(false)
+	}
 
 	const updateProfile = useMutation(
 		trpc.user.updateProfile.mutationOptions({
@@ -124,7 +147,13 @@ export function ProfilePage() {
 	}
 
 	return (
-		<Stack maw={480} mx="auto" mt="md" gap="xl">
+		<Stack
+			maw={480}
+			mx="auto"
+			mt="md"
+			gap="xl"
+			className="border px-6 py-6 rounded-md border-gray-300 dark:border-gray-800"
+		>
 			<Group justify="space-between" align="center">
 				<Title order={2}>Profile</Title>
 				<Button
@@ -212,7 +241,7 @@ export function ProfilePage() {
 						{...form.getInputProps("email")}
 					/>
 					<Title order={4} mt="sm" mb="xs">
-						Notifications
+						Notification Preferences
 					</Title>
 
 					<Switch
@@ -238,6 +267,31 @@ export function ProfilePage() {
 					</Group>
 				</Stack>
 			</form>
+
+			<Stack gap="sm" mt="md">
+				<Title order={4}>This Browser</Title>
+
+				{pushSubscription ? (
+					<>
+						<Text>Push notifications are enabled in this browser.</Text>
+						<Button
+							variant="outline"
+							color="red"
+							onClick={handleUnsubscribePush}
+							loading={subscribePending}
+						>
+							Unsubscribe this browser
+						</Button>
+					</>
+				) : (
+					<>
+						<Text>Push notifications are not enabled in this browser.</Text>
+						<Button variant="outline" onClick={handleSubscribePush} loading={subscribePending}>
+							Enable push notifications
+						</Button>
+					</>
+				)}
+			</Stack>
 		</Stack>
 	)
 }

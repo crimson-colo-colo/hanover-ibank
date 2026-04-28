@@ -1,6 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { ActionIcon, Alert, Button, Stack, Text, Tooltip } from "@mantine/core"
-import { useHover } from "@mantine/hooks"
+import { ActionIcon, Button, Flex, Paper, Stack, Text, Tooltip } from "@mantine/core"
+import { useHover, useLocalStorage } from "@mantine/hooks"
 import {
 	IconBolt,
 	IconBuildingBank,
@@ -14,14 +14,14 @@ import {
 	IconPointFilled,
 	IconStar,
 	IconUsers,
-	IconInfoCircleFilled,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import clsx from "clsx"
+import { useEffect, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
+import { getPushSubscription, subscribePush } from "@/lib/push.ts"
 import { trpc } from "@/lib/trpc.ts"
-import { useState } from "react"
 
 export type SideNavigationProps = {
 	collapsed: boolean
@@ -99,8 +99,26 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const location = useLocation()
 	const { hovered, ref } = useHover()
-	const [visible, setVisible] = useState(true)
-	const icon = <IconInfoCircleFilled className="fill-sky-600" size={50} />
+	const [pushSubscribed, setPushSubscribed] = useState(false)
+	const [showPushNag, setShowPushNag] = useLocalStorage({
+		key: "showPushNag",
+		defaultValue: true,
+	})
+	const [subscribePending, setSubscribePending] = useState(false)
+
+	async function handleSubscribePush() {
+		setSubscribePending(true)
+		await subscribePush()
+		const subscription = await getPushSubscription()
+		setPushSubscribed(!!subscription)
+		setSubscribePending(false)
+	}
+
+	useEffect(() => {
+		getPushSubscription().then((subscription) => {
+			setPushSubscribed(!!subscription)
+		})
+	}, [])
 
 	const navLinks = routeLinks
 		.filter((link) => !link.admin)
@@ -175,6 +193,30 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 
 			<div className="flex-1" />
 
+			{!collapsed && !pushSubscribed && showPushNag && auth0.isAuthenticated && (
+				<Paper withBorder className="mx-3 mb-3 p-3 bg-white">
+					<Text className="text-sm" fw={600}>
+						Stay up to date
+					</Text>
+					<Text className="text-xs">
+						Enable push notifications in this browser to get notified about important changes.
+					</Text>
+					<Flex gap={4} mt="sm" justify="flex-end">
+						<Button variant="subtle" size="xs" color="gray" onClick={() => setShowPushNag(false)}>
+							Dismiss
+						</Button>
+						<Button
+							variant="filled"
+							size="xs"
+							onClick={handleSubscribePush}
+							loading={subscribePending}
+						>
+							Enable
+						</Button>
+					</Flex>
+				</Paper>
+			)}
+
 			{auth0.isAuthenticated && auth0.user && (
 				<Button
 					component={Link}
@@ -191,38 +233,6 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 					radius={0}
 					fullWidth={!collapsed}
 				>
-					{visible && (
-					<Alert
-							variant="light"
-							color="sky"
-							title="Stay Up to Date"
-							bdrs="lg"
-							icon={icon}
-							styles={{ icon: { width: 50, height: 50 }, title: { fontSize: "24px" } }}
-							withCloseButton
-							onClose={() => setVisible(false)}
-							>
-							Enable Push Notifications in this browser to get notified about important changes
-								<Button
-								component={Link}
-								to="/profile"
-								justify="left"
-								variant="subtle"
-								color="gray"
-								className={clsx(
-									"h-14",
-									!collapsed
-										? "border-0 border-t border-gray-500 gap-3 py-1"
-										: "px-0 flex items-center justify-center"
-								)}
-								radius={0}
-								fullWidth={!collapsed}
-							>
-								Go to Profile	
-							</Button>
-						
-					</Alert>
-					)}
 					<Avatar userId={auth0.user.sub!} w={collapsed ? "30" : "32"} />
 					{!collapsed && (
 						<div className="flex flex-col items-start ml-3">
