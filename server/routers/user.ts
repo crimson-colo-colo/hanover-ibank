@@ -102,4 +102,58 @@ export const userRouter = router({
 		}
 		return `/avatar/${opts.input.userId}?${(object.ETag ?? Date.now().toString()).replace(/"/g, "")}`
 	}),
+
+	getStats: authProcedure.query(async (opts) => {
+		const userId = opts.ctx.auth.sub
+
+		const [employee, contentItems] = await Promise.all([
+			db.employee.findUniqueOrThrow({
+				where: { id: userId },
+				select: { createdAt: true },
+			}),
+			db.content.findMany({
+				where: { ownerId: userId },
+				select: { id: true, type: true, objectId: true },
+			}),
+		])
+
+		const fileItems = contentItems.filter((c) => c.type === "Object" && c.objectId)
+		const linkCount = contentItems.filter((c) => c.type === "Link").length
+
+		const fileMetadata = await Promise.all(
+			fileItems.map(async (item) => {
+				try {
+					const head = await s3.headObject({
+						Bucket: bucketName,
+						Key: item.objectId!,
+					})
+
+					return {
+						size: head.ContentLength ?? 0,
+						mimeType: head.ContentType ?? "application/octet-stream",
+					}
+				} catch {
+					return null
+				}
+			})
+		)
+
+		const fileTypes = new Map<string, number>()
+
+		for (const file of fileMetadata) {
+			if (!file) continue
+
+			fileTypes.set(file.mimeType, (fileTypes.get(file.mimeType) ?? 0) + file.size)
+		}
+
+		return {
+			fileCount: fileItems.length,
+			linkCount,
+			accountCreatedAt: employee.createdAt,
+			fileTypes: Array.from(fileTypes.entries()).map(([mimeType, totalSize]) => ({
+				mimeType,
+				totalSize,
+			})),
+		}
+	}),
 })

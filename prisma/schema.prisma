@@ -25,6 +25,7 @@ enum ThreadStatus {
 model Employee {
   id                String              @id
   role              EmployeeRole
+  createdAt         DateTime            @default(now())
   content           Content[]           @relation("Owner")
   favorite          FavoriteContent[]
   checkedOutContent Content[]           @relation("CheckedOutContent")
