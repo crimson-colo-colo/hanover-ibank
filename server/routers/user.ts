@@ -22,7 +22,7 @@ export const userRouter = router({
 			name: auth0User.name ?? auth0User.nickname ?? auth0User.username!,
 			email: auth0User.email!,
 			username: auth0User.username!,
-			role: userRole?.role,
+			role: userRole!.role,
 		}
 	}),
 	updateProfile: authProcedure
