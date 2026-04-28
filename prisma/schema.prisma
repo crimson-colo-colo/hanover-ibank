@@ -1,163 +1,174 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../server/generated/prisma"
+    provider = "prisma-client"
+    output   = "../server/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
 }
 
 enum EmployeeRole {
-  BusinessAnalyst
-  Underwriter
-  Admin
-  ActuarialAnalyst
-  ExlOperations
-  BusinessOperations
+    BusinessAnalyst
+    Underwriter
+    Admin
+    ActuarialAnalyst
+    ExlOperations
+    BusinessOperations
 }
 
 enum ThreadStatus {
-  Open
-  Resolved
-  Archived
+    Open
+    Resolved
+    Archived
 }
 
 model Employee {
-  id                String              @id
-  role              EmployeeRole
-  createdAt         DateTime            @default(now())
-  content           Content[]           @relation("Owner")
-  favorite          FavoriteContent[]
-  checkedOutContent Content[]           @relation("CheckedOutContent")
-  activity          UserActivity[]
-  threads           ContentTalkThread[] @relation("ThreadCreatedBy")
-  comments          TalkThreadComment[] @relation("CommentAuthor")
-  resolvedThreads   ContentTalkThread[]
-  recentTimestamps  RecentTimestamps[]
+    id                 String              @id
+    createdAt          DateTime            @default(now())
+    role               EmployeeRole
+    emailNotifications Boolean             @default(true)
+    pushNotifications  Boolean             @default(true)
+    content            Content[]           @relation("Owner")
+    favorite           FavoriteContent[]
+    checkedOutContent  Content[]           @relation("CheckedOutContent")
+    activity           UserActivity[]
+    threads            ContentTalkThread[] @relation("ThreadCreatedBy")
+    comments           TalkThreadComment[] @relation("CommentAuthor")
+    resolvedThreads    ContentTalkThread[]
+    pushSubscriptions  PushSubscription[]
+    recentTimestamps   RecentTimestamps[]
 }
 
 model Content {
-  id               String              @id @default(cuid())
-  title            String
-  description      String?
-  status           ContentStatus       @default(Incomplete)
-  type             ContentType
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  lastModifiedDate DateTime
-  expirationDate   DateTime
-  /// S3 Object ID
-  objectId         String?
-  /// URL for links
-  url              String?
-  ownerId          String
-  owner            Employee            @relation("Owner", fields: [ownerId], references: [id])
-  tags             ContentTag[]
-  favoritedBy      FavoriteContent[]
-  checkedOutById   String?
-  checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
-  threads          ContentTalkThread[]
-  recentTimestamps RecentTimestamps[]
+    id               String              @id @default(cuid())
+    title            String
+    description      String?
+    status           ContentStatus       @default(Incomplete)
+    type             ContentType
+    createdAt        DateTime            @default(now())
+    updatedAt        DateTime            @updatedAt
+    lastModifiedDate DateTime
+    expirationDate   DateTime
+    /// S3 Object ID
+    objectId         String?
+    /// URL for links
+    url              String?
+    ownerId          String
+    owner            Employee            @relation("Owner", fields: [ownerId], references: [id])
+    tags             ContentTag[]
+    favoritedBy      FavoriteContent[]
+    checkedOutById   String?
+    checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+    threads          ContentTalkThread[]
+    recentTimestamps RecentTimestamps[]
 }
 
 model ContentTalkThread {
-  id           String       @id @default(cuid())
-  title        String?
-  status       ThreadStatus @default(Open)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  resolvedAt   DateTime?
-  resolvedById String?
-  resolvedBy   Employee?    @relation(fields: [resolvedById], references: [id])
+    id           String       @id @default(cuid())
+    title        String?
+    status       ThreadStatus @default(Open)
+    createdAt    DateTime     @default(now())
+    updatedAt    DateTime     @updatedAt
+    resolvedAt   DateTime?
+    resolvedById String?
+    resolvedBy   Employee?    @relation(fields: [resolvedById], references: [id])
 
-  createdById String
-  createdBy   Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
-  contentId   String
-  content     Content             @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  comments    TalkThreadComment[]
+    createdById String
+    createdBy   Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
+    contentId   String
+    content     Content             @relation(fields: [contentId], references: [id], onDelete: Cascade)
+    comments    TalkThreadComment[]
 }
 
 model TalkThreadComment {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  body      String
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    body      String
 
-  threadId String
-  thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+    threadId String
+    thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
-  authorId String
-  author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
+    authorId String
+    author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
 }
 
 model Tag {
-  name     String
-  category TagCategory
+    name     String
+    category TagCategory
 
-  contents ContentTag[]
+    contents ContentTag[]
 
-  @@id([category, name])
+    @@id([category, name])
 }
 
 model ContentTag {
-  content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  contentId   String
-  tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
-  tagCategory TagCategory
-  tagName     String
+    content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
+    contentId   String
+    tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
+    tagCategory TagCategory
+    tagName     String
 
-  @@id([contentId, tagCategory, tagName])
+    @@id([contentId, tagCategory, tagName])
 }
 
 enum TagCategory {
-  DocumentType // Workflow or Reference
-  IntendedAudience // Underwriter or Business Analyst
-  Custom // Custom tag created by user
+    DocumentType // Workflow or Reference
+    IntendedAudience // Underwriter or Business Analyst
+    Custom // Custom tag created by user
 }
 
 model FavoriteContent {
-  content    Content  @relation(fields: [contentId], references: [id])
-  contentId  String
-  employee   Employee @relation(fields: [employeeId], references: [id])
-  employeeId String
+    content    Content  @relation(fields: [contentId], references: [id])
+    contentId  String
+    employee   Employee @relation(fields: [employeeId], references: [id])
+    employeeId String
 
-  @@id([contentId, employeeId])
+    @@id([contentId, employeeId])
 }
 
 enum ContentStatus {
-  Incomplete
-  UnderReview
-  Complete
+    Incomplete
+    UnderReview
+    Complete
 }
 
 enum ContentType {
-  Object
-  Link
+    Object
+    Link
 }
 
 model UserActivity {
-  timestamp  DateTime
-  // no default timestamp because we want to prefer using the server's time for this. This avoids
-  // the server and db being significantly out of sync even if improbable. This timestamp is also
-  // truncated to the second it was generated and must be manually done
-  employeeId String
-  employee   Employee @relation(fields: [employeeId], references: [id])
-  path       String
-  count      Int      @default(1)
-  day        DateTime // datetime truncated to the UTC day it was created in
-  hour       DateTime // datetime truncated to the UTC hour it was created in
+    timestamp  DateTime
+    // no default timestamp because we want to prefer using the server's time for this. This avoids
+    // the server and db being significantly out of sync even if improbable. This timestamp is also
+    // truncated to the second it was generated and must be manually done
+    employeeId String
+    employee   Employee @relation(fields: [employeeId], references: [id])
+    path       String
+    count      Int      @default(1)
+    day        DateTime // datetime truncated to the UTC day it was created in
+    hour       DateTime // datetime truncated to the UTC hour it was created in
 
-  @@id([timestamp, employeeId, path])
+    @@id([timestamp, employeeId, path])
 }
 
 model RecentTimestamps {
-  recentlyEdited DateTime
-  recentlyViewed DateTime
-  viewCount      Int      @default(0)
-  employeeId     String
-  employee       Employee @relation(fields: [employeeId], references: [id])
-  contentId      String
-  content        Content  @relation(fields: [contentId], references: [id])
+    recentlyEdited DateTime
+    recentlyViewed DateTime
+    viewCount      Int      @default(0)
+    employeeId     String
+    employee       Employee @relation(fields: [employeeId], references: [id])
+    contentId      String
+    content        Content  @relation(fields: [contentId], references: [id])
 
-  @@id([employeeId, contentId])
+    @@id([employeeId, contentId])
+}
+
+model PushSubscription {
+    endpoint   String   @id
+    p256dh     String
+    auth       String
+    employeeId String
+    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }

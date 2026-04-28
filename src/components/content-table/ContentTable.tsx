@@ -487,7 +487,7 @@ export function ContentTable({
 
 	return (
 		<>
-			<Flex align="center" justify="space-between" gap="md" mt="xl" mb="sm">
+			<Flex align="center" justify="space-between" gap="md" mb="sm">
 				<Title order={3} className="flex items-center gap-4">
 					<span>Your Content ({table.getRowCount()})</span>
 					{loading && <IconLoader2 size={20} className="animate-spin" />}

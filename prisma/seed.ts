@@ -254,8 +254,13 @@ async function createFavoriteContent(
 	const emp2 = "auth0|69d57d0af36c0b4100640b0a"
 
 	const thingsToFavorite = [
-		...linkContent.slice(0, 3).map((c) => c.id),
-		...[...fileTypeToContent.values()].flatMap((ids) => ids.slice(0, 1)),
+		...linkContent
+			.sort(() => 0.5 - Math.random())
+			.slice(0, 3)
+			.map((c) => c.id),
+		...Array.from(fileTypeToContent.values()).flatMap((contentIds) =>
+			contentIds.sort(() => 0.5 - Math.random()).slice(0, 3)
+		),
 	]
 
 	await Promise.all(

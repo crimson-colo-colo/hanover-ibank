@@ -27,6 +27,11 @@ app.use(
 
 // serve vite build
 app.use(express.static(staticDir))
+
+app.use("/email-assets", (req, res) => {
+	res.status(404).end()
+})
+
 // serve SPA fallback
 app.get("*any", (req, res) => {
 	res.sendFile(path.join(staticDir, "index.html"))
@@ -35,3 +40,13 @@ app.get("*any", (req, res) => {
 app.listen(env.PORT, () => {
 	console.log(`[prod] ready on ${env.APP_URL}`)
 })
+
+if (env.CLI_TOKEN) {
+	console.warn("[environ] CLI access is enabled")
+}
+
+if (env.EMAIL_GATEWAY && env.EMAIL_CLIENT_ID && env.EMAIL_CLIENT_SECRET) {
+	console.warn("[environ] email sending is enabled")
+} else {
+	console.warn("[environ] email sending is disabled, missing configuration")
+}

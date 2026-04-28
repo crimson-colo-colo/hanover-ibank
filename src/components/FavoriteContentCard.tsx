@@ -1,4 +1,5 @@
-import { ActionIcon, Card, Divider, Flex, Menu, Text, Tooltip } from "@mantine/core"
+import { ActionIcon, Card, Divider, Flex, Image, Menu, Text, Tooltip } from "@mantine/core"
+import { ContentType } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import type { ContentListItem } from "@shared/types.ts"
@@ -10,12 +11,13 @@ import {
 	IconLoader2,
 	IconStarFilled,
 } from "@tabler/icons-react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import clsx from "clsx"
 import { useEffect, useRef, useState } from "react"
+import { Document, Thumbnail } from "react-pdf"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { isTruncated } from "@/lib/isTruncated.ts"
 import { queryClient, trpc, trpcClient } from "@/lib/trpc.ts"
-
 export function FavoriteContentCard({
 	contentId,
 	contentUrl,
@@ -53,6 +55,88 @@ export function FavoriteContentCard({
 			},
 		})
 	)
+
+	const { data: contentThumbnail, isFetching } = useQuery(
+		trpc.preview.getContentUrl.queryOptions(
+			{ id: item.id },
+			{ enabled: item.type === ContentType.Object }
+		)
+	)
+	const { data: plaintextThumbnail, isFetching: isPlaintextFetching } = useQuery(
+		trpc.preview.getPlaintextContent.queryOptions(
+			{ id: item.id },
+			{ enabled: contentType === FileType.Plaintext }
+		)
+	)
+
+	let thumbnail: React.ReactNode
+
+	if (isFetching || isPlaintextFetching) {
+		thumbnail = <IconLoader2 className={clsx("animate-spin", "text-white")} size={40} />
+	} else if (
+		contentType === FileType.Link ||
+		contentType === FileType.Audio ||
+		contentType === FileType.Video
+	) {
+		thumbnail = (
+			<div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+				<FileTypeIcon
+					fileType={contentType}
+					size={48}
+					strokeWidth={1.5}
+					className="text-gray-400 dark:text-gray-500"
+				/>
+				<Text size="xs" c="dimmed" tt="capitalize">
+					{contentType}
+				</Text>
+			</div>
+		)
+	} else if (contentType === FileType.Image) {
+		thumbnail = (
+			<Image
+				src={contentThumbnail?.url}
+				alt="thumbnail"
+				className="absolute inset-0 w-full h-full object-cover"
+			/>
+		)
+	} else if (
+		contentType === FileType.Pdf ||
+		contentType === FileType.WordDocument ||
+		contentType === FileType.Excel
+	) {
+		thumbnail = (
+			<div className="absolute inset-0 overflow-hidden">
+				<div className="origin-top-left scale-120">
+					<Document file={contentThumbnail?.url} loading={() => null}>
+						<Thumbnail pageNumber={1} width={200} loading={() => null} />
+					</Document>
+				</div>
+			</div>
+		)
+	} else if (contentType === FileType.Plaintext) {
+		thumbnail = plaintextThumbnail?.text ? (
+			<div className="absolute inset-0 overflow-hidden p-2.5">
+				<p
+					className="text-9px leading-relaxed text-gray-500 dark:text-gray-400
+                  line-clamp-22 m-0"
+				>
+					{plaintextThumbnail?.text}
+				</p>
+			</div>
+		) : (
+			<div className="w-full h-full flex items-center justify-center p-4 bg-white rounded-md dark:bg-[#242424]">
+				<IconLoader2 className="animate-spin" size={48} />
+			</div>
+		)
+	} else if (contentType === FileType.Powerpoint) {
+		thumbnail = (
+			<div className="absolute inset-0 w-full flex justify-center">
+				<Document file={contentThumbnail?.url} loading={() => null} className="relative w-full">
+					<Thumbnail pageNumber={1} loading={() => null} className="absolute inset-0 thumb" />
+				</Document>
+			</div>
+		)
+	}
 
 	return (
 		<Card
@@ -136,9 +220,7 @@ export function FavoriteContentCard({
 				</Flex>
 			</Card.Section>
 			<Card.Section className="bg-white dark:bg-gray-950" bdrs="md" mt="xs">
-				<Flex justify="center" align="center" h={120}>
-					<FileTypeIcon fileType={contentType} size={40} strokeWidth={1.5} />
-				</Flex>
+				<div className="aspect-[1.3] relative overflow-hidden rounded-md">{thumbnail}</div>
 			</Card.Section>
 		</Card>
 	)

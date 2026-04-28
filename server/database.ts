@@ -16,12 +16,12 @@ export const db = new PrismaClient({
 
 db.$on("query", (e) => {
 	if (env.NODE_ENV !== "development") return
-	logger.debug(
-		"[db] %s %s - %dms",
-		e.query.replaceAll('"public".', "").replaceAll('"', "").slice(0, 100),
-		e.params.length > 1000 ? `[${JSON.parse(e.params).length} params]` : e.params,
-		Math.round(e.duration)
-	)
+	// logger.debug(
+	// 	"[db] %s %s - %dms",
+	// 	e.query.replaceAll('"public".', "").replaceAll('"', "").slice(0, 100),
+	// 	e.params.length > 1000 ? `[${JSON.parse(e.params).length} params]` : e.params,
+	// 	Math.round(e.duration)
+	// )
 })
 db.$on("error", (e) => {
 	logger.error("[db] %s", e.message)

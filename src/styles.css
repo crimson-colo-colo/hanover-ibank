@@ -125,3 +125,7 @@ html.color-scheme-transitioning * {
 .content-tags-input [data-disabled=true] .mantine-TagsInput-input {
     @apply bg-white;
 }
+
+.thumb .react-pdf__Thumbnail__page {
+    @apply -translate-x-1/4 -translate-y-1/4 scale-50;
+}
