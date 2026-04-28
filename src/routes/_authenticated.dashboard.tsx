@@ -34,6 +34,7 @@ function RoleDashboard() {
 	}
 
 	return (
+
 		<main>
 			<header className="w-full p-4 text-white rounded-lg bg-primary">
 				<Title>
@@ -93,6 +94,7 @@ function RoleDashboard() {
 					<PreviewModal closePreview={closeFilePreview} contentId={selectedContent.id} />
 				)}
 			</Modal.Root>
+			<Statistics />
 		</main>
 	)
 }

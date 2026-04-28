@@ -103,7 +103,7 @@ export const userRouter = router({
 		return `/avatar/${opts.input.userId}?${(object.ETag ?? Date.now().toString()).replace(/"/g, "")}`
 	}),
 
-	getStats: authProcedure.query(async(opts) => {
+	getStats: authProcedure.query(async (opts) => {
 		const userId = opts.ctx.auth.sub
 
 		const [employee, contentItems] = await Promise.all([
@@ -113,7 +113,7 @@ export const userRouter = router({
 			}),
 			db.content.findMany({
 				where: { ownerId: userId },
-				select: { id: true, type: true, objectId: true }
+				select: { id: true, type: true, objectId: true },
 			}),
 		])
 
@@ -127,6 +127,7 @@ export const userRouter = router({
 						Bucket: bucketName,
 						Key: item.objectId!,
 					})
+
 					return {
 						size: head.ContentLength ?? 0,
 						mimeType: head.ContentType ?? "application/octet-stream",
@@ -136,5 +137,23 @@ export const userRouter = router({
 				}
 			})
 		)
-	})
+
+		const fileTypes = new Map<string, number>()
+
+		for (const file of fileMetadata) {
+			if (!file) continue
+
+			fileTypes.set(file.mimeType, (fileTypes.get(file.mimeType) ?? 0) + file.size)
+		}
+
+		return {
+			fileCount: fileItems.length,
+			linkCount,
+			accountCreatedAt: employee.createdAt,
+			fileTypes: Array.from(fileTypes.entries()).map(([mimeType, totalSize]) => ({
+				mimeType,
+				totalSize,
+			})),
+		}
+	}),
 })
