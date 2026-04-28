@@ -121,12 +121,9 @@ export function SideNavigation({ collapsed, toggleCollapsed }: sideNavigationPro
 
 	return (
 		<header className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
-			<div className="flex p-4 mb-2 justify-center">
+			<div className={`flex p-4 mb-2 ${collapsed && "justify-center"}`}>
 				{!collapsed && (
-					<Link
-						to="/"
-						className={`flex items-center ${collapsed && "justify-center"} gap-2 no-underline active:text-primary-hover`}
-					>
+					<Link to="/" className="flex items-center gap-2 no-underline active:text-primary-hover">
 						<IconBuildingBank />
 						<span className="text-xl font-semibold font-display">iBank</span>
 					</Link>
