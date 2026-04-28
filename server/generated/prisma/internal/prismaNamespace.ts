@@ -1211,6 +1211,7 @@ export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[k
 export const RecentTimestampsScalarFieldEnum = {
   recentlyEdited: 'recentlyEdited',
   recentlyViewed: 'recentlyViewed',
+  viewCount: 'viewCount',
   employeeId: 'employeeId',
   contentId: 'contentId'
 } as const

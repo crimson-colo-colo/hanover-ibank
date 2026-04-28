@@ -421,14 +421,20 @@ async function createTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
+			//Generate a random view count for each piece of content between 1 and 100 (inclusive)
+			const viewCount = Math.floor(Math.random() * 100) + 1
 			await prisma.recentTimestamps.create({
 				data: {
 					recentlyViewed: recentlyViewed,
 					recentlyEdited: recentlyEdited,
+					viewCount: viewCount,
 					employeeId: employeeId,
 					contentId: contentId,
 				},
 			})
 		}
 	}
+	console.log(
+		`Created ${contentItems.length * employeeData.length} timestamps across ${contentItems.length} content items and ${employeeData.length} employees`
+	)
 }
