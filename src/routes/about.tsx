@@ -2,6 +2,19 @@ import { Card, Grid, Image, Text, Title } from "@mantine/core"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 
+import brandonPhoto from "../assets/teamphotos/brandon.png"
+import calebPhoto from "../assets/teamphotos/caleb.png"
+import elijahPhoto from "../assets/teamphotos/elijah.png"
+import everettPhoto from "../assets/teamphotos/everett.png"
+import jacePhoto from "../assets/teamphotos/jace.png"
+import josePhoto from "../assets/teamphotos/jose.jpg"
+import josuePhoto from "../assets/teamphotos/josue.png"
+import julienPhoto from "../assets/teamphotos/julien.png"
+import justinPhoto from "../assets/teamphotos/justin.png"
+import lucasPhoto from "../assets/teamphotos/lucas.png"
+import philPhoto from "../assets/teamphotos/phil.png"
+import wwong2Photo from "../assets/teamphotos/wwong2.jpg"
+
 export const Route = createFileRoute("/about")({
 	component: AboutPage,
 })
@@ -18,13 +31,13 @@ const rows: TeamMember[][] = [
 		{
 			name: "Prof. Wilson Wong",
 			role: "Software Engineering Professor",
-			photo: "src/assets/teamphotos/wwong2.jpg",
+			photo: wwong2Photo,
 			alt: "Wong",
 		},
 		{
 			name: "Jose Manuel Perez Jimenez",
 			role: "Team Coach",
-			photo: "src/assets/teamphotos/jose.jpg",
+			photo: josePhoto,
 			alt: "Jose",
 		},
 	],
@@ -32,19 +45,19 @@ const rows: TeamMember[][] = [
 		{
 			name: "Caleb Chan",
 			role: "Lead Software Engineer",
-			photo: "src/assets/teamphotos/caleb.png",
+			photo: calebPhoto,
 			alt: "Caleb",
 		},
 		{
 			name: "Everett Wilber",
 			role: "Assistant Lead Software Engineer",
-			photo: "src/assets/teamphotos/everett.png",
+			photo: everettPhoto,
 			alt: "Everett",
 		},
 		{
 			name: "Phil Banoub",
 			role: "Assistant Lead Software Engineer",
-			photo: "src/assets/teamphotos/phil.png",
+			photo: philPhoto,
 			alt: "Phil",
 		},
 	],
@@ -52,19 +65,19 @@ const rows: TeamMember[][] = [
 		{
 			name: "Josue Hernandez",
 			role: "Full Time Software Engineer",
-			photo: "src/assets/teamphotos/josue.png",
+			photo: josuePhoto,
 			alt: "Josue",
 		},
 		{
 			name: "Brandon Gainey",
 			role: "Full Time Software Engineer",
-			photo: "src/assets/teamphotos/brandon.png",
+			photo: brandonPhoto,
 			alt: "Brandon",
 		},
 		{
 			name: "Lucas Zaki",
 			role: "Full Time Software Engineer",
-			photo: "src/assets/teamphotos/lucas.png",
+			photo: lucasPhoto,
 			alt: "Lucas",
 		},
 	],
@@ -72,25 +85,25 @@ const rows: TeamMember[][] = [
 		{
 			name: "Justin Fletcher",
 			role: "Project Manager",
-			photo: "src/assets/teamphotos/justin.png",
+			photo: justinPhoto,
 			alt: "Justin",
 		},
 		{
 			name: "Julien Polycarpe",
 			role: "Product Owner",
-			photo: "src/assets/teamphotos/julien.png",
+			photo: julienPhoto,
 			alt: "Julien",
 		},
 		{
 			name: "Jace Bonjorno",
 			role: "Documentation Analyst",
-			photo: "src/assets/teamphotos/jace.png",
+			photo: jacePhoto,
 			alt: "Jace",
 		},
 		{
 			name: "Elijah King",
 			role: "Scrum Master",
-			photo: "src/assets/teamphotos/elijah.png",
+			photo: elijahPhoto,
 			alt: "Elijah",
 		},
 	],
