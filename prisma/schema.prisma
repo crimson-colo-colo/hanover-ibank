@@ -33,6 +33,7 @@ model Employee {
   comments          TalkThreadComment[] @relation("CommentAuthor")
   resolvedThreads   ContentTalkThread[]
   activityLogs      ActivityLog[]
+  recentTimestamps  RecentTimestamps[]
 }
 
 model Content {
@@ -56,6 +57,7 @@ model Content {
   checkedOutById   String?
   checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
   threads          ContentTalkThread[]
+  recentTimestamps RecentTimestamps[]
 }
 
 model ContentTalkThread {
@@ -159,4 +161,15 @@ model ActivityLog {
   metadata Json?
 
   createdAt DateTime @default(now())
+}
+
+model RecentTimestamps {
+  recentlyEdited DateTime
+  recentlyViewed DateTime
+  employeeId     String
+  employee       Employee @relation(fields: [employeeId], references: [id])
+  contentId      String
+  content        Content  @relation(fields: [contentId], references: [id])
+
+  @@id([employeeId, contentId])
 }
