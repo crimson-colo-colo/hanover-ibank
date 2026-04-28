@@ -8,6 +8,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useRef } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
+import { PushTest } from "@/components/PushTest.tsx"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
@@ -213,6 +214,8 @@ export function ProfilePage() {
 					</Group>
 				</Stack>
 			</form>
+
+			<PushTest />
 		</Stack>
 	)
 }

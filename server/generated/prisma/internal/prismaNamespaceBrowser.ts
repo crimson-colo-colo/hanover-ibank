@@ -59,7 +59,8 @@ export const ModelName = {
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
   UserActivity: 'UserActivity',
-  RecentTimestamps: 'RecentTimestamps'
+  RecentTimestamps: 'RecentTimestamps',
+  PushSubscription: 'PushSubscription'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -80,7 +81,9 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const EmployeeScalarFieldEnum = {
   id: 'id',
-  role: 'role'
+  role: 'role',
+  emailNotifications: 'emailNotifications',
+  pushNotifications: 'pushNotifications'
 } as const
 
 export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
@@ -177,6 +180,16 @@ export const RecentTimestampsScalarFieldEnum = {
 } as const
 
 export type RecentTimestampsScalarFieldEnum = (typeof RecentTimestampsScalarFieldEnum)[keyof typeof RecentTimestampsScalarFieldEnum]
+
+
+export const PushSubscriptionScalarFieldEnum = {
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  employeeId: 'employeeId'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
 
 
 export const SortOrder = {

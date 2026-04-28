@@ -5,22 +5,32 @@ import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 import superjson from "superjson"
 import { auth0Api, type JWTPayload } from "./auth.ts"
 import { db } from "./database.ts"
+import { env } from "./env.ts"
 import { EmployeeRole } from "./generated/prisma/client.ts"
 
 interface TRPCContext {
 	auth: JWTPayload | undefined
+	cli: boolean
 }
 
 export async function createContext({
 	req,
 	res,
 }: CreateExpressContextOptions): Promise<TRPCContext> {
+	const auth = await getAuth(req)
+
+	const cliTokenValid = !!env.CLI_TOKEN && req.headers["x-cli-token"] === env.CLI_TOKEN
+	return {
+		auth,
+		cli: cliTokenValid,
+	}
+}
+
+async function getAuth(req: CreateExpressContextOptions["req"]): Promise<JWTPayload | undefined> {
 	const authorization = req.headers.authorization?.trim()
 	const accessToken = authorization?.match(/^Bearer\s+(.+)$/i)?.[1]
 	if (!accessToken) {
-		return {
-			auth: undefined,
-		}
+		return undefined
 	}
 
 	let payload: Partial<JWTPayload>
@@ -29,9 +39,7 @@ export async function createContext({
 			accessToken,
 		})
 	} catch {
-		return {
-			auth: undefined,
-		}
+		return undefined
 	}
 
 	const sub = payload.sub
@@ -39,9 +47,7 @@ export async function createContext({
 		throw new TRPCError({ code: "BAD_REQUEST" })
 	}
 
-	return {
-		auth: { sub: sub },
-	}
+	return { sub: sub }
 }
 
 type Context = Awaited<ReturnType<typeof createContext>>
@@ -52,6 +58,16 @@ const t = initTRPC.context<Context>().create({
 
 export const router = t.router
 export const publicProcedure = t.procedure
+
+export const cliProcedure = publicProcedure.use(async (opts) => {
+	if (!opts.ctx.cli) {
+		throw new TRPCError({ code: "UNAUTHORIZED" })
+	}
+
+	return opts.next({
+		ctx: opts.ctx,
+	})
+})
 
 export const authProcedure = publicProcedure.use(async (opts) => {
 	const { ctx } = opts
