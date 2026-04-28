@@ -282,14 +282,12 @@ export function ContentTable({
 						(entry) => entry.employeeId === profile?.id
 					)?.recentlyViewed
 
-					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
-					if (!time) return new Date("1970-01-01")
-
-					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
-						/^(in )?about /,
-						"$1"
-					)
-					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
+					const elapsedTime =
+						time !== undefined
+							? formatDistanceToNow(time, { addSuffix: true }).replace(/^(in )?about /, "$1")
+							: ""
+					const titleTimestamp = time !== undefined ? time.toLocaleString() : ""
+					return <span title={titleTimestamp}>{elapsedTime}</span>
 				},
 			}),
 
@@ -308,14 +306,15 @@ export function ContentTable({
 						(entry) => entry.employeeId === profile?.id
 					)?.recentlyEdited
 
-					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
-					if (!time) return new Date("1970-01-01")
-
-					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
-						/^(in )?about /,
-						"$1"
-					)
-					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
+					const elapsedTime =
+						time !== undefined
+							? formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
+									/^(in )?about /,
+									"$1"
+								)
+							: ""
+					const titleTimestamp = time !== undefined ? time.toLocaleString() : ""
+					return <span title={titleTimestamp}>{elapsedTime}</span>
 				},
 			}),
 			columnHelper.accessor(
