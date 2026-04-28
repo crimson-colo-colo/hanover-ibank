@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Button, Group, Loader, Stack, TextInput, Title, Switch} from "@mantine/core"
+import { Button, Group, Loader, Stack, Switch, TextInput, Title } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { IconCamera, IconDeviceFloppy, IconMoon, IconSun } from "@tabler/icons-react"
@@ -16,7 +16,7 @@ const schema = z.object({
 	email: z.email(),
 	username: z.string().min(3).max(100),
 	emailNotifications: z.boolean(),
-  	pushNotifications: z.boolean(),
+	pushNotifications: z.boolean(),
 })
 
 export function ProfilePage() {
@@ -32,15 +32,6 @@ export function ProfilePage() {
 			async onSuccess() {
 				await queryClient.invalidateQueries({
 					queryKey: trpc.user.getAvatarUrl.queryKey({ userId: user!.sub! }),
-				})
-			},
-		})
-	)
-	const updateNotifications = useMutation(
-		trpc.user.notifications.mutationOptions({
-			async onSuccess() {
-				await queryClient.invalidateQueries({
-					queryKey: trpc.user.notifications.queryKey({ userId: user!.sub! }),
 				})
 			},
 		})
@@ -67,13 +58,6 @@ export function ProfilePage() {
 		transformValues: schema.parse,
 	})
 
-	const notificationsForm = useForm({
-		initialValues: {
-			emailNotifications: true,
-			pushNotifications: true,
-		},
-	})
-
 	useEffect(() => {
 		if (profileQuery.data) {
 			form.setValues({
@@ -81,7 +65,7 @@ export function ProfilePage() {
 				username: profileQuery.data.username,
 				email: profileQuery.data.email,
 				emailNotifications: profileQuery.data.emailNotifications,
-      			pushNotifications: profileQuery.data.pushNotifications,
+				pushNotifications: profileQuery.data.pushNotifications,
 			})
 		}
 	}, [profileQuery.data])
@@ -90,7 +74,13 @@ export function ProfilePage() {
 		await getAccessTokenSilently({ cacheMode: "off" })
 	}
 
-	async function onSubmit(values: { name: string; email: string; username: string , emailNotifications: boolean; pushNotifications: boolean }) {
+	async function onSubmit(values: {
+		name: string
+		email: string
+		username: string
+		emailNotifications: boolean
+		pushNotifications: boolean
+	}) {
 		const result = await updateProfile.mutateAsync(values)
 		if (result.error) {
 			notifications.show({
@@ -198,19 +188,6 @@ export function ProfilePage() {
 						{user?.email}
 					</p>
 				</Stack>
-				<Stack gap="sm">
-					<Title order={4}>Notifications</Title>
-
-					<Switch
-						label="Enable Push Notifications"
-						{...form.getInputProps("pushNotifications", { type: "checkbox" })}
-					/>
-
-					<Switch
-						label="Enable Email Notifications"
-						{...form.getInputProps("emailNotifications", { type: "checkbox" })}
-					/>
-    	</Stack>
 			</Group>
 
 			<form onSubmit={form.onSubmit(onSubmit)}>
@@ -234,13 +211,14 @@ export function ProfilePage() {
 						key={form.key("email")}
 						{...form.getInputProps("email")}
 					/>
-					<Title order={4}>Notifications</Title>
+					<Title order={4} mt="sm" mb="xs">
+						Notifications
+					</Title>
 
 					<Switch
 						label="Enable Push Notifications"
 						{...form.getInputProps("pushNotifications", { type: "checkbox" })}
 					/>
-
 					<Switch
 						label="Enable Email Notifications"
 						{...form.getInputProps("emailNotifications", { type: "checkbox" })}
@@ -258,7 +236,6 @@ export function ProfilePage() {
 							Save changes
 						</Button>
 					</Group>
-					
 				</Stack>
 			</form>
 		</Stack>

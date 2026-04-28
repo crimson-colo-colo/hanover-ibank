@@ -10,12 +10,14 @@ import { authProcedure, router } from "../trpc.ts"
 
 export const userRouter = router({
 	getProfile: authProcedure.query(async (opts) => {
-		const userRole = await db.employee.findUnique({
+		const user = await db.employee.findUnique({
 			where: {
 				id: opts.ctx.auth.sub,
 			},
 			select: {
 				role: true,
+				emailNotifications: true,
+				pushNotifications: true,
 			},
 		})
 		const auth0User = await auth0Management.users.get(opts.ctx.auth.sub)
@@ -24,7 +26,9 @@ export const userRouter = router({
 			name: auth0User.name ?? auth0User.nickname ?? auth0User.username!,
 			email: auth0User.email!,
 			username: auth0User.username!,
-			role: userRole!.role,
+			role: user!.role,
+			emailNotifications: user!.emailNotifications,
+			pushNotifications: user!.pushNotifications,
 		}
 	}),
 	updateProfile: authProcedure
@@ -33,10 +37,21 @@ export const userRouter = router({
 				name: z.string().min(3).max(100),
 				email: z.email(),
 				username: z.string().min(3).max(100),
+				emailNotifications: z.boolean(),
+				pushNotifications: z.boolean(),
 			})
 		)
 		.mutation(async (opts) => {
 			try {
+				await db.employee.update({
+					where: {
+						id: opts.ctx.auth.sub,
+					},
+					data: {
+						emailNotifications: opts.input.emailNotifications,
+						pushNotifications: opts.input.pushNotifications,
+					},
+				})
 				await auth0Management.users.update(opts.ctx.auth.sub, {
 					name: opts.input.name,
 					email: opts.input.email,

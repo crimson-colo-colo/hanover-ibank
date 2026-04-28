@@ -125,15 +125,18 @@ async function createUsersAndAvatars() {
 	await Promise.all(
 		employeeData.map(async ({ id }) => {
 			const user = users.data.find((u) => u.user_id === id)!
-			const avatar =
-				Math.random() < 0.8
-					? await downloadAvatar()
-					: generateDefaultAvatar(user.name ?? user.email!)
-			console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
+			const isCustomAvatar = Math.random() < 0.8
+			const avatar = isCustomAvatar
+				? await downloadAvatar()
+				: generateDefaultAvatar(user.name ?? user.email!)
+			console.log(`Uploading avatar for user ${user.name ?? "(unknown)"} to S3...`)
 			await s3.putObject({
 				Bucket: bucketName,
 				Key: `avatar/${id}.png`,
 				Body: avatar,
+				Metadata: {
+					source: isCustomAvatar ? "user" : "default",
+				},
 			})
 		})
 	)
