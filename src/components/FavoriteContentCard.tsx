@@ -219,7 +219,7 @@ export function FavoriteContentCard({
 				</Flex>
 			</Card.Section>
 			<Card.Section className="bg-white dark:bg-gray-950" bdrs="md" mt="xs">
-				<div className="aspect-square relative overflow-hidden rounded-md">{thumbnail}</div>
+				<div className="aspect-[1.3] relative overflow-hidden rounded-md">{thumbnail}</div>
 			</Card.Section>
 		</Card>
 	)
