@@ -131,8 +131,8 @@ export function FavoriteContentCard({
 	} else if (contentType === FileType.Powerpoint) {
 		thumbnail = (
 			<div className="absolute inset-0 w-full flex justify-center">
-				<Document file={contentThumbnail?.url}>
-					<Thumbnail pageNumber={1} />
+				<Document file={contentThumbnail?.url} loading={() => null}>
+					<Thumbnail pageNumber={1} loading={() => null} />
 				</Document>
 			</div>
 		)
