@@ -470,6 +470,24 @@ export const contentRouter = router({
 			})
 		}),
 
+	incrementContentViewCount: authProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async (opts) => {
+			await db.recentTimestamps.update({
+				where: {
+					employeeId_contentId: {
+						contentId: opts.input.id,
+						employeeId: opts.ctx.auth.sub,
+					},
+				},
+				data: {
+					viewCount: {
+						increment: 1,
+					},
+				},
+			})
+		}),
+
 	download: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
 		const content = await db.content.findUnique({
 			where: { id: opts.input.id },
@@ -503,6 +521,20 @@ export const contentRouter = router({
 			},
 			data: {
 				recentlyViewed: new Date(),
+			},
+		})
+
+		await db.recentTimestamps.update({
+			where: {
+				employeeId_contentId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+			data: {
+				viewCount: {
+					increment: 1,
+				},
 			},
 		})
 
@@ -1093,4 +1125,51 @@ export const contentRouter = router({
 			Links: grouped.get(month)?.Links ?? 0,
 		}))
 	}),
+	getContentViewTotals: authProcedure
+		.input(z.object({ type: z.enum(Object.values(ContentType)) }))
+		.query(async (opts) => {
+			const sums = await db.recentTimestamps.groupBy({
+				by: ["contentId"],
+				where: {
+					content: {
+						type: opts.input.type,
+					},
+				},
+				_sum: {
+					viewCount: true,
+				},
+			})
+			const contentDetails = await db.content.findMany({
+				where: {
+					id: { in: sums.map((entry) => entry.contentId) },
+				},
+				select: {
+					title: true,
+					id: true,
+					type: true,
+					objectId: true,
+				},
+			})
+
+			const metadata = new Map(
+				await Promise.all(
+					contentDetails
+						.filter((content) => content.type === "Object")
+						.map(
+							async (content) =>
+								[
+									content.id,
+									await s3.headObject({ Bucket: bucketName, Key: content.objectId! }),
+								] as const
+						)
+				)
+			)
+
+			const result = sums.map((entry) => ({
+				...entry,
+				title: contentDetails.find((item) => item.id === entry.contentId)?.title,
+				metadata: metadata.get(entry.contentId),
+			}))
+			return result
+		}),
 })

@@ -72,14 +72,6 @@ export type CheckOutMutationType = UseMutationResult<
 	CheckOutInput
 >
 
-type recentlyViewedOutput = RouterOutput["content"]["updateRecentlyViewedTimestamp"]
-type recentlyViewedInput = RouterInput["content"]["updateRecentlyViewedTimestamp"]
-export type recentlyViewedType = UseMutationResult<
-	recentlyViewedOutput,
-	TRPCClientErrorLike<AppRouter>,
-	recentlyViewedInput
->
-
 export type listFavoritesType = UseQueryResult<ContentList, TRPCClientErrorLike<AppRouter>>
 
 export type profileType = {

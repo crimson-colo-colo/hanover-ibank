@@ -1,6 +1,6 @@
 import { ActionIcon, Flex, Menu } from "@mantine/core"
 import { ContentType } from "@prisma/browser.ts"
-import type { ContentListItem, profileType, recentlyViewedType } from "@shared/types.ts"
+import type { ContentListItem, profileType } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconDoorEnter,
@@ -8,9 +8,10 @@ import {
 	IconDotsVertical,
 	IconDownload,
 } from "@tabler/icons-react"
+import { useMutation } from "@tanstack/react-query"
 import type { CellContext } from "@tanstack/react-table"
 import type { Dispatch, SetStateAction } from "react"
-import { trpcClient } from "@/lib/trpc.ts"
+import { trpc, trpcClient } from "@/lib/trpc.ts"
 
 export function ActionColumn({
 	info,
@@ -18,15 +19,16 @@ export function ActionColumn({
 	openCheckOutModal,
 	openCheckInModal,
 	profile,
-	recentlyViewed,
 }: {
 	info: CellContext<ContentListItem, unknown>
 	selectContentForCheckout: Dispatch<SetStateAction<ContentListItem | null>>
 	openCheckOutModal: () => void
 	openCheckInModal: () => void
 	profile: profileType | undefined
-	recentlyViewed: recentlyViewedType
 }) {
+	const recentlyViewed = useMutation(trpc.content.updateRecentlyViewedTimestamp.mutationOptions())
+	const incrementViewCount = useMutation(trpc.content.incrementContentViewCount.mutationOptions())
+
 	return (
 		<Flex className="content-actions w-max" gap="2px" justify="flex-end">
 			{info.row.original.type === "Link" ? (
@@ -37,6 +39,7 @@ export function ActionColumn({
 						if (info.row.original.type === ContentType.Link) {
 							window.open(info.row.original.url)
 							await recentlyViewed.mutateAsync({ id: info.row.original.id })
+							await incrementViewCount.mutateAsync({ id: info.row.original.id })
 						}
 					}}
 				>
@@ -85,6 +88,7 @@ export function ActionColumn({
 									window.open(info.row.original.url)
 								}
 								await recentlyViewed.mutateAsync({ id: info.row.original.id })
+								await incrementViewCount.mutateAsync({ id: info.row.original.id })
 							}}
 						>
 							Open link

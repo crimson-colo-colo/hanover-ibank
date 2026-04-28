@@ -129,10 +129,6 @@ export function ContentTable({
 		null
 	)
 
-	const recentlyViewed = useMutation(
-		trpc.content.updateRecentlyViewedTimestamp.mutationOptions(mutationOptions)
-	)
-
 	const defaultColumns = {
 		checkbox: true,
 		status: true,
@@ -343,7 +339,6 @@ export function ContentTable({
 						openCheckOutModal={openCheckOutModal}
 						openCheckInModal={openCheckInModal}
 						profile={profile}
-						recentlyViewed={recentlyViewed}
 					/>
 				),
 			}),
