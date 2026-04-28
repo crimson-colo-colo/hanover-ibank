@@ -1,5 +1,6 @@
 import { type Auth0ContextInterface, type User, useAuth0 } from "@auth0/auth0-react"
 import { AppShell, localStorageColorSchemeManager, MantineProvider } from "@mantine/core"
+import { useLocalStorage } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { DevSupport } from "@react-buddy/ide-toolbox"
 import { TanStackDevtools } from "@tanstack/react-devtools"
@@ -12,6 +13,7 @@ import {
 	useLocation,
 } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import clsx from "clsx"
 import Navigation from "@/components/Navigation.tsx"
 import { ScrollToTopButton, useRouteScrollToTop } from "@/components/ScrollToTopButton.tsx"
 import SideNavigation from "@/components/SideNavigation.tsx"
@@ -19,8 +21,6 @@ import { useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
 import { theme } from "@/theme.ts"
 import "../styles.css"
-import clsx from "clsx"
-import { useState } from "react"
 
 interface RouterContext {
 	auth0: Auth0ContextInterface<User>
@@ -37,7 +37,10 @@ function RootComponent() {
 	useRouteScrollToTop({ smooth: false })
 	const location = useLocation()
 	const isPreview = location.pathname.startsWith("/preview")
-	const [collapsed, toggleCollapsed] = useState(false)
+	const [collapsed, toggleCollapsed] = useLocalStorage({
+		key: "side-nav-collapsed",
+		defaultValue: false,
+	})
 	const auth0 = useAuth0()
 
 	const colorSchemeManager = localStorageColorSchemeManager({
@@ -53,8 +56,8 @@ function RootComponent() {
 						padding={isPreview ? 0 : "md"}
 						header={{ height: 56 }}
 						navbar={{
-							width: auth0.isAuthenticated && auth0.user ? (collapsed ? "70" : "260") : "0",
-							breakpoint: "xs",
+							width: auth0.isAuthenticated && auth0.user ? (collapsed ? "50" : "260") : "0",
+							breakpoint: "",
 						}}
 						className={clsx(isPreview && "not-dark:bg-gray-100")}
 					>
@@ -69,7 +72,7 @@ function RootComponent() {
 								/>
 							</AppShell.Navbar>
 						)}
-						<AppShell.Main className={clsx(!isPreview && "mx-auto max-w-325")}>
+						<AppShell.Main className={clsx(!isPreview && "mx-auto")}>
 							<HeadContent />
 							<Outlet />
 						</AppShell.Main>
