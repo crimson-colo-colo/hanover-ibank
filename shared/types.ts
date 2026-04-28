@@ -82,6 +82,14 @@ export type recentlyViewedType = UseMutationResult<
 
 export type listFavoritesType = UseQueryResult<ContentList, TRPCClientErrorLike<AppRouter>>
 
+export type profileType = {
+	id: string
+	name: string
+	email: string
+	username: string
+	role: EmployeeRole | undefined
+}
+
 export type Thread = Prisma.ContentTalkThreadGetPayload<{
 	include: {
 		createdBy: true

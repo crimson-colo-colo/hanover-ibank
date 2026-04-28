@@ -6,8 +6,8 @@ import { useMemo } from "react"
 import imageNotFound from "@/assets/image-not-found.png"
 import { trpc } from "@/lib/trpc.ts"
 
-export function URLCard({ url }: { url: string }) {
-	const opengraph = useQuery(trpc.opengraph.getOpenGraph.queryOptions({ url: url }))
+export function URLCard({ url, contentId }: { url: string, contentId: string }) {
+	const opengraph = useQuery(trpc.opengraph.getOpenGraph.queryOptions({ url: url, id: contentId  }))
 
 	function extractOGData(response: OgObject | null) {
 		if (!response) return null

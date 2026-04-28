@@ -494,6 +494,18 @@ export const contentRouter = router({
 			.setExpirationTime("5m")
 			.sign(new TextEncoder().encode(env.APP_SECRET))
 
+		await db.recentTimestamps.update({
+			where: {
+				employeeId_contentId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+			data: {
+				recentlyViewed: new Date(),
+			},
+		})
+
 		return { url: `/content/download?token=${token}` }
 	}),
 

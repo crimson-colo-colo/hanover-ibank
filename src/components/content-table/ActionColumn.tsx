@@ -1,6 +1,6 @@
 import { ActionIcon, Flex, Menu } from "@mantine/core"
-import { ContentType, type EmployeeRole } from "@prisma/browser.ts"
-import type { ContentListItem, recentlyViewedType } from "@shared/types.ts"
+import { ContentType } from "@prisma/browser.ts"
+import type { ContentListItem, profileType, recentlyViewedType } from "@shared/types.ts"
 import {
 	IconCircleArrowUpRight,
 	IconDoorEnter,
@@ -11,14 +11,6 @@ import {
 import type { CellContext } from "@tanstack/react-table"
 import type { Dispatch, SetStateAction } from "react"
 import { trpcClient } from "@/lib/trpc.ts"
-
-type profileType = {
-	id: string
-	name: string
-	email: string
-	username: string
-	role: EmployeeRole | undefined
-}
 
 export function ActionColumn({
 	info,
@@ -59,7 +51,6 @@ export function ActionColumn({
 							id: info.row.original.id,
 						})
 						window.open(url, "_blank", "noopener")
-						await recentlyViewed.mutateAsync({ id: info.row.original.id })
 					}}
 				>
 					<IconDownload />
@@ -81,7 +72,6 @@ export function ActionColumn({
 									id: info.row.original.id,
 								})
 								window.open(url, "_blank", "noopener")
-								await recentlyViewed.mutateAsync({ id: info.row.original.id })
 							}}
 						>
 							Download

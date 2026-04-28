@@ -233,12 +233,7 @@ export function ContentTable({
 				sortingFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => (
-					<NameColumn
-						info={info}
-						openFilePreview={openFilePreview}
-						profile={profile}
-						recentlyViewed={recentlyViewed}
-					/>
+					<NameColumn info={info} openFilePreview={openFilePreview} profile={profile} />
 				),
 			}),
 			columnHelper.accessor((row) => `${row.owner.name} ${row.owner.email}`, {
