@@ -9,9 +9,9 @@ export default function Search() {
 		trpc.content.search.queryOptions({ query: value ?? "History of the united states" })
 	)
 
-	function input(string: string) {
+	async function input(string: string) {
 		setValue(string)
-		data.refetch()
+		data.refetch({ cancelRefetch: true })
 	}
 	return (
 		<div>
