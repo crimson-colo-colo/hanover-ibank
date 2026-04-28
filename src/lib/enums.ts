@@ -25,3 +25,13 @@ export const tagCategoryDisplayName: Record<TagCategory, string> = {
 	DocumentType: "Document Type",
 	Custom: "Custom",
 }
+
+export const ContentViews = {
+	Default: "default",
+	ExpiringSoon: "expiringSoon",
+	RecentlyViewed: "recentlyViewed",
+	RecentlyEdited: "recentlyEdited",
+	CheckedOut: "checkedOut",
+} as const
+
+export type ContentViews = (typeof ContentViews)[keyof typeof ContentViews]
