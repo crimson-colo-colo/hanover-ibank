@@ -132,4 +132,12 @@ export const adminRouter = router({
 		const employeeCount = await db.employee.count()
 		return { employeeCount }
 	}),
+
+	getActivityLogs: adminProcedure.query(async () => {
+		return db.activityLog.findMany({
+			include: { employee: true },
+			orderBy: { createdAt: "desc" },
+			take: 50,
+		})
+	}),
 })

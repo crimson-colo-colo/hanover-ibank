@@ -1,8 +1,8 @@
 import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
-import { Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import {Button, Grid, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { trpc } from "@/lib/trpc.ts"
@@ -132,6 +132,10 @@ function AnalyticsDashboard() {
 	return (
 		<Stack mt="md" gap="lg">
 			<Title order={2}>Analytics Dashboard</Title>
+
+			<Button component={Link} to="/admin/activity-log" w="fit-content">
+				View Activity Log
+			</Button>
 
 			<Grid align="stretch" grow={true}>
 				{metrics.map((m) => (
