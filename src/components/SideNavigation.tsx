@@ -133,13 +133,15 @@ export function SideNavigation({ collapsed, toggleCollapsed }: sideNavigationPro
 					size="md"
 					onClick={toggleCollapsed}
 					ref={ref}
-					className={`${!collapsed && "absolute right-0 mr-2"}`}
+					className={`${!collapsed && "absolute right-2"}`}
 				>
 					{collapsed ? (
 						hovered ? (
 							<IconLayoutSidebarLeftExpand size={26} />
 						) : (
-							<IconBuildingBank size={26} />
+							<Link to="/">
+								<IconBuildingBank size={26} />
+							</Link>
 						)
 					) : (
 						<IconLayoutSidebarRightExpand size={26} />
@@ -171,8 +173,8 @@ export function SideNavigation({ collapsed, toggleCollapsed }: sideNavigationPro
 					radius={0}
 					fullWidth
 				>
-					<div className="flex items-center gap-3 px-2 py-1">
-						<Avatar userId={auth0.user.sub!} w={collapsed ? "lg" : "xl"} />
+					<div className={`flex items-center ${!collapsed && "gap-3 px-2 py-1"}}`}>
+						<Avatar userId={auth0.user.sub!} w={collapsed ? "30" : "32"} />
 						{!collapsed && (
 							<div className="flex flex-col items-start">
 								<Text size="sm" fw={500}>

@@ -29,6 +29,7 @@ import {
 	IconUsers,
 } from "@tabler/icons-react"
 import { Link, useLocation } from "@tanstack/react-router"
+import { createPortal } from "react-dom"
 import { Avatar } from "@/components/Avatar.tsx"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
@@ -172,7 +173,10 @@ export function Navigation() {
 					</Link>
 				</Group>
 
-				<Group gap={5} visibleFrom="xs">
+				<Group
+					visibleFrom="xs"
+					className={`${auth0.isAuthenticated && auth0.user && "flex justify-center w-full"}`}
+				>
 					{!auth0.isAuthenticated && !auth0.user ? (
 						<>
 							<Link
@@ -190,11 +194,12 @@ export function Navigation() {
 							leftSection={<IconSearch size={18} />}
 							rightSectionWidth={70}
 							rightSection={<Code>Ctrl+K</Code>}
-						></TextInput>
+							className="w-2/5"
+						/>
 					)}
 				</Group>
 
-				<Group>
+				<Group className="absolute right-11">
 					<ActionIcon onClick={toggleColorScheme} variant="subtle">
 						{colorScheme === "dark" ? <IconSun /> : <IconMoon />}
 					</ActionIcon>
