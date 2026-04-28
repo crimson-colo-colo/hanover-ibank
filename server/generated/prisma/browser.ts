@@ -58,6 +58,11 @@ export type FavoriteContent = Prisma.FavoriteContentModel
  */
 export type UserActivity = Prisma.UserActivityModel
 /**
+ * Model RecentTimestamps
+ * 
+ */
+export type RecentTimestamps = Prisma.RecentTimestampsModel
+/**
  * Model PushSubscription
  * 
  */

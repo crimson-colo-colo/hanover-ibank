@@ -1,5 +1,5 @@
 import { UTCDate } from "@date-fns/utc"
-import { ActionIcon, Popover } from "@mantine/core"
+import { ActionIcon, Popover, Tooltip } from "@mantine/core"
 import { DatePicker } from "@mantine/dates"
 import { IconCalendar, IconPencil } from "@tabler/icons-react"
 import type { EditableField } from "@/components/MetadataSidebar.tsx"
@@ -12,6 +12,8 @@ export function EditableDateField({
 	editingField,
 	setEditingField,
 	onFieldEdit,
+	ableToEdit,
+	disabledTooltip,
 }: {
 	enabled: boolean
 	field: "lastModifiedDate" | "expirationDate"
@@ -20,6 +22,8 @@ export function EditableDateField({
 	editingField: EditableField | null
 	setEditingField: (field: EditableField | null) => void
 	onFieldEdit: (field: EditableField, value: string) => void
+	ableToEdit: boolean
+	disabledTooltip: boolean
 }) {
 	return (
 		<Popover
@@ -41,14 +45,23 @@ export function EditableDateField({
 					</div>
 					<div className="@xs:contents flex items-center gap-2 ml-8 @xs:ml-0">
 						<span>{new UTCDate(value).toDateString()}</span>
-						<ActionIcon
-							className="metadata-edit"
-							variant="subtle"
-							onClick={() => setEditingField(field)}
-							disabled={!enabled}
-						>
-							<IconPencil />
-						</ActionIcon>
+						{ableToEdit && (
+							<Tooltip
+								label="Please check out this content in order to edit it"
+								withArrow
+								arrowSize={8}
+								disabled={disabledTooltip}
+							>
+								<ActionIcon
+									className="metadata-edit"
+									variant="subtle"
+									onClick={() => setEditingField(field)}
+									disabled={!enabled}
+								>
+									<IconPencil />
+								</ActionIcon>
+							</Tooltip>
+						)}
 					</div>
 				</div>
 			</Popover.Target>

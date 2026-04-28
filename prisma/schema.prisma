@@ -35,6 +35,7 @@ model Employee {
     comments           TalkThreadComment[] @relation("CommentAuthor")
     resolvedThreads    ContentTalkThread[]
     pushSubscriptions  PushSubscription[]
+    recentTimestamps   RecentTimestamps[]
 }
 
 model Content {
@@ -58,6 +59,7 @@ model Content {
     checkedOutById   String?
     checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
     threads          ContentTalkThread[]
+    recentTimestamps RecentTimestamps[]
 }
 
 model ContentTalkThread {
@@ -148,6 +150,17 @@ model UserActivity {
     hour       DateTime // datetime truncated to the UTC hour it was created in
 
     @@id([timestamp, employeeId, path])
+}
+
+model RecentTimestamps {
+    recentlyEdited DateTime
+    recentlyViewed DateTime
+    employeeId     String
+    employee       Employee @relation(fields: [employeeId], references: [id])
+    contentId      String
+    content        Content  @relation(fields: [contentId], references: [id])
+
+    @@id([employeeId, contentId])
 }
 
 model PushSubscription {
