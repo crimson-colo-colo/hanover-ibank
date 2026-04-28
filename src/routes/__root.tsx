@@ -49,6 +49,7 @@ function RootComponent() {
 			<MantineProvider theme={theme} colorSchemeManager={colorSchemeManager}>
 				<DevSupport ComponentPreviews={() => null} useInitialHook={useInitial}>
 					<AppShell
+						layout="alt"
 						padding={isPreview ? 0 : "md"}
 						header={{ height: 56 }}
 						navbar={{
