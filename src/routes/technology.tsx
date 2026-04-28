@@ -12,6 +12,27 @@ import {
 } from "@mantine/core"
 import { createFileRoute } from "@tanstack/react-router"
 
+import auth0Icon from "../assets/techIcons/auth0.svg"
+import biomeIcon from "../assets/techIcons/biome.svg"
+import bunIcon from "../assets/techIcons/bun.svg"
+import devcontainersIcon from "../assets/techIcons/devcontainers.svg"
+import dockerIcon from "../assets/techIcons/docker.svg"
+import expressIcon from "../assets/techIcons/express.png"
+import fakerIcon from "../assets/techIcons/fakerjs.svg"
+import gotenbergIcon from "../assets/techIcons/gotenberg.png"
+import mantineIcon from "../assets/techIcons/mantine.svg"
+import minioIcon from "../assets/techIcons/minio.svg"
+import nodejsIcon from "../assets/techIcons/nodejs.svg"
+import npmIcon from "../assets/techIcons/npm.svg"
+import postgresqlIcon from "../assets/techIcons/postgresql.svg"
+import prismaIcon from "../assets/techIcons/prisma.svg"
+import reactIcon from "../assets/techIcons/react.svg"
+import tablerIconsIcon from "../assets/techIcons/tabler-icons.svg"
+import tailwindcssIcon from "../assets/techIcons/tailwindcss.svg"
+import tanstackIcon from "../assets/techIcons/tanstack.png"
+import trpcIcon from "../assets/techIcons/trpc.svg"
+import zodIcon from "../assets/techIcons/zod.svg"
+
 export const Route = createFileRoute("/technology")({
 	component: TechPage,
 })
@@ -47,7 +68,7 @@ const pernStack = [
 				name: "PostgreSQL",
 				description: "Database",
 				url: "https://www.postgresql.org/",
-				icon: "./src/assets/techIcons/postgresql.svg",
+				icon: postgresqlIcon,
 			},
 		],
 	},
@@ -58,7 +79,7 @@ const pernStack = [
 				name: "Express",
 				description: "Backend Framework",
 				url: "https://expressjs.com/",
-				icon: "./src/assets/techIcons/express.png",
+				icon: expressIcon,
 			},
 		],
 	},
@@ -69,7 +90,7 @@ const pernStack = [
 				name: "React",
 				description: "UI Library",
 				url: "https://react.dev/",
-				icon: "./src/assets/techIcons/react.svg",
+				icon: reactIcon,
 			},
 		],
 	},
@@ -80,7 +101,7 @@ const pernStack = [
 				name: "Node.js",
 				description: "Runtime",
 				url: "https://nodejs.org/",
-				icon: "./src/assets/techIcons/nodejs.svg",
+				icon: nodejsIcon,
 			},
 		],
 	},
@@ -94,7 +115,7 @@ const technology = [
 				version: "1.3.11",
 				description: "All-in-one JavaScript runtime, bundler, and package manager.",
 				url: "https://bun.sh/",
-				icon: "./src/assets/techIcons/bun.svg",
+				icon: bunIcon,
 			},
 		],
 	},
@@ -106,14 +127,14 @@ const technology = [
 				version: "4.67.0",
 				description: "Containerisation platform for consistent dev and production environments.",
 				url: "https://www.docker.com/",
-				icon: "./src/assets/techIcons/docker.svg",
+				icon: dockerIcon,
 			},
 			{
 				name: "Devcontainers",
 				version: "js-node:0C1575",
 				description: "Reproducible virtual developer environments via the devcontainers spec.",
 				url: "https://containers.dev/",
-				icon: "./src/assets/techIcons/devconatiners.svg",
+				icon: devcontainersIcon,
 			},
 		],
 	},
@@ -125,14 +146,14 @@ const technology = [
 				version: "5.2.1",
 				description: "Minimalist web framework for Node.js powering the HTTP API layer.",
 				url: "https://expressjs.com/",
-				icon: "./src/assets/techIcons/express.png",
+				icon: expressIcon,
 			},
 			{
 				name: "tRPC",
 				version: "11.16.0",
 				description: "End-to-end typesafe APIs without schemas or code generation.",
 				url: "https://trpc.io/",
-				icon: "./src/assets/techIcons/trpc.svg",
+				icon: trpcIcon,
 			},
 		],
 	},
@@ -144,7 +165,7 @@ const technology = [
 				version: "1.168.22",
 				description: "Routing, forms, and server-state querying — fully type-safe React utilities.",
 				url: "https://tanstack.com/",
-				icon: "./src/assets/techIcons/tanstack.png",
+				icon: tanstackIcon,
 			},
 		],
 	},
@@ -157,21 +178,21 @@ const technology = [
 				description:
 					"Fully featured React component library with accessible, themeable components.",
 				url: "https://mantine.dev/",
-				icon: "./src/assets/techIcons/mantine.svg",
+				icon: mantineIcon,
 			},
 			{
 				name: "Tailwind CSS",
 				version: "4.2.2",
 				description: "Utility-first CSS framework for rapid, consistent UI development.",
 				url: "https://tailwindcss.com/",
-				icon: "./src/assets/techIcons/tailwindcss.svg",
+				icon: tailwindcssIcon,
 			},
 			{
 				name: "Tabler Icons",
 				version: "3.41.1",
 				description: "Over 5,000 free MIT-licensed high-quality SVG icons for React.",
 				url: "https://tabler.io/icons",
-				icon: "./src/assets/techIcons/tabler-icons.svg",
+				icon: tablerIconsIcon,
 			},
 		],
 	},
@@ -183,7 +204,7 @@ const technology = [
 				version: "5.6.0",
 				description: "Managed user authentication and authorization as a service.",
 				url: "https://auth0.com/",
-				icon: "./src/assets/techIcons/auth0.svg",
+				icon: auth0Icon,
 			},
 		],
 	},
@@ -195,7 +216,7 @@ const technology = [
 				version: "17.9",
 				description: "Reliable, ACID-compliant relational database system.",
 				url: "https://www.postgresql.org/",
-				icon: "./src/assets/techIcons/postgresql.svg",
+				icon: postgresqlIcon,
 			},
 			{
 				name: "Prisma ORM",
@@ -203,14 +224,14 @@ const technology = [
 				description:
 					"Next-gen TypeScript ORM with intuitive modelling and auto-generated migrations.",
 				url: "https://www.prisma.io/",
-				icon: "./src/assets/techIcons/prisma.svg",
+				icon: prismaIcon,
 			},
 			{
 				name: "MinIO S3",
 				version: "8.0.7",
 				description: "S3-compatible object storage for scalable file and media asset hosting.",
 				url: "https://min.io/",
-				icon: "./src/assets/techIcons/minio.svg",
+				icon: minioIcon,
 			},
 		],
 	},
@@ -222,7 +243,7 @@ const technology = [
 				version: "4.3.6",
 				description: "TypeScript-first schema declaration and validation library.",
 				url: "https://zod.dev/",
-				icon: "./src/assets/techIcons/zod.svg",
+				icon: zodIcon,
 			},
 		],
 	},
@@ -234,7 +255,7 @@ const technology = [
 				version: "2.4.6",
 				description: "Fast all-in-one linter and formatter replacing ESLint and Prettier.",
 				url: "https://biomejs.dev/",
-				icon: "https://bestofjs.org/logos/biome.dark.svg",
+				icon: biomeIcon,
 			},
 		],
 	},
@@ -246,28 +267,28 @@ const technology = [
 				version: "8.30.1",
 				description: "Docker-powered microservice that converts files and web pages into PDFs.",
 				url: "https://gotenberg.dev/",
-				icon: "https://gotenberg.dev/img/logo.png",
+				icon: gotenbergIcon,
 			},
 			{
 				name: "Faker.js",
 				version: "10.4.0",
 				description: "Generates realistic fake data for testing and seeding databases.",
 				url: "https://fakerjs.dev/",
-				icon: "https://fakerjs.dev/logo.svg",
+				icon: fakerIcon,
 			},
 			{
 				name: "Canvas",
 				version: "3.2.3",
 				description: "Node.js canvas API implementation used to draw and generate avatar icons.",
 				url: "https://github.com/Automattic/node-canvas",
-				icon: "https://upload.wikimedia.org/wikipedia/commons/d/db/Npm-logo.svg", // could not find icon
+				icon: npmIcon,
 			},
 			{
 				name: "Open Graph Scraper",
 				version: "6.11.0",
 				description: "Fetches Open Graph metadata from URLs to generate rich link previews.",
 				url: "https://github.com/jshemas/openGraphScraper",
-				icon: "https://upload.wikimedia.org/wikipedia/commons/d/db/Npm-logo.svg",
+				icon: npmIcon,
 			},
 		],
 	},
