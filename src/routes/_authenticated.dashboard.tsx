@@ -90,7 +90,7 @@ function RoleDashboard() {
 						Welcome,{" "}
 						{auth0.user?.name ?? auth0.user?.nickname ?? auth0.user?.preferred_username ?? "User"}
 					</Title>
-					<small className="mb-3 font-semibold tracking-wider text-gray-200 uppercase">
+					<small className="font-semibold tracking-wider text-gray-200 uppercase">
 						{profile.data ? employeeRoleDisplayName[profile.data.role!] : ""}
 					</small>
 				</Stack>
