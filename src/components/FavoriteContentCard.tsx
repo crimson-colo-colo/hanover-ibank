@@ -107,8 +107,8 @@ export function FavoriteContentCard({
 		thumbnail = (
 			<div className="absolute inset-0 overflow-hidden">
 				<div className="origin-top-left scale-120">
-					<Document file={contentThumbnail?.url}>
-						<Thumbnail pageNumber={1} width={200} />
+					<Document file={contentThumbnail?.url} loading={() => null}>
+						<Thumbnail pageNumber={1} width={200} loading={() => null} />
 					</Document>
 				</div>
 			</div>
