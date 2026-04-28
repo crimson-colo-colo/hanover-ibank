@@ -1,0 +1,12 @@
+--2026-04-28 12:06:26--  https://bestofjs.org/logos/biome.dark.svg
+Loaded CA certificate '/etc/ssl/certs/ca-certificates.crt'
+Resolving bestofjs.org (bestofjs.org)... 76.223.126.88
+Connecting to bestofjs.org (bestofjs.org)|76.223.126.88|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 316 [image/svg+xml]
+Saving to: ‘biome.dark.svg’
+
+     0K                                                       100% 39.0M=0s
+
+2026-04-28 12:06:26 (39.0 MB/s) - ‘biome.dark.svg’ saved [316/316]
+
