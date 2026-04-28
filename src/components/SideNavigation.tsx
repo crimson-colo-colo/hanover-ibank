@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { ActionIcon, Button, Stack, Text, Tooltip } from "@mantine/core"
+import { ActionIcon, Alert, Button, Stack, Text, Tooltip } from "@mantine/core"
 import { useHover } from "@mantine/hooks"
 import {
 	IconBolt,
@@ -14,12 +14,14 @@ import {
 	IconPointFilled,
 	IconStar,
 	IconUsers,
+	IconInfoCircleFilled,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import clsx from "clsx"
 import { Avatar } from "@/components/Avatar.tsx"
 import { trpc } from "@/lib/trpc.ts"
+import { useState } from "react"
 
 export type SideNavigationProps = {
 	collapsed: boolean
@@ -97,6 +99,8 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const location = useLocation()
 	const { hovered, ref } = useHover()
+	const [visible, setVisible] = useState(true)
+	const icon = <IconInfoCircleFilled className="fill-sky-600" size={50} />
 
 	const navLinks = routeLinks
 		.filter((link) => !link.admin)
@@ -187,6 +191,38 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 					radius={0}
 					fullWidth={!collapsed}
 				>
+					{visible && (
+					<Alert
+							variant="light"
+							color="sky"
+							title="Stay Up to Date"
+							bdrs="lg"
+							icon={icon}
+							styles={{ icon: { width: 50, height: 50 }, title: { fontSize: "24px" } }}
+							withCloseButton
+							onClose={() => setVisible(false)}
+							>
+							Enable Push Notifications in this browser to get notified about important changes
+								<Button
+								component={Link}
+								to="/profile"
+								justify="left"
+								variant="subtle"
+								color="gray"
+								className={clsx(
+									"h-14",
+									!collapsed
+										? "border-0 border-t border-gray-500 gap-3 py-1"
+										: "px-0 flex items-center justify-center"
+								)}
+								radius={0}
+								fullWidth={!collapsed}
+							>
+								Go to Profile	
+							</Button>
+						
+					</Alert>
+					)}
 					<Avatar userId={auth0.user.sub!} w={collapsed ? "30" : "32"} />
 					{!collapsed && (
 						<div className="flex flex-col items-start ml-3">
