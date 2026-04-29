@@ -323,7 +323,13 @@ export function ContentTable({
 					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
 				{
 					id: "tags",
-					header: ({ column }) => <TagFilterPopup column={column} allTags={allTags} />,
+					header: ({ column }) => (
+						<TagFilterPopup
+							resetPage={() => table.setPageIndex(0)}
+							column={column}
+							allTags={allTags}
+						/>
+					),
 					filterFn: "tagFilterFn",
 					sortingFn: "fuzzy",
 					enableSorting: false,
