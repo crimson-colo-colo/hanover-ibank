@@ -1,192 +1,128 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import {
 	ActionIcon,
-	Burger,
 	Button,
-	Container,
-	Divider,
-	Drawer,
 	Group,
 	Image,
+	Indicator,
+	Kbd,
 	Menu,
-	NavLink,
-	ScrollArea,
+	Popover,
 	Text,
 } from "@mantine/core"
-import { useDisclosure } from "@mantine/hooks"
+import { notifications as mantineNotifications } from "@mantine/notifications"
+import type { ServiceWorkerMessage } from "@shared/types.ts"
 import {
+	IconBell,
 	IconBuildingBank,
-	IconChartBar,
-	IconChevronRight,
-	IconHome,
 	IconLayoutSidebarLeftExpand,
 	IconMoon,
+	IconSearch,
 	IconSun,
 	IconUser,
-	IconUsers,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
-import { Link, useLocation } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
+import clsx from "clsx"
+import { useEffect, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
+import { NotificationsPopover } from "@/components/NotificationsPopover.tsx"
 import { trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
-function NavLinks({ isLoading, isAdmin }: { isLoading: boolean; isAdmin: boolean | undefined }) {
+function NavLinks() {
 	const location = useLocation()
 
 	return (
-		<>
-			{isAdmin && (
-				<div>
-					<Button
-						component={Link}
-						variant={location.pathname === "/admin/manage-users" ? "light" : "subtle"}
-						to="/admin/manage-users"
-					>
-						Manage Employees
-					</Button>
-
-					<Button
-						component={Link}
-						variant={location.pathname === "/admin/analytics" ? "light" : "subtle"}
-						to="/admin/analytics"
-					>
-						Analytics Dashboard
-					</Button>
-				</div>
-			)}
-		</>
-	)
-}
-
-function DrawerNavLinks({
-	isLoading,
-	isAdmin,
-	closeDrawer,
-}: {
-	isLoading: boolean
-	isAdmin: boolean | undefined
-	closeDrawer: () => void
-}) {
-	const location = useLocation()
-
-	return (
-		<>
-			<NavLink
+		<div>
+			<Button
 				component={Link}
-				to="/"
-				label="Dashboard"
-				variant="filled"
-				leftSection={<IconHome size={16} />}
-				rightSection={<IconChevronRight size={12} />}
-				active={location.pathname === "/"}
-				onClick={closeDrawer}
-			/>
-			<NavLink
+				variant={location.pathname === "/about" ? "light" : "subtle"}
+				to="/about"
+			>
+				About
+			</Button>
+
+			<Button
 				component={Link}
-				to="/analytics"
-				label="Analytics"
-				variant="filled"
-				leftSection={<IconChartBar size={16} />}
-				rightSection={<IconChevronRight size={12} />}
-				active={location.pathname === "/analytics"}
-				onClick={closeDrawer}
-			/>
-			{isAdmin && (
-				<NavLink
-					component={Link}
-					to="/admin/manage-users"
-					label="Manage Employees"
-					variant="filled"
-					leftSection={<IconUsers size={16} />}
-					rightSection={<IconChevronRight size={12} />}
-					active={location.pathname === "/admin/manage-users"}
-					onClick={closeDrawer}
-				/>
-			)}
-		</>
-	)
-}
-
-function DrawerUserMenu() {
-	const auth0 = useAuth0()
-	if (!auth0.user) {
-		return null
-	}
-
-	return (
-		<Menu trigger="click" position="top-start">
-			<Menu.Target>
-				<Button
-					variant="subtle"
-					color="gray"
-					p="4"
-					className="border-t border-t-gray-200 hover:bg-gray-100 h-max"
-					justify="start"
-				>
-					<div className="flex items-center gap-2 px-2 py-1">
-						<Image
-							h={32}
-							bdrs="100%"
-							className="cursor-pointer"
-							src={auth0.user.picture}
-							alt={auth0.user.name}
-						/>
-						<div className="flex flex-col items-start">
-							<Text size="sm" fw={500}>
-								{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
-							</Text>
-							<Text size="xs" c="gray">
-								{auth0.user.email}
-							</Text>
-						</div>
-					</div>
-				</Button>
-			</Menu.Target>
-			<Menu.Dropdown>
-				<Menu.Item
-					leftSection={<IconLayoutSidebarLeftExpand />}
-					onClick={() => auth0.logout()}
-					color="red"
-				>
-					Sign Out
-				</Menu.Item>
-			</Menu.Dropdown>
-		</Menu>
+				variant={location.pathname === "/technology" ? "light" : "subtle"}
+				to="/technology"
+			>
+				Technology
+			</Button>
+		</div>
 	)
 }
 
 export function Navigation() {
 	const auth0 = useAuth0()
-	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
-	const [opened, { toggle, close }] = useDisclosure(false)
-
 	const { colorScheme, toggleColorScheme } = useColorScheme()
+	const notifications = useQuery(trpc.user.getNotifications.queryOptions())
+	const [notificationsOpen, setNotificationsOpen] = useState(false)
+	const location = useLocation()
+	const navigate = useNavigate()
+
+	useEffect(() => {
+		if (!("serviceWorker" in navigator)) {
+			return
+		}
+
+		function onMessage(event: MessageEvent) {
+			const message = event.data as ServiceWorkerMessage
+			if (message.type === "new_notification") {
+				notifications.refetch()
+				const id = mantineNotifications.show({
+					title: message.notification.title,
+					message: message.notification.body,
+					icon: <Image src={message.notification.icon} width={24} height={24} radius="xl" />,
+					className: message.notification.url ? "cursor-pointer" : undefined,
+					onClick() {
+						if (message.notification.url) {
+							mantineNotifications.hide(id)
+							navigate({ to: new URL(message.notification.url).pathname })
+						}
+					},
+				})
+			}
+		}
+
+		navigator.serviceWorker.addEventListener("message", onMessage)
+		return () => {
+			navigator.serviceWorker.removeEventListener("message", onMessage)
+		}
+	})
 
 	return (
-		<header className="border-b border-gray-300 h-14 mb-30 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
-			<Container size="1300px" className="flex items-center justify-between h-full">
-				<Group hiddenFrom="xs">
-					<Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
-					<Link
-						to="/"
-						className="flex items-center gap-2 mr-4 no-underline active:text-primary-hover"
-					>
-						<IconBuildingBank />
-						<span className="text-xl font-semibold font-display">iBank</span>
-					</Link>
-				</Group>
-
-				<Group gap={5} visibleFrom="xs">
-					<Link
-						to="/"
-						className="flex items-center gap-2 mr-4 no-underline active:text-primary-hover"
-					>
-						<IconBuildingBank />
-						<span className="text-xl font-semibold font-display">iBank</span>
-					</Link>
-					{auth0.isAuthenticated && (
-						<NavLinks isLoading={isAdmin.isFetching} isAdmin={isAdmin.data} />
+		<div className="h-full bg-gray-50 dark:bg-gray-900 flex items-center justify-between gap-md">
+			<div
+				className={clsx(
+					"flex-1 flex justify-center items-center px-md",
+					(location.pathname === "/" || !auth0.isAuthenticated) && "max-w-240 mx-auto"
+				)}
+			>
+				<Group className="flex-1">
+					{!auth0.isAuthenticated && !auth0.user ? (
+						<>
+							<Link
+								to="/"
+								className="flex items-center gap-2 mr-4 no-underline active:text-primary-hover"
+							>
+								<IconBuildingBank />
+								<span className="text-xl font-semibold font-display">iBank</span>
+							</Link>
+							<NavLinks />
+						</>
+					) : (
+						<button
+							className="max-w-100 flex-1 flex items-center gap-2 rounded-md cursor-text bg-white border-gray-300 border py-1.5 pl-4 pr-2 text-gray-500 w-full text-sm dark:border-gray-800 dark:bg-gray-800/50 dark:text-gray-400"
+							onClick={() => {}}
+						>
+							<IconSearch size={18} />
+							<span className="flex-1 mr-8 text-left w-max">Search anything</span>
+							<div className="flex items-center gap-1">
+								<Kbd>Ctrl</Kbd> <Kbd>K</Kbd>
+							</div>
+						</button>
 					)}
 				</Group>
 
@@ -195,76 +131,75 @@ export function Navigation() {
 						{colorScheme === "dark" ? <IconSun /> : <IconMoon />}
 					</ActionIcon>
 					{auth0.isAuthenticated && auth0.user ? (
-						<Menu trigger="click" position="bottom-end">
-							<Menu.Target>
-								<Button id="nav-user-menu" variant="subtle" color="gray" p="0" className="h-max">
-									<div className="flex items-center gap-2 px-2 py-1">
-										<div className="flex flex-col items-end">
-											<Text size="sm" fw={500}>
-												{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
-											</Text>
-											<Text size="xs" c="gray">
-												{auth0.user.email}
-											</Text>
+						<>
+							<Popover
+								position="bottom-end"
+								width="500"
+								withArrow
+								opened={notificationsOpen}
+								onChange={setNotificationsOpen}
+							>
+								<Popover.Target>
+									<Indicator
+										label={notifications.data?.length ?? 0}
+										showZero={false}
+										size={16}
+										className="flex items-center justify-center"
+									>
+										<ActionIcon variant="subtle" onClick={() => setNotificationsOpen((o) => !o)}>
+											<IconBell />
+										</ActionIcon>
+									</Indicator>
+								</Popover.Target>
+								<Popover.Dropdown className="shadow-sm h-80 pb-0">
+									<NotificationsPopover
+										notifications={notifications.data ?? []}
+										closeNotifications={() => setNotificationsOpen(false)}
+									/>
+								</Popover.Dropdown>
+							</Popover>
+							<Menu trigger="click" position="bottom-end">
+								<Menu.Target>
+									<Button id="nav-user-menu" variant="subtle" color="gray" p="0" className="h-max">
+										<div className="flex items-center gap-2 px-2 py-1">
+											<div className="flex flex-col items-end">
+												<Text size="sm" fw={500}>
+													{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
+												</Text>
+												<Text size="xs" c="gray">
+													{auth0.user.email}
+												</Text>
+											</div>
+											<Avatar userId={auth0.user.sub!} h={32} />
 										</div>
-										<Avatar userId={auth0.user.sub!} h={32} />
-									</div>
-								</Button>
-							</Menu.Target>
-							<Menu.Dropdown className="shadow-sm">
-								<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
-									Profile
-								</Menu.Item>
-								<Menu.Item
-									leftSection={<IconLayoutSidebarLeftExpand />}
-									onClick={() =>
-										auth0.logout({
-											logoutParams: {
-												returnTo: window.location.origin,
-											},
-										})
-									}
-									color="red"
-								>
-									Sign Out
-								</Menu.Item>
-							</Menu.Dropdown>
-						</Menu>
+									</Button>
+								</Menu.Target>
+								<Menu.Dropdown className="shadow-sm">
+									<Menu.Item component={Link} to="/profile" leftSection={<IconUser />}>
+										Profile
+									</Menu.Item>
+									<Menu.Item
+										leftSection={<IconLayoutSidebarLeftExpand />}
+										onClick={() =>
+											auth0.logout({
+												logoutParams: {
+													returnTo: window.location.origin,
+												},
+											})
+										}
+										color="red"
+									>
+										Sign Out
+									</Menu.Item>
+								</Menu.Dropdown>
+							</Menu>
+						</>
 					) : (
 						<Button onClick={() => auth0.loginWithRedirect()}>Login</Button>
 					)}
 				</Group>
-			</Container>
-
-			<Drawer
-				opened={opened}
-				onClose={close}
-				size="100%"
-				padding={0}
-				title={
-					<span className="flex items-center gap-2 text-fuchsia-800">
-						<IconBuildingBank />
-						<span className="text-xl font-semibold font-display">iBank</span>
-					</span>
-				}
-				hiddenFrom="xs"
-				classNames={{
-					header: "px-4",
-					content: "flex flex-col h-full bg-gray-50",
-					body: "flex flex-col flex-grow-1",
-				}}
-			>
-				<ScrollArea className="flex-1">
-					<Divider mb="sm" />
-					<DrawerNavLinks
-						isLoading={isAdmin.isFetching}
-						isAdmin={isAdmin.data}
-						closeDrawer={close}
-					/>
-				</ScrollArea>
-				<DrawerUserMenu />
-			</Drawer>
-		</header>
+			</div>
+		</div>
 	)
 }
 export default Navigation

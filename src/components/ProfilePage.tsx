@@ -1,21 +1,24 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { Button, Group, Loader, Stack, TextInput, Title, Text } from "@mantine/core"
+import { Button, Group, Loader, Stack, Switch, Text, TextInput, Title } from "@mantine/core"
 import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { IconCamera, IconDeviceFloppy, IconMoon, IconSun } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
+import { HelpHint } from "@/components/help.hint.tsx"
+import { getPushSubscription, subscribePush, unsubscribePush } from "@/lib/push.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
-import { HelpHint } from "@/components/help.hint.tsx"
 
 const schema = z.object({
 	name: z.string().min(3).max(100),
 	email: z.email(),
 	username: z.string().min(3).max(100),
+	emailNotifications: z.boolean(),
+	pushNotifications: z.boolean(),
 })
 
 export function ProfilePage() {
@@ -23,8 +26,30 @@ export function ProfilePage() {
 	const navigate = useNavigate()
 	const avatarInputRef = useRef<HTMLInputElement>(null)
 	const { colorScheme, toggleColorScheme } = useColorScheme()
-
+	const [pushSubscription, setPushSubscription] = useState<z.infer<typeof PushSubscription> | null>(
+		null
+	)
 	const profileQuery = useQuery(trpc.user.getProfile.queryOptions())
+	const [subscribePending, setSubscribePending] = useState(false)
+
+	useEffect(() => {
+		getPushSubscription().then(setPushSubscription)
+	}, [])
+
+	async function handleSubscribePush() {
+		setSubscribePending(true)
+		await subscribePush()
+		const sub = await getPushSubscription()
+		setPushSubscription(sub)
+		setSubscribePending(false)
+	}
+
+	async function handleUnsubscribePush() {
+		setSubscribePending(true)
+		unsubscribePush()
+		setPushSubscription(null)
+		setSubscribePending(false)
+	}
 
 	const updateProfile = useMutation(
 		trpc.user.updateProfile.mutationOptions({
@@ -50,6 +75,8 @@ export function ProfilePage() {
 			name: user!.name!,
 			email: user!.email!,
 			username: "",
+			emailNotifications: true,
+			pushNotifications: true,
 		},
 		validate: schemaResolver(schema, { sync: true }),
 		transformValues: schema.parse,
@@ -61,6 +88,8 @@ export function ProfilePage() {
 				name: profileQuery.data.name,
 				username: profileQuery.data.username,
 				email: profileQuery.data.email,
+				emailNotifications: profileQuery.data.emailNotifications,
+				pushNotifications: profileQuery.data.pushNotifications,
 			})
 		}
 	}, [profileQuery.data])
@@ -69,7 +98,13 @@ export function ProfilePage() {
 		await getAccessTokenSilently({ cacheMode: "off" })
 	}
 
-	async function onSubmit(values: { name: string; email: string; username: string }) {
+	async function onSubmit(values: {
+		name: string
+		email: string
+		username: string
+		emailNotifications: boolean
+		pushNotifications: boolean
+	}) {
 		const result = await updateProfile.mutateAsync(values)
 		if (result.error) {
 			notifications.show({
@@ -113,7 +148,14 @@ export function ProfilePage() {
 	}
 
 	return (
-		<Stack id="profile-page" maw={480} mx="auto" mt="md" gap="xl">
+		<Stack
+			id="profile-page"
+			maw={480}
+			mx="auto"
+			mt="md"
+			gap="xl"
+			className="border px-6 py-6 rounded-md border-gray-300 dark:border-gray-800"
+		>
 			<Group justify="space-between" align="center">
 				<Title order={2}>Profile</Title>
 				<Button
@@ -166,14 +208,14 @@ export function ProfilePage() {
 				</div>
 				<Stack gap={2}>
 					<Group gap={6} align="center">
-					<p
-						style={{
-							margin: 0,
-							fontWeight: 500,
-						}}
-					>
-						{user?.name}
-					</p>
+						<p
+							style={{
+								margin: 0,
+								fontWeight: 500,
+							}}
+						>
+							{user?.name}
+						</p>
 						<HelpHint
 							feature="your profile picture"
 							steps={[
@@ -195,7 +237,9 @@ export function ProfilePage() {
 
 			<form id="profile-form" onSubmit={form.onSubmit(onSubmit)}>
 				<Group gap="xs" mb="xs">
-					<Text size="sm" fw="600">Account Details</Text>
+					<Text size="sm" fw="600">
+						Account Details
+					</Text>
 					<HelpHint
 						feature="profile settings"
 						steps={[
@@ -210,6 +254,7 @@ export function ProfilePage() {
 					/>
 				</Group>
 				<Stack gap="sm">
+					<Title order={4}>Profile Information</Title>
 					<TextInput
 						label="Full name"
 						placeholder="John Doe"
@@ -228,6 +273,18 @@ export function ProfilePage() {
 						key={form.key("email")}
 						{...form.getInputProps("email")}
 					/>
+					<Title order={4} mt="sm" mb="xs">
+						Notification Preferences
+					</Title>
+
+					<Switch
+						label="Enable Push Notifications"
+						{...form.getInputProps("pushNotifications", { type: "checkbox" })}
+					/>
+					<Switch
+						label="Enable Email Notifications"
+						{...form.getInputProps("emailNotifications", { type: "checkbox" })}
+					/>
 
 					<Group justify="flex-end" mt="md">
 						<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/" })}>
@@ -243,6 +300,31 @@ export function ProfilePage() {
 					</Group>
 				</Stack>
 			</form>
+
+			<Stack gap="sm" mt="md">
+				<Title order={4}>This Browser</Title>
+
+				{pushSubscription ? (
+					<>
+						<Text>Push notifications are enabled in this browser.</Text>
+						<Button
+							variant="outline"
+							color="red"
+							onClick={handleUnsubscribePush}
+							loading={subscribePending}
+						>
+							Unsubscribe this browser
+						</Button>
+					</>
+				) : (
+					<>
+						<Text>Push notifications are not enabled in this browser.</Text>
+						<Button variant="outline" onClick={handleSubscribePush} loading={subscribePending}>
+							Enable push notifications
+						</Button>
+					</>
+				)}
+			</Stack>
 		</Stack>
 	)
 }

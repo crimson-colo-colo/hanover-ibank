@@ -25,9 +25,41 @@ const TOPICS = [
 	"Marketing and Sales Strategy",
 	"Financial Reporting",
 	"Legal and General Counsel",
+	"Product Development Roadmap",
+	"Supply Chain Management",
+	"Corporate Social Responsibility",
+	"Data Privacy and Security",
+	"Employee Training and Development",
+	"Crisis Management Plan",
+	"Mergers and Acquisitions Strategy",
+	"Diversity and Inclusion Initiatives",
+	"Sustainability and Environmental Impact",
+	"Investor Relations and Communications",
+	"Competitive Analysis and Market Research",
+	"Brand Management and Positioning",
+	"Customer Retention and Loyalty Programs",
+	"Innovation and Technology Adoption",
+	"Corporate Governance and Ethics",
+	"Financial Planning and Analysis",
+	"Talent Acquisition and Retention",
+	"Global Expansion Strategy",
+	"Corporate Culture and Employee Engagement",
+	"Shareholder Value Creation",
+	"Operational Efficiency and Cost Reduction",
+	"Productivity and Performance Metrics",
+	"Stakeholder Engagement and Communication",
+	"Corporate Philanthropy",
+	"Community Engagement",
+	"Change Management",
+	"Leadership Development",
+	"Succession Planning",
+	"Workplace Safety and Health",
+	"Employee Benefits and Compensation",
+	"Remote Work Policies",
 ]
 
-const COUNT_PER_TYPE = 10
+const COUNT_PER_DOCUMENT_TYPE = 80
+const COUNT_PER_MEDIA_TYPE = 5
 
 async function ensureDir() {
 	if (fs.existsSync(OUTPUT_DIR)) {
@@ -52,12 +84,12 @@ function getFilename(topic: string, ext: string) {
 		"Final",
 		"Review",
 	])
-	const safeTopic = topic.replace(/\s+/g, "_").replace(/\//g, "-")
-	return `${safeTopic}_${docType}_${year}_${quarter}_v${version}.${ext}`
+	const safeTopic = topic.replace(/\//g, "-")
+	return `${safeTopic} ${docType} ${year} ${quarter} v${version}.${ext}`
 }
 
 async function generateTxt() {
-	for (let i = 0; i < COUNT_PER_TYPE; i++) {
+	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "txt")
 		const content =
@@ -77,7 +109,7 @@ async function generateTxt() {
 }
 
 async function generateCsv() {
-	for (let i = 0; i < COUNT_PER_TYPE; i++) {
+	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "csv")
 		let content =
@@ -91,7 +123,7 @@ async function generateCsv() {
 }
 
 async function generatePdf() {
-	for (let i = 0; i < COUNT_PER_TYPE; i++) {
+	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "pdf")
 		const doc = new PDFDocument()
@@ -144,7 +176,7 @@ async function generatePdf() {
 }
 
 async function generateDocx() {
-	for (let i = 0; i < COUNT_PER_TYPE; i++) {
+	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "docx")
 		const content = [
@@ -220,7 +252,7 @@ function toTitleCase(str: string) {
 }
 
 async function generateXlsx() {
-	for (let i = 0; i < COUNT_PER_TYPE; i++) {
+	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "xlsx")
 		const workbook = new ExcelJS.Workbook()
@@ -258,12 +290,26 @@ async function generateXlsx() {
 	}
 }
 
+const backgroundColors = [
+	"ACC8E5",
+	"F9D5E5",
+	"B5EAEA",
+	"F1F1F1",
+	"FFE156",
+	"6A0572",
+	"AB83A1",
+	"FF6B6B",
+	"4ECDC4",
+	"C7F464",
+]
 async function generatePptx() {
-	for (let i = 0; i < COUNT_PER_TYPE; i++) {
+	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
+		const bg = faker.helpers.arrayElement(backgroundColors)
 		const topic = faker.company.name()
 		const filename = getFilename(topic, "pptx")
 		const pres = new PptxGenJS()
 		const slide = pres.addSlide()
+		slide.background = { color: bg }
 		slide.addText(topic, { x: 1, y: 1, fontSize: 36, color: "363636", bold: true })
 		slide.addText(
 			`Prepared by: ${faker.person.fullName()}\nDate: ${faker.date.recent().toISOString().split("T")[0]}`,
@@ -272,6 +318,7 @@ async function generatePptx() {
 		const numSlides = faker.number.int({ min: 3, max: 7 })
 		for (let j = 0; j < numSlides; j++) {
 			const slide = pres.addSlide()
+			slide.background = { color: bg }
 			slide.addText(toTitleCase(faker.company.buzzPhrase()), {
 				x: 1,
 				y: 1,
@@ -280,6 +327,7 @@ async function generatePptx() {
 			})
 			slide.addText(faker.lorem.paragraph(), { x: 1, y: 2, fontSize: 18 })
 			const slide2 = pres.addSlide()
+			slide.background = { color: bg }
 			slide2.addText(toTitleCase(faker.company.catchPhrase()), { x: 1, y: 0.5, fontSize: 24 })
 			slide2.addText(
 				`- ${faker.hacker.phrase()}\n- ${faker.hacker.phrase()}\n- ${faker.hacker.phrase()}`,
@@ -325,21 +373,29 @@ async function downloadMedia() {
 		},
 	]
 
+	const promises: Promise<void>[] = []
+
 	for (const media of mediaTypes) {
-		for (let i = 0; i < COUNT_PER_TYPE; i++) {
-			const topic = getRandomTopic()
-			const filename = getFilename(topic, media.ext)
-			const targetUrl = media.url()
-			const response = await fetch(targetUrl)
-			if (response.ok) {
-				const buffer = await response.arrayBuffer()
-				fs.writeFileSync(path.join(OUTPUT_DIR, filename), Buffer.from(buffer))
-				console.log(`Downloaded ${filename}`)
-			} else {
-				console.error(`Failed to download ${media.ext} for topic ${topic}`)
-			}
+		for (let i = 0; i < COUNT_PER_MEDIA_TYPE; i++) {
+			promises.push(
+				(async () => {
+					const topic = getRandomTopic()
+					const filename = getFilename(topic, media.ext)
+					const targetUrl = media.url()
+					const response = await fetch(targetUrl)
+					if (response.ok) {
+						const buffer = await response.arrayBuffer()
+						fs.writeFileSync(path.join(OUTPUT_DIR, filename), Buffer.from(buffer))
+						console.log(`Downloaded ${filename}`)
+					} else {
+						console.error(`Failed to download ${media.ext} for topic ${topic}`)
+					}
+				})()
+			)
 		}
 	}
+
+	await Promise.all(promises)
 }
 
 async function main() {

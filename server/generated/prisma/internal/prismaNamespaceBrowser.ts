@@ -58,7 +58,10 @@ export const ModelName = {
   Tag: 'Tag',
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
-  UserActivity: 'UserActivity'
+  UserActivity: 'UserActivity',
+  RecentTimestamps: 'RecentTimestamps',
+  PushSubscription: 'PushSubscription',
+  Notification: 'Notification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -79,7 +82,10 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const EmployeeScalarFieldEnum = {
   id: 'id',
-  role: 'role'
+  createdAt: 'createdAt',
+  role: 'role',
+  emailNotifications: 'emailNotifications',
+  pushNotifications: 'pushNotifications'
 } as const
 
 export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
@@ -166,6 +172,39 @@ export const UserActivityScalarFieldEnum = {
 } as const
 
 export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[keyof typeof UserActivityScalarFieldEnum]
+
+
+export const RecentTimestampsScalarFieldEnum = {
+  recentlyEdited: 'recentlyEdited',
+  recentlyViewed: 'recentlyViewed',
+  viewCount: 'viewCount',
+  employeeId: 'employeeId',
+  contentId: 'contentId'
+} as const
+
+export type RecentTimestampsScalarFieldEnum = (typeof RecentTimestampsScalarFieldEnum)[keyof typeof RecentTimestampsScalarFieldEnum]
+
+
+export const PushSubscriptionScalarFieldEnum = {
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  employeeId: 'employeeId'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  type: 'type',
+  contentId: 'contentId',
+  actorId: 'actorId',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const SortOrder = {

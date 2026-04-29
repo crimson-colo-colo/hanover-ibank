@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client"
 import { authOptions } from "@/lib/auth.ts"
 import { setAuth0 } from "@/lib/trpc.ts"
 import { getRouter } from "@/router.tsx"
+import serviceWorker from "../sw.ts?url"
 
 declare module "@tanstack/react-router" {
 	interface Register {
@@ -44,3 +45,21 @@ if (!rootElement.innerHTML) {
 		</Auth0Provider>
 	)
 }
+
+async function registerServiceWorker() {
+	if ("serviceWorker" in navigator) {
+		try {
+			const registration = await navigator.serviceWorker.register(serviceWorker, {
+				scope: "/",
+				type: "module",
+			})
+			console.log("[sw] Service worker registered with scope:", registration.scope)
+		} catch (err) {
+			console.error("[sw] Service worker registration failed:", err)
+		}
+	} else {
+		console.warn("[sw] Service workers are not supported in this browser.")
+	}
+}
+
+registerServiceWorker()

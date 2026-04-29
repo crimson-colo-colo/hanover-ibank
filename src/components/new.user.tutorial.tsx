@@ -23,20 +23,21 @@ const DASHBOARD_STEPS: Step[] = [
 			"This is your personal dashboard. It shows your name and role at the top so you always know who you're logged in as.",
 		placement: "bottom",
 	},
-	{
-		target: "#dashboard-favorites",
-		title: "Your Favorites",
-		content:
-			"Pinned content you've marked as a favorite appears here for quick access. Star any file or link in the table below to add it.",
-		placement: "bottom",
-	},
-	{
-		target: "#dashboard-content-section",
-		title: "Content Library",
-		content:
-			"This table lists all the content available to you — files, documents, and links. You can sort, filter, search, and manage everything from here.",
-		placement: "top",
-	},
+	// TODO: replace these - they don't exist anymore after the redesign
+	// {
+	// 	target: "#dashboard-favorites",
+	// 	title: "Your Favorites",
+	// 	content:
+	// 		"Pinned content you've marked as a favorite appears here for quick access. Star any file or link in the table below to add it.",
+	// 	placement: "bottom",
+	// },
+	// {
+	// 	target: "#dashboard-content-section",
+	// 	title: "Content Library",
+	// 	content:
+	// 		"This table lists all the content available to you — files, documents, and links. You can sort, filter, search, and manage everything from here.",
+	// 	placement: "top",
+	// },
 	{
 		target: "#content-filter-control",
 		title: "For You vs. Show All",
@@ -79,7 +80,7 @@ const PROFILE_STEPS: Step[] = [
 		target: "#profile-form",
 		title: "Profile Settings",
 		content:
-			"Update your display name, username, and email address here. Changes are reflected immediately across the platform.",
+			"Update your display name, username, email address, and notification preferences here. Changes are reflected immediately across the platform.",
 		placement: "top",
 	},
 ]

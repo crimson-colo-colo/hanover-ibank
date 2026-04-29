@@ -3,6 +3,7 @@ import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { EmployeeRole } from "../generated/prisma/client.ts"
+import { auth0Cache } from "../lib/auth0.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { getGravatarUrl } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -19,7 +20,7 @@ export const adminRouter = router({
 	}),
 	listUsers: adminProcedure.query(async () => {
 		const users = await db.employee.findMany()
-		const auth0Users = await auth0Management.users.list()
+		const auth0Users = await auth0Cache.listUsers()
 
 		return users.flatMap((user) => {
 			const auth0User = auth0Users.data.find((u) => u.user_id === user.id)
@@ -66,6 +67,8 @@ export const adminRouter = router({
 				username: opts.input.username,
 			})
 
+			auth0Cache.invalidate()
+
 			await new Promise((resolve) => setTimeout(resolve, 1000))
 
 			await db.employee.update({
@@ -97,6 +100,8 @@ export const adminRouter = router({
 				connection: "Username-Password-Authentication",
 			})
 
+			auth0Cache.invalidate()
+
 			const avatar = generateDefaultAvatar(opts.input.name ?? opts.input.email!)
 
 			await s3.putObject({
@@ -126,6 +131,7 @@ export const adminRouter = router({
 				await db.employee.delete({ where: { id } })
 			})
 		)
+		auth0Cache.invalidate()
 	}),
 
 	getStats: adminProcedure.query(async () => {

@@ -13,6 +13,7 @@ import {
 	type IconProps,
 } from "@tabler/icons-react"
 import clsx from "clsx"
+import { twMerge } from "tailwind-merge"
 
 const fileTypeIcons: Record<
 	FileType,
@@ -39,37 +40,43 @@ const fileTypeIcons: Record<
 	[FileType.Pdf]: (props) => (
 		<IconFileTypePdf
 			{...props}
-			className={clsx(props.className, "stroke-red-600 dark:stroke-red-400")}
+			className={twMerge("stroke-red-600 dark:stroke-red-400", props.className)}
 		/>
 	),
 	[FileType.Audio]: (props) => (
 		<IconFileMusic
 			{...props}
-			className={clsx(props.className, "stroke-emerald-600 dark:stroke-emerald-400")}
+			className={twMerge("stroke-emerald-600 dark:stroke-emerald-400", props.className)}
 		/>
 	),
 	[FileType.Video]: (props) => (
-		<IconMovie {...props} className={clsx(props.className, "stroke-red-600 dark:stroke-red-400")} />
+		<IconMovie
+			{...props}
+			className={twMerge("stroke-red-600 dark:stroke-red-400", props.className)}
+		/>
 	),
 	[FileType.Image]: (props) => (
-		<IconPhoto {...props} className={clsx(props.className, "stroke-sky-600 dark:stroke-sky-400")} />
+		<IconPhoto
+			{...props}
+			className={twMerge("stroke-sky-600 dark:stroke-sky-400", props.className)}
+		/>
 	),
 	[FileType.Link]: (props) => (
 		<IconLink
 			{...props}
-			className={clsx(props.className, "stroke-gray-600 dark:stroke-gray-400")}
+			className={twMerge("stroke-gray-600 dark:stroke-gray-400", props.className)}
 		/>
 	),
 	[FileType.Plaintext]: (props) => (
 		<IconFileText
 			{...props}
-			className={clsx(props.className, "stroke-pear-700 dark:stroke-pear-400")}
+			className={twMerge("stroke-pear-700 dark:stroke-pear-400", props.className)}
 		/>
 	),
 	[FileType.Unknown]: (props) => (
 		<IconFile
 			{...props}
-			className={clsx(props.className, "stroke-gray-700 dark:stroke-gray-400")}
+			className={twMerge("stroke-gray-700 dark:stroke-gray-400", props.className)}
 		/>
 	),
 }

@@ -38,7 +38,7 @@ import { Avatar } from "@/components/Avatar.tsx"
 import { CreateUserForm } from "@/components/CreateUserForm.tsx"
 import { UpdateUserForm, type UpdateUserValues } from "@/components/UpdateUserForm.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
-import { fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
+import { checkedOutByFilterFn, fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
 import { trpc } from "@/lib/trpc.ts"
 import { HelpHint } from "@/components/help.hint.tsx"
 
@@ -139,6 +139,7 @@ function RouteComponent() {
 		filterFns: {
 			fuzzy: fuzzyFilter,
 			tagFilterFn: tagFilterFn,
+			checkedOutByFilterFn: checkedOutByFilterFn,
 		},
 		sortingFns: {
 			fuzzy: fuzzySort,
