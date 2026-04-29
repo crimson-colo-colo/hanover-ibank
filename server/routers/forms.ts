@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid"
 import z from "zod"
-import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import {
 	ContentStatus,
@@ -9,6 +8,7 @@ import {
 	TagCategory,
 } from "../generated/prisma/browser.ts"
 import { embedFile } from "../lib/embedFile.ts"
+import { auth0Cache } from "../lib/auth0.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -93,7 +93,7 @@ export const formsRouter = router({
 	searchUsers: authProcedure
 		.input(z.object({ query: z.string(), roles: z.array(z.enum(Object.values(EmployeeRole))) }))
 		.query(async (opts) => {
-			const auth0Users = await auth0Management.users.list({
+			const auth0Users = await auth0Cache.listUsers({
 				q: opts.input.query,
 			})
 			const users = await db.employee.findMany({

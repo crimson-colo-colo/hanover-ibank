@@ -3,15 +3,16 @@ import { faker } from "@faker-js/faker"
 import { Temporal } from "@js-temporal/polyfill"
 import { PrismaPg } from "@prisma/adapter-pg"
 import type { FileType } from "@shared/filetype.ts"
-import { auth0Management } from "../server/auth.ts"
 import {
 	ContentStatus,
 	EmployeeRole,
+	NotificationType,
 	type Prisma,
 	PrismaClient,
 	TagCategory,
 	ThreadStatus,
 } from "../server/generated/prisma/client.ts"
+import { auth0Cache } from "../server/lib/auth0.ts"
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
 import { embedFile } from "../server/lib/embedFile.ts"
 import { bucketName, s3 } from "../server/s3.ts"
@@ -43,22 +44,21 @@ async function main() {
 
 	await createUsersAndAvatars()
 	await createTags()
+
 	const linkContent = await createLinkContent()
 	await uploadFilesToS3()
 	const { fileContent, fileTypeToContent } = await createFileContent()
 	await createContentTags(fileContent, linkContent)
-
 	console.log(`Uploaded ${fileContent.length} files to S3 and created content rows for them`)
 
-	await createFavoriteContent(linkContent, fileTypeToContent)
-
-	await createUserActivity()
-
-	await checkoutFiles(fileContent)
-
-	await createContentThreads()
-
-	await createTimestamps()
+	await Promise.all([
+		createFavoriteContent(linkContent, fileTypeToContent),
+		createUserActivity(),
+		checkoutFiles(fileContent),
+		createContentThreads(),
+		createRecentTimestamps(),
+		createNotifications(),
+	])
 
 	await embedAllContent()
 }
@@ -112,7 +112,8 @@ async function wipeDBandS3() {
 }
 
 async function createUsersAndAvatars() {
-	const users = await auth0Management.users.list()
+	const users = await auth0Cache.listUsers()
+
 	await prisma.$transaction(
 		employeeData.map((employee) => {
 			const auth0User = users.data.find((u) => u.user_id === employee.id)
@@ -138,15 +139,18 @@ async function createUsersAndAvatars() {
 			.map(async ({ id }) => {
 				const user = users.data.find((u) => u.user_id === id)
 				if (user === undefined) return null
-				const avatar =
-					Math.random() < 0.8
+				const isCustomAvatar =
+					Math.random() < 0.8const avatar = isCustomAvatar
 						? await downloadAvatar()
 						: generateDefaultAvatar(user.name ?? user.email!)
-				console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
+			console.log(`Uploading avatar for user ${user.name ?? "(unknown)"} to S3...`)
 				await s3.putObject({
 					Bucket: bucketName,
 					Key: `avatar/${id}.png`,
 					Body: avatar,
+				Metadata: {
+					source: isCustomAvatar ? "user" : "default",
+				},
 				})
 			})
 			.filter((value) => value !== null)
@@ -425,7 +429,7 @@ async function createContentThreads() {
 	console.log(`Created ${commentData.flat().length} comments across all threads`)
 }
 
-async function createTimestamps() {
+async function createRecentTimestamps() {
 	const contentItems = await prisma.content.findMany({
 		select: { id: true },
 	})
@@ -461,4 +465,80 @@ async function embedAllContent() {
 	const allContent = await prisma.content.findMany({ include: { tags: true } })
 	await Promise.all(allContent.map(embedFile))
 	console.log("embedding complete")
+}
+
+// Create 5 notifications for each employee, with random types and associated with random content items where applicable
+async function createNotifications() {
+	const data: Prisma.NotificationCreateManyInput[] = []
+
+	for (const employee of employeeData) {
+		const ownedContent = await prisma.content.findMany({
+			where: { ownerId: employee.id },
+			select: { id: true },
+		})
+		const relevantContent = await prisma.content.findMany({
+			select: { id: true },
+			where: {
+				tags: {
+					some: {
+						tagCategory: TagCategory.IntendedAudience,
+						tagName: employee.role,
+					},
+				},
+			},
+		})
+		for (let i = 0; i < 5; i++) {
+			const type = faker.helpers.arrayElement(Object.values(NotificationType))
+			const createdAt = Temporal.Now.instant()
+				.subtract({ minutes: Math.floor(Math.random() * 60 * 24 * 30) })
+				.toString()
+
+			data.push({
+				createdAt,
+				employeeId: employee.id,
+				type,
+				...generateNotification(employee.id, type, ownedContent, relevantContent),
+			})
+		}
+	}
+
+	await prisma.notification.createMany({ data })
+	console.log(`Created ${data.length} notifications for employees`)
+}
+
+function generateNotification(
+	employeeId: string,
+	type: NotificationType,
+	ownedContent: { id: string }[],
+	relevantContent: { id: string }[]
+): Omit<Prisma.NotificationCreateManyInput, "employeeId" | "type" | "createdAt"> {
+	switch (type) {
+		case NotificationType.ContentTransferred:
+		case NotificationType.ContentEdited:
+		case NotificationType.ContentCheckedOut:
+		case NotificationType.ContentCheckedIn: {
+			const content = faker.helpers.arrayElement(ownedContent)!
+			const actor = faker.helpers.arrayElement(employeeData.filter((e) => e.id !== employeeId))!
+			return {
+				contentId: content.id,
+				actorId: actor.id,
+			}
+		}
+		case NotificationType.ExpiringOneDay: {
+			const content = faker.helpers.arrayElement(ownedContent)!
+			return {
+				contentId: content.id,
+			}
+		}
+
+		case NotificationType.ContentAdded: {
+			const content = faker.helpers.arrayElement(relevantContent)!
+			return {
+				contentId: content.id,
+			}
+		}
+		default: {
+			throw new Error(`Unhandled notification type: ${type}`)
+		}
+	}
 }

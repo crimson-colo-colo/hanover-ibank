@@ -28,6 +28,8 @@ model Employee {
     resolvedThreads    ContentTalkThread[]
     pushSubscriptions  PushSubscription[]
     recentTimestamps   RecentTimestamps[]
+    notifications      Notification[]
+    actorNotifications Notification[]      @relation("Actor")
 }
 
 model Content {
@@ -53,6 +55,7 @@ model Content {
     threads          ContentTalkThread[]
   embeddings       Embedding[]
     recentTimestamps RecentTimestamps[]
+    notifications    Notification[]
 }
 
 model ContentTalkThread {
@@ -190,4 +193,25 @@ model PushSubscription {
     auth       String
     employeeId String
     employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationType {
+    ContentTransferred /// Content is transferred to the current user by another user
+    ContentEdited /// Owned content is edited by another user
+    ExpiringOneDay /// Owned content is expiring in one day
+    ContentCheckedOut /// Owned content is checked out by another user
+    ContentCheckedIn /// Owned content is checked in by another user
+    ContentAdded /// New content that the user is part of the intended audience for is added
+}
+
+model Notification {
+    id         String           @id @default(cuid())
+    employeeId String
+    employee   Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+    type       NotificationType
+    contentId  String? /// ID of the content associated with the notification, if applicable
+    content    Content?         @relation(fields: [contentId], references: [id], onDelete: Cascade)
+    actorId    String? /// ID of the employee that triggered the notification, if applicable
+    actor      Employee?        @relation("Actor", fields: [actorId], references: [id], onDelete: Cascade)
+    createdAt  DateTime         @default(now())
 }

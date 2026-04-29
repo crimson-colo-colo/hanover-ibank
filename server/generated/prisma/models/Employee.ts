@@ -191,6 +191,8 @@ export type EmployeeWhereInput = {
   resolvedThreads?: Prisma.ContentTalkThreadListRelationFilter
   pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
   recentTimestamps?: Prisma.RecentTimestampsListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  actorNotifications?: Prisma.NotificationListRelationFilter
 }
 
 export type EmployeeOrderByWithRelationInput = {
@@ -208,6 +210,8 @@ export type EmployeeOrderByWithRelationInput = {
   resolvedThreads?: Prisma.ContentTalkThreadOrderByRelationAggregateInput
   pushSubscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput
   recentTimestamps?: Prisma.RecentTimestampsOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  actorNotifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
@@ -228,6 +232,8 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   resolvedThreads?: Prisma.ContentTalkThreadListRelationFilter
   pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter
   recentTimestamps?: Prisma.RecentTimestampsListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  actorNotifications?: Prisma.NotificationListRelationFilter
 }, "id">
 
 export type EmployeeOrderByWithAggregationInput = {
@@ -267,6 +273,8 @@ export type EmployeeCreateInput = {
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateInput = {
@@ -284,6 +292,8 @@ export type EmployeeUncheckedCreateInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUpdateInput = {
@@ -301,6 +311,8 @@ export type EmployeeUpdateInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateInput = {
@@ -318,6 +330,8 @@ export type EmployeeUncheckedUpdateInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeCreateManyInput = {
@@ -524,6 +538,36 @@ export type EmployeeUpdateOneRequiredWithoutPushSubscriptionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutPushSubscriptionsInput, Prisma.EmployeeUpdateWithoutPushSubscriptionsInput>, Prisma.EmployeeUncheckedUpdateWithoutPushSubscriptionsInput>
 }
 
+export type EmployeeCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeCreateNestedOneWithoutActorNotificationsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutActorNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutActorNotificationsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutActorNotificationsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.EmployeeUpsertWithoutNotificationsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutNotificationsInput, Prisma.EmployeeUpdateWithoutNotificationsInput>, Prisma.EmployeeUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type EmployeeUpdateOneWithoutActorNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutActorNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutActorNotificationsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutActorNotificationsInput
+  upsert?: Prisma.EmployeeUpsertWithoutActorNotificationsInput
+  disconnect?: Prisma.EmployeeWhereInput | boolean
+  delete?: Prisma.EmployeeWhereInput | boolean
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutActorNotificationsInput, Prisma.EmployeeUpdateWithoutActorNotificationsInput>, Prisma.EmployeeUncheckedUpdateWithoutActorNotificationsInput>
+}
+
 export type EmployeeCreateWithoutContentInput = {
   id: string
   createdAt?: Date | string
@@ -538,6 +582,8 @@ export type EmployeeCreateWithoutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutContentInput = {
@@ -554,6 +600,8 @@ export type EmployeeUncheckedCreateWithoutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutContentInput = {
@@ -575,6 +623,8 @@ export type EmployeeCreateWithoutCheckedOutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
@@ -591,6 +641,8 @@ export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutCheckedOutContentInput = {
@@ -623,6 +675,8 @@ export type EmployeeUpdateWithoutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutContentInput = {
@@ -639,6 +693,8 @@ export type EmployeeUncheckedUpdateWithoutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUpsertWithoutCheckedOutContentInput = {
@@ -666,6 +722,8 @@ export type EmployeeUpdateWithoutCheckedOutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
@@ -682,6 +740,8 @@ export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeCreateWithoutResolvedThreadsInput = {
@@ -698,6 +758,8 @@ export type EmployeeCreateWithoutResolvedThreadsInput = {
   comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutResolvedThreadsInput = {
@@ -714,6 +776,8 @@ export type EmployeeUncheckedCreateWithoutResolvedThreadsInput = {
   comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutResolvedThreadsInput = {
@@ -735,6 +799,8 @@ export type EmployeeCreateWithoutThreadsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutThreadsInput = {
@@ -751,6 +817,8 @@ export type EmployeeUncheckedCreateWithoutThreadsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutThreadsInput = {
@@ -783,6 +851,8 @@ export type EmployeeUpdateWithoutResolvedThreadsInput = {
   comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutResolvedThreadsInput = {
@@ -799,6 +869,8 @@ export type EmployeeUncheckedUpdateWithoutResolvedThreadsInput = {
   comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUpsertWithoutThreadsInput = {
@@ -826,6 +898,8 @@ export type EmployeeUpdateWithoutThreadsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutThreadsInput = {
@@ -842,6 +916,8 @@ export type EmployeeUncheckedUpdateWithoutThreadsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeCreateWithoutCommentsInput = {
@@ -858,6 +934,8 @@ export type EmployeeCreateWithoutCommentsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutCommentsInput = {
@@ -874,6 +952,8 @@ export type EmployeeUncheckedCreateWithoutCommentsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutCommentsInput = {
@@ -906,6 +986,8 @@ export type EmployeeUpdateWithoutCommentsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutCommentsInput = {
@@ -922,6 +1004,8 @@ export type EmployeeUncheckedUpdateWithoutCommentsInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeCreateWithoutFavoriteInput = {
@@ -938,6 +1022,8 @@ export type EmployeeCreateWithoutFavoriteInput = {
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutFavoriteInput = {
@@ -954,6 +1040,8 @@ export type EmployeeUncheckedCreateWithoutFavoriteInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutFavoriteInput = {
@@ -986,6 +1074,8 @@ export type EmployeeUpdateWithoutFavoriteInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
@@ -1002,6 +1092,8 @@ export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeCreateWithoutActivityInput = {
@@ -1018,6 +1110,8 @@ export type EmployeeCreateWithoutActivityInput = {
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutActivityInput = {
@@ -1034,6 +1128,8 @@ export type EmployeeUncheckedCreateWithoutActivityInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutActivityInput = {
@@ -1066,6 +1162,8 @@ export type EmployeeUpdateWithoutActivityInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutActivityInput = {
@@ -1082,6 +1180,8 @@ export type EmployeeUncheckedUpdateWithoutActivityInput = {
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeCreateWithoutRecentTimestampsInput = {
@@ -1098,6 +1198,8 @@ export type EmployeeCreateWithoutRecentTimestampsInput = {
   comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutRecentTimestampsInput = {
@@ -1114,6 +1216,8 @@ export type EmployeeUncheckedCreateWithoutRecentTimestampsInput = {
   comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutRecentTimestampsInput = {
@@ -1146,6 +1250,8 @@ export type EmployeeUpdateWithoutRecentTimestampsInput = {
   comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutRecentTimestampsInput = {
@@ -1162,6 +1268,8 @@ export type EmployeeUncheckedUpdateWithoutRecentTimestampsInput = {
   comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeCreateWithoutPushSubscriptionsInput = {
@@ -1178,6 +1286,8 @@ export type EmployeeCreateWithoutPushSubscriptionsInput = {
   comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
   resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeUncheckedCreateWithoutPushSubscriptionsInput = {
@@ -1194,6 +1304,8 @@ export type EmployeeUncheckedCreateWithoutPushSubscriptionsInput = {
   comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
 }
 
 export type EmployeeCreateOrConnectWithoutPushSubscriptionsInput = {
@@ -1226,6 +1338,8 @@ export type EmployeeUpdateWithoutPushSubscriptionsInput = {
   comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
   resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutPushSubscriptionsInput = {
@@ -1242,6 +1356,184 @@ export type EmployeeUncheckedUpdateWithoutPushSubscriptionsInput = {
   comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
   resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type EmployeeCreateWithoutNotificationsInput = {
+  id: string
+  createdAt?: Date | string
+  role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
+  content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
+  recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+}
+
+export type EmployeeUncheckedCreateWithoutNotificationsInput = {
+  id: string
+  createdAt?: Date | string
+  role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
+  content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type EmployeeCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutNotificationsInput>
+}
+
+export type EmployeeCreateWithoutActorNotificationsInput = {
+  id: string
+  createdAt?: Date | string
+  role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
+  content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
+  recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeUncheckedCreateWithoutActorNotificationsInput = {
+  id: string
+  createdAt?: Date | string
+  role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
+  content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeCreateOrConnectWithoutActorNotificationsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutActorNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutActorNotificationsInput>
+}
+
+export type EmployeeUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutNotificationsInput, Prisma.EmployeeUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutNotificationsInput, Prisma.EmployeeUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type EmployeeUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type EmployeeUpsertWithoutActorNotificationsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutActorNotificationsInput, Prisma.EmployeeUncheckedUpdateWithoutActorNotificationsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutActorNotificationsInput, Prisma.EmployeeUncheckedCreateWithoutActorNotificationsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutActorNotificationsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutActorNotificationsInput, Prisma.EmployeeUncheckedUpdateWithoutActorNotificationsInput>
+}
+
+export type EmployeeUpdateWithoutActorNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutActorNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 
@@ -1259,6 +1551,8 @@ export type EmployeeCountOutputType = {
   resolvedThreads: number
   pushSubscriptions: number
   recentTimestamps: number
+  notifications: number
+  actorNotifications: number
 }
 
 export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1271,6 +1565,8 @@ export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   resolvedThreads?: boolean | EmployeeCountOutputTypeCountResolvedThreadsArgs
   pushSubscriptions?: boolean | EmployeeCountOutputTypeCountPushSubscriptionsArgs
   recentTimestamps?: boolean | EmployeeCountOutputTypeCountRecentTimestampsArgs
+  notifications?: boolean | EmployeeCountOutputTypeCountNotificationsArgs
+  actorNotifications?: boolean | EmployeeCountOutputTypeCountActorNotificationsArgs
 }
 
 /**
@@ -1346,6 +1642,20 @@ export type EmployeeCountOutputTypeCountRecentTimestampsArgs<ExtArgs extends run
   where?: Prisma.RecentTimestampsWhereInput
 }
 
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountActorNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1362,6 +1672,8 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   resolvedThreads?: boolean | Prisma.Employee$resolvedThreadsArgs<ExtArgs>
   pushSubscriptions?: boolean | Prisma.Employee$pushSubscriptionsArgs<ExtArgs>
   recentTimestamps?: boolean | Prisma.Employee$recentTimestampsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Employee$notificationsArgs<ExtArgs>
+  actorNotifications?: boolean | Prisma.Employee$actorNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -1400,6 +1712,8 @@ export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   resolvedThreads?: boolean | Prisma.Employee$resolvedThreadsArgs<ExtArgs>
   pushSubscriptions?: boolean | Prisma.Employee$pushSubscriptionsArgs<ExtArgs>
   recentTimestamps?: boolean | Prisma.Employee$recentTimestampsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Employee$notificationsArgs<ExtArgs>
+  actorNotifications?: boolean | Prisma.Employee$actorNotificationsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1417,6 +1731,8 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     resolvedThreads: Prisma.$ContentTalkThreadPayload<ExtArgs>[]
     pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[]
     recentTimestamps: Prisma.$RecentTimestampsPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    actorNotifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1827,6 +2143,8 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
   resolvedThreads<T extends Prisma.Employee$resolvedThreadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$resolvedThreadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContentTalkThreadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pushSubscriptions<T extends Prisma.Employee$pushSubscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$pushSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PushSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recentTimestamps<T extends Prisma.Employee$recentTimestampsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$recentTimestampsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecentTimestampsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.Employee$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  actorNotifications<T extends Prisma.Employee$actorNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$actorNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2467,6 +2785,54 @@ export type Employee$recentTimestampsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.RecentTimestampsScalarFieldEnum | Prisma.RecentTimestampsScalarFieldEnum[]
+}
+
+/**
+ * Employee.notifications
+ */
+export type Employee$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * Employee.actorNotifications
+ */
+export type Employee$actorNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

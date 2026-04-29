@@ -86,7 +86,11 @@ function RootComponent() {
 								/>
 							</AppShell.Navbar>
 						)}
-						<AppShell.Main className={clsx(!isPreview && "mx-auto")}>
+						<AppShell.Main
+							className={clsx(
+								(location.pathname === "/" || !auth0.isAuthenticated) && "max-w-240 mx-auto"
+							)}
+						>
 							<HeadContent />
 							<Outlet />
 						</AppShell.Main>

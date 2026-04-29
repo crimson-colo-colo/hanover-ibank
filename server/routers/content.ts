@@ -7,12 +7,24 @@ import * as jose from "jose"
 import z from "zod"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
-import type { Tag } from "../generated/prisma/client.ts"
-import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
+import type { Employee, Tag } from "../generated/prisma/client.ts"
+import {
+	ContentStatus,
+	ContentType,
+	EmployeeRole,
+	NotificationType,
+	TagCategory,
+} from "../generated/prisma/enums.ts"
 import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
 import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { search } from "../lib/openrouter.ts"
+import {
+	notifyContentCheckedIn,
+	notifyContentCheckedOut,
+	notifyContentEdited,
+	notifyContentTransferred,
+} from "../lib/notify.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
@@ -181,6 +193,21 @@ export const contentRouter = router({
 					},
 				})
 
+				if (updated.ownerId !== opts.ctx.auth.sub) {
+					const actor = (await db.employee.findUnique({
+						where: { id: opts.ctx.auth.sub },
+					})) as Employee
+					const notification = await db.notification.create({
+						data: {
+							employeeId: updated.ownerId,
+							contentId: updated.id,
+							type: NotificationType.ContentEdited,
+							actorId: opts.ctx.auth.sub,
+						},
+					})
+					await notifyContentEdited(notification, updated, actor)
+				}
+
 				return updated
 			}
 		}),
@@ -203,7 +230,7 @@ export const contentRouter = router({
 				opts.input.lastModifiedDate !==
 				beforeLastModifiedDate?.lastModifiedDate.toISOString().split("T")[0]
 			) {
-				const update = await db.content.update({
+				const updated = await db.content.update({
 					where: { id: opts.input.id },
 					data: {
 						lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
@@ -222,8 +249,23 @@ export const contentRouter = router({
 					},
 				})
 
-				await embedFile(update)
-				return update
+				if (updated.ownerId !== opts.ctx.auth.sub) {
+					const actor = (await db.employee.findUnique({
+						where: { id: opts.ctx.auth.sub },
+					})) as Employee
+					const notification = await db.notification.create({
+						data: {
+							employeeId: updated.ownerId,
+							contentId: updated.id,
+							type: NotificationType.ContentEdited,
+							actorId: opts.ctx.auth.sub,
+						},
+					})
+					await notifyContentEdited(notification, updated, actor)
+				}
+
+				await embedFile(updated)
+				return updated
 			}
 		}),
 
@@ -265,7 +307,23 @@ export const contentRouter = router({
 					},
 				})
 
+				if (updated.ownerId !== opts.ctx.auth.sub) {
+					const actor = (await db.employee.findUnique({
+						where: { id: opts.ctx.auth.sub },
+					})) as Employee
+					const notification = await db.notification.create({
+						data: {
+							employeeId: updated.ownerId,
+							contentId: updated.id,
+							type: NotificationType.ContentEdited,
+							actorId: opts.ctx.auth.sub,
+						},
+					})
+					await notifyContentEdited(notification, updated, actor)
+				}
+
 				await embedFile(updated)
+
 				return updated
 			}
 		}),
@@ -274,8 +332,8 @@ export const contentRouter = router({
 		.mutation(async (opts) => {
 			const beforeOwnerId = await db.content.findUnique({
 				where: { id: opts.input.id },
-				select: { ownerId: true },
 			})
+
 			if (opts.input.ownerId !== beforeOwnerId?.ownerId) {
 				const updated = await db.content.update({
 					where: { id: opts.input.id },
@@ -295,7 +353,21 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+				const actor = (await db.employee.findUnique({
+					where: { id: opts.ctx.auth.sub },
+				})) as Employee
+				const notification = await db.notification.create({
+					data: {
+						employeeId: opts.input.ownerId,
+						type: NotificationType.ContentTransferred,
+						contentId: opts.input.id,
+						actorId: opts.ctx.auth.sub,
+					},
+				})
+				await notifyContentTransferred(notification, updated, actor)
+
 				await embedFile(updated)
+
 				return updated
 			}
 		}),
@@ -325,7 +397,24 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				if (updated.ownerId !== opts.ctx.auth.sub) {
+					const actor = (await db.employee.findUnique({
+						where: { id: opts.ctx.auth.sub },
+					})) as Employee
+					const notification = await db.notification.create({
+						data: {
+							employeeId: updated.ownerId,
+							contentId: updated.id,
+							type: NotificationType.ContentEdited,
+							actorId: opts.ctx.auth.sub,
+						},
+					})
+					await notifyContentEdited(notification, updated, actor)
+				}
+
 				await embedFile(updated)
+
 				return updated
 			}
 		}),
@@ -409,8 +498,25 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				if (updated.ownerId !== opts.ctx.auth.sub) {
+					const actor = (await db.employee.findUnique({
+						where: { id: opts.ctx.auth.sub },
+					})) as Employee
+					const notification = await db.notification.create({
+						data: {
+							employeeId: updated.ownerId,
+							contentId: updated.id,
+							type: NotificationType.ContentEdited,
+							actorId: opts.ctx.auth.sub,
+						},
+					})
+					await notifyContentEdited(notification, updated, actor)
+				}
+
 				await embedFile(updated)
-				return updated
+
+                return updated
 			}
 		}),
 
@@ -577,7 +683,7 @@ export const contentRouter = router({
 					filetype: fileType,
 				},
 			})
-			await db.content.update({
+			const updated = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
 					lastModifiedDate: new Date(),
@@ -599,6 +705,20 @@ export const contentRouter = router({
 					lastModifiedDate: true,
 				},
 			})
+			if (updated.ownerId !== opts.ctx.auth.sub) {
+				const actor = (await db.employee.findUnique({
+					where: { id: opts.ctx.auth.sub },
+				})) as Employee
+				const notification = await db.notification.create({
+					data: {
+						employeeId: updated.ownerId,
+						contentId: updated.id,
+						type: NotificationType.ContentEdited,
+						actorId: opts.ctx.auth.sub,
+					},
+				})
+				await notifyContentEdited(notification, updated, actor)
+			}
 			await embedFile(content)
 		}),
 
@@ -663,7 +783,7 @@ export const contentRouter = router({
 				})
 			}
 
-			const embedContent = await db.content.update({
+			const updated = await db.content.update({
 				where: { id: opts.input.id },
 				data: {
 					url: opts.input.url,
@@ -671,7 +791,21 @@ export const contentRouter = router({
 				},
 				include: { tags: true },
 			})
-			await embedFile(embedContent)
+			if (updated.ownerId !== opts.ctx.auth.sub) {
+				const actor = (await db.employee.findUnique({
+					where: { id: opts.ctx.auth.sub },
+				})) as Employee
+				const notification = await db.notification.create({
+					data: {
+						employeeId: updated.ownerId,
+						contentId: updated.id,
+						type: NotificationType.ContentEdited,
+						actorId: opts.ctx.auth.sub,
+					},
+				})
+				await notifyContentEdited(notification, updated, actor)
+			}
+			await embedFile(updated)
 		}),
 
 	delete: authProcedure.input(z.object({ ids: z.array(z.string()) })).mutation(async (opts) => {
@@ -811,8 +945,22 @@ export const contentRouter = router({
 			where: { id: opts.input.id },
 			data: { checkedOutById: user.id },
 		})
+
+		if (updated.ownerId !== opts.ctx.auth.sub) {
+			const notification = await db.notification.create({
+				data: {
+					type: NotificationType.ContentCheckedOut,
+					actorId: opts.ctx.auth.sub,
+					employeeId: content.ownerId,
+					contentId: content.id,
+				},
+			})
+			await notifyContentCheckedOut(notification, content, user)
+		}
+
 		return updated
 	}),
+
 	checkIn: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const user = await db.employee.findUnique({
 			where: {
@@ -854,6 +1002,19 @@ export const contentRouter = router({
 			where: { id: opts.input.id },
 			data: { checkedOutById: null },
 		})
+
+		if (updated.ownerId !== opts.ctx.auth.sub) {
+			const notification = await db.notification.create({
+				data: {
+					type: NotificationType.ContentCheckedIn,
+					actorId: opts.ctx.auth.sub,
+					employeeId: content.ownerId,
+					contentId: content.id,
+				},
+			})
+			await notifyContentCheckedIn(notification, content, user)
+		}
+
 		return updated
 	}),
 
@@ -1020,7 +1181,12 @@ export const contentRouter = router({
 				include: getContentInclude(opts.ctx.auth.sub),
 			})
 
-			return await fetchAndTransformToContentListItems(contentDetails, opts.ctx.auth.sub)
+			const contentMap = new Map(contentDetails.map((item) => [item.id, item]))
+			const sortedContent = sums
+				.map((sum) => contentMap.get(sum.contentId))
+				.filter((item) => item !== undefined)
+
+			return await fetchAndTransformToContentListItems(sortedContent, opts.ctx.auth.sub)
 		}),
 
 	getExpiringContent: authProcedure.query(async (opts) => {

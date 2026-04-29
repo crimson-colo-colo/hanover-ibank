@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server"
 import z from "zod"
-import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { ThreadStatus } from "../generated/prisma/enums.ts"
+import { auth0Cache } from "../lib/auth0.ts"
 import { authProcedure, router } from "../trpc.ts"
 
 export const discussionRouter = router({
@@ -37,7 +37,7 @@ export const discussionRouter = router({
 				.flatMap((v) => [v.createdBy, v.resolvedBy, ...v.comments.flatMap((v) => v.author)])
 				.filter((v) => v !== null)
 
-			const auth0Users = await auth0Management.users.list()
+			const auth0Users = await auth0Cache.listUsers()
 			const auth0User = new Map(
 				users.flatMap(({ id }) => {
 					const v = auth0Users.data.find((u) => u.user_id === id)

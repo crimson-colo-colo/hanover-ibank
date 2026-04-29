@@ -1,6 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { ActionIcon, Button, Stack, Text, Tooltip } from "@mantine/core"
-import { useHover } from "@mantine/hooks"
+import { ActionIcon, Button, Flex, Paper, Stack, Text, Tooltip } from "@mantine/core"
+import { useHover, useLocalStorage } from "@mantine/hooks"
 import { ContentType } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
@@ -20,8 +20,10 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import clsx from "clsx"
+import { useEffect, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { getPushSubscription, subscribePush } from "@/lib/push.ts"
 import { trpc } from "@/lib/trpc.ts"
 
 export type SideNavigationProps = {
@@ -102,6 +104,26 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 	const { hovered, ref } = useHover()
 	const recentlyViewedContent = useQuery(trpc.content.getRecentlyViewed.queryOptions({ limit: 5 }))
 	const recentlyViewed = useMutation(trpc.content.updateRecentlyViewedTimestamp.mutationOptions())
+	const [pushSubscribed, setPushSubscribed] = useState(false)
+	const [showPushNag, setShowPushNag] = useLocalStorage({
+		key: "showPushNag",
+		defaultValue: true,
+	})
+	const [subscribePending, setSubscribePending] = useState(false)
+
+	async function handleSubscribePush() {
+		setSubscribePending(true)
+		await subscribePush()
+		const subscription = await getPushSubscription()
+		setPushSubscribed(!!subscription)
+		setSubscribePending(false)
+	}
+
+	useEffect(() => {
+		getPushSubscription().then((subscription) => {
+			setPushSubscribed(!!subscription)
+		})
+	}, [])
 
 	const navLinks = routeLinks
 		.filter((link) => !link.admin)
@@ -205,6 +227,30 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 			)}
 
 			<div className="flex-1" />
+
+			{!collapsed && !pushSubscribed && showPushNag && auth0.isAuthenticated && (
+				<Paper withBorder className="mx-3 mb-3 p-3 bg-white">
+					<Text className="text-sm" fw={600}>
+						Stay up to date
+					</Text>
+					<Text className="text-xs">
+						Enable push notifications in this browser to get notified about important changes.
+					</Text>
+					<Flex gap={4} mt="sm" justify="flex-end">
+						<Button variant="subtle" size="xs" color="gray" onClick={() => setShowPushNag(false)}>
+							Dismiss
+						</Button>
+						<Button
+							variant="filled"
+							size="xs"
+							onClick={handleSubscribePush}
+							loading={subscribePending}
+						>
+							Enable
+						</Button>
+					</Flex>
+				</Paper>
+			)}
 
 			{auth0.isAuthenticated && auth0.user && (
 				<Tooltip

@@ -62,7 +62,8 @@ export const ModelName = {
   Embedding: 'Embedding',
   TextExtractionCache: 'TextExtractionCache',
   RecentTimestamps: 'RecentTimestamps',
-  PushSubscription: 'PushSubscription'
+  PushSubscription: 'PushSubscription',
+  Notification: 'Notification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -212,6 +213,18 @@ export const PushSubscriptionScalarFieldEnum = {
 } as const
 
 export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  type: 'type',
+  contentId: 'contentId',
+  actorId: 'actorId',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const SortOrder = {
