@@ -1,4 +1,5 @@
 import { Button, Flex, Paper, Stack, Text, Title } from "@mantine/core"
+import { useElementSize } from "@mantine/hooks"
 import { ContentType } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
 import { IconLoader2 } from "@tabler/icons-react"
@@ -18,8 +19,14 @@ export function RecentlyViewedModule({
 	setSelectedContentFileType: (param: React.SetStateAction<FileType | null>) => void
 	openFilePreviewModal: () => void
 }) {
-	const recentlyViewedContent = useQuery(trpc.content.getRecentlyViewed.queryOptions({ limit: 5 }))
+	const recentlyViewedContent = useQuery(trpc.content.getRecentlyViewed.queryOptions({ limit: 10 }))
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
+	const { ref, width, height } = useElementSize()
+
+	const maxWidth = 487
+	const itemHeight = 70
+	const items = width < maxWidth ? Math.floor(height / itemHeight) : 5
+	const displayedContent = recentlyViewedContent.data?.slice(0, items) ?? []
 
 	return (
 		<Paper p="lg" withBorder>
@@ -31,8 +38,8 @@ export function RecentlyViewedModule({
 				<Title order={3}>Recently Viewed</Title>
 				{recentlyViewedContent.isFetching && <IconLoader2 className="animate-spin" size={24} />}
 			</Link>
-			<Stack h="90%" gap={4} align="stretch">
-				{recentlyViewedContent.data?.map((item) => {
+			<Stack h="90%" gap={4} align="stretch" ref={ref}>
+				{displayedContent.map((item) => {
 					const contentType =
 						item.type === ContentType.Link
 							? FileType.Link

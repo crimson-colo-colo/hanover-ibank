@@ -45,6 +45,7 @@ export function FavoriteContentModule({
 					{favoriteContent.data?.content.slice(0, 5).map((item) => {
 						return (
 							<FavoriteContentCard
+								size="sm"
 								fileName={item.title}
 								key={item.id}
 								contentId={item.id}

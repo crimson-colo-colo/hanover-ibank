@@ -688,6 +688,24 @@ export const contentRouter = router({
 		})
 		return unfavorite
 	}),
+	bulkUnFavorite: authProcedure
+		.input(z.object({ ids: z.array(z.string()) }))
+		.mutation(async (opts) => {
+			await Promise.all([
+				db.favoriteContent.deleteMany({
+					where: {
+						content: {
+							id: {
+								in: opts.input.ids,
+							},
+						},
+						employee: {
+							id: opts.ctx.auth.sub,
+						},
+					},
+				}),
+			])
+		}),
 	listFavorites: authProcedure.query(async (opts): Promise<ContentList> => {
 		const user = await db.employee.findUnique({
 			where: {

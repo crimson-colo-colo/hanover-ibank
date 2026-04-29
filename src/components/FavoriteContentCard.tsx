@@ -25,6 +25,7 @@ export function FavoriteContentCard({
 	fileName,
 	openFilePreview,
 	item,
+	size = "md",
 }: {
 	contentId: string
 	contentUrl: string | null
@@ -32,6 +33,7 @@ export function FavoriteContentCard({
 	fileName: string
 	openFilePreview: (info: ContentListItem, type: FileType) => void
 	item: ContentListItem
+	size?: "sm" | "md"
 }) {
 	const titleRef = useRef<HTMLParagraphElement>(null)
 	const [titleTruncated, setTitleTruncated] = useState(false)
@@ -82,7 +84,7 @@ export function FavoriteContentCard({
 			<div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
 				<FileTypeIcon
 					fileType={contentType}
-					size={48}
+					size={size === "sm" ? 32 : 48}
 					strokeWidth={1.5}
 					className="text-gray-400 dark:text-gray-500"
 				/>
@@ -116,12 +118,12 @@ export function FavoriteContentCard({
 	} else if (contentType === FileType.Plaintext) {
 		thumbnail = plaintextThumbnail?.text ? (
 			<div className="absolute inset-0 overflow-hidden p-2.5">
-				<p
-					className="text-9px leading-relaxed text-gray-500 dark:text-gray-400
-                  line-clamp-22 m-0"
+				<pre
+					className="text-[9px] text-gray-500 dark:text-gray-400
+                  line-clamp-22 m-0 w-max"
 				>
 					{plaintextThumbnail?.text}
-				</p>
+				</pre>
 			</div>
 		) : (
 			<div className="w-full h-full flex items-center justify-center p-4 bg-white rounded-md dark:bg-[#242424]">
@@ -142,7 +144,7 @@ export function FavoriteContentCard({
 		<Card
 			style={{ width: "100%" }}
 			rel="noopener noreferrer"
-			p="28"
+			p={size === "sm" ? 24 : 28}
 			className="transition duration-75 cursor-pointer bg-gray-light hover:bg-gray-light-hover hover:shadow-sm"
 			onClick={() => {
 				openFilePreview(item, contentType)
@@ -153,7 +155,11 @@ export function FavoriteContentCard({
 					<Flex align="center" gap="xs" className="truncate">
 						<FileTypeIcon fileType={contentType} size={24} strokeWidth={1.5} className="shrink-0" />
 						<Tooltip label={fileName} withArrow disabled={!titleTruncated}>
-							<Text className="font-medium truncate" ref={titleRef}>
+							<Text
+								className="font-medium truncate"
+								ref={titleRef}
+								size={size === "sm" ? "sm" : "md"}
+							>
 								{fileName}
 							</Text>
 						</Tooltip>
