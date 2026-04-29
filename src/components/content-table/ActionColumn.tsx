@@ -1,5 +1,5 @@
 import { ActionIcon, Flex, Menu, Tooltip } from "@mantine/core"
-import { ContentType } from "@prisma/browser.ts"
+import { ContentType, EmployeeRole } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import type { ContentListItem, Profile } from "@shared/types.ts"
 import {
@@ -81,7 +81,7 @@ export function ActionColumn({
 					<IconDownload />
 				</ActionIcon>
 			)}
-			<Menu shadow="sm" width={140} closeOnItemClick={true} position="bottom-end">
+			<Menu shadow="sm" closeOnItemClick={true} position="bottom-end">
 				<Menu.Target>
 					<ActionIcon variant="subtle" size="sm">
 						<IconDotsVertical />
@@ -119,7 +119,7 @@ export function ActionColumn({
 					{info.row.original.checkedOutBy === null ? (
 						<Tooltip
 							label="You must be in the intended audience for this content to check it out"
-							disabled={!cannotCheckOut}
+							disabled={profile?.role === EmployeeRole.Admin || !cannotCheckOut}
 							withArrow
 							arrowSize={8}
 							position="bottom"
@@ -131,7 +131,7 @@ export function ActionColumn({
 									selectContentForCheckout(info.row.original)
 									openCheckOutModal()
 								}}
-								disabled={cannotCheckOut}
+								disabled={!(profile?.role === EmployeeRole.Admin) && cannotCheckOut}
 							>
 								Check Out
 							</Menu.Item>
@@ -146,6 +146,17 @@ export function ActionColumn({
 							}}
 						>
 							Check In
+						</Menu.Item>
+					) : profile?.role === EmployeeRole.Admin ? (
+						<Menu.Item
+							leftSection={<IconDoorEnter size={22} />}
+							variant="subtle"
+							onClick={() => {
+								selectContentForCheckout(info.row.original)
+								openCheckInModal()
+							}}
+						>
+							Force Check In
 						</Menu.Item>
 					) : (
 						<Tooltip
