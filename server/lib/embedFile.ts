@@ -1,4 +1,5 @@
 import { FileType } from "@shared/filetype.ts"
+import ogs from "open-graph-scraper"
 import { db } from "../database.ts"
 import { convertToPDF } from "../routers/preview.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -62,7 +63,15 @@ export async function embedFile(
 		}
 		if (fileType === "image") image = buffer
 	} else if (content.type === "Link") {
-		if (content.url !== null) text = content.url
+		if (content.url !== null) {
+			const parts = [content.url]
+			const { error, result } = await ogs({ url: content.url })
+			if (!error) {
+				if (result.ogTitle) parts.push(result.ogTitle)
+				if (result.ogDescription) parts.push(result.ogDescription)
+			}
+			text = parts.join("\n")
+		}
 	}
 	if (text !== undefined && text.length > 50000) {
 		return `${text.match(/^.{25000}/)}...${text.match(/.{25000}$/)}`

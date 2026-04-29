@@ -69,15 +69,14 @@ async function confirmOverwrite() {
 		process.stdout.write(
 			`⚠️ \x1b[33mDatabase already has data (employee: ${employees}, content: ${content}. Continuing will erase existing data and cannot be undone. Really continue? [y/N] \x1b[0m`
 		)
-		const answer = "y"
-		// await new Promise<string>((resolve) => {
-		// 	process.stdin.setEncoding("utf-8")
-		// 	process.stdin.once("data", (data) =>
-		// 		resolve(
-		// 			(typeof data === "string" ? data : new TextDecoder().decode(data)).trim().toLowerCase()
-		// 		)
-		// 	)
-		// })
+		const answer = await new Promise<string>((resolve) => {
+			process.stdin.setEncoding("utf-8")
+			process.stdin.once("data", (data) =>
+				resolve(
+					(typeof data === "string" ? data : new TextDecoder().decode(data)).trim().toLowerCase()
+				)
+			)
+		})
 		if (answer !== "y" && answer !== "yes") {
 			console.log("Aborting.")
 			process.exit(0)

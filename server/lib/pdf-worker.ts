@@ -1,3 +1,4 @@
+/// <reference lib="webworker" />
 import scribe from "scribe.js-ocr"
 
 type RecognitionSettings = {
@@ -11,10 +12,8 @@ type WorkerMessage = {
 }
 
 await scribe.init({ ocr: true, pdf: true, font: true })
-// @ts-expect-error
 self.postMessage({ ready: true })
 
-// @ts-expect-error
 self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 	try {
 		const file = new File([event.data.buffer], "file.pdf", { type: "application/pdf" })
@@ -22,10 +21,8 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 			skipRecPDFTextNative: event.data.settings.skipRecPDFTextNative,
 			skipRecPDFTextOCR: event.data.settings.skipRecPDFTextOCR,
 		})
-		// @ts-expect-error
 		self.postMessage({ ok: true, text: result.toString() })
 	} catch (err) {
-		// @ts-expect-error
 		self.postMessage({ ok: false, error: String(err).toString() })
 	}
 }
