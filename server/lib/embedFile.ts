@@ -3,12 +3,10 @@ import { db } from "../database.ts"
 import { convertToPDF } from "../routers/preview.ts"
 import { bucketName, s3 } from "../s3.ts"
 import type { Embedding } from "./embeddings.ts"
-import { embedDocument, embedImage, openrouter } from "./openrouter.ts"
+import { embedDocument, embedImage } from "./openrouter.ts"
 import { pdfText } from "./pdf-extractor.ts"
 
 type NotNull<Type> = Exclude<Type, undefined | null>
-
-const openrouterInternal = openrouter
 
 export async function embedFile(
 	content: Pick<
