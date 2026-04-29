@@ -55,6 +55,22 @@ export default defineConfig({
 		allowedHosts: true,
 		host: "0.0.0.0",
 	},
+	build: {
+		rollupOptions: {
+			input: {
+				index: "index.html",
+				sw: "sw.ts",
+			},
+			output: {
+				entryFileNames: (chunk) => {
+					if (chunk.name === "sw") {
+						return "sw.js"
+					}
+					return "assets/[name]-[hash].js"
+				},
+			},
+		},
+	},
 })
 
 async function openFileInEditor(path: string, line: string | undefined, col: string | undefined) {

@@ -9,6 +9,24 @@
 * 🟢 You can import this file directly.
 */
 
+export const ThreadStatus = {
+  Open: 'Open',
+  Resolved: 'Resolved',
+  Archived: 'Archived'
+} as const
+
+export type ThreadStatus = (typeof ThreadStatus)[keyof typeof ThreadStatus]
+
+
+export const EmbeddingType = {
+  Query: 'Query',
+  Content: 'Content',
+  Unknown: 'Unknown'
+} as const
+
+export type EmbeddingType = (typeof EmbeddingType)[keyof typeof EmbeddingType]
+
+
 export const EmployeeRole = {
   BusinessAnalyst: 'BusinessAnalyst',
   Underwriter: 'Underwriter',
@@ -19,15 +37,6 @@ export const EmployeeRole = {
 } as const
 
 export type EmployeeRole = (typeof EmployeeRole)[keyof typeof EmployeeRole]
-
-
-export const ThreadStatus = {
-  Open: 'Open',
-  Resolved: 'Resolved',
-  Archived: 'Archived'
-} as const
-
-export type ThreadStatus = (typeof ThreadStatus)[keyof typeof ThreadStatus]
 
 
 export const TagCategory = {

@@ -42,11 +42,7 @@ export function AccountStatisticsModule() {
 				</SimpleGrid>
 			</Skeleton>
 
-			{!stats.data ? (
-				<div className="flex-1 flex justify-center items-center">
-					<IconLoader2 className="animate-spin" size={48} />
-				</div>
-			) : (
+			{stats.data && (
 				<Treemap
 					data={Object.entries(stats.data.fileStorage ?? {}).map(([group, files]) => ({
 						name: group,

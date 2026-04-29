@@ -1,5 +1,4 @@
 import z from "zod"
-import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { TestEmail } from "../emails/TestEmail.tsx"
 import { auth0Cache } from "../lib/auth0.ts"
@@ -61,9 +60,9 @@ export const cliRouter = router({
 			})
 		)
 		.mutation(async (opts) => {
-			const userName = await auth0Management.users
-				.get(opts.input.userId)
-				.then((user) => user.name || user.username!)
+			const userName = await auth0Cache
+				.getUser(opts.input.userId)
+				.then((user) => user?.name ?? user?.nickname ?? user?.username ?? "Unknown")
 
 			return await sendEmailNotification(opts.input.userId, {
 				subject: "Test Email",

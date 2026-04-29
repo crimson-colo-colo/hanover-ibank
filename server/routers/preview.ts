@@ -8,6 +8,26 @@ import { env } from "../env.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
+export async function convertToPDF(key: string, filename: string) {
+	const formData = new FormData()
+	formData.append(
+		"files",
+		new Blob(
+			[
+				(await s3
+					.getObject({ Bucket: bucketName, Key: key })
+					.then((res) => res.Body!.transformToByteArray())) as Uint8Array<ArrayBuffer>,
+			],
+			{ type: "application/octet-stream" }
+		),
+		filename
+	)
+	return await fetch(`${env.GOTENBERG_URL}/forms/libreoffice/convert`, {
+		method: "POST",
+		body: formData,
+	})
+}
+
 export const previewRouter = router({
 	getContentUrl: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
 		const content = await db.content.findUnique({
@@ -28,26 +48,22 @@ export const previewRouter = router({
 			})
 		}
 
-		await db.recentTimestamps.update({
+		await db.recentTimestamps.upsert({
 			where: {
 				employeeId_contentId: {
 					contentId: opts.input.id,
 					employeeId: opts.ctx.auth.sub,
 				},
 			},
-			data: {
+			create: {
 				recentlyViewed: new Date(),
+				recentlyEdited: new Date(),
+				viewCount: 1,
+				contentId: opts.input.id,
+				employeeId: opts.ctx.auth.sub,
 			},
-		})
-
-		await db.recentTimestamps.update({
-			where: {
-				employeeId_contentId: {
-					contentId: opts.input.id,
-					employeeId: opts.ctx.auth.sub,
-				},
-			},
-			data: {
+			update: {
+				recentlyViewed: new Date(),
 				viewCount: {
 					increment: 1,
 				},
@@ -90,25 +106,9 @@ export const previewRouter = router({
 				// otherwise, convert the file again
 			}
 
-			const formData = new FormData()
-			formData.append(
-				"files",
-				new Blob(
-					[
-						(await s3
-							.getObject({ Bucket: bucketName, Key: content.objectId! })
-							.then((res) => res.Body!.transformToByteArray())) as Uint8Array<ArrayBuffer>,
-					],
-					{ type: "application/octet-stream" }
-				),
-				content.title
-			)
 			let res: Response
 			try {
-				res = await fetch(`${env.GOTENBERG_URL}/forms/libreoffice/convert`, {
-					method: "POST",
-					body: formData,
-				})
+				res = await convertToPDF(content.objectId!, content.title)
 			} catch (error) {
 				console.log(error)
 				throw new TRPCError({
@@ -199,23 +199,11 @@ export const previewRouter = router({
 			},
 			data: {
 				recentlyViewed: new Date(),
-			},
-		})
-
-		await db.recentTimestamps.update({
-			where: {
-				employeeId_contentId: {
-					contentId: opts.input.id,
-					employeeId: opts.ctx.auth.sub,
-				},
-			},
-			data: {
 				viewCount: {
 					increment: 1,
 				},
 			},
 		})
-
 		const text = await data.Body!.transformToString()
 
 		return { text }

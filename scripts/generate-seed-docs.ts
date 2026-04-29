@@ -14,51 +14,12 @@ import PDFDocument from "pdfkit"
 import PptxGenJS from "pptxgenjs"
 
 const OUTPUT_DIR = path.join(process.cwd(), "prisma", "seed-data", "generated")
-const TOPICS = [
-	"Claims Processing",
-	"Underwriting Guidelines",
-	"HR Policies",
-	"Compliance and Regulatory Affairs",
-	"Customer Service Procedures",
-	"IT Support and Infrastructure",
-	"Risk Management",
-	"Marketing and Sales Strategy",
-	"Financial Reporting",
-	"Legal and General Counsel",
-	"Product Development Roadmap",
-	"Supply Chain Management",
-	"Corporate Social Responsibility",
-	"Data Privacy and Security",
-	"Employee Training and Development",
-	"Crisis Management Plan",
-	"Mergers and Acquisitions Strategy",
-	"Diversity and Inclusion Initiatives",
-	"Sustainability and Environmental Impact",
-	"Investor Relations and Communications",
-	"Competitive Analysis and Market Research",
-	"Brand Management and Positioning",
-	"Customer Retention and Loyalty Programs",
-	"Innovation and Technology Adoption",
-	"Corporate Governance and Ethics",
-	"Financial Planning and Analysis",
-	"Talent Acquisition and Retention",
-	"Global Expansion Strategy",
-	"Corporate Culture and Employee Engagement",
-	"Shareholder Value Creation",
-	"Operational Efficiency and Cost Reduction",
-	"Productivity and Performance Metrics",
-	"Stakeholder Engagement and Communication",
-	"Corporate Philanthropy",
-	"Community Engagement",
-	"Change Management",
-	"Leadership Development",
-	"Succession Planning",
-	"Workplace Safety and Health",
-	"Employee Benefits and Compensation",
-	"Remote Work Policies",
-]
+const TOPICS = fs
+	.readFileSync(path.join(process.cwd(), "prisma", "seed-data", "topics.txt"), "utf-8")
+	.split("\n")
+	.filter(Boolean)
 
-const COUNT_PER_DOCUMENT_TYPE = 80
+const COUNT_PER_DOCUMENT_TYPE = 10
 const COUNT_PER_MEDIA_TYPE = 5
 
 async function ensureDir() {

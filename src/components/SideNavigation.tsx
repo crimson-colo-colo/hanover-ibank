@@ -248,7 +248,6 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 										component={Link}
 										to={`${item.type === ContentType.Link ? item.url : `/preview/${item.id}`}`}
 										target={item.type === ContentType.Link ? "_blank" : "_self"}
-										rel="opener"
 										variant="subtle"
 										radius={0}
 										leftSection={<FileTypeIcon fileType={contentType} />}

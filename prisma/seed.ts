@@ -14,6 +14,7 @@ import {
 } from "../server/generated/prisma/client.ts"
 import { auth0Cache } from "../server/lib/auth0.ts"
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
+import { embedFile } from "../server/lib/embedFile.ts"
 import { bucketName, s3 } from "../server/s3.ts"
 import { fileContentData, objectIdToFileType, uploadFilesToS3 } from "./seed-data/files.ts"
 import { linkContentData } from "./seed-data/links.ts"
@@ -58,6 +59,8 @@ async function main() {
 		createRecentTimestamps(),
 		createNotifications(),
 	])
+
+	await embedAllContent()
 }
 
 async function confirmOverwrite() {
@@ -121,8 +124,8 @@ async function createUsersAndAvatars() {
 						? new Date(auth0User.created_at.toString())
 						: Temporal.Now.instant()
 								.subtract({
-									hours: 24 + Math.random() * 24 * 365,
-									minutes: Math.random() * 60,
+									hours: Math.round(24 + Math.random() * 24 * 365),
+									minutes: Math.round(Math.random() * 60),
 								})
 								.toString(),
 				},
@@ -132,22 +135,25 @@ async function createUsersAndAvatars() {
 	)
 
 	await Promise.all(
-		employeeData.map(async ({ id }) => {
-			const user = users.data.find((u) => u.user_id === id)!
-			const isCustomAvatar = Math.random() < 0.8
-			const avatar = isCustomAvatar
-				? await downloadAvatar()
-				: generateDefaultAvatar(user.name ?? user.email!)
-			console.log(`Uploading avatar for user ${user.name ?? "(unknown)"} to S3...`)
-			await s3.putObject({
-				Bucket: bucketName,
-				Key: `avatar/${id}.png`,
-				Body: avatar,
-				Metadata: {
-					source: isCustomAvatar ? "user" : "default",
-				},
+		employeeData
+			.map(async ({ id }) => {
+				const user = users.data.find((u) => u.user_id === id)
+				if (user === undefined) return null
+				const isCustomAvatar = Math.random() < 0.8
+				const avatar = isCustomAvatar
+					? await downloadAvatar()
+					: generateDefaultAvatar(user.name ?? user.email!)
+				console.log(`Uploading avatar for user ${user.name ?? "(unknown)"} to S3...`)
+				await s3.putObject({
+					Bucket: bucketName,
+					Key: `avatar/${id}.png`,
+					Body: avatar,
+					Metadata: {
+						source: isCustomAvatar ? "user" : "default",
+					},
+				})
 			})
-		})
+			.filter((value) => value !== null)
 	)
 
 	console.log(`Created ${employeeData.length} employee rows`)
@@ -454,6 +460,68 @@ async function createRecentTimestamps() {
 	console.log(`Created recent timestamps for ${data.length} employee-content pairs`)
 }
 
+async function embedAllContent() {
+	// restore saved embeddings and text extractions from embeddings.json, if present
+	try {
+		const { readFile } = await import("node:fs/promises")
+		const path = await import("node:path")
+		const embeddingsPath = path.join(process.cwd(), "embeddings.json")
+		const data = JSON.parse(await readFile(embeddingsPath, "utf-8"))
+
+		if (data.textExtractionCache) {
+			console.log(`Restoring ${data.textExtractionCache.length} text extraction cache entries...`)
+			await prisma.textExtractionCache.createMany({
+				data: data.textExtractionCache.map((entry: any) => ({
+					hash: Buffer.from(entry.hash, "hex"),
+					skipRecPDFTextNative: entry.skipRecPDFTextNative,
+					skipRecPDFTextOCR: entry.skipRecPDFTextOCR,
+					text: entry.text,
+				})),
+				skipDuplicates: true,
+			})
+		}
+
+		if (data.embeddings) {
+			console.log(`Restoring ${data.embeddings.length} embeddings...`)
+			// Use a map to de-duplicate embeddings by hash since the JSON might have multiple entries for the same embedding linked to different contentIds
+			const uniqueEmbeddings = new Map<
+				string,
+				{ hash: string; embedding: number[]; type: string[] }
+			>()
+			for (const entry of data.embeddings) {
+				const existing = uniqueEmbeddings.get(entry.hash)
+				if (existing) {
+					existing.type = [...new Set([...existing.type, ...entry.type])]
+				} else {
+					uniqueEmbeddings.set(entry.hash, {
+						hash: entry.hash,
+						embedding: entry.embedding,
+						type: entry.type,
+					})
+				}
+			}
+
+			for (const entry of uniqueEmbeddings.values()) {
+				const hash = Buffer.from(entry.hash, "hex")
+				const vector = `[${entry.embedding.join(",")}]`
+				// We use executeRaw because prisma doesn't support the vector type natively in its typical models
+				await prisma.$executeRaw`
+                    INSERT INTO "Embedding" (hash, embedding, type)
+                    VALUES (${hash}, ${vector}::vector, ${entry.type}::"EmbeddingType"[])
+                    ON CONFLICT (hash) DO UPDATE SET embedding = EXCLUDED.embedding, type = EXCLUDED.type
+                `
+			}
+		}
+	} catch (e) {
+		console.log("No embeddings.json found or error reading it, skipping restoration.")
+	}
+
+	console.log("beginning embedding")
+	const allContent = await prisma.content.findMany({ include: { tags: true } })
+	await Promise.all(allContent.map(embedFile))
+	console.log("embedding complete")
+}
+
 // Create 5 notifications for each employee, with random types and associated with random content items where applicable
 async function createNotifications() {
 	const data: Prisma.NotificationCreateManyInput[] = []
@@ -498,12 +566,13 @@ function generateNotification(
 	type: NotificationType,
 	ownedContent: { id: string }[],
 	relevantContent: { id: string }[]
-): Omit<Prisma.NotificationCreateManyInput, "employeeId" | "type" | "createdAt"> {
+): Omit<Prisma.NotificationCreateManyInput, "employeeId" | "type" | "createdAt"> | null {
 	switch (type) {
 		case NotificationType.ContentTransferred:
 		case NotificationType.ContentEdited:
 		case NotificationType.ContentCheckedOut:
 		case NotificationType.ContentCheckedIn: {
+			if (!ownedContent.length) return null
 			const content = faker.helpers.arrayElement(ownedContent)!
 			const actor = faker.helpers.arrayElement(employeeData.filter((e) => e.id !== employeeId))!
 			return {
@@ -512,6 +581,7 @@ function generateNotification(
 			}
 		}
 		case NotificationType.ExpiringOneDay: {
+			if (!ownedContent.length) return null
 			const content = faker.helpers.arrayElement(ownedContent)!
 			return {
 				contentId: content.id,
@@ -519,6 +589,7 @@ function generateNotification(
 		}
 
 		case NotificationType.ContentAdded: {
+			if (!relevantContent.length) return null
 			const content = faker.helpers.arrayElement(relevantContent)!
 			return {
 				contentId: content.id,

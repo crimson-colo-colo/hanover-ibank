@@ -4,6 +4,7 @@ import { contentRouter } from "./routers/content.ts"
 import { formsRouter } from "./routers/forms.ts"
 import { opengraphRouter } from "./routers/linkPreview.ts"
 import { previewRouter } from "./routers/preview.ts"
+import { searchRouter } from "./routers/search.ts"
 import { userRouter } from "./routers/user.ts"
 import { userActivityRouter } from "./routers/userActivity.ts"
 import { router } from "./trpc.ts"
@@ -18,4 +19,5 @@ export const appRouter = router({
 	preview: previewRouter,
 	opengraph: opengraphRouter,
 	userActivity: userActivityRouter,
+	search: searchRouter,
 })

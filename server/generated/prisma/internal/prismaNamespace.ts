@@ -392,6 +392,8 @@ export const ModelName = {
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
   UserActivity: 'UserActivity',
+  Embedding: 'Embedding',
+  TextExtractionCache: 'TextExtractionCache',
   RecentTimestamps: 'RecentTimestamps',
   PushSubscription: 'PushSubscription',
   Notification: 'Notification'
@@ -410,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "employee" | "content" | "contentTalkThread" | "talkThreadComment" | "tag" | "contentTag" | "favoriteContent" | "userActivity" | "recentTimestamps" | "pushSubscription" | "notification"
+    modelProps: "employee" | "content" | "contentTalkThread" | "talkThreadComment" | "tag" | "contentTag" | "favoriteContent" | "userActivity" | "embedding" | "textExtractionCache" | "recentTimestamps" | "pushSubscription" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1006,6 +1008,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Embedding: {
+      payload: Prisma.$EmbeddingPayload<ExtArgs>
+      fields: Prisma.EmbeddingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmbeddingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmbeddingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        findFirst: {
+          args: Prisma.EmbeddingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmbeddingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        findMany: {
+          args: Prisma.EmbeddingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>[]
+        }
+        delete: {
+          args: Prisma.EmbeddingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        update: {
+          args: Prisma.EmbeddingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmbeddingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmbeddingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmbeddingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>[]
+        }
+        aggregate: {
+          args: Prisma.EmbeddingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmbedding>
+        }
+        groupBy: {
+          args: Prisma.EmbeddingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmbeddingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmbeddingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmbeddingCountAggregateOutputType> | number
+        }
+      }
+    }
+    TextExtractionCache: {
+      payload: Prisma.$TextExtractionCachePayload<ExtArgs>
+      fields: Prisma.TextExtractionCacheFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TextExtractionCacheFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TextExtractionCacheFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        findFirst: {
+          args: Prisma.TextExtractionCacheFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TextExtractionCacheFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        findMany: {
+          args: Prisma.TextExtractionCacheFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>[]
+        }
+        create: {
+          args: Prisma.TextExtractionCacheCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        createMany: {
+          args: Prisma.TextExtractionCacheCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TextExtractionCacheCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>[]
+        }
+        delete: {
+          args: Prisma.TextExtractionCacheDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        update: {
+          args: Prisma.TextExtractionCacheUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        deleteMany: {
+          args: Prisma.TextExtractionCacheDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TextExtractionCacheUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TextExtractionCacheUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>[]
+        }
+        upsert: {
+          args: Prisma.TextExtractionCacheUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TextExtractionCachePayload>
+        }
+        aggregate: {
+          args: Prisma.TextExtractionCacheAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTextExtractionCache>
+        }
+        groupBy: {
+          args: Prisma.TextExtractionCacheGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TextExtractionCacheGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TextExtractionCacheCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TextExtractionCacheCountAggregateOutputType> | number
+        }
+      }
+    }
     RecentTimestamps: {
       payload: Prisma.$RecentTimestampsPayload<ExtArgs>
       fields: Prisma.RecentTimestampsFieldRefs
@@ -1361,6 +1495,24 @@ export const UserActivityScalarFieldEnum = {
 export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[keyof typeof UserActivityScalarFieldEnum]
 
 
+export const EmbeddingScalarFieldEnum = {
+  hash: 'hash',
+  type: 'type'
+} as const
+
+export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
+
+
+export const TextExtractionCacheScalarFieldEnum = {
+  hash: 'hash',
+  skipRecPDFTextNative: 'skipRecPDFTextNative',
+  skipRecPDFTextOCR: 'skipRecPDFTextOCR',
+  text: 'text'
+} as const
+
+export type TextExtractionCacheScalarFieldEnum = (typeof TextExtractionCacheScalarFieldEnum)[keyof typeof TextExtractionCacheScalarFieldEnum]
+
+
 export const RecentTimestampsScalarFieldEnum = {
   recentlyEdited: 'recentlyEdited',
   recentlyViewed: 'recentlyViewed',
@@ -1544,6 +1696,34 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Bytes'
+ */
+export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
+    
+
+
+/**
+ * Reference to a field of type 'Bytes[]'
+ */
+export type ListBytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EmbeddingType[]'
+ */
+export type ListEnumEmbeddingTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmbeddingType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EmbeddingType'
+ */
+export type EnumEmbeddingTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmbeddingType'>
+    
+
+
+/**
  * Reference to a field of type 'NotificationType'
  */
 export type EnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationType'>
@@ -1688,6 +1868,8 @@ export type GlobalOmitConfig = {
   contentTag?: Prisma.ContentTagOmit
   favoriteContent?: Prisma.FavoriteContentOmit
   userActivity?: Prisma.UserActivityOmit
+  embedding?: Prisma.EmbeddingOmit
+  textExtractionCache?: Prisma.TextExtractionCacheOmit
   recentTimestamps?: Prisma.RecentTimestampsOmit
   pushSubscription?: Prisma.PushSubscriptionOmit
   notification?: Prisma.NotificationOmit

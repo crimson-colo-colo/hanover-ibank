@@ -1,8 +1,10 @@
+// noinspection UnnecessaryLocalVariableJS
+
 import { ContentFilter } from "@shared/enum.ts"
+import type { ContentList, ContentListItem } from "@shared/types.ts"
 import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
 import z from "zod"
-import type { ContentList, ContentListItem } from "../../shared/types.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { Employee, Tag } from "../generated/prisma/client.ts"
@@ -14,6 +16,7 @@ import {
 	TagCategory,
 } from "../generated/prisma/enums.ts"
 import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
+import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import {
 	notifyContentCheckedIn,
@@ -21,6 +24,7 @@ import {
 	notifyContentEdited,
 	notifyContentTransferred,
 } from "../lib/notify.ts"
+import { search } from "../lib/openrouter.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
@@ -147,7 +151,9 @@ export const contentRouter = router({
 						},
 					},
 				},
+				include: { tags: true },
 			})
+			await embedFile(updated)
 			return updated
 		}),
 
@@ -171,7 +177,9 @@ export const contentRouter = router({
 					data: {
 						title: opts.input.title,
 					},
+					include: { tags: true },
 				})
+				await embedFile(updated)
 
 				await db.recentTimestamps.update({
 					where: {
@@ -227,6 +235,7 @@ export const contentRouter = router({
 					data: {
 						lastModifiedDate: isoDateToTimestamp(opts.input.lastModifiedDate),
 					},
+					include: { tags: true },
 				})
 				await db.recentTimestamps.update({
 					where: {
@@ -255,6 +264,7 @@ export const contentRouter = router({
 					await notifyContentEdited(notification, updated, actor)
 				}
 
+				await embedFile(updated)
 				return updated
 			}
 		}),
@@ -280,6 +290,9 @@ export const contentRouter = router({
 					data: {
 						expirationDate: isoDateToTimestamp(opts.input.expirationDate),
 					},
+					include: {
+						tags: true,
+					},
 				})
 
 				await db.recentTimestamps.update({
@@ -309,6 +322,8 @@ export const contentRouter = router({
 					await notifyContentEdited(notification, updated, actor)
 				}
 
+				await embedFile(updated)
+
 				return updated
 			}
 		}),
@@ -325,6 +340,7 @@ export const contentRouter = router({
 					data: {
 						ownerId: opts.input.ownerId,
 					},
+					include: { tags: true },
 				})
 				await db.recentTimestamps.update({
 					where: {
@@ -349,6 +365,9 @@ export const contentRouter = router({
 					},
 				})
 				await notifyContentTransferred(notification, updated, actor)
+
+				await embedFile(updated)
+
 				return updated
 			}
 		}),
@@ -365,6 +384,7 @@ export const contentRouter = router({
 					data: {
 						status: opts.input.status,
 					},
+					include: { tags: true },
 				})
 				await db.recentTimestamps.update({
 					where: {
@@ -393,6 +413,8 @@ export const contentRouter = router({
 					await notifyContentEdited(notification, updated, actor)
 				}
 
+				await embedFile(updated)
+
 				return updated
 			}
 		}),
@@ -414,14 +436,15 @@ export const contentRouter = router({
 				select: { tags: true },
 			})
 			const changed =
-				beforeTags?.tags.length !== opts.input.tags.length
-					? true
-					: beforeTags?.tags.every(
-							(item, i) =>
-								item.tagCategory === opts.input.tags[i].category &&
-								item.tagName === opts.input.tags[i].name
-						)
-
+				opts.input.tags.length !== beforeTags?.tags.length ||
+				opts.input.tags.some(
+					(tag) =>
+						!beforeTags?.tags.some((t) => t.tagCategory === tag.category && t.tagName === tag.name)
+				) ||
+				beforeTags?.tags.some(
+					(t) =>
+						!opts.input.tags.some((tag) => tag.category === t.tagCategory && tag.name === t.tagName)
+				)
 			if (changed) {
 				const updated = await db.content.update({
 					where: { id: opts.input.id },
@@ -461,6 +484,9 @@ export const contentRouter = router({
 							},
 						},
 					},
+					include: {
+						tags: true,
+					},
 				})
 				await db.recentTimestamps.update({
 					where: {
@@ -473,6 +499,7 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
 						where: { id: opts.ctx.auth.sub },
@@ -487,6 +514,9 @@ export const contentRouter = router({
 					})
 					await notifyContentEdited(notification, updated, actor)
 				}
+
+				await embedFile(updated)
+
 				return updated
 			}
 		}),
@@ -671,6 +701,10 @@ export const contentRouter = router({
 				data: {
 					recentlyEdited: new Date(),
 				},
+				select: {
+					contentId: true,
+					lastModifiedDate: true,
+				},
 			})
 			if (updated.ownerId !== opts.ctx.auth.sub) {
 				const actor = (await db.employee.findUnique({
@@ -686,6 +720,7 @@ export const contentRouter = router({
 				})
 				await notifyContentEdited(notification, updated, actor)
 			}
+			await embedFile(content)
 		}),
 
 	updateLink: authProcedure
@@ -755,6 +790,7 @@ export const contentRouter = router({
 					url: opts.input.url,
 					lastModifiedDate: new Date(),
 				},
+				include: { tags: true },
 			})
 			if (updated.ownerId !== opts.ctx.auth.sub) {
 				const actor = (await db.employee.findUnique({
@@ -770,6 +806,7 @@ export const contentRouter = router({
 				})
 				await notifyContentEdited(notification, updated, actor)
 			}
+			await embedFile(updated)
 		}),
 
 	delete: authProcedure.input(z.object({ ids: z.array(z.string()) })).mutation(async (opts) => {
@@ -1013,6 +1050,14 @@ export const contentRouter = router({
 		}
 	}),
 
+	search: authProcedure.input(z.object({ query: z.string() })).query(async (opts) => {
+		const results = await search(opts.input.query)
+		const ids = results.map(({ id }) => id)
+		const rows = await db.content.findMany({ where: { id: { in: ids } } })
+		const byId = new Map(rows.map((r) => [r.id, r]))
+		return ids.map((id) => byId.get(id)).filter((r) => r !== undefined)
+	}),
+
 	getFileStats: authProcedure.query(async (opts) => {
 		const content = await db.content.findMany({
 			where: {
@@ -1160,3 +1205,4 @@ export const contentRouter = router({
 		return await fetchAndTransformToContentListItems(expiringContent, opts.ctx.auth.sub)
 	}),
 })
+export default contentRouter

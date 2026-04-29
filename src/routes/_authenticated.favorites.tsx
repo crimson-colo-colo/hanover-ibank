@@ -306,7 +306,9 @@ function FavoritesTable({
 					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
 				{
 					id: "tags",
-					header: ({ column }) => <TagFilterPopup column={column} allTags={allTags} />,
+					header: ({ column }) => (
+						<TagFilterPopup column={column} allTags={allTags} resetPage={() => {}} />
+					),
 					filterFn: "tagFilterFn",
 					sortingFn: "fuzzy",
 					enableSorting: false,
