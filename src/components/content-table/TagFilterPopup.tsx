@@ -153,7 +153,7 @@ export function TagFilterPopup({ column, allTags, resetPage }: TagFilterPopupPro
 								color="gray"
 								size="xs"
 								onClick={() => {
-									clearAll
+									clearAll()
 									resetPage()
 								}}
 								mt={4}
