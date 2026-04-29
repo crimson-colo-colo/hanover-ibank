@@ -2,6 +2,7 @@ import type { HeadObjectOutput } from "@aws-sdk/client-s3"
 import type { UseMutationResult } from "@tanstack/react-query"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
+import type { Management } from "auth0"
 import z from "zod"
 import type { Prisma } from "../server/generated/prisma/browser.ts"
 import type {
@@ -111,3 +112,12 @@ export const PushMessage = z.object({
 	tag: z.string(),
 	url: z.string().optional(),
 })
+
+export type ContentNotification = Prisma.NotificationGetPayload<{}> & {
+	actor: Management.UserResponseSchema | null
+	content: Prisma.ContentGetPayload<{}> | null // TODO: ContentListItem
+}
+
+export type ServiceWorkerMessage = {
+	type: "new_notification"
+}

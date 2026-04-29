@@ -1,4 +1,4 @@
-import { PushSubscription } from "@shared/types.ts"
+import { type ContentNotification, PushSubscription } from "@shared/types.ts"
 import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
@@ -156,6 +156,38 @@ export const userRouter = router({
 			icon: "http://localhost:3000/favicon.png",
 			tag: "abcdefghijklmnopqrstuvwxyz",
 			url: "http://localhost:3000/dashboard",
+		})
+	}),
+	getNotifications: authProcedure.query(async (opts): Promise<ContentNotification[]> => {
+		const notifications = await db.notification.findMany({
+			where: {
+				employeeId: opts.ctx.auth.sub,
+			},
+			orderBy: {
+				createdAt: "desc",
+			},
+			include: {
+				content: true,
+			},
+		})
+		const users = await auth0Cache.listUsers()
+		return notifications.map((n) => ({
+			...n,
+			actor: n.actorId ? (users.data.find((u) => u.user_id === n.actorId) ?? null) : null,
+		}))
+	}),
+	clearNotification: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		await db.notification.delete({
+			where: {
+				id: opts.input.id,
+			},
+		})
+	}),
+	clearAllNotifications: authProcedure.mutation(async (opts) => {
+		await db.notification.deleteMany({
+			where: {
+				employeeId: opts.ctx.auth.sub,
+			},
 		})
 	}),
 })

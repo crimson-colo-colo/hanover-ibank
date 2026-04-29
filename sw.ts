@@ -1,4 +1,4 @@
-import { PushMessage } from "@shared/types.ts"
+import { PushMessage, type ServiceWorkerMessage } from "@shared/types.ts"
 import * as idb from "idb-keyval"
 
 declare const self: ServiceWorkerGlobalScope
@@ -27,6 +27,10 @@ self.addEventListener("push", (event) => {
 			tag: message.tag,
 		})
 	)
+
+	postMessage({
+		type: "new_notification",
+	} satisfies ServiceWorkerMessage)
 })
 
 self.addEventListener("notificationclick", (event) => {

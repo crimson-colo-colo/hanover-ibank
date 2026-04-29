@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { ActionIcon, Button, Group, Indicator, Kbd, Menu, Text } from "@mantine/core"
+import { ActionIcon, Button, Group, Indicator, Kbd, Menu, Popover, Text } from "@mantine/core"
+import type { ServiceWorkerMessage } from "@shared/types.ts"
 import {
 	IconBell,
 	IconBuildingBank,
@@ -9,8 +10,12 @@ import {
 	IconSun,
 	IconUser,
 } from "@tabler/icons-react"
+import { useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
+import { useEffect, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
+import { NotificationsPopover } from "@/components/NotificationsPopover.tsx"
+import { trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
 
 function NavLinks() {
@@ -36,6 +41,26 @@ function NavLinks() {
 export function Navigation() {
 	const auth0 = useAuth0()
 	const { colorScheme, toggleColorScheme } = useColorScheme()
+	const notifications = useQuery(trpc.user.getNotifications.queryOptions())
+	const [notificationsOpen, setNotificationsOpen] = useState(false)
+
+	useEffect(() => {
+		if (!("serviceWorker" in navigator)) {
+			return
+		}
+
+		function onMessage(event: MessageEvent) {
+			const message = event.data as ServiceWorkerMessage
+			if (message.type === "new_notification") {
+				notifications.refetch()
+			}
+		}
+
+		navigator.serviceWorker.addEventListener("message", onMessage)
+		return () => {
+			navigator.serviceWorker.removeEventListener("message", onMessage)
+		}
+	})
 
 	return (
 		<div className="h-full px-md bg-gray-50 dark:bg-gray-900 flex items-center justify-between gap-md">
@@ -71,12 +96,32 @@ export function Navigation() {
 				</ActionIcon>
 				{auth0.isAuthenticated && auth0.user ? (
 					<>
-						<Indicator label={undefined} className="flex justify-items-center">
-							<ActionIcon variant="subtle" onClick={undefined}>
-								<IconBell />
-							</ActionIcon>
-						</Indicator>
-
+						<Popover
+							position="bottom-end"
+							width="500"
+							withArrow
+							opened={notificationsOpen}
+							onChange={setNotificationsOpen}
+						>
+							<Popover.Target>
+								<Indicator
+									label={notifications.data?.length ?? 0}
+									showZero={false}
+									size={16}
+									className="flex items-center justify-center"
+								>
+									<ActionIcon variant="subtle" onClick={() => setNotificationsOpen((o) => !o)}>
+										<IconBell />
+									</ActionIcon>
+								</Indicator>
+							</Popover.Target>
+							<Popover.Dropdown className="shadow-sm h-80 pb-0">
+								<NotificationsPopover
+									notifications={notifications.data ?? []}
+									closeNotifications={() => setNotificationsOpen(false)}
+								/>
+							</Popover.Dropdown>
+						</Popover>
 						<Menu trigger="click" position="bottom-end">
 							<Menu.Target>
 								<Button variant="subtle" color="gray" p="0" className="h-max">
