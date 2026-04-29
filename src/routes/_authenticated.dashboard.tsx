@@ -84,7 +84,7 @@ function RoleDashboard() {
 
 	return (
 		<main>
-			<header className="w-full p-4 text-white rounded-lg bg-primary flex">
+			<header id="dashboard-welcome" className="w-full p-4 text-white rounded-lg bg-primary flex">
 				<Stack gap={0} className="flex-1">
 					<Title>
 						Welcome,{" "}
@@ -106,12 +106,13 @@ function RoleDashboard() {
 						const ModuleComponent = modules.find((m) => m.id === module.id)?.component
 						if (!ModuleComponent) return null
 						return (
-							<ModuleComponent
-								key={module.id}
-								setSelectedContent={setSelectedContent}
-								setSelectedContentFileType={setSelectedContentFileType}
-								openFilePreviewModal={openFilePreviewModal}
-							/>
+							<div key={module.id} id={`dashboard-module-${module.id}`}>
+								<ModuleComponent
+									setSelectedContent={setSelectedContent}
+									setSelectedContentFileType={setSelectedContentFileType}
+									openFilePreviewModal={openFilePreviewModal}
+								/>
+							</div>
 						)
 					})}
 			</SimpleGrid>

@@ -128,7 +128,7 @@ export function Navigation() {
 				</Group>
 
 				<Group>
-					<ActionIcon onClick={toggleColorScheme} variant="subtle">
+					<ActionIcon id="nav-theme-toggle" onClick={toggleColorScheme} variant="subtle">
 						{colorScheme === "dark" ? <IconSun /> : <IconMoon />}
 					</ActionIcon>
 					{auth0.isAuthenticated && auth0.user ? (
@@ -161,7 +161,7 @@ export function Navigation() {
 							</Popover>
 							<Menu trigger="click" position="bottom-end">
 								<Menu.Target>
-									<Button variant="subtle" color="gray" p="0" className="h-max">
+									<Button id="nav-user-menu" variant="subtle" color="gray" p="0" className="h-max">
 										<div className="flex items-center gap-2 px-2 py-1">
 											<div className="flex flex-col items-end">
 												<Text size="sm" fw={500}>

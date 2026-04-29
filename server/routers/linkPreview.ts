@@ -9,37 +9,36 @@ export const opengraphRouter = router({
 		.query(async (opts) => {
 			const url = opts.input.url
 
-			const { error, result } = await ogs({ url: url })
+			try {
+				const { error, result } = await ogs({ url: url })
 
-			await db.recentTimestamps.update({
-				where: {
-					employeeId_contentId: {
+				await db.recentTimestamps.upsert({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					create: {
+						recentlyViewed: new Date(),
+						viewCount: 1,
 						contentId: opts.input.id,
+						recentlyEdited: new Date(),
 						employeeId: opts.ctx.auth.sub,
 					},
-				},
-				data: {
-					recentlyViewed: new Date(),
-				},
-			})
-
-			await db.recentTimestamps.update({
-				where: {
-					employeeId_contentId: {
-						contentId: opts.input.id,
-						employeeId: opts.ctx.auth.sub,
+					update: {
+						recentlyViewed: new Date(),
+						viewCount: { increment: 1 },
 					},
-				},
-				data: {
-					viewCount: {
-						increment: 1,
-					},
-				},
-			})
+				})
 
-			if (!error) {
-				return { response: result }
-			} else {
+				if (!error) {
+					return { response: result }
+				} else {
+					return { response: null }
+				}
+			} catch (e) {
+				console.error("Error fetching Open Graph data:", e)
 				return { response: null }
 			}
 		}),

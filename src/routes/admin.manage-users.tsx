@@ -40,6 +40,7 @@ import { UpdateUserForm, type UpdateUserValues } from "@/components/UpdateUserFo
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { checkedOutByFilterFn, fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
 import { trpc } from "@/lib/trpc.ts"
+import { HelpHint } from "@/components/help.hint.tsx"
 
 export const Route = createFileRoute("/admin/manage-users")({
 	component: RouteComponent,
@@ -177,11 +178,28 @@ function RouteComponent() {
 
 	return (
 		<div>
-			<Group justify="space-between" className="flex-col sm:flex-row">
-				<Title order={2} className="self-start">
-					Manage Users
-				</Title>
-				<Group gap="xs" mb="md" className="self-end">
+			<Group
+				id="manage-users-header"
+				justify="space-between"
+				mb="md"
+				className="flex-col sm:flex-row"
+			>
+				<Group gap="xs" align="center" wrap="nowrap">
+					<Title order={2}>Manage Users</Title>
+					<HelpHint
+						feature="employee management"
+						steps={[
+							{
+								target: "#manage-users-header",
+								title: "Manage Employees",
+								content:
+									"View, edit, and delete employee accounts from this table. Each row shows the employee's name, username, email, and role.",
+								placement: "bottom",
+							},
+						]}
+					/>
+				</Group>
+				<Group gap="xs">
 					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"
@@ -194,6 +212,7 @@ function RouteComponent() {
 						Delete selected
 					</Button>
 					<Button
+						id="add-user-btn"
 						leftSection={<IconPlus />}
 						onClick={() => {
 							openCreateDialog()
@@ -201,6 +220,18 @@ function RouteComponent() {
 					>
 						Add user
 					</Button>
+					<HelpHint
+						feature="adding a new employee"
+						steps={[
+							{
+								target: "#add-user-btn",
+								title: "Add a New Employee",
+								content:
+									"Click here to create a new employee account. You'll set their name, email, username, and role (e.g. Underwriter, Analyst, Admin).",
+								placement: "bottom",
+							},
+						]}
+					/>
 				</Group>
 			</Group>
 			<Modal opened={deleteOpened} onClose={closeDeleteDialog} title="Confirm Deletion">

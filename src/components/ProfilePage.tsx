@@ -8,6 +8,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
+import { HelpHint } from "@/components/help.hint.tsx"
 import { getPushSubscription, subscribePush, unsubscribePush } from "@/lib/push.ts"
 import { queryClient, trpc } from "@/lib/trpc.ts"
 import { useColorScheme } from "@/lib/useColorScheme.ts"
@@ -148,6 +149,7 @@ export function ProfilePage() {
 
 	return (
 		<Stack
+			id="profile-page"
 			maw={480}
 			mx="auto"
 			mt="md"
@@ -172,7 +174,7 @@ export function ProfilePage() {
 				</Button>
 			</Group>
 
-			<Group align="center" gap="md">
+			<Group id="profile-avatar-section" align="center" gap="md">
 				<div style={{ position: "relative", display: "inline-block" }}>
 					<Avatar userId={user!.sub!} w={80} h={80} />
 					<Button
@@ -205,21 +207,52 @@ export function ProfilePage() {
 					/>
 				</div>
 				<Stack gap={2}>
-					<p
-						style={{
-							margin: 0,
-							fontWeight: 500,
-						}}
-					>
-						{user?.name}
-					</p>
+					<Group gap={6} align="center">
+						<p
+							style={{
+								margin: 0,
+								fontWeight: 500,
+							}}
+						>
+							{user?.name}
+						</p>
+						<HelpHint
+							feature="your profile picture"
+							steps={[
+								{
+									target: "#profile-avatar-section",
+									title: "Your Profile Picture",
+									content:
+										"Click the camera icon to upload a custom avatar. Your picture appears next to your name throughout the app.",
+									placement: "bottom",
+								},
+							]}
+						/>
+					</Group>
 					<p style={{ margin: 0, fontSize: 14, color: "var(--mantine-color-dimmed)" }}>
 						{user?.email}
 					</p>
 				</Stack>
 			</Group>
 
-			<form onSubmit={form.onSubmit(onSubmit)}>
+			<form id="profile-form" onSubmit={form.onSubmit(onSubmit)}>
+				<Group gap="xs" mb="xs">
+					<Text size="sm" fw="600">
+						Account Details
+					</Text>
+					<HelpHint
+						feature="profile settings"
+						steps={[
+							{
+								target: "#profile-form",
+								title: "Profile Settings",
+								content:
+									"Update your display name, username, and email address here. Changes are reflected immediately across the platform.",
+								placement: "top",
+							},
+						]}
+					/>
+				</Group>
 				<Stack gap="sm">
 					<Title order={4}>Profile Information</Title>
 					<TextInput
