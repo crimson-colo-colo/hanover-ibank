@@ -1,5 +1,16 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { ActionIcon, Button, Group, Indicator, Kbd, Menu, Popover, Text } from "@mantine/core"
+import {
+	ActionIcon,
+	Button,
+	Group,
+	Image,
+	Indicator,
+	Kbd,
+	Menu,
+	Popover,
+	Text,
+} from "@mantine/core"
+import { notifications as mantineNotifications } from "@mantine/notifications"
 import type { ServiceWorkerMessage } from "@shared/types.ts"
 import {
 	IconBell,
@@ -11,7 +22,7 @@ import {
 	IconUser,
 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
-import { Link, useLocation } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
@@ -49,6 +60,7 @@ export function Navigation() {
 	const notifications = useQuery(trpc.user.getNotifications.queryOptions())
 	const [notificationsOpen, setNotificationsOpen] = useState(false)
 	const location = useLocation()
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		if (!("serviceWorker" in navigator)) {
@@ -59,6 +71,18 @@ export function Navigation() {
 			const message = event.data as ServiceWorkerMessage
 			if (message.type === "new_notification") {
 				notifications.refetch()
+				const id = mantineNotifications.show({
+					title: message.notification.title,
+					message: message.notification.body,
+					icon: <Image src={message.notification.icon} width={24} height={24} radius="xl" />,
+					className: message.notification.url ? "cursor-pointer" : undefined,
+					onClick() {
+						if (message.notification.url) {
+							mantineNotifications.hide(id)
+							navigate({ to: new URL(message.notification.url).pathname })
+						}
+					},
+				})
 			}
 		}
 

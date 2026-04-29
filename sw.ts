@@ -28,9 +28,17 @@ self.addEventListener("push", (event) => {
 		})
 	)
 
-	postMessage({
-		type: "new_notification",
-	} satisfies ServiceWorkerMessage)
+	const clients = self.clients.matchAll({ includeUncontrolled: true, type: "window" })
+	event.waitUntil(
+		clients.then((clients) => {
+			clients.forEach((client) => {
+				client.postMessage({
+					type: "new_notification",
+					notification: message,
+				} satisfies ServiceWorkerMessage)
+			})
+		})
+	)
 })
 
 self.addEventListener("notificationclick", (event) => {

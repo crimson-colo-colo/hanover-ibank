@@ -1,51 +1,47 @@
-import { FileType } from "@shared/filetype.ts"
 import { Button, Text } from "react-email"
 import { Email, type EmailConfig } from "./Email.tsx"
 
-export default function ExpiringSoonEmailPreview() {
+export default function ContentCheckedInEmailPreview() {
 	return (
-		<ExpiringSoonEmail
+		<ContentCheckedInEmail
 			config={{
 				assetOrigin: "http://localhost:3000",
 				profileUrl: "http://localhost:3000/profile",
 				supportUrl: "http://localhost:3000/support",
 			}}
 			userName="John Doe"
+			actorName="Jane Smith"
 			contentName="Project Plan.docx"
-			fileType={FileType.WordDocument}
 			action="http://localhost:3000/preview/abcd1234"
-			expires="in 3 days"
 		/>
 	)
 }
 
-export function ExpiringSoonEmail({
+export function ContentCheckedInEmail({
 	config,
 	userName,
 	contentName,
-	fileType,
+	actorName,
 	action,
-	expires,
 }: {
 	config: EmailConfig
 	userName: string
 	contentName: string
-	fileType: FileType
+	actorName: string
 	action: string
-	expires: string
 }) {
 	return (
 		<Email
 			config={config}
-			preview={`${contentName} is expiring soon. Review or update it to keep it in use.`}
-			heading={`${contentName} is expiring soon`}
+			preview={`${actorName} checked in ${contentName}`}
+			heading={`${contentName} has been checked in`}
 			reason="You received this email because you are subscribed to email notifications for your content in iBank."
 		>
 			<Text className="text-gray-700 mt-4">Hello {userName},</Text>
 			{/* TODO: file type icon? */}
 			<Text className="text-gray-700 mt-2">
-				Your {fileType === FileType.Link ? "link" : "file"} <strong>{contentName}</strong> is set to
-				expire {expires}. Please review or update it to keep it in use.
+				{actorName} has checked in {contentName}. You can now view and edit this content in iBank.
+				Please review it and make any necessary updates.
 			</Text>
 			<Button
 				href={action}

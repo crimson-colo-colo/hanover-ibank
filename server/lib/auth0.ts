@@ -28,6 +28,11 @@ class CachedAuth0Management {
 		return this.userListCache
 	}
 
+	async getUser(id: string): Promise<User | null> {
+		const users = await this.listUsers()
+		return users.data.find((user) => user.user_id === id) || null
+	}
+
 	/**
 	 * Invalidates the user list cache.
 	 */

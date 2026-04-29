@@ -120,4 +120,5 @@ export type ContentNotification = Prisma.NotificationGetPayload<{}> & {
 
 export type ServiceWorkerMessage = {
 	type: "new_notification"
+	notification: z.infer<typeof PushMessage>
 }
