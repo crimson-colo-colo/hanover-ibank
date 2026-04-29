@@ -983,7 +983,12 @@ export const contentRouter = router({
 				include: getContentInclude(opts.ctx.auth.sub),
 			})
 
-			return await fetchAndTransformToContentListItems(contentDetails, opts.ctx.auth.sub)
+			const contentMap = new Map(contentDetails.map((item) => [item.id, item]))
+			const sortedContent = sums
+				.map((sum) => contentMap.get(sum.contentId))
+				.filter((item) => item !== undefined)
+
+			return await fetchAndTransformToContentListItems(sortedContent, opts.ctx.auth.sub)
 		}),
 
 	getExpiringContent: authProcedure.query(async (opts) => {
