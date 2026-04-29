@@ -3,11 +3,11 @@ import { TRPCError } from "@trpc/server"
 import * as jose from "jose"
 import z from "zod"
 import type { ContentList, ContentListItem } from "../../shared/types.ts"
-import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { Tag } from "../generated/prisma/client.ts"
 import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
+import { auth0Cache } from "../lib/auth0.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -61,7 +61,7 @@ export const contentRouter = router({
 				},
 			})
 
-			const users = await auth0Management.users.list()
+			const users = await auth0Cache.listUsers()
 
 			const metadata = new Map(
 				await Promise.all(
@@ -748,7 +748,7 @@ export const contentRouter = router({
 			)
 		)
 
-		const users = await auth0Management.users.list()
+		const users = await auth0Cache.listUsers()
 
 		return {
 			role: user.role,
@@ -930,7 +930,7 @@ export const contentRouter = router({
 			})
 		}
 
-		const users = await auth0Management.users.list()
+		const users = await auth0Cache.listUsers()
 
 		const objectMetadata =
 			content.type === "Object"

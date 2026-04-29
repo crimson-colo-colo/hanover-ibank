@@ -3,6 +3,7 @@ import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
+import { auth0Cache } from "../lib/auth0.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { sendPushNotification } from "../lib/notifications.tsx"
 import { bucketName, s3 } from "../s3.ts"
@@ -59,6 +60,7 @@ export const userRouter = router({
 				await auth0Management.users.update(opts.ctx.auth.sub, {
 					username: opts.input.username,
 				})
+				auth0Cache.invalidate()
 
 				const avatar = await s3.headObject({
 					Bucket: bucketName,
