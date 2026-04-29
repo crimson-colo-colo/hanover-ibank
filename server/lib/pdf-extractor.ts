@@ -3,7 +3,7 @@ import { Worker } from "node:worker_threads"
 import ObjHash from "object-hash"
 import { db } from "../database.ts"
 
-const POOL_SIZE = 6
+const POOL_SIZE = 3
 
 type RecognitionSettings = {
 	skipRecPDFTextNative: boolean

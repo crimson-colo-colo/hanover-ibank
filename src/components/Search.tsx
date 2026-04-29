@@ -8,10 +8,7 @@ export default function Search() {
 	const [value, setValue] = useState("")
 	const [debouncedValue] = useDebouncedValue(value, 250)
 	const data = useQuery(
-		trpc.content.search.queryOptions(
-			{ query: debouncedValue || "History of the united states" },
-			{ enabled: true }
-		)
+		trpc.content.search.queryOptions({ query: debouncedValue }, { enabled: true })
 	)
 
 	return (

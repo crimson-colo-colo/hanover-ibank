@@ -13,7 +13,7 @@ import {
 	ThreadStatus,
 } from "../server/generated/prisma/client.ts"
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
-import { embedPDF } from "../server/routers/embedPDF.ts"
+import { embedFile } from "../server/lib/embedFile.ts"
 import { bucketName, s3 } from "../server/s3.ts"
 import { fileContentData, objectIdToFileType, uploadFilesToS3 } from "./seed-data/files.ts"
 import { linkContentData } from "./seed-data/links.ts"
@@ -126,19 +126,22 @@ async function createUsersAndAvatars() {
 	const users = await auth0Management.users.list()
 
 	await Promise.all(
-		employeeData.map(async ({ id }) => {
-			const user = users.data.find((u) => u.user_id === id)!
-			const avatar =
-				Math.random() < 0.8
-					? await downloadAvatar()
-					: generateDefaultAvatar(user.name ?? user.email!)
-			console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
-			await s3.putObject({
-				Bucket: bucketName,
-				Key: `avatar/${id}.png`,
-				Body: avatar,
+		employeeData
+			.map(async ({ id }) => {
+				const user = users.data.find((u) => u.user_id === id)
+				if (user === undefined) return null
+				const avatar =
+					Math.random() < 0.8
+						? await downloadAvatar()
+						: generateDefaultAvatar(user.name ?? user.email!)
+				console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
+				await s3.putObject({
+					Bucket: bucketName,
+					Key: `avatar/${id}.png`,
+					Body: avatar,
+				})
 			})
-		})
+			.filter((value) => value !== null)
 	)
 
 	console.log(`Created ${employeeData.length} employee rows`)
@@ -440,6 +443,6 @@ async function createTimestamps() {
 async function embedAllContent() {
 	console.log("beginning embedding")
 	const allContent = await prisma.content.findMany({ include: { tags: true } })
-	await Promise.all(allContent.map(embedPDF))
+	await Promise.all(allContent.map(embedFile))
 	console.log("embedding complete")
 }

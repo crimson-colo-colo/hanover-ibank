@@ -8,12 +8,11 @@ import {
 	EmployeeRole,
 	TagCategory,
 } from "../generated/prisma/browser.ts"
+import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
-
-import { embedPDF } from "./embedPDF.ts"
 
 const baseSchema = z.object({
 	name: z.string().max(250).min(3),
@@ -88,7 +87,7 @@ export const formsRouter = router({
 			},
 			include: { tags: true },
 		})
-		await embedPDF(content)
+		await embedFile(content)
 		return content
 	}),
 	searchUsers: authProcedure

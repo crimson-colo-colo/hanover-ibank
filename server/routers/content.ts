@@ -10,13 +10,13 @@ import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { Tag } from "../generated/prisma/client.ts"
 import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "../generated/prisma/enums.ts"
+import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { search } from "../lib/openrouter.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 import { discussionRouter } from "./discussion.ts"
-import { embedPDF } from "./embedPDF.ts"
 
 export const contentRouter = router({
 	discussion: discussionRouter,
@@ -199,7 +199,7 @@ export const contentRouter = router({
 				},
 				include: { tags: true },
 			})
-			await embedPDF(updated)
+			await embedFile(updated)
 			return updated
 		}),
 
@@ -225,7 +225,7 @@ export const contentRouter = router({
 					},
 					include: { tags: true },
 				})
-				await embedPDF(updated)
+				await embedFile(updated)
 
 				await db.recentTimestamps.update({
 					where: {
@@ -280,7 +280,7 @@ export const contentRouter = router({
 					},
 				})
 
-				await embedPDF(update)
+				await embedFile(update)
 				return update
 			}
 		}),
@@ -323,7 +323,7 @@ export const contentRouter = router({
 					},
 				})
 
-				await embedPDF(updated)
+				await embedFile(updated)
 				return updated
 			}
 		}),
@@ -353,7 +353,7 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
-				await embedPDF(updated)
+				await embedFile(updated)
 				return updated
 			}
 		}),
@@ -383,7 +383,7 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
-				await embedPDF(updated)
+				await embedFile(updated)
 				return updated
 			}
 		}),
@@ -467,7 +467,7 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
-				await embedPDF(updated)
+				await embedFile(updated)
 				return updated
 			}
 		}),
@@ -613,7 +613,7 @@ export const contentRouter = router({
 					lastModifiedDate: true,
 				},
 			})
-			await embedPDF(content)
+			await embedFile(content)
 		}),
 
 	updateLink: authProcedure
@@ -685,7 +685,7 @@ export const contentRouter = router({
 				},
 				include: { tags: true },
 			})
-			await embedPDF(embedContent)
+			await embedFile(embedContent)
 		}),
 
 	delete: authProcedure.input(z.object({ ids: z.array(z.string()) })).mutation(async (opts) => {

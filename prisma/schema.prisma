@@ -130,6 +130,7 @@ model Embedding {
 enum EmbeddingType {
   Query
   Content
+
   Unknown
 }
 
