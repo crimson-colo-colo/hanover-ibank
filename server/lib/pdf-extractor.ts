@@ -75,6 +75,11 @@ for (let i = 0; i < POOL_SIZE; i++) {
 	pool.push(worker)
 }
 
+/**
+ * Convert a pdf buffer to a string. This is a very expensive function to call, but it also memoizes its results to the database.
+ * @param buffer the pdf buffer
+ * @param settings extra settings, changing these will cause a cache miss
+ */
 export function pdfText(
 	buffer: ArrayBuffer,
 	settings: RecognitionSettings = { skipRecPDFTextNative: false, skipRecPDFTextOCR: false }
