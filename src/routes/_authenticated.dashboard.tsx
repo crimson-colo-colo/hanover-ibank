@@ -106,12 +106,13 @@ function RoleDashboard() {
 						const ModuleComponent = modules.find((m) => m.id === module.id)?.component
 						if (!ModuleComponent) return null
 						return (
-							<ModuleComponent
-								key={module.id}
-								setSelectedContent={setSelectedContent}
-								setSelectedContentFileType={setSelectedContentFileType}
-								openFilePreviewModal={openFilePreviewModal}
-							/>
+							<div key={module.id} id={`dashboard-module-${module.id}`}>
+								<ModuleComponent
+									setSelectedContent={setSelectedContent}
+									setSelectedContentFileType={setSelectedContentFileType}
+									openFilePreviewModal={openFilePreviewModal}
+								/>
+							</div>
 						)
 					})}
 			</SimpleGrid>

@@ -95,7 +95,7 @@ function FavoritesPage() {
 		<main>
 			<div>
 				<Group mb="md">
-					<Title order={3} className="flex items-center gap-3">
+					<Title id="favorites-header" order={3} className="flex items-center gap-3">
 						Your Favorites
 					</Title>
 					{favoriteContent.isFetching && <IconLoader2 className="animate-spin" />}
@@ -113,6 +113,7 @@ function FavoritesPage() {
 						</Button>
 					)}
 					<SegmentedControl
+						id="favorites-view-toggle"
 						data={[
 							{ label: "Grid", value: "Grid" },
 							{ label: "List", value: "List" },

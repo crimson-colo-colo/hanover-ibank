@@ -8,6 +8,7 @@ import {
 	IconBuildingBank,
 	IconChartBarPopular,
 	IconChevronRight,
+	IconCompass,
 	IconHome,
 	IconInfoCircle,
 	IconLayoutSidebarLeftExpand,
@@ -23,6 +24,7 @@ import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
+import { TUTORIAL_START_EVENT } from "@/components/new.user.tutorial.tsx"
 import { getPushSubscription, subscribePush } from "@/lib/push.ts"
 import { trpc } from "@/lib/trpc.ts"
 
@@ -97,6 +99,28 @@ function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; coll
 	)
 }
 
+function TutorialLink({ collapsed }: { collapsed: boolean }) {
+	function handleClick() {
+		localStorage.removeItem("ibank-tutorial-completed")
+		window.dispatchEvent(new Event(TUTORIAL_START_EVENT))
+	}
+
+	return (
+		<Tooltip label="Tutorial" position="right" withArrow={true} arrowSize={8} disabled={!collapsed}>
+			<Button
+				variant="subtle"
+				onClick={handleClick}
+				rightSection={!collapsed && <IconChevronRight size={20} />}
+				justify={collapsed ? "center" : "space-between"}
+				radius={0}
+				className={clsx(collapsed && "px-0")}
+			>
+				<IconCompass size={20} />
+				{!collapsed && <span className="p-2">Tutorial</span>}
+			</Button>
+		</Tooltip>
+	)
+}
 export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationProps) {
 	const auth0 = useAuth0()
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
@@ -153,6 +177,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 
 	return (
 		<header
+			id="side-navigation"
 			className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700 flex flex-col"
 			ref={ref}
 		>
@@ -184,7 +209,26 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 			</div>
 			<Stack gap={0}>{navLinks}</Stack>
 			{<AdminLinks isAdmin={isAdmin.data} collapsed={collapsed}></AdminLinks>}
-
+			{collapsed ? (
+				<div>
+					<Stack gap={0}>
+						<div className="flex justify-center my-2 py-1">
+							<IconPointFilled className="fill-gray-300" size={20} />
+						</div>
+						<TutorialLink collapsed={collapsed} />
+					</Stack>
+				</div>
+			) : (
+				<div>
+					<hr />
+					<Stack gap={0}>
+						<Text c="dimmed" className="ml-5 mb-2 text-xs uppercase tracking-wider font-semibold">
+							Help
+						</Text>
+						<TutorialLink collapsed={collapsed} />
+					</Stack>
+				</div>
+			)}
 			{!collapsed && (
 				<div>
 					<hr />

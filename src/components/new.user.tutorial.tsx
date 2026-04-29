@@ -15,29 +15,66 @@ import { trpc } from "@/lib/trpc.ts"
 
 const TUTORIAL_STORAGE_KEY = "ibank-tutorial-completed"
 
+export const TUTORIAL_START_EVENT = "ibank:start-tutorial"
+
 const DASHBOARD_STEPS: Step[] = [
 	{
 		target: "#dashboard-welcome",
 		title: "Welcome to iBank!",
 		content:
-			"This is your personal dashboard. It shows your name and role at the top so you always know who you're logged in as.",
+			"This is your personal dashboard. It greets you with your name and role at the top. Click the gear icon in the top-right of this banner to rearrange or hide any of the modules below.",
 		placement: "bottom",
 	},
-	// TODO: replace these - they don't exist anymore after the redesign
-	// {
-	// 	target: "#dashboard-favorites",
-	// 	title: "Your Favorites",
-	// 	content:
-	// 		"Pinned content you've marked as a favorite appears here for quick access. Star any file or link in the table below to add it.",
-	// 	placement: "bottom",
-	// },
-	// {
-	// 	target: "#dashboard-content-section",
-	// 	title: "Content Library",
-	// 	content:
-	// 		"This table lists all the content available to you — files, documents, and links. You can sort, filter, search, and manage everything from here.",
-	// 	placement: "top",
-	// },
+	{
+		target: "#side-navigation",
+		title: "Your Navigation",
+		content:
+			"This is the sidebar — your map for the whole app. Use it to jump between Home, Content, Favorites, About, and Technology (plus Employees and Analytics if you're an admin). Recently Viewed gives you quick links to content you've opened lately, and the Help section in the middle has a \"Take a tour\" button that replays this tutorial whenever you want.",
+		placement: "right",
+	},
+	{
+		target: "#dashboard-module-favorite-content",
+		title: "Favorite Content",
+		content:
+			"Anything you've starred shows up here for quick access. Click any item to preview it.",
+		placement: "top",
+	},
+	{
+		target: "#dashboard-module-recently-viewed",
+		title: "Recently Viewed",
+		content: "The last few files and links you've opened, so you can pick up where you left off.",
+		placement: "top",
+	},
+	{
+		target: "#dashboard-module-popular-links",
+		title: "Popular Links",
+		content:
+			"The most-visited links across your organization — useful for finding the resources your coworkers rely on.",
+		placement: "top",
+	},
+	{
+		target: "#dashboard-module-popular-files",
+		title: "Popular Files",
+		content:
+			"The most-accessed files across the platform. A good place to discover important documents you might not know about yet.",
+		placement: "top",
+	},
+	{
+		target: "#dashboard-module-expiring-content",
+		title: "Expiring Content",
+		content:
+			"Content with an expiration date approaching. Keep an eye here so nothing important lapses without you knowing.",
+		placement: "top",
+	},
+	{
+		target: "#dashboard-module-account-statistics",
+		title: "Account Statistics",
+		content:
+			"A quick summary of your account: how many files and links you own, and how long you've had your account.",
+		placement: "top",
+	},
+]
+const CONTENT_STEPS: Step[] = [
 	{
 		target: "#content-filter-control",
 		title: "For You vs. Show All",
@@ -65,6 +102,23 @@ const DASHBOARD_STEPS: Step[] = [
 		content:
 			"Each row is a piece of content. Click the star to favorite it, click the file name to preview it, and use the action menu (⋮) to download, check out, or check in.",
 		placement: "top",
+	},
+]
+
+const FAVORITES_STEPS: Step[] = [
+	{
+		target: "#favorites-header",
+		title: "Your Favorites",
+		content:
+			"Anything you star anywhere in the app shows up here for quick access. You can preview, download, or unfavorite items right from this page.",
+		placement: "bottom",
+	},
+	{
+		target: "#favorites-view-toggle",
+		title: "Grid or List View",
+		content:
+			"Switch between a visual grid of thumbnails and a sortable list. List view also lets you select multiple favorites and unfavorite them in bulk.",
+		placement: "bottom",
 	},
 ]
 
@@ -140,11 +194,15 @@ interface PageBoundary {
 
 const NON_ADMIN_BOUNDARIES: PageBoundary[] = [
 	{ steps: DASHBOARD_STEPS, path: "/dashboard" },
+	{ steps: CONTENT_STEPS, path: "/content-table" },
+	{ steps: FAVORITES_STEPS, path: "/favorites" },
 	{ steps: PROFILE_STEPS, path: "/profile" },
 ]
 
 const ADMIN_BOUNDARIES: PageBoundary[] = [
 	{ steps: DASHBOARD_STEPS, path: "/dashboard" },
+	{ steps: CONTENT_STEPS, path: "/content-table" },
+	{ steps: FAVORITES_STEPS, path: "/favorites" },
 	{ steps: ADMIN_ANALYTICS_STEPS, path: "/admin/analytics" },
 	{ steps: MANAGE_USERS_STEPS, path: "/admin/manage-users" },
 	{ steps: PROFILE_STEPS, path: "/profile" },
@@ -192,16 +250,27 @@ export function NewUserTutorial() {
 		localStorage.setItem(TUTORIAL_STORAGE_KEY, "true")
 	}
 
-	function startTutorial() {
+	const startTutorial = useCallback(() => {
 		setShowPrompt(false)
+		setRun(false)
 		setPageIndex(0)
 		setStepIndex(0)
+		navigatingRef.current = true
 		navigate({ to: "/dashboard" }).then(async () => {
 			const firstTarget = boundaries[0]?.steps[0]?.target as string
 			if (firstTarget) await waitForTarget(firstTarget)
+			navigatingRef.current = false
 			setRun(true)
 		})
-	}
+	}, [boundaries, navigate])
+
+	useEffect(() => {
+		function onStart() {
+			startTutorial()
+		}
+		window.addEventListener(TUTORIAL_START_EVENT, onStart)
+		return () => window.removeEventListener(TUTORIAL_START_EVENT, onStart)
+	}, [startTutorial])
 
 	function dismissTutorial() {
 		setShowPrompt(false)
@@ -254,6 +323,13 @@ export function NewUserTutorial() {
 	const handleEvent = useCallback(
 		(data: EventData, controls: Controls) => {
 			const { action, index, status, type } = data
+
+			if (action === ACTIONS.CLOSE) {
+				controls.stop()
+				setRun(false)
+				completeTutorial()
+				return
+			}
 
 			if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
 				if (action === ACTIONS.NEXT) {
