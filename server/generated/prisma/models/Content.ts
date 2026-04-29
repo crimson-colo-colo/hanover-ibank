@@ -636,10 +636,6 @@ export type EnumContentTypeFieldUpdateOperationsInput = {
   set?: $Enums.ContentType
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type ContentCreateNestedOneWithoutThreadsInput = {
   create?: Prisma.XOR<Prisma.ContentCreateWithoutThreadsInput, Prisma.ContentUncheckedCreateWithoutThreadsInput>
   connectOrCreate?: Prisma.ContentCreateOrConnectWithoutThreadsInput

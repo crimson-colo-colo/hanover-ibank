@@ -1269,6 +1269,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const EmployeeScalarFieldEnum = {
   id: 'id',
+  createdAt: 'createdAt',
   role: 'role',
   emailNotifications: 'emailNotifications',
   pushNotifications: 'pushNotifications'
@@ -1363,6 +1364,7 @@ export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[k
 export const RecentTimestampsScalarFieldEnum = {
   recentlyEdited: 'recentlyEdited',
   recentlyViewed: 'recentlyViewed',
+  viewCount: 'viewCount',
   employeeId: 'employeeId',
   contentId: 'contentId'
 } as const
@@ -1437,6 +1439,20 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
  * Reference to a field of type 'EmployeeRole'
  */
 export type EnumEmployeeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmployeeRole'>
@@ -1482,20 +1498,6 @@ export type EnumContentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'ContentType[]'
  */
 export type ListEnumContentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContentType[]'>
-    
-
-
-/**
- * Reference to a field of type 'DateTime'
- */
-export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-/**
- * Reference to a field of type 'DateTime[]'
- */
-export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 

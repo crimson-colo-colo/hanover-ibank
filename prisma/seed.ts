@@ -109,18 +109,27 @@ async function wipeDBandS3() {
 }
 
 async function createUsersAndAvatars() {
+	const users = await auth0Cache.listUsers()
+
 	await prisma.$transaction(
-		employeeData.map((employee) =>
-			prisma.employee.create({
+		employeeData.map((employee) => {
+			const auth0User = users.data.find((u) => u.user_id === employee.id)
+			return prisma.employee.create({
 				data: {
 					...employee,
+					createdAt: auth0User?.created_at
+						? new Date(auth0User.created_at.toString())
+						: Temporal.Now.instant()
+								.subtract({
+									hours: 24 + Math.random() * 24 * 365,
+									minutes: Math.random() * 60,
+								})
+								.toString(),
 				},
 				select: { id: true },
 			})
-		)
+		})
 	)
-
-	const users = await auth0Cache.listUsers()
 
 	await Promise.all(
 		employeeData.map(async ({ id }) => {
@@ -431,11 +440,13 @@ async function createRecentTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
+			const viewCount = Math.floor(Math.random() * 100) + 1
 			data.push({
 				recentlyViewed: recentlyViewed,
 				recentlyEdited: recentlyEdited,
 				employeeId: employeeId,
 				contentId: contentId,
+				viewCount: viewCount,
 			})
 		}
 	}

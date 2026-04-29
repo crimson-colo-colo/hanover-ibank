@@ -1,3 +1,4 @@
+import { FileType } from "@shared/filetype.ts"
 import { type ContentNotification, PushSubscription } from "@shared/types.ts"
 import sharp from "sharp"
 import z from "zod"
@@ -120,6 +121,60 @@ export const userRouter = router({
 			})
 		}
 		return `/avatar/${opts.input.userId}?${(object.ETag ?? Date.now().toString()).replace(/"/g, "")}`
+	}),
+
+	getStats: authProcedure.query(async (opts) => {
+		const userId = opts.ctx.auth.sub
+
+		const [employee, contentItems] = await Promise.all([
+			db.employee.findUniqueOrThrow({
+				where: { id: userId },
+				select: { createdAt: true },
+			}),
+			db.content.findMany({
+				where: { ownerId: userId },
+				select: { id: true, title: true, type: true, objectId: true },
+			}),
+		])
+
+		const fileItems = contentItems.filter((c) => c.type === "Object" && c.objectId)
+		const linkCount = contentItems.filter((c) => c.type === "Link").length
+
+		const fileMetadata = await Promise.all(
+			fileItems.map(async (item) => {
+				const head = await s3.headObject({
+					Bucket: bucketName,
+					Key: item.objectId!,
+				})
+
+				return {
+					name: item.title,
+					size: head.ContentLength ?? 0,
+					fileType: (head.Metadata?.filetype as FileType) ?? FileType.Unknown,
+				}
+			})
+		)
+
+		const filesByFileType: Record<FileType, { name: string; size: number }[]> = {} as Record<
+			FileType,
+			{ name: string; size: number }[]
+		>
+		for (const file of fileMetadata) {
+			if (!filesByFileType[file.fileType]) {
+				filesByFileType[file.fileType] = []
+			}
+			filesByFileType[file.fileType].push({
+				name: file.name,
+				size: Math.log(file.size),
+			})
+		}
+
+		return {
+			fileCount: fileItems.length,
+			linkCount,
+			accountCreatedAt: employee.createdAt,
+			fileStorage: filesByFileType,
+		}
 	}),
 	createPushSubscription: authProcedure.input(PushSubscription).mutation(async (opts) => {
 		await db.pushSubscription.upsert({
