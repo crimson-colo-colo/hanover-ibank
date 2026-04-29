@@ -1,4 +1,5 @@
 import { create, insertMultiple, search } from "@orama/orama"
+import { pluginQPS } from "@orama/plugin-qps"
 import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
@@ -121,7 +122,7 @@ function createSearchIndex(items: ContentListItem[], activeFilters: SearchFilter
 			},
 			url: "string",
 		},
-		// plugins: [pluginQPS()],
+		plugins: [pluginQPS()],
 	})
 
 	insertMultiple(
@@ -133,6 +134,7 @@ function createSearchIndex(items: ContentListItem[], activeFilters: SearchFilter
 		index,
 		items.map((item) => ({
 			...item,
+			title: item.title.replaceAll(/[_.]+/g, " "),
 			url: item.type === "Link" ? item.url : undefined,
 			tags: item.tags.map((tag) => tag.name),
 		}))
@@ -231,11 +233,13 @@ export class SearchWorker {
 
 		const results = await search(this.index, {
 			mode: "fulltext",
-			limit: 5,
+			limit: 20,
 			term: query,
+			tolerance: 1,
 		})
 
 		return results.hits
+			.sort((a, b) => b.score - a.score)
 			.map((hit) => {
 				const filter = searchFilters.find((filter) => filter.id === hit.id)
 				if (filter) {

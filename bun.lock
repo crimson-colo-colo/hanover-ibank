@@ -55,6 +55,7 @@
         "@mantine/notifications": "^9.0.2",
         "@mantine/spotlight": "^9.1.0",
         "@orama/orama": "^3.1.18",
+        "@orama/plugin-qps": "^3.1.18",
         "@react-buddy/ide-toolbox": "^2.4.0",
         "@react-email/ui": "6.0.0",
         "@rolldown/plugin-babel": "^0.2.3",
@@ -531,6 +532,8 @@
     "@nodable/entities": ["@nodable/entities@2.1.0", "", {}, "sha512-nyT7T3nbMyBI/lvr6L5TyWbFJAI9FTgVRakNoBqCD+PmID8DzFrrNdLLtHMwMszOtqZa8PAOV24ZqDnQrhQINA=="],
 
     "@orama/orama": ["@orama/orama@3.1.18", "", {}, "sha512-a61ljmRVVyG5MC/698C8/FfFDw5a8LOIvyOLW5fztgUXqUpc1jOfQzOitSCbge657OgXXThmY3Tk8fpiDb4UcA=="],
+
+    "@orama/plugin-qps": ["@orama/plugin-qps@3.1.18", "", { "dependencies": { "@orama/orama": "3.1.18" } }, "sha512-q19pFGF1jRk+dGR4j/4MscCACtZo6DKO8ZjnM3AWJICzjWVYJYBvlGuD2+Jt079iUW04cGh4EpMw5WxaTpZQCw=="],
 
     "@oxc-project/types": ["@oxc-project/types@0.127.0", "", {}, "sha512-aIYXQBo4lCbO4z0R3FHeucQHpF46l2LbMdxRvqvuRuW2OxdnSkcng5B8+K12spgLDj93rtN3+J2Vac/TIO+ciQ=="],
 

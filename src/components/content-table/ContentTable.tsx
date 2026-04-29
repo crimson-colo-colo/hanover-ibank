@@ -5,7 +5,6 @@ import {
 	Chip,
 	Flex,
 	Group,
-	Kbd,
 	Modal,
 	NumberInput,
 	Pagination,
@@ -13,12 +12,12 @@ import {
 	Select,
 	Table,
 	Text,
-	TextInput,
 	Title,
 	Tooltip,
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
+import { spotlight } from "@mantine/spotlight"
 import { ContentStatus, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import type { FileType } from "@shared/filetype.ts"
@@ -34,6 +33,7 @@ import {
 	IconMessageCircleUser,
 	IconPencil,
 	IconProgress,
+	IconSearch,
 	IconSortAscending2,
 	IconSortDescending2,
 	IconStar,
@@ -370,7 +370,7 @@ export function ContentTable({
 			],
 			pagination: {
 				pageIndex: 0, //custom initial page index
-				pageSize: 10, //custom default page size
+				pageSize: 20, //custom default page size
 			},
 		},
 		state: {
@@ -537,18 +537,9 @@ export function ContentTable({
 					>
 						Delete selected
 					</Button>
-					<TextInput
-						className="grow max-w-120"
-						value={globalFilter ?? ""}
-						onChange={(value) => setGlobalFilter(value.currentTarget.value)}
-						placeholder="Search..."
-						rightSection={
-							<Flex gap={4} mr={32}>
-								<Kbd size="xs">Ctrl</Kbd> <Kbd size="xs">K</Kbd>
-							</Flex>
-						}
-						id="content-search-input"
-					/>
+					<ActionIcon size="lg" variant="subtle" onClick={spotlight.open}>
+						<IconSearch />
+					</ActionIcon>
 				</Flex>
 			</Flex>
 			<Chip.Group value={activeView} onChange={setActiveView}>
