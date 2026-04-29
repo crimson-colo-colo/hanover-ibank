@@ -22,6 +22,7 @@ type Tag = ContentListItem["tags"][number]
 interface TagFilterPopupProps {
 	column: Column<ContentListItem, string>
 	allTags: Tag[]
+	resetPage: () => void
 }
 
 export type FilterOptions = {
@@ -29,7 +30,7 @@ export type FilterOptions = {
 	tags: string[]
 }
 
-export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
+export function TagFilterPopup({ column, allTags, resetPage }: TagFilterPopupProps) {
 	const [open, setOpen] = useState(false)
 	const [selected, setSelected] = useState<string[]>([])
 	const [filterMode, setFilterMode] = useState<string>("Includes these tags")
@@ -114,6 +115,7 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 							value={filterMode}
 							onChange={(val) => {
 								selectMode(val ?? "Includes these tags")
+								resetPage()
 							}}
 						/>
 						{Object.entries(tagsByCategory).map(([category, tags]) => (
@@ -132,7 +134,11 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 												key={`${tag.category}-${tag.name}`}
 												label={displayName}
 												checked={filterValue.includes(tag.name)}
-												onChange={() => toggleTag(tag.name)}
+												onChange={() => {
+													toggleTag(tag.name)
+													console.log("Hello")
+													resetPage()
+												}}
 												size="sm"
 											/>
 										)
@@ -142,7 +148,16 @@ export function TagFilterPopup({ column, allTags }: TagFilterPopupProps) {
 						))}
 
 						{hasActiveFilters && (
-							<Button variant="subtle" color="gray" size="xs" onClick={clearAll} mt={4}>
+							<Button
+								variant="subtle"
+								color="gray"
+								size="xs"
+								onClick={() => {
+									clearAll()
+									resetPage()
+								}}
+								mt={4}
+							>
 								Clear filters
 							</Button>
 						)}
