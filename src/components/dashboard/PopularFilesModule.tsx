@@ -43,7 +43,7 @@ export function PopularFilesModule({
 							}}
 						>
 							<FileTypeIcon
-								fileType={FileType.Link}
+								fileType={fileType}
 								size={56}
 								strokeWidth={1.5}
 								className="pr-5 shrink-0"

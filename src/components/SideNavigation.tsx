@@ -1,6 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { ActionIcon, Button, Stack, Text, Tooltip } from "@mantine/core"
 import { useHover } from "@mantine/hooks"
+import { ContentType } from "@prisma/browser.ts"
+import { FileType } from "@shared/filetype.ts"
 import {
 	IconBolt,
 	IconBuildingBank,
@@ -15,10 +17,11 @@ import {
 	IconStar,
 	IconUsers,
 } from "@tabler/icons-react"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import clsx from "clsx"
 import { Avatar } from "@/components/Avatar.tsx"
+import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { trpc } from "@/lib/trpc.ts"
 
 export type SideNavigationProps = {
@@ -97,6 +100,8 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 	const isAdmin = useQuery(trpc.admin.isAdmin.queryOptions())
 	const location = useLocation()
 	const { hovered, ref } = useHover()
+	const recentlyViewedContent = useQuery(trpc.content.getRecentlyViewed.queryOptions({ limit: 5 }))
+	const recentlyViewed = useMutation(trpc.content.updateRecentlyViewedTimestamp.mutationOptions())
 
 	const navLinks = routeLinks
 		.filter((link) => !link.admin)
@@ -159,10 +164,40 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 			{!collapsed && (
 				<div>
 					<hr />
-					<Stack>
+					<Stack gap={0}>
 						<Text c="dimmed" className="ml-5 mb-2 text-xs uppercase tracking-wider font-semibold">
 							Recently Viewed
 						</Text>
+						<Stack gap={0}>
+							{recentlyViewedContent.data?.map((item) => {
+								const contentType =
+									item.type === ContentType.Link
+										? FileType.Link
+										: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
+								return (
+									<Button
+										key={item.id}
+										component={Link}
+										to={`${item.type === ContentType.Link ? item.url : `/preview/${item.id}`}`}
+										target={item.type === ContentType.Link ? "_blank" : "_self"}
+										rel="opener"
+										variant="subtle"
+										radius={0}
+										leftSection={<FileTypeIcon fileType={contentType} />}
+										onClick={async () => {
+											if (item.type === ContentType.Link) {
+												await recentlyViewed.mutateAsync({ id: item.id })
+											}
+										}}
+										className="flex justify-left"
+									>
+										<span className="h-full content-center max-w-[20ch] truncate">
+											{item.title}
+										</span>
+									</Button>
+								)
+							})}
+						</Stack>
 					</Stack>
 				</div>
 			)}
@@ -170,33 +205,41 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 			<div className="flex-1" />
 
 			{auth0.isAuthenticated && auth0.user && (
-				<Button
-					component={Link}
-					to="/profile"
-					justify="left"
-					variant="subtle"
-					color="gray"
-					className={clsx(
-						"h-14",
-						!collapsed
-							? "border-0 border-t border-gray-500 gap-3 py-1"
-							: "px-0 flex items-center justify-center"
-					)}
-					radius={0}
-					fullWidth={!collapsed}
+				<Tooltip
+					label="Profile"
+					position="right"
+					withArrow={true}
+					arrowSize={8}
+					disabled={!collapsed}
 				>
-					<Avatar userId={auth0.user.sub!} w={collapsed ? "30" : "32"} />
-					{!collapsed && (
-						<div className="flex flex-col items-start ml-3">
-							<Text size="sm" fw={500}>
-								{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
-							</Text>
-							<Text size="xs" c="gray">
-								{auth0.user.email}
-							</Text>
-						</div>
-					)}
-				</Button>
+					<Button
+						component={Link}
+						to="/profile"
+						justify="left"
+						variant="subtle"
+						color="gray"
+						className={clsx(
+							"h-14",
+							!collapsed
+								? "border-0 border-t border-gray-500 gap-3 py-1"
+								: "px-0 flex items-center justify-center"
+						)}
+						radius={0}
+						fullWidth={!collapsed}
+					>
+						<Avatar userId={auth0.user.sub!} w={collapsed ? "30" : "32"} />
+						{!collapsed && (
+							<div className="flex flex-col items-start ml-3">
+								<Text size="sm" fw={500}>
+									{auth0.user.name ?? auth0.user.nickname ?? auth0.user.username}
+								</Text>
+								<Text size="xs" c="gray">
+									{auth0.user.email}
+								</Text>
+							</div>
+						)}
+					</Button>
+				</Tooltip>
 			)}
 		</header>
 	)
