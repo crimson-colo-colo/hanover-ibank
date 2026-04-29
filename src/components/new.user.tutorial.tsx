@@ -24,6 +24,7 @@ const DASHBOARD_STEPS: Step[] = [
 		content:
 			"This is your personal dashboard. It greets you with your name and role at the top. Click the gear icon in the top-right of this banner to rearrange or hide any of the modules below.",
 		placement: "bottom",
+		scrollOffset: 50,
 	},
 	{
 		target: "#side-navigation",
@@ -112,6 +113,7 @@ const FAVORITES_STEPS: Step[] = [
 		content:
 			"Anything you star anywhere in the app shows up here for quick access. You can preview, download, or unfavorite items right from this page.",
 		placement: "bottom",
+		scrollOffset: 50,
 	},
 	{
 		target: "#favorites-view-toggle",
@@ -119,6 +121,7 @@ const FAVORITES_STEPS: Step[] = [
 		content:
 			"Switch between a visual grid of thumbnails and a sortable list. List view also lets you select multiple favorites and unfavorite them in bulk.",
 		placement: "bottom",
+		scrollOffset: 50,
 	},
 ]
 
@@ -146,6 +149,7 @@ const ADMIN_ANALYTICS_STEPS: Step[] = [
 		content:
 			"A quick snapshot of platform activity: time on site, total uploads, file and link counts, your busiest month, and total employee count.",
 		placement: "bottom",
+		scrollOffset: 50,
 	},
 	{
 		target: "#analytics-uploads-chart",

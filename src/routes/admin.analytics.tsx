@@ -1,11 +1,11 @@
 import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
-import { Grid, Paper, Stack, Text, Timeline, Title, Group } from "@mantine/core"
-import { HelpHint } from "@/components/help.hint.tsx";
+import { Grid, Group, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
 import { IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
+import { HelpHint } from "@/components/help.hint.tsx"
 import { trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/admin/analytics")({
@@ -147,97 +147,99 @@ function AnalyticsDashboard() {
 								content:
 									"A quick snapshot of platform activity: time on site, total uploads, file and link counts, your busiest month, and total employee count.",
 								placement: "bottom",
+								scrollOffset: 50,
 							},
 						]}
 					/>
 				</Group>
-			<Grid id="analytics-metrics" align="stretch" grow={true}>
-				{metrics.map((m) => (
-					<Grid.Col key={m.label} span={{ base: 12, sm: 6, md: 4, lg: 2 }} align="stretch">
-						<Paper withBorder p="md" radius="md">
-							<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
-								{m.label}
-							</Text>
-							<Text size="xl" fw={500} mt={4}>
-								{m.value}
-							</Text>
-						</Paper>
-					</Grid.Col>
-				))}
-			</Grid>
+				<Grid id="analytics-metrics" align="stretch" grow={true}>
+					{metrics.map((m) => (
+						<Grid.Col key={m.label} span={{ base: 12, sm: 6, md: 4, lg: 2 }} align="stretch">
+							<Paper withBorder p="md" radius="md">
+								<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
+									{m.label}
+								</Text>
+								<Text size="xl" fw={500} mt={4}>
+									{m.value}
+								</Text>
+							</Paper>
+						</Grid.Col>
+					))}
+				</Grid>
 			</div>
 			<div>
-			<Group gap="xs" mb="xs">
-				<Text size="sm" fw={600}>
-					Uploads & Activity
-				</Text>
-				<HelpHint
-					feature="uploads and recent activity"
-					steps={[
-						{
-							target: "#analytics-uploads-chart",
-							title: "Uploads Over Time & Recent Activity",
-							content:
-								"The area chart tracks file and link uploads over the last 12 months. The timeline on the right shows the most recent actions taken by any user on the platform.",
-							placement: "top",
-						},
-					]}
-				/>
-			</Group>
-			<Grid id="analytics-uploads-chart">
-				<Grid.Col span={{ base: 12, md: 7 }}>
-					<Paper withBorder p="md" radius="md" h="100%">
-						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-							Uploads Over Time
-						</Text>
-						<AreaChart
-							h={220}
-							data={normalizedUploadData}
-							dataKey="month"
-							series={[
-								{ name: "Files", color: "blue" },
-								{ name: "Links", color: "teal" },
-							]}
-							curveType="monotone"
-							xAxisProps={{
-								padding: { right: 20 },
-							}}
-						/>
-					</Paper>
-				</Grid.Col>
+				<Group gap="xs" mb="xs">
+					<Text size="sm" fw={600}>
+						Uploads & Activity
+					</Text>
+					<HelpHint
+						feature="uploads and recent activity"
+						steps={[
+							{
+								target: "#analytics-uploads-chart",
+								title: "Uploads Over Time & Recent Activity",
+								content:
+									"The area chart tracks file and link uploads over the last 12 months. The timeline on the right shows the most recent actions taken by any user on the platform.",
+								placement: "top",
+								scrollOffset: 50,
+							},
+						]}
+					/>
+				</Group>
+				<Grid id="analytics-uploads-chart">
+					<Grid.Col span={{ base: 12, md: 7 }}>
+						<Paper withBorder p="md" radius="md" h="100%">
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+								Uploads Over Time
+							</Text>
+							<AreaChart
+								h={220}
+								data={normalizedUploadData}
+								dataKey="month"
+								series={[
+									{ name: "Files", color: "blue" },
+									{ name: "Links", color: "teal" },
+								]}
+								curveType="monotone"
+								xAxisProps={{
+									padding: { right: 20 },
+								}}
+							/>
+						</Paper>
+					</Grid.Col>
 
-				<Grid.Col span={{ base: 12, md: 5 }}>
-					<Paper withBorder p="md" radius="md" h="100%">
-						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-							Recent User Activity
-						</Text>
-						<div style={{ maxHeight: 200, overflowY: "auto" }}>
-							<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
-								{(userData ?? []).map((activity, i) => {
-									const { title, description } = getActivityLabel(activity.path)
-									return (
-										<Timeline.Item
-											// biome-ignore lint/suspicious/noArrayIndexKey: foo
-											key={i}
-											bullet={<IconUserKey size={12} />}
-											title={title}
-										>
-											<Text size="sm" c="dimmed">
-												{activity.contentTitle
-													? `Uploaded "${activity.contentTitle}"`
-													: description}
-											</Text>
-											<Text size="xs" mt={4}>
-												{new Date(activity.timestamp).toLocaleTimeString()}
-											</Text>
-										</Timeline.Item>
-									)
-								})}
-							</Timeline>
-						</div>
-					</Paper>
-				</Grid.Col>
-			</Grid>
+					<Grid.Col span={{ base: 12, md: 5 }}>
+						<Paper withBorder p="md" radius="md" h="100%">
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+								Recent User Activity
+							</Text>
+							<div style={{ maxHeight: 200, overflowY: "auto" }}>
+								<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
+									{(userData ?? []).map((activity, i) => {
+										const { title, description } = getActivityLabel(activity.path)
+										return (
+											<Timeline.Item
+												// biome-ignore lint/suspicious/noArrayIndexKey: foo
+												key={i}
+												bullet={<IconUserKey size={12} />}
+												title={title}
+											>
+												<Text size="sm" c="dimmed">
+													{activity.contentTitle
+														? `Uploaded "${activity.contentTitle}"`
+														: description}
+												</Text>
+												<Text size="xs" mt={4}>
+													{new Date(activity.timestamp).toLocaleTimeString()}
+												</Text>
+											</Timeline.Item>
+										)
+									})}
+								</Timeline>
+							</div>
+						</Paper>
+					</Grid.Col>
+				</Grid>
 			</div>
 			<div>
 				<Group gap="xs" mb="xs">
@@ -257,57 +259,57 @@ function AnalyticsDashboard() {
 						]}
 					/>
 				</Group>
-			<Grid id="analytics-file-charts">
-				<Grid.Col span={{ base: 12, md: 6 }}>
-					<Paper withBorder p="md" radius="md">
-						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-							File Types
-						</Text>
-						{pieData.length > 0 ? (
-							<PieChart
-								size={200}
-								data={pieData}
-								withTooltip
-								tooltipDataSource="segment"
-								withLabels
-								withLabelsLine
-								labelsPosition="outside"
-								labelsType="value"
-								className="mx-auto"
-							/>
-						) : (
-							<Text c="dimmed" ta="center" mt="xl">
-								No file data available yet
+				<Grid id="analytics-file-charts">
+					<Grid.Col span={{ base: 12, md: 6 }}>
+						<Paper withBorder p="md" radius="md">
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+								File Types
 							</Text>
-						)}
-					</Paper>
-				</Grid.Col>
+							{pieData.length > 0 ? (
+								<PieChart
+									size={200}
+									data={pieData}
+									withTooltip
+									tooltipDataSource="segment"
+									withLabels
+									withLabelsLine
+									labelsPosition="outside"
+									labelsType="value"
+									className="mx-auto"
+								/>
+							) : (
+								<Text c="dimmed" ta="center" mt="xl">
+									No file data available yet
+								</Text>
+							)}
+						</Paper>
+					</Grid.Col>
 
-				<Grid.Col span={{ base: 12, md: 6 }}>
-					<Paper withBorder p="md" radius="md">
-						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-							Storage Used by Type
-						</Text>
-						{barData.length > 0 ? (
-							<BarChart
-								h={300}
-								data={barData}
-								dataKey="type"
-								valueFormatter={(value) => {
-									if (value < 1024) return `${value} B`
-									if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`
-									return `${(value / (1024 * 1024)).toFixed(1)} MB`
-								}}
-								series={[{ name: "storage", color: "violet.6", label: "Storage Used" }]}
-							/>
-						) : (
-							<Text c="dimmed" ta="center" mt="xl">
-								No file data available yet
+					<Grid.Col span={{ base: 12, md: 6 }}>
+						<Paper withBorder p="md" radius="md">
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+								Storage Used by Type
 							</Text>
-						)}
-					</Paper>
-				</Grid.Col>
-			</Grid>
+							{barData.length > 0 ? (
+								<BarChart
+									h={300}
+									data={barData}
+									dataKey="type"
+									valueFormatter={(value) => {
+										if (value < 1024) return `${value} B`
+										if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`
+										return `${(value / (1024 * 1024)).toFixed(1)} MB`
+									}}
+									series={[{ name: "storage", color: "violet.6", label: "Storage Used" }]}
+								/>
+							) : (
+								<Text c="dimmed" ta="center" mt="xl">
+									No file data available yet
+								</Text>
+							)}
+						</Paper>
+					</Grid.Col>
+				</Grid>
 			</div>
 			<div>
 				<Group gap="xs" mb="xs">
@@ -327,37 +329,37 @@ function AnalyticsDashboard() {
 						]}
 					/>
 				</Group>
-			<Grid id="analytics-heatmap">
-				<Grid.Col span={12}>
-					<Paper withBorder p="md" radius="md">
-						<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-							User Activity Heatmap
-						</Text>
-						<Heatmap
-							data={heatmapData ?? {}}
-							startDate={startDate}
-							endDate={endDate}
-							colors={[
-								"var(--mantine-color-violet-2)",
-								"var(--mantine-color-violet-3)",
-								"var(--mantine-color-violet-4)",
-								"var(--mantine-color-violet-5)",
-							]}
-							withTooltip
-							withWeekdayLabels
-							weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
-							withMonthLabels
-							firstDayOfWeek={0}
-							rectSize={20}
-							rectRadius={20}
-							gap={5}
-							getTooltipLabel={({ date, value }) =>
-								`${dayjs(date).format("D MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
-							}
-						/>
-					</Paper>
-				</Grid.Col>
-			</Grid>
+				<Grid id="analytics-heatmap">
+					<Grid.Col span={12}>
+						<Paper withBorder p="md" radius="md">
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+								User Activity Heatmap
+							</Text>
+							<Heatmap
+								data={heatmapData ?? {}}
+								startDate={startDate}
+								endDate={endDate}
+								colors={[
+									"var(--mantine-color-violet-2)",
+									"var(--mantine-color-violet-3)",
+									"var(--mantine-color-violet-4)",
+									"var(--mantine-color-violet-5)",
+								]}
+								withTooltip
+								withWeekdayLabels
+								weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
+								withMonthLabels
+								firstDayOfWeek={0}
+								rectSize={20}
+								rectRadius={20}
+								gap={5}
+								getTooltipLabel={({ date, value }) =>
+									`${dayjs(date).format("D MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
+								}
+							/>
+						</Paper>
+					</Grid.Col>
+				</Grid>
 			</div>
 		</Stack>
 	)
