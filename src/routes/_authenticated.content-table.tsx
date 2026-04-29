@@ -44,46 +44,44 @@ function ContentTablePage() {
 	const { view } = Route.useSearch()
 
 	return (
-		<main>
-			<div>
-				<section>
-					{content.isError ? (
-						<Alert color="red" title="Failed to load content" icon={<IconAlertOctagon />}>
-							Failed to load content: {content.error.message}
-						</Alert>
-					) : (
-						<ContentTable
-							loading={content.isFetching}
-							data={
-								content.data ?? {
-									content: [],
-									role: "Employee" as EmployeeRole,
-								}
+		<>
+			<section>
+				{content.isError ? (
+					<Alert color="red" title="Failed to load content" icon={<IconAlertOctagon />}>
+						Failed to load content: {content.error.message}
+					</Alert>
+				) : (
+					<ContentTable
+						loading={content.isFetching}
+						data={
+							content.data ?? {
+								content: [],
+								role: "Employee" as EmployeeRole,
 							}
-							filter={contentFilter}
-							changeFilter={setContentFilter}
-							openFilePreview={(file, type) => {
-								setSelectedContent(file)
-								setSelectedContentFileType(type)
-								openFilePreviewModal()
-							}}
-							view={view}
-						/>
-					)}
-				</section>
-				<Modal.Root
-					opened={filePreviewOpen}
-					onClose={closeFilePreview}
-					fullScreen
-					shadow="none"
-					transitionProps={{ transition: "fade", duration: 200 }}
-				>
-					<Modal.Overlay backgroundOpacity={0.55} blur={3} />
-					{selectedContent && selectedContentFileType && (
-						<PreviewModal closePreview={closeFilePreview} contentId={selectedContent.id} />
-					)}
-				</Modal.Root>
-			</div>
-		</main>
+						}
+						filter={contentFilter}
+						changeFilter={setContentFilter}
+						openFilePreview={(file, type) => {
+							setSelectedContent(file)
+							setSelectedContentFileType(type)
+							openFilePreviewModal()
+						}}
+						view={view}
+					/>
+				)}
+			</section>
+			<Modal.Root
+				opened={filePreviewOpen}
+				onClose={closeFilePreview}
+				fullScreen
+				shadow="none"
+				transitionProps={{ transition: "fade", duration: 200 }}
+			>
+				<Modal.Overlay backgroundOpacity={0.55} blur={3} />
+				{selectedContent && selectedContentFileType && (
+					<PreviewModal closePreview={closeFilePreview} contentId={selectedContent.id} />
+				)}
+			</Modal.Root>
+		</>
 	)
 }

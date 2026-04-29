@@ -1,7 +1,9 @@
-import type { HeadObjectOutput } from "@aws-sdk/client-s3"
-import type { UseMutationResult } from "@tanstack/react-query"
+import type { HeadObjectCommandOutput, HeadObjectOutput } from "@aws-sdk/client-s3"
+import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
+import type { Management } from "auth0"
+import z from "zod"
 import type { Prisma } from "../server/generated/prisma/browser.ts"
 import type {
 	ContentStatus,
@@ -72,13 +74,27 @@ export type CheckOutMutationType = UseMutationResult<
 	CheckOutInput
 >
 
-type recentlyViewedOutput = RouterOutput["content"]["updateRecentlyViewedTimestamp"]
-type recentlyViewedInput = RouterInput["content"]["updateRecentlyViewedTimestamp"]
-export type recentlyViewedType = UseMutationResult<
-	recentlyViewedOutput,
-	TRPCClientErrorLike<AppRouter>,
-	recentlyViewedInput
->
+type ViewTotals =
+	| {
+			title: string | undefined
+			contentId: string
+			_sum: {
+				viewCount: number | null
+			}
+			metadata: HeadObjectCommandOutput | undefined
+	  }[]
+	| undefined
+
+export type ListFavoritesQuery = UseQueryResult<ContentList, TRPCClientErrorLike<AppRouter>>
+export type ViewTotalsQuery = UseQueryResult<ViewTotals, TRPCClientErrorLike<AppRouter>>
+
+export type Profile = {
+	id: string
+	name: string
+	email: string
+	username: string
+	role: EmployeeRole | undefined
+}
 
 export type Thread = Prisma.ContentTalkThreadGetPayload<{
 	include: {
@@ -94,3 +110,29 @@ export type Thread = Prisma.ContentTalkThreadGetPayload<{
 		}
 	}
 }>
+
+export const PushSubscription = z.object({
+	endpoint: z.string(),
+	keys: z.object({
+		p256dh: z.string(),
+		auth: z.string(),
+	}),
+})
+
+export const PushMessage = z.object({
+	title: z.string(),
+	body: z.string(),
+	icon: z.string().optional(),
+	tag: z.string(),
+	url: z.string().optional(),
+})
+
+export type ContentNotification = Prisma.NotificationGetPayload<{}> & {
+	actor: Management.UserResponseSchema | null
+	content: Prisma.ContentGetPayload<{}> | null // TODO: ContentListItem
+}
+
+export type ServiceWorkerMessage = {
+	type: "new_notification"
+	notification: z.infer<typeof PushMessage>
+}

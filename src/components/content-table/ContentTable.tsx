@@ -39,6 +39,7 @@ import {
 	IconStar,
 	IconStarFilled,
 	IconTrash,
+	IconUser,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
@@ -127,10 +128,6 @@ export function ContentTable({
 		useDisclosure(false)
 	const [contentSelectedForCheckout, selectContentForCheckout] = useState<ContentListItem | null>(
 		null
-	)
-
-	const recentlyViewed = useMutation(
-		trpc.content.updateRecentlyViewedTimestamp.mutationOptions(mutationOptions)
 	)
 
 	const defaultColumns = {
@@ -233,12 +230,7 @@ export function ContentTable({
 				sortingFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => (
-					<NameColumn
-						info={info}
-						openFilePreview={openFilePreview}
-						profile={profile}
-						recentlyViewed={recentlyViewed}
-					/>
+					<NameColumn info={info} openFilePreview={openFilePreview} profile={profile} />
 				),
 			}),
 			columnHelper.accessor((row) => `${row.owner.name} ${row.owner.email}`, {
@@ -291,14 +283,12 @@ export function ContentTable({
 						(entry) => entry.employeeId === profile?.id
 					)?.recentlyViewed
 
-					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
-					if (!time) return new Date("1970-01-01")
-
-					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
-						/^(in )?about /,
-						"$1"
-					)
-					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
+					const elapsedTime =
+						time !== undefined
+							? formatDistanceToNow(time, { addSuffix: true }).replace(/^(in )?about /, "$1")
+							: ""
+					const titleTimestamp = time !== undefined ? time.toLocaleString() : ""
+					return <span title={titleTimestamp}>{elapsedTime}</span>
 				},
 			}),
 
@@ -317,14 +307,15 @@ export function ContentTable({
 						(entry) => entry.employeeId === profile?.id
 					)?.recentlyEdited
 
-					//This should never happen but just in case instead of returning null (would break the website) return January 1st 1970
-					if (!time) return new Date("1970-01-01")
-
-					const elapsedTime = formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
-						/^(in )?about /,
-						"$1"
-					)
-					return <span title={new Date(time).toLocaleString()}>{elapsedTime}</span>
+					const elapsedTime =
+						time !== undefined
+							? formatDistanceToNow(new Date(time), { addSuffix: true }).replace(
+									/^(in )?about /,
+									"$1"
+								)
+							: ""
+					const titleTimestamp = time !== undefined ? time.toLocaleString() : ""
+					return <span title={titleTimestamp}>{elapsedTime}</span>
 				},
 			}),
 			columnHelper.accessor(
@@ -348,7 +339,6 @@ export function ContentTable({
 						openCheckOutModal={openCheckOutModal}
 						openCheckInModal={openCheckInModal}
 						profile={profile}
-						recentlyViewed={recentlyViewed}
 					/>
 				),
 			}),
@@ -433,6 +423,7 @@ export function ContentTable({
 				...defaultColumns,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -444,6 +435,7 @@ export function ContentTable({
 				expirationDate: true,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -455,6 +447,7 @@ export function ContentTable({
 				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -466,15 +459,27 @@ export function ContentTable({
 				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
 		if (activeView === "checkedOut") {
-			table.getColumn("checkedOutBy")?.setFilterValue("active")
 			setColumnVisibility({
 				...defaultColumns,
 				lastModified: false,
 			})
+			table.getColumn("checkedOutBy")?.setFilterValue("active")
+			table.getColumn("owner")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "owned") {
+			setColumnVisibility({
+				...defaultColumns,
+				owner: false,
+			})
+			table.getColumn("owner")?.setFilterValue(profile?.name ?? "")
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 	}, [activeView])
@@ -498,7 +503,7 @@ export function ContentTable({
 
 	return (
 		<>
-			<Flex align="center" justify="space-between" gap="md" mt="xl" mb="sm">
+			<Flex align="center" justify="space-between" gap="md" mb="sm">
 				<Title order={3} className="flex items-center gap-4">
 					<span>Your Content ({table.getRowCount()})</span>
 					{loading && <IconLoader2 size={20} className="animate-spin" />}
@@ -628,6 +633,23 @@ export function ContentTable({
 						<Group wrap="nowrap">
 							<IconDoorExit size="1rem" />
 							Checked Out
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="owned"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconUser size="1rem" />
+							Owned By You
 						</Group>
 					</Chip>
 				</Group>

@@ -3,15 +3,16 @@ import { faker } from "@faker-js/faker"
 import { Temporal } from "@js-temporal/polyfill"
 import { PrismaPg } from "@prisma/adapter-pg"
 import type { FileType } from "@shared/filetype.ts"
-import { auth0Management } from "../server/auth.ts"
 import {
 	ContentStatus,
 	EmployeeRole,
+	NotificationType,
 	type Prisma,
 	PrismaClient,
 	TagCategory,
 	ThreadStatus,
 } from "../server/generated/prisma/client.ts"
+import { auth0Cache } from "../server/lib/auth0.ts"
 import { generateDefaultAvatar } from "../server/lib/avatar.ts"
 import { bucketName, s3 } from "../server/s3.ts"
 import { fileContentData, objectIdToFileType, uploadFilesToS3 } from "./seed-data/files.ts"
@@ -42,22 +43,21 @@ async function main() {
 
 	await createUsersAndAvatars()
 	await createTags()
+
 	const linkContent = await createLinkContent()
 	await uploadFilesToS3()
 	const { fileContent, fileTypeToContent } = await createFileContent()
 	await createContentTags(fileContent, linkContent)
-
 	console.log(`Uploaded ${fileContent.length} files to S3 and created content rows for them`)
 
-	await createFavoriteContent(linkContent, fileTypeToContent)
-
-	await createUserActivity()
-
-	await checkoutFiles(fileContent)
-
-	await createContentThreads()
-
-	await createTimestamps()
+	await Promise.all([
+		createFavoriteContent(linkContent, fileTypeToContent),
+		createUserActivity(),
+		checkoutFiles(fileContent),
+		createContentThreads(),
+		createRecentTimestamps(),
+		createNotifications(),
+	])
 }
 
 async function confirmOverwrite() {
@@ -83,6 +83,7 @@ async function confirmOverwrite() {
 
 async function wipeDBandS3() {
 	await prisma.$transaction([
+		prisma.recentTimestamps.deleteMany(),
 		prisma.talkThreadComment.deleteMany(),
 		prisma.contentTalkThread.deleteMany(),
 		prisma.userActivity.deleteMany(),
@@ -108,31 +109,43 @@ async function wipeDBandS3() {
 }
 
 async function createUsersAndAvatars() {
+	const users = await auth0Cache.listUsers()
+
 	await prisma.$transaction(
-		employeeData.map((employee) =>
-			prisma.employee.create({
+		employeeData.map((employee) => {
+			const auth0User = users.data.find((u) => u.user_id === employee.id)
+			return prisma.employee.create({
 				data: {
 					...employee,
+					createdAt: auth0User?.created_at
+						? new Date(auth0User.created_at.toString())
+						: Temporal.Now.instant()
+								.subtract({
+									hours: 24 + Math.random() * 24 * 365,
+									minutes: Math.random() * 60,
+								})
+								.toString(),
 				},
 				select: { id: true },
 			})
-		)
+		})
 	)
-
-	const users = await auth0Management.users.list()
 
 	await Promise.all(
 		employeeData.map(async ({ id }) => {
 			const user = users.data.find((u) => u.user_id === id)!
-			const avatar =
-				Math.random() < 0.8
-					? await downloadAvatar()
-					: generateDefaultAvatar(user.name ?? user.email!)
-			console.log(`Uploading default avatar for user ${user.name ?? "(unknown)"} to S3...`)
+			const isCustomAvatar = Math.random() < 0.8
+			const avatar = isCustomAvatar
+				? await downloadAvatar()
+				: generateDefaultAvatar(user.name ?? user.email!)
+			console.log(`Uploading avatar for user ${user.name ?? "(unknown)"} to S3...`)
 			await s3.putObject({
 				Bucket: bucketName,
 				Key: `avatar/${id}.png`,
 				Body: avatar,
+				Metadata: {
+					source: isCustomAvatar ? "user" : "default",
+				},
 			})
 		})
 	)
@@ -241,30 +254,27 @@ async function createFavoriteContent(
 	linkContent: { id: string; ownerId: string }[],
 	fileTypeToContent: Map<FileType, string[]>
 ) {
-	const [admin, emp1, emp2] = await Promise.all(
-		["cccadmin@calebc.co", "cccemp1@calebc.co", "cccemp2@calebc.co"].map((email) =>
-			auth0Management.users.listUsersByEmail({ email }).then((users) => users[0])
-		)
-	)
-	if (!admin || !emp1 || !emp2) {
-		console.error(
-			"Could not find one or more required users in Auth0. Make sure these users exist before running the seed script."
-		)
-		process.exit(1)
-	}
+	const admin = "auth0|69d57cf83f6e9b609fe8a92f"
+	const emp1 = "auth0|69d57d03e7bf39d172e84921"
+	const emp2 = "auth0|69d57d0af36c0b4100640b0a"
 
 	const thingsToFavorite = [
-		...linkContent.slice(0, 3).map((c) => c.id),
-		...[...fileTypeToContent.values()].flatMap((ids) => ids.slice(0, 1)),
+		...linkContent
+			.sort(() => 0.5 - Math.random())
+			.slice(0, 3)
+			.map((c) => c.id),
+		...Array.from(fileTypeToContent.values()).flatMap((contentIds) =>
+			contentIds.sort(() => 0.5 - Math.random()).slice(0, 3)
+		),
 	]
 
 	await Promise.all(
-		[admin, emp1, emp2].flatMap((user) =>
+		[admin, emp1, emp2].flatMap((userId) =>
 			thingsToFavorite.map((contentId) =>
 				prisma.favoriteContent.create({
 					data: {
 						contentId,
-						employeeId: user.user_id!,
+						employeeId: userId,
 					},
 				})
 			)
@@ -413,10 +423,11 @@ async function createContentThreads() {
 	console.log(`Created ${commentData.flat().length} comments across all threads`)
 }
 
-async function createTimestamps() {
+async function createRecentTimestamps() {
 	const contentItems = await prisma.content.findMany({
 		select: { id: true },
 	})
+	const data: Prisma.RecentTimestampsCreateManyInput[] = []
 	for (const content of contentItems) {
 		for (const employee of employeeData) {
 			const employeeId = employee.id
@@ -429,14 +440,92 @@ async function createTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
-			await prisma.recentTimestamps.create({
-				data: {
-					recentlyViewed: recentlyViewed,
-					recentlyEdited: recentlyEdited,
-					employeeId: employeeId,
-					contentId: contentId,
-				},
+			const viewCount = Math.floor(Math.random() * 100) + 1
+			data.push({
+				recentlyViewed: recentlyViewed,
+				recentlyEdited: recentlyEdited,
+				employeeId: employeeId,
+				contentId: contentId,
+				viewCount: viewCount,
 			})
+		}
+	}
+	await prisma.recentTimestamps.createMany({ data })
+	console.log(`Created recent timestamps for ${data.length} employee-content pairs`)
+}
+
+// Create 5 notifications for each employee, with random types and associated with random content items where applicable
+async function createNotifications() {
+	const data: Prisma.NotificationCreateManyInput[] = []
+
+	for (const employee of employeeData) {
+		const ownedContent = await prisma.content.findMany({
+			where: { ownerId: employee.id },
+			select: { id: true },
+		})
+		const relevantContent = await prisma.content.findMany({
+			select: { id: true },
+			where: {
+				tags: {
+					some: {
+						tagCategory: TagCategory.IntendedAudience,
+						tagName: employee.role,
+					},
+				},
+			},
+		})
+		for (let i = 0; i < 5; i++) {
+			const type = faker.helpers.arrayElement(Object.values(NotificationType))
+			const createdAt = Temporal.Now.instant()
+				.subtract({ minutes: Math.floor(Math.random() * 60 * 24 * 30) })
+				.toString()
+
+			data.push({
+				createdAt,
+				employeeId: employee.id,
+				type,
+				...generateNotification(employee.id, type, ownedContent, relevantContent),
+			})
+		}
+	}
+
+	await prisma.notification.createMany({ data })
+	console.log(`Created ${data.length} notifications for employees`)
+}
+
+function generateNotification(
+	employeeId: string,
+	type: NotificationType,
+	ownedContent: { id: string }[],
+	relevantContent: { id: string }[]
+): Omit<Prisma.NotificationCreateManyInput, "employeeId" | "type" | "createdAt"> {
+	switch (type) {
+		case NotificationType.ContentTransferred:
+		case NotificationType.ContentEdited:
+		case NotificationType.ContentCheckedOut:
+		case NotificationType.ContentCheckedIn: {
+			const content = faker.helpers.arrayElement(ownedContent)!
+			const actor = faker.helpers.arrayElement(employeeData.filter((e) => e.id !== employeeId))!
+			return {
+				contentId: content.id,
+				actorId: actor.id,
+			}
+		}
+		case NotificationType.ExpiringOneDay: {
+			const content = faker.helpers.arrayElement(ownedContent)!
+			return {
+				contentId: content.id,
+			}
+		}
+
+		case NotificationType.ContentAdded: {
+			const content = faker.helpers.arrayElement(relevantContent)!
+			return {
+				contentId: content.id,
+			}
+		}
+		default: {
+			throw new Error(`Unhandled notification type: ${type}`)
 		}
 	}
 }

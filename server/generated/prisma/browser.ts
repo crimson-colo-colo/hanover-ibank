@@ -62,3 +62,13 @@ export type UserActivity = Prisma.UserActivityModel
  * 
  */
 export type RecentTimestamps = Prisma.RecentTimestampsModel
+/**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel

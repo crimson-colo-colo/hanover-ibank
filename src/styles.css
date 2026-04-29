@@ -112,7 +112,7 @@ button[aria-label='Open TanStack Devtools'] {
 .metadata-edit {
     visibility: hidden;
 }
-.metadata-field[data-enabled=true]:hover .metadata-edit {
+.metadata-field:hover .metadata-edit {
     visibility: visible;
 }
 
@@ -125,4 +125,8 @@ html.color-scheme-transitioning * {
 
 .content-tags-input [data-disabled=true] .mantine-TagsInput-input {
     @apply bg-white;
+}
+
+.thumb .react-pdf__Thumbnail__page {
+    @apply -translate-x-1/4 -translate-y-1/4 scale-50;
 }
