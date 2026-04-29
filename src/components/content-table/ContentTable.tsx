@@ -39,6 +39,7 @@ import {
 	IconStar,
 	IconStarFilled,
 	IconTrash,
+	IconUser,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
@@ -422,6 +423,7 @@ export function ContentTable({
 				...defaultColumns,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -433,6 +435,7 @@ export function ContentTable({
 				expirationDate: true,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -444,6 +447,7 @@ export function ContentTable({
 				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -455,15 +459,27 @@ export function ContentTable({
 				lastModified: false,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
 		if (activeView === "checkedOut") {
-			table.getColumn("checkedOutBy")?.setFilterValue("active")
 			setColumnVisibility({
 				...defaultColumns,
 				lastModified: false,
 			})
+			table.getColumn("checkedOutBy")?.setFilterValue("active")
+			table.getColumn("owner")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "owned") {
+			setColumnVisibility({
+				...defaultColumns,
+				owner: false,
+			})
+			table.getColumn("owner")?.setFilterValue(profile?.name ?? "")
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 	}, [activeView])
@@ -617,6 +633,23 @@ export function ContentTable({
 						<Group wrap="nowrap">
 							<IconDoorExit size="1rem" />
 							Checked Out
+						</Group>
+					</Chip>
+					<Chip
+						icon={null}
+						value="owned"
+						styles={{
+							root: {
+								padding: 0,
+							},
+							label: {
+								padding: 15,
+							},
+						}}
+					>
+						<Group wrap="nowrap">
+							<IconUser size="1rem" />
+							Owned By You
 						</Group>
 					</Chip>
 				</Group>

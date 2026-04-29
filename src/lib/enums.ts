@@ -32,6 +32,7 @@ export const ContentViews = {
 	RecentlyViewed: "recentlyViewed",
 	RecentlyEdited: "recentlyEdited",
 	CheckedOut: "checkedOut",
+	OwnedContent: "owned",
 } as const
 
 export type ContentViews = (typeof ContentViews)[keyof typeof ContentViews]

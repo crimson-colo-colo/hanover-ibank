@@ -1,9 +1,10 @@
 import { FileType } from "@shared/filetype.ts"
-import { PushSubscription } from "@shared/types.ts"
+import { type ContentNotification, PushSubscription } from "@shared/types.ts"
 import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
+import { auth0Cache } from "../lib/auth0.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { sendPushNotification } from "../lib/notifications.tsx"
 import { bucketName, s3 } from "../s3.ts"
@@ -11,12 +12,14 @@ import { authProcedure, router } from "../trpc.ts"
 
 export const userRouter = router({
 	getProfile: authProcedure.query(async (opts) => {
-		const userRole = await db.employee.findUnique({
+		const user = await db.employee.findUnique({
 			where: {
 				id: opts.ctx.auth.sub,
 			},
 			select: {
 				role: true,
+				emailNotifications: true,
+				pushNotifications: true,
 			},
 		})
 		const auth0User = await auth0Management.users.get(opts.ctx.auth.sub)
@@ -25,7 +28,9 @@ export const userRouter = router({
 			name: auth0User.name ?? auth0User.nickname ?? auth0User.username!,
 			email: auth0User.email!,
 			username: auth0User.username!,
-			role: userRole!.role,
+			role: user!.role,
+			emailNotifications: user!.emailNotifications,
+			pushNotifications: user!.pushNotifications,
 		}
 	}),
 	updateProfile: authProcedure
@@ -34,10 +39,21 @@ export const userRouter = router({
 				name: z.string().min(3).max(100),
 				email: z.email(),
 				username: z.string().min(3).max(100),
+				emailNotifications: z.boolean(),
+				pushNotifications: z.boolean(),
 			})
 		)
 		.mutation(async (opts) => {
 			try {
+				await db.employee.update({
+					where: {
+						id: opts.ctx.auth.sub,
+					},
+					data: {
+						emailNotifications: opts.input.emailNotifications,
+						pushNotifications: opts.input.pushNotifications,
+					},
+				})
 				await auth0Management.users.update(opts.ctx.auth.sub, {
 					name: opts.input.name,
 					email: opts.input.email,
@@ -45,6 +61,7 @@ export const userRouter = router({
 				await auth0Management.users.update(opts.ctx.auth.sub, {
 					username: opts.input.username,
 				})
+				auth0Cache.invalidate()
 
 				const avatar = await s3.headObject({
 					Bucket: bucketName,
@@ -194,6 +211,38 @@ export const userRouter = router({
 			icon: "http://localhost:3000/favicon.png",
 			tag: "abcdefghijklmnopqrstuvwxyz",
 			url: "http://localhost:3000/dashboard",
+		})
+	}),
+	getNotifications: authProcedure.query(async (opts): Promise<ContentNotification[]> => {
+		const notifications = await db.notification.findMany({
+			where: {
+				employeeId: opts.ctx.auth.sub,
+			},
+			orderBy: {
+				createdAt: "desc",
+			},
+			include: {
+				content: true,
+			},
+		})
+		const users = await auth0Cache.listUsers()
+		return notifications.map((n) => ({
+			...n,
+			actor: n.actorId ? (users.data.find((u) => u.user_id === n.actorId) ?? null) : null,
+		}))
+	}),
+	clearNotification: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
+		await db.notification.delete({
+			where: {
+				id: opts.input.id,
+			},
+		})
+	}),
+	clearAllNotifications: authProcedure.mutation(async (opts) => {
+		await db.notification.deleteMany({
+			where: {
+				employeeId: opts.ctx.auth.sub,
+			},
 		})
 	}),
 })

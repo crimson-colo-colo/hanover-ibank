@@ -1,4 +1,4 @@
-import { PushMessage } from "@shared/types.ts"
+import { PushMessage, type ServiceWorkerMessage } from "@shared/types.ts"
 import * as idb from "idb-keyval"
 
 declare const self: ServiceWorkerGlobalScope
@@ -25,6 +25,18 @@ self.addEventListener("push", (event) => {
 			body: message.body,
 			icon: message.icon,
 			tag: message.tag,
+		})
+	)
+
+	const clients = self.clients.matchAll({ includeUncontrolled: true, type: "window" })
+	event.waitUntil(
+		clients.then((clients) => {
+			clients.forEach((client) => {
+				client.postMessage({
+					type: "new_notification",
+					notification: message,
+				} satisfies ServiceWorkerMessage)
+			})
 		})
 	)
 })
