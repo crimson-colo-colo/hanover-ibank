@@ -53,6 +53,9 @@
         "@mantine/form": "^9.0.2",
         "@mantine/hooks": "^9.0.2",
         "@mantine/notifications": "^9.0.2",
+        "@mantine/spotlight": "^9.1.0",
+        "@orama/orama": "^3.1.18",
+        "@orama/plugin-qps": "^3.1.18",
         "@react-buddy/ide-toolbox": "^2.4.0",
         "@react-email/ui": "6.0.0",
         "@rolldown/plugin-babel": "^0.2.3",
@@ -87,6 +90,7 @@
         "@vitejs/plugin-react": "^6.0.1",
         "babel-plugin-react-compiler": "^1.0.0",
         "clsx": "^2.1.1",
+        "comlink": "^4.4.2",
         "date-fns": "^4.1.0",
         "dayjs": "^1.11.20",
         "docx": "^9.6.1",
@@ -471,6 +475,8 @@
 
     "@mantine/notifications": ["@mantine/notifications@9.1.1", "", { "dependencies": { "@mantine/store": "9.1.1", "react-transition-group": "4.4.5" }, "peerDependencies": { "@mantine/core": "9.1.1", "@mantine/hooks": "9.1.1", "react": "^19.2.0", "react-dom": "^19.2.0" } }, "sha512-ZfcEMMDp0BQ+yKmVp8ifPXLKej8pv9TcaRnmy2CZ07USD61E9LH5ClRAP/hxQuCyf/qLb5BPHsI7+f3K8uhj4Q=="],
 
+    "@mantine/spotlight": ["@mantine/spotlight@9.1.0", "", { "dependencies": { "@mantine/store": "9.1.0" }, "peerDependencies": { "@mantine/core": "9.1.0", "@mantine/hooks": "9.1.0", "react": "^19.2.0", "react-dom": "^19.2.0" } }, "sha512-bzqhIzxNEY8cwp0Agrlfnjys17kv3EI0w1rAa9pNG3cWY8D4kT/k7iAnqsfB/W0y+Rm45+0YfFeWDrpVCE7nMQ=="],
+
     "@mantine/store": ["@mantine/store@9.1.1", "", { "peerDependencies": { "react": "^19.2.0" } }, "sha512-kbxEU8wVGbobHlmQmk0lu9M+xCILKjuAPcMAshgzPznGLfXeE9zrB0gNT2cbk11Ik8dlV9J6Vsn9cuACyOSpfQ=="],
 
     "@napi-rs/canvas": ["@napi-rs/canvas@0.1.100", "", { "optionalDependencies": { "@napi-rs/canvas-android-arm64": "0.1.100", "@napi-rs/canvas-darwin-arm64": "0.1.100", "@napi-rs/canvas-darwin-x64": "0.1.100", "@napi-rs/canvas-linux-arm-gnueabihf": "0.1.100", "@napi-rs/canvas-linux-arm64-gnu": "0.1.100", "@napi-rs/canvas-linux-arm64-musl": "0.1.100", "@napi-rs/canvas-linux-riscv64-gnu": "0.1.100", "@napi-rs/canvas-linux-x64-gnu": "0.1.100", "@napi-rs/canvas-linux-x64-musl": "0.1.100", "@napi-rs/canvas-win32-arm64-msvc": "0.1.100", "@napi-rs/canvas-win32-x64-msvc": "0.1.100" } }, "sha512-xglYA6q3XO5P3BNJYxVZ1IV7DLVjp1Py6nwag88YntrS+3vKHyYcMqXVS4ZztJmwz2uGvz1FWhI/4LgbR5uQDA=="],
@@ -524,6 +530,10 @@
     "@noble/hashes": ["@noble/hashes@1.8.0", "", {}, "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="],
 
     "@nodable/entities": ["@nodable/entities@2.1.0", "", {}, "sha512-nyT7T3nbMyBI/lvr6L5TyWbFJAI9FTgVRakNoBqCD+PmID8DzFrrNdLLtHMwMszOtqZa8PAOV24ZqDnQrhQINA=="],
+
+    "@orama/orama": ["@orama/orama@3.1.18", "", {}, "sha512-a61ljmRVVyG5MC/698C8/FfFDw5a8LOIvyOLW5fztgUXqUpc1jOfQzOitSCbge657OgXXThmY3Tk8fpiDb4UcA=="],
+
+    "@orama/plugin-qps": ["@orama/plugin-qps@3.1.18", "", { "dependencies": { "@orama/orama": "3.1.18" } }, "sha512-q19pFGF1jRk+dGR4j/4MscCACtZo6DKO8ZjnM3AWJICzjWVYJYBvlGuD2+Jt079iUW04cGh4EpMw5WxaTpZQCw=="],
 
     "@oxc-project/types": ["@oxc-project/types@0.127.0", "", {}, "sha512-aIYXQBo4lCbO4z0R3FHeucQHpF46l2LbMdxRvqvuRuW2OxdnSkcng5B8+K12spgLDj93rtN3+J2Vac/TIO+ciQ=="],
 
@@ -1082,6 +1092,8 @@
     "clsx": ["clsx@2.1.1", "", {}, "sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA=="],
 
     "colorette": ["colorette@2.0.20", "", {}, "sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w=="],
+
+    "comlink": ["comlink@4.4.2", "", {}, "sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g=="],
 
     "commander": ["commander@11.1.0", "", {}, "sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ=="],
 
@@ -2132,6 +2144,8 @@
     "@fast-csv/format/@types/node": ["@types/node@14.18.63", "", {}, "sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ=="],
 
     "@fast-csv/parse/@types/node": ["@types/node@14.18.63", "", {}, "sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ=="],
+
+    "@mantine/spotlight/@mantine/store": ["@mantine/store@9.1.0", "", { "peerDependencies": { "react": "^19.2.0" } }, "sha512-0HhnJ7Ubx7WXFmU4b9cBL9d/CubYf8l645FpIugaQXPJ0wOnSCvehRM5vC3r3AftEW9ZaJwR6+fw4uPy7y55+g=="],
 
     "@prisma/dev/std-env": ["std-env@3.10.0", "", {}, "sha512-5GS12FdOZNliM5mAOxFRg7Ir0pWz8MdpYm6AY6VPkGpbA7ZzmbzNcBJQ0GPvvyWgcY7QAhCgf9Uy89I03faLkg=="],
 

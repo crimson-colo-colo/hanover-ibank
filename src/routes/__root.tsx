@@ -21,6 +21,7 @@ import { useInitial } from "@/dev/index.ts"
 import { queryClient } from "@/lib/trpc.ts"
 import { theme } from "@/theme.ts"
 import "../styles.css"
+import { AppSpotlight } from "@/components/AppSpotlight.tsx"
 
 interface RouterContext {
 	auth0: Auth0ContextInterface<User>
@@ -79,6 +80,7 @@ function RootComponent() {
 						>
 							<HeadContent />
 							<Outlet />
+							<AppSpotlight />
 						</AppShell.Main>
 					</AppShell>
 					<Notifications />
