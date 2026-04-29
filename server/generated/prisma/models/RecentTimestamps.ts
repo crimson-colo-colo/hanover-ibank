@@ -20,13 +20,24 @@ export type RecentTimestampsModel = runtime.Types.Result.DefaultSelection<Prisma
 
 export type AggregateRecentTimestamps = {
   _count: RecentTimestampsCountAggregateOutputType | null
+  _avg: RecentTimestampsAvgAggregateOutputType | null
+  _sum: RecentTimestampsSumAggregateOutputType | null
   _min: RecentTimestampsMinAggregateOutputType | null
   _max: RecentTimestampsMaxAggregateOutputType | null
+}
+
+export type RecentTimestampsAvgAggregateOutputType = {
+  viewCount: number | null
+}
+
+export type RecentTimestampsSumAggregateOutputType = {
+  viewCount: number | null
 }
 
 export type RecentTimestampsMinAggregateOutputType = {
   recentlyEdited: Date | null
   recentlyViewed: Date | null
+  viewCount: number | null
   employeeId: string | null
   contentId: string | null
 }
@@ -34,6 +45,7 @@ export type RecentTimestampsMinAggregateOutputType = {
 export type RecentTimestampsMaxAggregateOutputType = {
   recentlyEdited: Date | null
   recentlyViewed: Date | null
+  viewCount: number | null
   employeeId: string | null
   contentId: string | null
 }
@@ -41,15 +53,25 @@ export type RecentTimestampsMaxAggregateOutputType = {
 export type RecentTimestampsCountAggregateOutputType = {
   recentlyEdited: number
   recentlyViewed: number
+  viewCount: number
   employeeId: number
   contentId: number
   _all: number
 }
 
 
+export type RecentTimestampsAvgAggregateInputType = {
+  viewCount?: true
+}
+
+export type RecentTimestampsSumAggregateInputType = {
+  viewCount?: true
+}
+
 export type RecentTimestampsMinAggregateInputType = {
   recentlyEdited?: true
   recentlyViewed?: true
+  viewCount?: true
   employeeId?: true
   contentId?: true
 }
@@ -57,6 +79,7 @@ export type RecentTimestampsMinAggregateInputType = {
 export type RecentTimestampsMaxAggregateInputType = {
   recentlyEdited?: true
   recentlyViewed?: true
+  viewCount?: true
   employeeId?: true
   contentId?: true
 }
@@ -64,6 +87,7 @@ export type RecentTimestampsMaxAggregateInputType = {
 export type RecentTimestampsCountAggregateInputType = {
   recentlyEdited?: true
   recentlyViewed?: true
+  viewCount?: true
   employeeId?: true
   contentId?: true
   _all?: true
@@ -107,6 +131,18 @@ export type RecentTimestampsAggregateArgs<ExtArgs extends runtime.Types.Extensio
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: RecentTimestampsAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: RecentTimestampsSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: RecentTimestampsMinAggregateInputType
@@ -137,6 +173,8 @@ export type RecentTimestampsGroupByArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   _count?: RecentTimestampsCountAggregateInputType | true
+  _avg?: RecentTimestampsAvgAggregateInputType
+  _sum?: RecentTimestampsSumAggregateInputType
   _min?: RecentTimestampsMinAggregateInputType
   _max?: RecentTimestampsMaxAggregateInputType
 }
@@ -144,9 +182,12 @@ export type RecentTimestampsGroupByArgs<ExtArgs extends runtime.Types.Extensions
 export type RecentTimestampsGroupByOutputType = {
   recentlyEdited: Date
   recentlyViewed: Date
+  viewCount: number
   employeeId: string
   contentId: string
   _count: RecentTimestampsCountAggregateOutputType | null
+  _avg: RecentTimestampsAvgAggregateOutputType | null
+  _sum: RecentTimestampsSumAggregateOutputType | null
   _min: RecentTimestampsMinAggregateOutputType | null
   _max: RecentTimestampsMaxAggregateOutputType | null
 }
@@ -172,6 +213,7 @@ export type RecentTimestampsWhereInput = {
   NOT?: Prisma.RecentTimestampsWhereInput | Prisma.RecentTimestampsWhereInput[]
   recentlyEdited?: Prisma.DateTimeFilter<"RecentTimestamps"> | Date | string
   recentlyViewed?: Prisma.DateTimeFilter<"RecentTimestamps"> | Date | string
+  viewCount?: Prisma.IntFilter<"RecentTimestamps"> | number
   employeeId?: Prisma.StringFilter<"RecentTimestamps"> | string
   contentId?: Prisma.StringFilter<"RecentTimestamps"> | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
@@ -181,6 +223,7 @@ export type RecentTimestampsWhereInput = {
 export type RecentTimestampsOrderByWithRelationInput = {
   recentlyEdited?: Prisma.SortOrder
   recentlyViewed?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
   employee?: Prisma.EmployeeOrderByWithRelationInput
@@ -194,6 +237,7 @@ export type RecentTimestampsWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RecentTimestampsWhereInput | Prisma.RecentTimestampsWhereInput[]
   recentlyEdited?: Prisma.DateTimeFilter<"RecentTimestamps"> | Date | string
   recentlyViewed?: Prisma.DateTimeFilter<"RecentTimestamps"> | Date | string
+  viewCount?: Prisma.IntFilter<"RecentTimestamps"> | number
   employeeId?: Prisma.StringFilter<"RecentTimestamps"> | string
   contentId?: Prisma.StringFilter<"RecentTimestamps"> | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
@@ -203,11 +247,14 @@ export type RecentTimestampsWhereUniqueInput = Prisma.AtLeast<{
 export type RecentTimestampsOrderByWithAggregationInput = {
   recentlyEdited?: Prisma.SortOrder
   recentlyViewed?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
   _count?: Prisma.RecentTimestampsCountOrderByAggregateInput
+  _avg?: Prisma.RecentTimestampsAvgOrderByAggregateInput
   _max?: Prisma.RecentTimestampsMaxOrderByAggregateInput
   _min?: Prisma.RecentTimestampsMinOrderByAggregateInput
+  _sum?: Prisma.RecentTimestampsSumOrderByAggregateInput
 }
 
 export type RecentTimestampsScalarWhereWithAggregatesInput = {
@@ -216,6 +263,7 @@ export type RecentTimestampsScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RecentTimestampsScalarWhereWithAggregatesInput | Prisma.RecentTimestampsScalarWhereWithAggregatesInput[]
   recentlyEdited?: Prisma.DateTimeWithAggregatesFilter<"RecentTimestamps"> | Date | string
   recentlyViewed?: Prisma.DateTimeWithAggregatesFilter<"RecentTimestamps"> | Date | string
+  viewCount?: Prisma.IntWithAggregatesFilter<"RecentTimestamps"> | number
   employeeId?: Prisma.StringWithAggregatesFilter<"RecentTimestamps"> | string
   contentId?: Prisma.StringWithAggregatesFilter<"RecentTimestamps"> | string
 }
@@ -223,6 +271,7 @@ export type RecentTimestampsScalarWhereWithAggregatesInput = {
 export type RecentTimestampsCreateInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   employee: Prisma.EmployeeCreateNestedOneWithoutRecentTimestampsInput
   content: Prisma.ContentCreateNestedOneWithoutRecentTimestampsInput
 }
@@ -230,6 +279,7 @@ export type RecentTimestampsCreateInput = {
 export type RecentTimestampsUncheckedCreateInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   employeeId: string
   contentId: string
 }
@@ -237,6 +287,7 @@ export type RecentTimestampsUncheckedCreateInput = {
 export type RecentTimestampsUpdateInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutRecentTimestampsNestedInput
   content?: Prisma.ContentUpdateOneRequiredWithoutRecentTimestampsNestedInput
 }
@@ -244,6 +295,7 @@ export type RecentTimestampsUpdateInput = {
 export type RecentTimestampsUncheckedUpdateInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -251,6 +303,7 @@ export type RecentTimestampsUncheckedUpdateInput = {
 export type RecentTimestampsCreateManyInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   employeeId: string
   contentId: string
 }
@@ -258,11 +311,13 @@ export type RecentTimestampsCreateManyInput = {
 export type RecentTimestampsUpdateManyMutationInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type RecentTimestampsUncheckedUpdateManyInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -285,13 +340,19 @@ export type RecentTimestampsEmployeeIdContentIdCompoundUniqueInput = {
 export type RecentTimestampsCountOrderByAggregateInput = {
   recentlyEdited?: Prisma.SortOrder
   recentlyViewed?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
+}
+
+export type RecentTimestampsAvgOrderByAggregateInput = {
+  viewCount?: Prisma.SortOrder
 }
 
 export type RecentTimestampsMaxOrderByAggregateInput = {
   recentlyEdited?: Prisma.SortOrder
   recentlyViewed?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
 }
@@ -299,8 +360,13 @@ export type RecentTimestampsMaxOrderByAggregateInput = {
 export type RecentTimestampsMinOrderByAggregateInput = {
   recentlyEdited?: Prisma.SortOrder
   recentlyViewed?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
+}
+
+export type RecentTimestampsSumOrderByAggregateInput = {
+  viewCount?: Prisma.SortOrder
 }
 
 export type RecentTimestampsCreateNestedManyWithoutEmployeeInput = {
@@ -390,12 +456,14 @@ export type RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput = {
 export type RecentTimestampsCreateWithoutEmployeeInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   content: Prisma.ContentCreateNestedOneWithoutRecentTimestampsInput
 }
 
 export type RecentTimestampsUncheckedCreateWithoutEmployeeInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   contentId: string
 }
 
@@ -431,6 +499,7 @@ export type RecentTimestampsScalarWhereInput = {
   NOT?: Prisma.RecentTimestampsScalarWhereInput | Prisma.RecentTimestampsScalarWhereInput[]
   recentlyEdited?: Prisma.DateTimeFilter<"RecentTimestamps"> | Date | string
   recentlyViewed?: Prisma.DateTimeFilter<"RecentTimestamps"> | Date | string
+  viewCount?: Prisma.IntFilter<"RecentTimestamps"> | number
   employeeId?: Prisma.StringFilter<"RecentTimestamps"> | string
   contentId?: Prisma.StringFilter<"RecentTimestamps"> | string
 }
@@ -438,12 +507,14 @@ export type RecentTimestampsScalarWhereInput = {
 export type RecentTimestampsCreateWithoutContentInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   employee: Prisma.EmployeeCreateNestedOneWithoutRecentTimestampsInput
 }
 
 export type RecentTimestampsUncheckedCreateWithoutContentInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   employeeId: string
 }
 
@@ -476,48 +547,56 @@ export type RecentTimestampsUpdateManyWithWhereWithoutContentInput = {
 export type RecentTimestampsCreateManyEmployeeInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   contentId: string
 }
 
 export type RecentTimestampsUpdateWithoutEmployeeInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   content?: Prisma.ContentUpdateOneRequiredWithoutRecentTimestampsNestedInput
 }
 
 export type RecentTimestampsUncheckedUpdateWithoutEmployeeInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type RecentTimestampsUncheckedUpdateManyWithoutEmployeeInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   contentId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type RecentTimestampsCreateManyContentInput = {
   recentlyEdited: Date | string
   recentlyViewed: Date | string
+  viewCount?: number
   employeeId: string
 }
 
 export type RecentTimestampsUpdateWithoutContentInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutRecentTimestampsNestedInput
 }
 
 export type RecentTimestampsUncheckedUpdateWithoutContentInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type RecentTimestampsUncheckedUpdateManyWithoutContentInput = {
   recentlyEdited?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recentlyViewed?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -526,6 +605,7 @@ export type RecentTimestampsUncheckedUpdateManyWithoutContentInput = {
 export type RecentTimestampsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   recentlyEdited?: boolean
   recentlyViewed?: boolean
+  viewCount?: boolean
   employeeId?: boolean
   contentId?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -535,6 +615,7 @@ export type RecentTimestampsSelect<ExtArgs extends runtime.Types.Extensions.Inte
 export type RecentTimestampsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   recentlyEdited?: boolean
   recentlyViewed?: boolean
+  viewCount?: boolean
   employeeId?: boolean
   contentId?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -544,6 +625,7 @@ export type RecentTimestampsSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
 export type RecentTimestampsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   recentlyEdited?: boolean
   recentlyViewed?: boolean
+  viewCount?: boolean
   employeeId?: boolean
   contentId?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -553,11 +635,12 @@ export type RecentTimestampsSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
 export type RecentTimestampsSelectScalar = {
   recentlyEdited?: boolean
   recentlyViewed?: boolean
+  viewCount?: boolean
   employeeId?: boolean
   contentId?: boolean
 }
 
-export type RecentTimestampsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"recentlyEdited" | "recentlyViewed" | "employeeId" | "contentId", ExtArgs["result"]["recentTimestamps"]>
+export type RecentTimestampsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"recentlyEdited" | "recentlyViewed" | "viewCount" | "employeeId" | "contentId", ExtArgs["result"]["recentTimestamps"]>
 export type RecentTimestampsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ContentDefaultArgs<ExtArgs>
@@ -580,6 +663,7 @@ export type $RecentTimestampsPayload<ExtArgs extends runtime.Types.Extensions.In
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     recentlyEdited: Date
     recentlyViewed: Date
+    viewCount: number
     employeeId: string
     contentId: string
   }, ExtArgs["result"]["recentTimestamps"]>
@@ -1009,6 +1093,7 @@ export interface Prisma__RecentTimestampsClient<T, Null = never, ExtArgs extends
 export interface RecentTimestampsFieldRefs {
   readonly recentlyEdited: Prisma.FieldRef<"RecentTimestamps", 'DateTime'>
   readonly recentlyViewed: Prisma.FieldRef<"RecentTimestamps", 'DateTime'>
+  readonly viewCount: Prisma.FieldRef<"RecentTimestamps", 'Int'>
   readonly employeeId: Prisma.FieldRef<"RecentTimestamps", 'String'>
   readonly contentId: Prisma.FieldRef<"RecentTimestamps", 'String'>
 }

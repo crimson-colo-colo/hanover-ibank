@@ -24,6 +24,7 @@ enum ThreadStatus {
 
 model Employee {
     id                 String              @id
+    createdAt          DateTime            @default(now())
     role               EmployeeRole
     emailNotifications Boolean             @default(true)
     pushNotifications  Boolean             @default(true)
@@ -155,6 +156,7 @@ model UserActivity {
 model RecentTimestamps {
     recentlyEdited DateTime
     recentlyViewed DateTime
+    viewCount      Int      @default(0)
     employeeId     String
     employee       Employee @relation(fields: [employeeId], references: [id])
     contentId      String

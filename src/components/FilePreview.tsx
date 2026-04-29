@@ -110,7 +110,7 @@ export function FilePreviewProvider({
 			/>
 		)
 	} else if (content.type === "Link") {
-		preview = <URLCard url={content.url} />
+		preview = <URLCard url={content.url} contentId={content.id} />
 	} else if (fileType === FileType.Image) {
 		preview = (
 			<Image

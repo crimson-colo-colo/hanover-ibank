@@ -1,5 +1,5 @@
-import type { HeadObjectOutput } from "@aws-sdk/client-s3"
-import type { UseMutationResult } from "@tanstack/react-query"
+import type { HeadObjectCommandOutput, HeadObjectOutput } from "@aws-sdk/client-s3"
+import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import z from "zod"
@@ -73,13 +73,27 @@ export type CheckOutMutationType = UseMutationResult<
 	CheckOutInput
 >
 
-type recentlyViewedOutput = RouterOutput["content"]["updateRecentlyViewedTimestamp"]
-type recentlyViewedInput = RouterInput["content"]["updateRecentlyViewedTimestamp"]
-export type recentlyViewedType = UseMutationResult<
-	recentlyViewedOutput,
-	TRPCClientErrorLike<AppRouter>,
-	recentlyViewedInput
->
+type ViewTotals =
+	| {
+			title: string | undefined
+			contentId: string
+			_sum: {
+				viewCount: number | null
+			}
+			metadata: HeadObjectCommandOutput | undefined
+	  }[]
+	| undefined
+
+export type ListFavoritesQuery = UseQueryResult<ContentList, TRPCClientErrorLike<AppRouter>>
+export type ViewTotalsQuery = UseQueryResult<ViewTotals, TRPCClientErrorLike<AppRouter>>
+
+export type Profile = {
+	id: string
+	name: string
+	email: string
+	username: string
+	role: EmployeeRole | undefined
+}
 
 export type Thread = Prisma.ContentTalkThreadGetPayload<{
 	include: {

@@ -1,5 +1,6 @@
 import { ActionIcon, Button, Flex, ScrollArea, Tabs } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { ContentType } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
 import { IconArrowLeft, IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
@@ -31,7 +32,9 @@ function RouteComponent() {
 
 	const content = contentQuery.data?.content
 	const fileType =
-		(contentQuery.data?.content.object?.Metadata?.filetype as FileType) ?? FileType.Unknown
+		(contentQuery.data?.content.type === ContentType.Object
+			? (contentQuery.data?.content.object?.Metadata?.filetype as FileType)
+			: FileType.Link) ?? FileType.Unknown
 
 	function closePreview() {
 		if (window.opener) {
