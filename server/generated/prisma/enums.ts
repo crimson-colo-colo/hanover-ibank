@@ -54,3 +54,15 @@ export const ContentType = {
 } as const
 
 export type ContentType = (typeof ContentType)[keyof typeof ContentType]
+
+
+export const NotificationType = {
+  ContentTransferred: 'ContentTransferred',
+  ContentEdited: 'ContentEdited',
+  ExpiringOneDay: 'ExpiringOneDay',
+  ContentCheckedOut: 'ContentCheckedOut',
+  ContentCheckedIn: 'ContentCheckedIn',
+  ContentAdded: 'ContentAdded'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
