@@ -17,7 +17,7 @@ import {
 	IconStar,
 	IconUsers,
 } from "@tabler/icons-react"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
 import clsx from "clsx"
 import { Avatar } from "@/components/Avatar.tsx"
@@ -101,6 +101,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 	const location = useLocation()
 	const { hovered, ref } = useHover()
 	const recentlyViewedContent = useQuery(trpc.content.getRecentlyViewed.queryOptions({ limit: 5 }))
+	const recentlyViewed = useMutation(trpc.content.updateRecentlyViewedTimestamp.mutationOptions())
 
 	const navLinks = routeLinks
 		.filter((link) => !link.admin)
@@ -178,14 +179,21 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 										key={item.id}
 										component={Link}
 										to={`${item.type === ContentType.Link ? item.url : `/preview/${item.id}`}`}
-										target="_blank"
+										target={item.type === ContentType.Link ? "_blank" : "_self"}
 										rel="opener"
 										variant="subtle"
 										radius={0}
 										leftSection={<FileTypeIcon fileType={contentType} />}
+										onClick={async () => {
+											if (item.type === ContentType.Link) {
+												await recentlyViewed.mutateAsync({ id: item.id })
+											}
+										}}
 										className="flex justify-left"
 									>
-										<Text className="max-w-[18ch] truncate">{item.title}</Text>
+										<span className="h-full content-center max-w-[20ch] truncate">
+											{item.title}
+										</span>
 									</Button>
 								)
 							})}
