@@ -9,6 +9,7 @@ import type { JobOptions, JobResult, PDFWorker, RecognitionSettings } from "./pd
 const POOL_SIZE = 3
 
 type PoolWorker = {
+	w: Worker
 	worker: Comlink.Remote<PDFWorker>
 	job: Promise<JobResult> | null
 }
@@ -38,15 +39,29 @@ function dispatch(worker: PoolWorker, job: Job) {
 		const next = queue.shift()
 		if (next) {
 			dispatch(worker, next)
+		} else {
+			worker.worker[Comlink.releaseProxy]()
+			worker.w.terminate()
+			pool.splice(pool.indexOf(worker), 1)
 		}
 	})
 }
 
-for (let i = 0; i < POOL_SIZE; i++) {
-	const worker = Comlink.wrap<PDFWorker>(
-		nodeAdapter(new Worker(path.resolve(import.meta.dirname, "pdf.worker.ts"), {}))
-	)
-	pool.push({ worker, job: null })
+function getIdleWorker(): PoolWorker | null {
+	const existing = pool.find((worker) => worker.job === null)
+	if (existing) {
+		return existing
+	}
+
+	if (pool.length < POOL_SIZE) {
+		const w = new Worker(path.resolve(import.meta.dirname, "pdf.worker.ts"), {})
+		const worker = Comlink.wrap<PDFWorker>(nodeAdapter(w))
+		const poolWorker = { w, worker, job: null }
+		pool.push(poolWorker)
+		return poolWorker
+	}
+
+	return null
 }
 
 /**
@@ -83,7 +98,7 @@ export async function pdfText(
 			resolve,
 			reject,
 		}
-		const idleWorker = pool.find((worker) => worker.job === null)
+		const idleWorker = getIdleWorker()
 		if (idleWorker) {
 			dispatch(idleWorker, job)
 		} else {

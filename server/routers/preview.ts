@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server"
 import z from "zod"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
+import { logger } from "../logger.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
@@ -110,7 +111,11 @@ export const previewRouter = router({
 			try {
 				res = await convertToPDF(content.objectId!, content.title)
 			} catch (error) {
-				console.log(error)
+				logger.error({
+					message: "Failed to connect to document conversion service",
+					contentId: content.id,
+					cause: error instanceof Error ? error.message : String(error),
+				})
 				throw new TRPCError({
 					code: "INTERNAL_SERVER_ERROR",
 					message: "Failed to connect to document conversion service",
@@ -118,6 +123,13 @@ export const previewRouter = router({
 				})
 			}
 			if (!res.ok) {
+				logger.error({
+					message: "Document conversion failed",
+					contentId: content.id,
+					status: res.status,
+					statusText: res.statusText,
+					body: await res.text(),
+				})
 				throw new TRPCError({
 					code: "INTERNAL_SERVER_ERROR",
 					message: "Failed to convert document for preview",

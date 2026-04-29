@@ -195,7 +195,7 @@ export class SearchWorker {
 		for (const item of items) {
 			this.items.set(item.id, {
 				...item,
-				embedding: unpackFloat16Array(item.embedding),
+				embedding: item.embedding ? unpackFloat16Array(item.embedding) : Array(768).fill(0.001),
 			})
 		}
 		console.log("Downloaded content list", this.items.values())

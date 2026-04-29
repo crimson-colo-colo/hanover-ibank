@@ -38,8 +38,9 @@ export function AppSpotlight() {
 	const [items, setItems] = useState<React.ReactNode[]>([])
 	const [filters, setFilters] = useState<SearchFilter[]>([])
 
-	const [debouncedQuery] = useDebouncedValue(query, 250)
+	const [debouncedQuery] = useDebouncedValue(query, 50)
 
+	const version = useRef(0)
 	const worker = useRef<SearchWorker | null>(null)
 
 	useEffect(() => {
@@ -77,7 +78,13 @@ export function AppSpotlight() {
 			}
 			if (!worker.current) return
 
+			const v = version.current + 1
+			version.current = v
 			const results = await worker.current.search(debouncedQuery)
+			if (version.current !== v) {
+				// A newer search has been initiated, discard these results
+				return
+			}
 
 			setItems(
 				results.map((item) =>

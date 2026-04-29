@@ -29,7 +29,7 @@ export function RecentlyViewedModule({
 	const displayedContent = recentlyViewedContent.data?.slice(0, items) ?? []
 
 	return (
-		<Paper p="lg" withBorder>
+		<Paper p="lg" withBorder className="h-full">
 			<Link
 				to="/content-table"
 				search={{ view: "recentlyViewed" }}

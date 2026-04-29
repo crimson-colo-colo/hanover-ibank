@@ -36,9 +36,11 @@ export const searchRouter = router({
 
 		return (await fetchAndTransformToContentListItems(content, opts.ctx.auth.sub)).map((item) => {
 			const embedding = embeddingMap
-				.get(item.id)!
-				.totals.map((total) => total / embeddingMap.get(item.id)!.count)
-			const encoded = new Uint8Array(new Float16Array(embedding).buffer).toBase64()
+				.get(item.id)
+				?.totals.map((total) => total / embeddingMap.get(item.id)!.count)
+			const encoded = embedding
+				? new Uint8Array(new Float16Array(embedding).buffer).toBase64()
+				: undefined
 			return {
 				...item,
 				embedding: encoded,
