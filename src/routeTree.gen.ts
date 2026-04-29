@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminManageUsersRouteImport } from './routes/admin.manage-users'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
+import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated.favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedContentTableRouteImport } from './routes/_authenticated.content-table'
 import { Route as AuthenticatedPreviewContentIdRouteImport } from './routes/_authenticated.preview.$contentId'
@@ -60,6 +61,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/technology': typeof TechnologyRoute
   '/content-table': typeof AuthenticatedContentTableRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/favorites': typeof AuthenticatedFavoritesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/technology': typeof TechnologyRoute
   '/content-table': typeof AuthenticatedContentTableRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/favorites': typeof AuthenticatedFavoritesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/technology': typeof TechnologyRoute
   '/_authenticated/content-table': typeof AuthenticatedContentTableRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/technology'
     | '/content-table'
     | '/dashboard'
+    | '/favorites'
     | '/profile'
     | '/admin/analytics'
     | '/admin/manage-users'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/technology'
     | '/content-table'
     | '/dashboard'
+    | '/favorites'
     | '/profile'
     | '/admin/analytics'
     | '/admin/manage-users'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/technology'
     | '/_authenticated/content-table'
     | '/_authenticated/dashboard'
+    | '/_authenticated/favorites'
     | '/_authenticated/profile'
     | '/admin/analytics'
     | '/admin/manage-users'
@@ -222,6 +234,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/favorites': {
+      id: '/_authenticated/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof AuthenticatedFavoritesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -249,6 +268,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedContentTableRoute: typeof AuthenticatedContentTableRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedPreviewContentIdRoute: typeof AuthenticatedPreviewContentIdRoute
 }
@@ -256,6 +276,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedContentTableRoute: AuthenticatedContentTableRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedPreviewContentIdRoute: AuthenticatedPreviewContentIdRoute,
 }

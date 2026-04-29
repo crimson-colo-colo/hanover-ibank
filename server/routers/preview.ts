@@ -48,6 +48,32 @@ export const previewRouter = router({
 			})
 		}
 
+		await db.recentTimestamps.update({
+			where: {
+				employeeId_contentId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+			data: {
+				recentlyViewed: new Date(),
+			},
+		})
+
+		await db.recentTimestamps.update({
+			where: {
+				employeeId_contentId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+			data: {
+				viewCount: {
+					increment: 1,
+				},
+			},
+		})
+
 		const metadata = await s3.headObject({
 			Bucket: bucketName,
 			Key: content.objectId!,
@@ -166,6 +192,32 @@ export const previewRouter = router({
 		const data = await s3.getObject({
 			Bucket: bucketName,
 			Key: content.objectId!,
+		})
+
+		await db.recentTimestamps.update({
+			where: {
+				employeeId_contentId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+			data: {
+				recentlyViewed: new Date(),
+			},
+		})
+
+		await db.recentTimestamps.update({
+			where: {
+				employeeId_contentId: {
+					contentId: opts.input.id,
+					employeeId: opts.ctx.auth.sub,
+				},
+			},
+			data: {
+				viewCount: {
+					increment: 1,
+				},
+			},
 		})
 
 		const text = await data.Body!.transformToString()

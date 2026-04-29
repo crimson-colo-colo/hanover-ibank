@@ -83,6 +83,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const EmployeeScalarFieldEnum = {
   id: 'id',
+  createdAt: 'createdAt',
   role: 'role',
   emailNotifications: 'emailNotifications',
   pushNotifications: 'pushNotifications'
@@ -195,6 +196,7 @@ export type TextExtractionCacheScalarFieldEnum = (typeof TextExtractionCacheScal
 export const RecentTimestampsScalarFieldEnum = {
   recentlyEdited: 'recentlyEdited',
   recentlyViewed: 'recentlyViewed',
+  viewCount: 'viewCount',
   employeeId: 'employeeId',
   contentId: 'contentId'
 } as const

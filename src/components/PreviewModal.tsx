@@ -1,5 +1,6 @@
 import { Button, Flex, Modal, ScrollArea, Tabs } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
+import { ContentType } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
 import { IconCircleArrowUpRight, IconInfoCircle, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
@@ -23,7 +24,9 @@ export function PreviewModal({
 
 	const content = contentQuery.data?.content
 	const fileType =
-		(contentQuery.data?.content.object?.Metadata?.filetype as FileType) ?? FileType.Unknown
+		(contentQuery.data?.content.type === ContentType.Object
+			? (contentQuery.data?.content.object?.Metadata?.filetype as FileType)
+			: FileType.Link) ?? FileType.Unknown
 
 	if (!content) {
 		return null
