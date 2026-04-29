@@ -1,14 +1,7 @@
 // Save embeddings for all documents in the database to a JSON file. This is used for testing and debugging.
 
-import { writeFile } from "fs/promises"
+import { writeFile } from "node:fs/promises"
 import { db } from "../server/database.ts"
-
-type TextExtractionCache = {
-	hash: string
-	skipRecPDFTextNative: boolean
-	skipRecPDFTextOCR: boolean
-	text: string
-}
 
 // model Embedding {
 //   hash      Bytes                 @id

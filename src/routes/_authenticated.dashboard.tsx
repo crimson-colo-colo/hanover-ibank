@@ -16,7 +16,6 @@ import { PopularFilesModule } from "@/components/dashboard/PopularFilesModule.ts
 import { PopularLinksModule } from "@/components/dashboard/PopularLinksModule.tsx"
 import { RecentlyViewedModule } from "@/components/dashboard/RecentlyViewedModule.tsx"
 import { PreviewModal } from "@/components/PreviewModal.tsx"
-import Search from "@/components/Search.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
 
