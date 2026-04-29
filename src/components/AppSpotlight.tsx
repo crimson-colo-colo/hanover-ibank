@@ -123,9 +123,9 @@ export function AppSpotlight() {
 			<Flex
 				mx="md"
 				direction={filters.length >= 3 ? "column" : "row"}
-				mb="md"
+				mb="sm"
 				justify="space-between"
-				className={clsx(!filters.length && "hidden")}
+				className={clsx("-mt-2", !filters.length && "hidden")}
 			>
 				<Group gap={4}>
 					{filters.map((filter) => (
