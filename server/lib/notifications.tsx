@@ -3,11 +3,11 @@ import type { PushMessage } from "@shared/types.ts"
 import { render, toPlainText } from "react-email"
 import webpush from "web-push"
 import type z from "zod"
-import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import type { EmailConfig } from "../emails/Email.tsx"
 import { env } from "../env.ts"
 import { logger } from "../logger.ts"
+import { auth0Cache } from "./auth0.ts"
 
 export async function sendPushNotification(
 	employeeId: string,
@@ -75,7 +75,7 @@ export async function sendEmailNotification<Props extends { config: EmailConfig 
 		return { ok: false, error: "Email gateway not configured" }
 	}
 
-	const toAddress = await auth0Management.users.get(employeeId).then((user) => user.email)
+	const toAddress = await auth0Cache.getUser(employeeId).then((user) => user?.email)
 	assert(toAddress, "Auth0 users must have an email address")
 
 	const emailProps = {

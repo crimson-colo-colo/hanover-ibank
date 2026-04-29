@@ -6,7 +6,6 @@ import { createRoot } from "react-dom/client"
 import { authOptions } from "@/lib/auth.ts"
 import { setAuth0 } from "@/lib/trpc.ts"
 import { getRouter } from "@/router.tsx"
-import serviceWorker from "../sw.ts?url"
 
 declare module "@tanstack/react-router" {
 	interface Register {
@@ -49,7 +48,8 @@ if (!rootElement.innerHTML) {
 async function registerServiceWorker() {
 	if ("serviceWorker" in navigator) {
 		try {
-			const registration = await navigator.serviceWorker.register(serviceWorker, {
+			const swUrl = import.meta.env.DEV ? "/sw.ts" : "/sw.js"
+			const registration = await navigator.serviceWorker.register(swUrl, {
 				scope: "/",
 				type: "module",
 			})

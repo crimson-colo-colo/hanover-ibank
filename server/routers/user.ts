@@ -1,3 +1,4 @@
+import assert from "node:assert"
 import { FileType } from "@shared/filetype.ts"
 import { type ContentNotification, PushSubscription } from "@shared/types.ts"
 import sharp from "sharp"
@@ -22,7 +23,8 @@ export const userRouter = router({
 				pushNotifications: true,
 			},
 		})
-		const auth0User = await auth0Management.users.get(opts.ctx.auth.sub)
+		const auth0User = await auth0Cache.getUser(opts.ctx.auth.sub)
+		assert(auth0User, "User not found in Auth0")
 		return {
 			id: opts.ctx.auth.sub,
 			name: auth0User.name ?? auth0User.nickname ?? auth0User.username!,

@@ -11,6 +11,7 @@ import {
 	Text,
 } from "@mantine/core"
 import { notifications as mantineNotifications } from "@mantine/notifications"
+import { spotlight } from "@mantine/spotlight"
 import type { ServiceWorkerMessage } from "@shared/types.ts"
 import {
 	IconBell,
@@ -115,7 +116,7 @@ export function Navigation() {
 					) : (
 						<button
 							className="max-w-100 flex-1 flex items-center gap-2 rounded-md cursor-text bg-white border-gray-300 border py-1.5 pl-4 pr-2 text-gray-500 w-full text-sm dark:border-gray-800 dark:bg-gray-800/50 dark:text-gray-400"
-							onClick={() => {}}
+							onClick={spotlight.open}
 						>
 							<IconSearch size={18} />
 							<span className="flex-1 mr-8 text-left w-max">Search anything</span>
