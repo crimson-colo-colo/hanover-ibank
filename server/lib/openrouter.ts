@@ -104,12 +104,12 @@ type GeminiTasks =
 	| "classification"
 	| "clustering"
 	| "sentence similarity"
-function buildInstructionTemplate(
+export function buildInstructionTemplate(
 	task_description: GeminiTasks,
 	query: string,
 	model: "gemini-embedding-2"
 ): string
-function buildInstructionTemplate(
+export function buildInstructionTemplate(
 	task_description: string,
 	query: string,
 	model: Exclude<SupportedModels, "gemini-embedding-2">
@@ -120,7 +120,7 @@ function buildInstructionTemplate(
  * @param query
  * @param model
  */
-function buildInstructionTemplate(
+export function buildInstructionTemplate(
 	task_description: string,
 	query: string,
 	model: SupportedModels

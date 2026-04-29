@@ -85,8 +85,6 @@ function RoleDashboard() {
 
 	return (
 		<main>
-			<Search />
-
 			<header className="w-full p-4 text-white rounded-lg bg-primary flex">
 				<Stack gap={0} className="flex-1">
 					<Title>

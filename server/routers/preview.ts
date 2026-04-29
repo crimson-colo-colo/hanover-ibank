@@ -48,26 +48,22 @@ export const previewRouter = router({
 			})
 		}
 
-		await db.recentTimestamps.update({
+		await db.recentTimestamps.upsert({
 			where: {
 				employeeId_contentId: {
 					contentId: opts.input.id,
 					employeeId: opts.ctx.auth.sub,
 				},
 			},
-			data: {
+			create: {
 				recentlyViewed: new Date(),
+				recentlyEdited: new Date(),
+				viewCount: 1,
+				contentId: opts.input.id,
+				employeeId: opts.ctx.auth.sub,
 			},
-		})
-
-		await db.recentTimestamps.update({
-			where: {
-				employeeId_contentId: {
-					contentId: opts.input.id,
-					employeeId: opts.ctx.auth.sub,
-				},
-			},
-			data: {
+			update: {
+				recentlyViewed: new Date(),
 				viewCount: {
 					increment: 1,
 				},

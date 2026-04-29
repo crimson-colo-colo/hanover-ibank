@@ -7,11 +7,11 @@ import { getFileTypeFromFile } from "./filetype.ts"
 describe("filetype", () => {
 	it("should correctly identify file types", async () => {
 		const files = {
-			"prisma/seed-data/sample-excel.xlsx": FileType.Excel,
-			"prisma/seed-data/sample-image.jpg": FileType.Image,
-			"prisma/seed-data/sample-pdf.pdf": FileType.Pdf,
-			"prisma/seed-data/sample-word.docx": FileType.WordDocument,
-			"prisma/seed-data/sample-powerpoint.pptx": FileType.Powerpoint,
+			"prisma/seed-data/content/sample-excel.xlsx": FileType.Excel,
+			"prisma/seed-data/content/sample-image.jpg": FileType.Image,
+			"prisma/seed-data/content/sample-pdf.pdf": FileType.Pdf,
+			"prisma/seed-data/content/sample-word.docx": FileType.WordDocument,
+			"prisma/seed-data/content/sample-powerpoint.pptx": FileType.Powerpoint,
 			"README.md": FileType.Plaintext,
 		}
 

@@ -135,3 +135,11 @@ export async function embedOne(
 	})
 	return embedding
 }
+
+export function truncate(embedding: Embedding): Embedding {
+	embedding.embedding.slice(0, 768)
+	return {
+		hash: embedding.hash,
+		embedding: embedding.embedding.slice(0, 768),
+	}
+}

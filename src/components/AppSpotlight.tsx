@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react"
 import { Flex, Group, Kbd, Pill, Text } from "@mantine/core"
+import { useDebouncedValue } from "@mantine/hooks"
 import { Spotlight } from "@mantine/spotlight"
 import { ContentStatus, ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
@@ -36,6 +37,8 @@ export function AppSpotlight() {
 	// const worker = useRef<Comlink.Remote<SearchWorker> | null>(null)
 	const [items, setItems] = useState<React.ReactNode[]>([])
 	const [filters, setFilters] = useState<SearchFilter[]>([])
+
+	const [debouncedQuery] = useDebouncedValue(query, 250)
 
 	const worker = useRef<SearchWorker | null>(null)
 
@@ -74,7 +77,7 @@ export function AppSpotlight() {
 			}
 			if (!worker.current) return
 
-			const results = await worker.current.search(query)
+			const results = await worker.current.search(debouncedQuery)
 
 			setItems(
 				results.map((item) =>
@@ -101,7 +104,7 @@ export function AppSpotlight() {
 		}
 
 		search()
-	}, [worker, query])
+	}, [worker, debouncedQuery])
 
 	return (
 		<Spotlight.Root

@@ -4,7 +4,8 @@
 		"server/generated/prisma/browser.ts",
 		"sw.ts",
 		"src/**/*.worker.ts",
-		"server/**/*.worker.ts"
+		"server/**/*.worker.ts",
+		"server/**/*.d.ts"
 	],
 	"compilerOptions": {
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",

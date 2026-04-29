@@ -18,13 +18,13 @@ import {
 import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
 import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
-import { search } from "../lib/openrouter.ts"
 import {
 	notifyContentCheckedIn,
 	notifyContentCheckedOut,
 	notifyContentEdited,
 	notifyContentTransferred,
 } from "../lib/notify.ts"
+import { search } from "../lib/openrouter.ts"
 import { isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
@@ -436,14 +436,15 @@ export const contentRouter = router({
 				select: { tags: true },
 			})
 			const changed =
-				beforeTags?.tags.length !== opts.input.tags.length
-					? true
-					: beforeTags?.tags.every(
-							(item, i) =>
-								item.tagCategory === opts.input.tags[i].category &&
-								item.tagName === opts.input.tags[i].name
-						)
-
+				opts.input.tags.length !== beforeTags?.tags.length ||
+				opts.input.tags.some(
+					(tag) =>
+						!beforeTags?.tags.some((t) => t.tagCategory === tag.category && t.tagName === tag.name)
+				) ||
+				beforeTags?.tags.some(
+					(t) =>
+						!opts.input.tags.some((tag) => tag.category === t.tagCategory && tag.name === t.tagName)
+				)
 			if (changed) {
 				const updated = await db.content.update({
 					where: { id: opts.input.id },
@@ -516,7 +517,7 @@ export const contentRouter = router({
 
 				await embedFile(updated)
 
-                return updated
+				return updated
 			}
 		}),
 

@@ -1,78 +1,52 @@
 import path from "node:path"
 import { Worker } from "node:worker_threads"
+import * as Comlink from "comlink"
+import nodeAdapter from "comlink/dist/esm/node-adapter"
 import ObjHash from "object-hash"
 import { db } from "../database.ts"
+import type { JobOptions, JobResult, PDFWorker, RecognitionSettings } from "./pdf.worker.ts"
 
 const POOL_SIZE = 3
 
-type RecognitionSettings = {
-	skipRecPDFTextNative: boolean
-	skipRecPDFTextOCR: boolean
+type PoolWorker = {
+	worker: Comlink.Remote<PDFWorker>
+	job: Promise<JobResult> | null
 }
 
 type Job = {
-	payload: {
-		buffer: ArrayBuffer
-		settings: RecognitionSettings
-	}
-	resolve: (text: string) => void
-	reject: (err: Error) => void
-}
-
-type PoolWorker = Worker & {
-	_resolve?: (text: string) => void
-	_reject?: (err: Error) => void
-	busy: boolean
+	hash: Uint8Array<ArrayBuffer>
+	payload: JobOptions
+	resolve: (value: string) => void
+	reject: (reason: string) => void
 }
 
 const pool: PoolWorker[] = []
 const queue: Job[] = []
 
 function dispatch(worker: PoolWorker, job: Job) {
-	worker.busy = true
-	worker._resolve = job.resolve
-	worker._reject = job.reject
-	worker.postMessage(job.payload, [job.payload.buffer])
-}
-
-for (let i = 0; i < POOL_SIZE; i++) {
-	const worker = new Worker(path.resolve(import.meta.dirname, "pdf-worker.ts"), {
-		stderr: true,
-		stdout: true,
-		stdin: false,
-	}) as PoolWorker
-	worker.busy = true // busy until ready signal received
-
-	worker.on("message", (msg: { ready?: boolean; ok?: boolean; text?: string; error?: string }) => {
-		if (msg.ready) {
-			worker.busy = false
-			const next = queue.shift()
-			if (next) dispatch(worker, next)
+	worker.job = worker.worker.extractText(job.payload)
+	worker.job.then(async (result) => {
+		if (!result.ok) {
+			console.error("Error extracting PDF text:", result.error)
+			job.reject(result.error)
 			return
 		}
 
-		const resolve = worker._resolve!
-		const reject = worker._reject!
-		worker._resolve = undefined
-		worker._reject = undefined
-		worker.busy = false
-
+		await insertCache(result.ok ? result.text : "", job.hash, job.payload.settings)
+		job.resolve(result.text)
+		worker.job = null
 		const next = queue.shift()
-		if (next) dispatch(worker, next)
-
-		if (msg.ok) resolve(msg.text!)
-		else reject(new Error(msg.error))
+		if (next) {
+			dispatch(worker, next)
+		}
 	})
+}
 
-	worker.on("error", (err) => {
-		// @ts-expect-error
-		worker._reject?.(err)
-		worker._resolve = undefined
-		worker._reject = undefined
-		worker.busy = false
-	})
-
-	pool.push(worker)
+for (let i = 0; i < POOL_SIZE; i++) {
+	const worker = Comlink.wrap<PDFWorker>(
+		nodeAdapter(new Worker(path.resolve(import.meta.dirname, "pdf.worker.ts"), {}))
+	)
+	pool.push({ worker, job: null })
 }
 
 /**
@@ -80,71 +54,55 @@ for (let i = 0; i < POOL_SIZE; i++) {
  * @param buffer the pdf buffer
  * @param settings extra settings, changing these will cause a cache miss
  */
-export function pdfText(
+export async function pdfText(
 	buffer: ArrayBuffer,
 	settings: RecognitionSettings = { skipRecPDFTextNative: false, skipRecPDFTextOCR: false }
 ): Promise<string> {
+	const hash: Uint8Array<ArrayBuffer> = Uint8Array.from(
+		ObjHash(buffer, { algorithm: "md5", encoding: "buffer" })
+	)
+
+	const entry = await db.textExtractionCache.findUnique({
+		where: {
+			hash_skipRecPDFTextNative_skipRecPDFTextOCR: {
+				hash,
+				skipRecPDFTextNative: settings.skipRecPDFTextNative,
+				skipRecPDFTextOCR: settings.skipRecPDFTextOCR,
+			},
+		},
+	})
+
+	if (entry !== null) {
+		return entry.text
+	}
+
 	return new Promise((resolve, reject) => {
-		const hash: Uint8Array<ArrayBuffer> = Uint8Array.from(
-			ObjHash(buffer, { algorithm: "md5", encoding: "buffer" })
-		)
-		const insertCache = (text: string | PromiseLike<string>) => {
-			if (typeof text === "string") {
-				db.textExtractionCache
-					.create({
-						data: {
-							hash,
-							text,
-							skipRecPDFTextNative: settings.skipRecPDFTextNative,
-							skipRecPDFTextOCR: settings.skipRecPDFTextOCR,
-						},
-					})
-					.catch(reject)
-			} else {
-				text.then((text) => {
-					db.textExtractionCache
-						.create({
-							data: {
-								hash,
-								text,
-								skipRecPDFTextNative: settings.skipRecPDFTextNative,
-								skipRecPDFTextOCR: settings.skipRecPDFTextOCR,
-							},
-						})
-						.catch()
-				})
-			}
+		const job: Job = {
+			hash,
+			payload: { buffer, settings },
+			resolve,
+			reject,
 		}
-		db.textExtractionCache
-			.findUnique({
-				where: {
-					hash_skipRecPDFTextNative_skipRecPDFTextOCR: {
-						hash,
-						skipRecPDFTextNative: settings.skipRecPDFTextNative,
-						skipRecPDFTextOCR: settings.skipRecPDFTextOCR,
-					},
-				},
-			})
-			.then((entry) => {
-				if (entry !== null) resolve(entry.text)
-				else {
-					const payload = {
-						buffer,
-						settings,
-					}
-					const free = pool.find((w) => !w.busy)
-					const job: Job = {
-						payload,
-						resolve: ((result) => {
-							resolve(result)
-							insertCache(result)
-						}) satisfies typeof resolve,
-						reject,
-					}
-					if (free) dispatch(free, job)
-					else queue.push(job)
-				}
-			})
-			.catch(reject)
+		const idleWorker = pool.find((worker) => worker.job === null)
+		if (idleWorker) {
+			dispatch(idleWorker, job)
+		} else {
+			queue.push(job)
+		}
+	})
+}
+
+async function insertCache(
+	text: string,
+	hash: Uint8Array<ArrayBuffer>,
+	settings: RecognitionSettings
+) {
+	await db.textExtractionCache.create({
+		data: {
+			hash,
+			text,
+			skipRecPDFTextNative: settings.skipRecPDFTextNative,
+			skipRecPDFTextOCR: settings.skipRecPDFTextOCR,
+		},
 	})
 }

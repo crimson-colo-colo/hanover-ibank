@@ -8,13 +8,13 @@
 		"shared/**/*.ts",
 		"scripts/**/*.ts"
 	],
-	"exclude": ["server/lib/pdf-worker.ts"],
+	"exclude": ["server/**/*.worker.ts"],
 	"compilerOptions": {
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
 		"target": "esnext",
 		"lib": ["ESNext"],
 		"module": "ESNext",
-		"types": ["node"],
+		"types": ["node", "bun"],
 		"skipLibCheck": true,
 
 		/* Bundler mode */

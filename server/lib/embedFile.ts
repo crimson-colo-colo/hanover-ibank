@@ -1,6 +1,7 @@
 import { FileType } from "@shared/filetype.ts"
 import ogs from "open-graph-scraper"
 import { db } from "../database.ts"
+import type { Prisma } from "../generated/prisma/client.ts"
 import { convertToPDF } from "../routers/preview.ts"
 import { bucketName, s3 } from "../s3.ts"
 import type { Embedding } from "./embeddings.ts"
@@ -9,20 +10,7 @@ import { pdfText } from "./pdf-extractor.ts"
 
 type NotNull<Type> = Exclude<Type, undefined | null>
 
-export async function embedFile(
-	content: Pick<
-		Awaited<ReturnType<typeof db.content.findFirstOrThrow<{ include: { tags: true } }>>>,
-		| "id"
-		| "lastModifiedDate"
-		| "title"
-		| "status"
-		| "objectId"
-		| "expirationDate"
-		| "tags"
-		| "type"
-		| "url"
-	>
-) {
+export async function embedFile(content: Prisma.ContentGetPayload<{ include: { tags: true } }>) {
 	let text: string | undefined
 	let image: Uint8Array<ArrayBufferLike> | undefined
 	if (content.type === "Object") {
@@ -65,11 +53,13 @@ export async function embedFile(
 	} else if (content.type === "Link") {
 		if (content.url !== null) {
 			const parts = [content.url]
-			const { error, result } = await ogs({ url: content.url })
-			if (!error) {
-				if (result.ogTitle) parts.push(result.ogTitle)
-				if (result.ogDescription) parts.push(result.ogDescription)
-			}
+			try {
+				const { error, result } = await ogs({ url: content.url })
+				if (!error) {
+					if (result.ogTitle) parts.push(result.ogTitle)
+					if (result.ogDescription) parts.push(result.ogDescription)
+				}
+			} catch {}
 			text = parts.join("\n")
 		}
 	}
@@ -93,11 +83,11 @@ tags: ${content.tags
 			]),
 		]
 	} else {
-		console.log("Embeddings generated from text:")
-		console.group()
-		console.log(formattedText)
-		console.log(text)
-		console.groupEnd()
+		// console.log("Embeddings generated from text:")
+		// console.group()
+		// console.log(formattedText)
+		// console.log(text)
+		// console.groupEnd()
 		embeddings = [
 			...embeddings,
 			...(await embedDocument(content.title.substring(0, 3000), [
