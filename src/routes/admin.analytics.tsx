@@ -177,26 +177,33 @@ function AnalyticsDashboard() {
 						</Text>
 						<div style={{ maxHeight: 200, overflowY: "auto" }}>
 							<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
-								{(userData ?? []).map((activity, i) => {
-									const { title, description } = getActivityLabel(activity.path)
-									return (
-										<Timeline.Item
-											// biome-ignore lint/suspicious/noArrayIndexKey: foo
-											key={i}
-											bullet={<IconUserKey size={12} />}
-											title={title}
-										>
-											<Text size="sm" c="dimmed">
-												{activity.contentTitle
-													? `Uploaded "${activity.contentTitle}"`
-													: description}
-											</Text>
-											<Text size="xs" mt={4}>
-												{new Date(activity.timestamp).toLocaleTimeString()}
-											</Text>
-										</Timeline.Item>
+								{/*hot fix for removing notification api calls from user activity*/}
+								{(userData ?? [])
+									.filter(
+										(item) =>
+											item.path !== "user.getNotifications" &&
+											item.path !== "user.createPushSubscription"
 									)
-								})}
+									.map((activity, i) => {
+										const { title, description } = getActivityLabel(activity.path)
+										return (
+											<Timeline.Item
+												// biome-ignore lint/suspicious/noArrayIndexKey: foo
+												key={i}
+												bullet={<IconUserKey size={12} />}
+												title={title}
+											>
+												<Text size="sm" c="dimmed">
+													{activity.contentTitle
+														? `Uploaded "${activity.contentTitle}"`
+														: description}
+												</Text>
+												<Text size="xs" mt={4}>
+													{new Date(activity.timestamp).toLocaleTimeString()}
+												</Text>
+											</Timeline.Item>
+										)
+									})}
 							</Timeline>
 						</div>
 					</Paper>
