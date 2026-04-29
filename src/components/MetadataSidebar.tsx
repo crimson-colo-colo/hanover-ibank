@@ -448,7 +448,10 @@ export function MetadataSidebar({
 						onChange={(tags) => {
 							const stringifiedTags = stringifyTagList(tags)
 							if (profile?.role !== undefined) {
-								if (!stringifiedTags.includes(profile.role)) {
+								if (
+									!stringifiedTags.includes(profile.role) &&
+									profile.role !== EmployeeRole.Admin
+								) {
 									setPendingTagChange({ stringifiedTags: stringifyTagList(tags) })
 									setEditingField(null)
 									openConfirmTagChange()
