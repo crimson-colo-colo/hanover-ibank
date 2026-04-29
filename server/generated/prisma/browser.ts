@@ -72,3 +72,8 @@ export type TextExtractionCache = Prisma.TextExtractionCacheModel
  * 
  */
 export type RecentTimestamps = Prisma.RecentTimestampsModel
+/**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel

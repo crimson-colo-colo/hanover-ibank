@@ -1,8 +1,10 @@
+import { PushSubscription } from "@shared/types.ts"
 import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
+import { sendPushNotification } from "../lib/notifications.tsx"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
@@ -101,5 +103,42 @@ export const userRouter = router({
 			})
 		}
 		return `/avatar/${opts.input.userId}?${(object.ETag ?? Date.now().toString()).replace(/"/g, "")}`
+	}),
+	createPushSubscription: authProcedure.input(PushSubscription).mutation(async (opts) => {
+		await db.pushSubscription.upsert({
+			where: {
+				endpoint: opts.input.endpoint,
+			},
+			update: {
+				endpoint: opts.input.endpoint,
+				p256dh: opts.input.keys.p256dh,
+				auth: opts.input.keys.auth,
+				employeeId: opts.ctx.auth.sub,
+			},
+			create: {
+				endpoint: opts.input.endpoint,
+				p256dh: opts.input.keys.p256dh,
+				auth: opts.input.keys.auth,
+				employeeId: opts.ctx.auth.sub,
+			},
+		})
+	}),
+	deletePushSubscription: authProcedure
+		.input(z.object({ endpoint: z.string() }))
+		.mutation(async (opts) => {
+			await db.pushSubscription.delete({
+				where: {
+					endpoint: opts.input.endpoint,
+				},
+			})
+		}),
+	sendTestPush: authProcedure.mutation(async (opts) => {
+		await sendPushNotification(opts.ctx.auth.sub, {
+			title: "Test Notification",
+			body: "This is a test notification sent from the server.",
+			icon: "http://localhost:3000/favicon.png",
+			tag: "abcdefghijklmnopqrstuvwxyz",
+			url: "http://localhost:3000/dashboard",
+		})
 	}),
 })

@@ -82,7 +82,7 @@ export function FavoriteContentCard({
 			<div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
 				<FileTypeIcon
 					fileType={contentType}
-					size={32}
+					size={48}
 					strokeWidth={1.5}
 					className="text-gray-400 dark:text-gray-500"
 				/>
@@ -131,8 +131,8 @@ export function FavoriteContentCard({
 	} else if (contentType === FileType.Powerpoint) {
 		thumbnail = (
 			<div className="absolute inset-0 w-full flex justify-center">
-				<Document file={contentThumbnail?.url} loading={() => null}>
-					<Thumbnail pageNumber={1} loading={() => null} />
+				<Document file={contentThumbnail?.url} loading={() => null} className="relative w-full">
+					<Thumbnail pageNumber={1} loading={() => null} className="absolute inset-0 thumb" />
 				</Document>
 			</div>
 		)

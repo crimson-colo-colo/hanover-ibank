@@ -86,6 +86,7 @@ async function confirmOverwrite() {
 
 async function wipeDBandS3() {
 	await prisma.$transaction([
+		prisma.recentTimestamps.deleteMany(),
 		prisma.talkThreadComment.deleteMany(),
 		prisma.contentTalkThread.deleteMany(),
 		prisma.userActivity.deleteMany(),
@@ -252,8 +253,13 @@ async function createFavoriteContent(
 	const emp2 = "auth0|69d57d0af36c0b4100640b0a"
 
 	const thingsToFavorite = [
-		...linkContent.slice(0, 3).map((c) => c.id),
-		...[...fileTypeToContent.values()].flatMap((ids) => ids.slice(0, 1)),
+		...linkContent
+			.sort(() => 0.5 - Math.random())
+			.slice(0, 3)
+			.map((c) => c.id),
+		...Array.from(fileTypeToContent.values()).flatMap((contentIds) =>
+			contentIds.sort(() => 0.5 - Math.random()).slice(0, 3)
+		),
 	]
 
 	await Promise.all(
@@ -415,6 +421,7 @@ async function createTimestamps() {
 	const contentItems = await prisma.content.findMany({
 		select: { id: true },
 	})
+	const data: Prisma.RecentTimestampsCreateManyInput[] = []
 	for (const content of contentItems) {
 		for (const employee of employeeData) {
 			const employeeId = employee.id
@@ -427,16 +434,16 @@ async function createTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
-			await prisma.recentTimestamps.create({
-				data: {
-					recentlyViewed: recentlyViewed,
-					recentlyEdited: recentlyEdited,
-					employeeId: employeeId,
-					contentId: contentId,
-				},
+			data.push({
+				recentlyViewed: recentlyViewed,
+				recentlyEdited: recentlyEdited,
+				employeeId: employeeId,
+				contentId: contentId,
 			})
 		}
 	}
+	await prisma.recentTimestamps.createMany({ data })
+	console.log(`Created recent timestamps for ${data.length} employee-content pairs`)
 }
 
 async function embedAllContent() {

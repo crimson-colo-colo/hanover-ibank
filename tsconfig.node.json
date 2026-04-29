@@ -2,6 +2,8 @@
 	"include": [
 		"vite.config.ts",
 		"server/**/*.ts",
+		"server/**/*.tsx",
+		"cli/**/*.ts",
 		"prisma/**/*.ts",
 		"shared/**/*.ts",
 		"scripts/**/*.ts"
@@ -12,7 +14,7 @@
 		"target": "esnext",
 		"lib": ["ESNext"],
 		"module": "ESNext",
-		"types": ["bun"],
+		"types": ["node"],
 		"skipLibCheck": true,
 
 		/* Bundler mode */
@@ -21,6 +23,7 @@
 		"verbatimModuleSyntax": true,
 		"moduleDetection": "force",
 		"noEmit": true,
+		"jsx": "react-jsx",
 
 		/* Linting */
 		"strict": true,

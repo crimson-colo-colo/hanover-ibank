@@ -258,12 +258,26 @@ async function generateXlsx() {
 	}
 }
 
+const backgroundColors = [
+	"ACC8E5",
+	"F9D5E5",
+	"B5EAEA",
+	"F1F1F1",
+	"FFE156",
+	"6A0572",
+	"AB83A1",
+	"FF6B6B",
+	"4ECDC4",
+	"C7F464",
+]
 async function generatePptx() {
 	for (let i = 0; i < COUNT_PER_TYPE; i++) {
+		const bg = faker.helpers.arrayElement(backgroundColors)
 		const topic = faker.company.name()
 		const filename = getFilename(topic, "pptx")
 		const pres = new PptxGenJS()
 		const slide = pres.addSlide()
+		slide.background = { color: bg }
 		slide.addText(topic, { x: 1, y: 1, fontSize: 36, color: "363636", bold: true })
 		slide.addText(
 			`Prepared by: ${faker.person.fullName()}\nDate: ${faker.date.recent().toISOString().split("T")[0]}`,
@@ -272,6 +286,7 @@ async function generatePptx() {
 		const numSlides = faker.number.int({ min: 3, max: 7 })
 		for (let j = 0; j < numSlides; j++) {
 			const slide = pres.addSlide()
+			slide.background = { color: bg }
 			slide.addText(toTitleCase(faker.company.buzzPhrase()), {
 				x: 1,
 				y: 1,
@@ -280,6 +295,7 @@ async function generatePptx() {
 			})
 			slide.addText(faker.lorem.paragraph(), { x: 1, y: 2, fontSize: 18 })
 			const slide2 = pres.addSlide()
+			slide.background = { color: bg }
 			slide2.addText(toTitleCase(faker.company.catchPhrase()), { x: 1, y: 0.5, fontSize: 24 })
 			slide2.addText(
 				`- ${faker.hacker.phrase()}\n- ${faker.hacker.phrase()}\n- ${faker.hacker.phrase()}`,
@@ -325,21 +341,29 @@ async function downloadMedia() {
 		},
 	]
 
+	const promises: Promise<void>[] = []
+
 	for (const media of mediaTypes) {
 		for (let i = 0; i < COUNT_PER_TYPE; i++) {
-			const topic = getRandomTopic()
-			const filename = getFilename(topic, media.ext)
-			const targetUrl = media.url()
-			const response = await fetch(targetUrl)
-			if (response.ok) {
-				const buffer = await response.arrayBuffer()
-				fs.writeFileSync(path.join(OUTPUT_DIR, filename), Buffer.from(buffer))
-				console.log(`Downloaded ${filename}`)
-			} else {
-				console.error(`Failed to download ${media.ext} for topic ${topic}`)
-			}
+			promises.push(
+				(async () => {
+					const topic = getRandomTopic()
+					const filename = getFilename(topic, media.ext)
+					const targetUrl = media.url()
+					const response = await fetch(targetUrl)
+					if (response.ok) {
+						const buffer = await response.arrayBuffer()
+						fs.writeFileSync(path.join(OUTPUT_DIR, filename), Buffer.from(buffer))
+						console.log(`Downloaded ${filename}`)
+					} else {
+						console.error(`Failed to download ${media.ext} for topic ${topic}`)
+					}
+				})()
+			)
 		}
 	}
+
+	await Promise.all(promises)
 }
 
 async function main() {
