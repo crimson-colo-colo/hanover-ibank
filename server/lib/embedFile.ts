@@ -74,7 +74,7 @@ export async function embedFile(
 		}
 	}
 	if (text !== undefined && text.length > 50000) {
-		return `${text.match(/^.{25000}/)}...${text.match(/.{25000}$/)}`
+		text = `${text.match(/^.{25000}/)}...${text.match(/.{25000}$/)}`
 	}
 	const formattedText = `# ${content.title.substring(0, 3000)}
 status: ${content.status}

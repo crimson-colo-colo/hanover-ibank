@@ -41,7 +41,7 @@ async function processBatch(batch: PendingEmbedding[]) {
 			requestBody: {
 				encodingFormat: "float",
 				model: "google/gemini-embedding-2-preview",
-				dimensions: 2048,
+				dimensions: 1536,
 				input: batch.map((item) => ({
 					content: item.value.map((value) => {
 						if (value.type === "text")
