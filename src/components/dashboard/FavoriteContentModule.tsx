@@ -25,7 +25,7 @@ export function FavoriteContentModule({
 	return (
 		<Paper p="lg" withBorder className="flex flex-col">
 			<Link
-				to="/content-table"
+				to="/favorites"
 				className="no-underline text-inherit flex items-center mb-sm gap-2 w-fit hover:underline"
 			>
 				<Title order={3}>Your Favorites</Title>
