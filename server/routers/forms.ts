@@ -8,6 +8,7 @@ import {
 	TagCategory,
 } from "../generated/prisma/browser.ts"
 import { auth0Cache } from "../lib/auth0.ts"
+import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -84,7 +85,9 @@ export const formsRouter = router({
 					})),
 				},
 			},
+			include: { tags: true },
 		})
+		await embedFile(content)
 		return content
 	}),
 	searchUsers: authProcedure

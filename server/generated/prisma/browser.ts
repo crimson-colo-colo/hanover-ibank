@@ -58,6 +58,16 @@ export type FavoriteContent = Prisma.FavoriteContentModel
  */
 export type UserActivity = Prisma.UserActivityModel
 /**
+ * Model Embedding
+ * 
+ */
+export type Embedding = Prisma.EmbeddingModel
+/**
+ * Model TextExtractionCache
+ * 
+ */
+export type TextExtractionCache = Prisma.TextExtractionCacheModel
+/**
  * Model RecentTimestamps
  * 
  */

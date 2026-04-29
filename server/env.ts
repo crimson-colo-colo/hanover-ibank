@@ -21,6 +21,7 @@ export const env = createEnv({
 		AUTH0_MANAGEMENT_CLIENT_ID: z.string(),
 		AUTH0_MANAGEMENT_CLIENT_SECRET: z.string(),
 		GOTENBERG_URL: z.url(),
+		OPENROUTER_API_KEY: z.string(),
 		VITE_VAPID_PUBLIC_KEY: z.string(),
 		VAPID_PRIVATE_KEY: z.string(),
 		VAPID_CONTACT_EMAIL: z.email(),

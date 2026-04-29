@@ -7,15 +7,6 @@ datasource db {
     provider = "postgresql"
 }
 
-enum EmployeeRole {
-    BusinessAnalyst
-    Underwriter
-    Admin
-    ActuarialAnalyst
-    ExlOperations
-    BusinessOperations
-}
-
 enum ThreadStatus {
     Open
     Resolved
@@ -62,6 +53,7 @@ model Content {
     checkedOutById   String?
     checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
     threads          ContentTalkThread[]
+  embeddings       Embedding[]
     recentTimestamps RecentTimestamps[]
     notifications    Notification[]
 }
@@ -99,35 +91,78 @@ model TalkThreadComment {
 model Tag {
     name     String
     category TagCategory
-
     contents ContentTag[]
 
     @@id([category, name])
 }
 
 model ContentTag {
-    content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
     contentId   String
-    tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
     tagCategory TagCategory
     tagName     String
+  content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
 
     @@id([contentId, tagCategory, tagName])
 }
 
-enum TagCategory {
-    DocumentType // Workflow or Reference
-    IntendedAudience // Underwriter or Business Analyst
-    Custom // Custom tag created by user
-}
-
 model FavoriteContent {
+  contentId  String
+  employeeId String
     content    Content  @relation(fields: [contentId], references: [id])
-    contentId  String
     employee   Employee @relation(fields: [employeeId], references: [id])
-    employeeId String
 
     @@id([contentId, employeeId])
+}
+
+model UserActivity {
+  timestamp  DateTime
+  employeeId String
+  path       String
+  count      Int      @default(1)
+  day        DateTime
+  hour       DateTime
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  @@id([timestamp, employeeId, path])
+}
+
+model Embedding {
+  hash      Bytes                 @id
+  embedding Unsupported("vector")
+  content  Content[]
+  type     EmbeddingType[]        @default([Unknown])
+}
+
+enum EmbeddingType {
+  Query
+  Content
+
+  Unknown
+}
+
+model TextExtractionCache {
+  hash Bytes
+  skipRecPDFTextNative Boolean
+  skipRecPDFTextOCR Boolean
+  text String
+
+  @@id([hash, skipRecPDFTextNative, skipRecPDFTextOCR])
+}
+
+enum EmployeeRole {
+  BusinessAnalyst
+  Underwriter
+  Admin
+  ActuarialAnalyst
+  ExlOperations
+  BusinessOperations
+}
+
+enum TagCategory {
+  DocumentType
+  IntendedAudience
+  Custom
 }
 
 enum ContentStatus {
@@ -140,22 +175,6 @@ enum ContentType {
     Object
     Link
 }
-
-model UserActivity {
-    timestamp  DateTime
-    // no default timestamp because we want to prefer using the server's time for this. This avoids
-    // the server and db being significantly out of sync even if improbable. This timestamp is also
-    // truncated to the second it was generated and must be manually done
-    employeeId String
-    employee   Employee @relation(fields: [employeeId], references: [id])
-    path       String
-    count      Int      @default(1)
-    day        DateTime // datetime truncated to the UTC day it was created in
-    hour       DateTime // datetime truncated to the UTC hour it was created in
-
-    @@id([timestamp, employeeId, path])
-}
-
 model RecentTimestamps {
     recentlyEdited DateTime
     recentlyViewed DateTime

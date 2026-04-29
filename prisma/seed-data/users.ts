@@ -36,6 +36,7 @@ export const employeeData = [
 	{ id: "auth0|69e7fb62edd4fcd00a45979a", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb62edd4fcd00a45979b", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb648943d0107ceef484", role: EmployeeRole.BusinessOperations },
+	{ id: "auth0|69eed7728e98f379ff437da2", role: EmployeeRole.Admin },
 ]
 
 export function randomUserId() {

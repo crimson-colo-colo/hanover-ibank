@@ -1,7 +1,6 @@
 import { create, insertMultiple, search } from "@orama/orama"
-import { pluginQPS } from "@orama/plugin-qps"
+// import { pluginQPS } from "@orama/plugin-qps"
 import { ContentStatus, ContentType, EmployeeRole, TagCategory } from "@prisma/browser.ts"
-import { ContentFilter } from "@shared/enum.ts"
 import { FileType } from "@shared/filetype.ts"
 import type { ContentListItem } from "@shared/types.ts"
 import { createTRPCClient, httpBatchLink, loggerLink, type TRPCClient } from "@trpc/client"
@@ -43,10 +42,13 @@ export type SearchFilter =
 			value: ContentType
 	  }
 
+const filterEmbeddings: Record<string, number[]> = {}
+
 export type SearchFilterItem = {
 	id: string
 	title: string
 	toSearchFilter(): SearchFilter
+	embeddingName: string
 }
 
 const searchFilters: SearchFilterItem[] = [
@@ -56,6 +58,7 @@ const searchFilters: SearchFilterItem[] = [
 		toSearchFilter(): SearchFilter {
 			return { id: this.id, type: "favorited" }
 		},
+		embeddingName: "A file that is favorited by the user",
 	},
 	...Object.values(ContentStatus).map((status) => ({
 		id: `status:${status}`,
@@ -63,6 +66,7 @@ const searchFilters: SearchFilterItem[] = [
 		toSearchFilter(): SearchFilter {
 			return { id: this.id, type: "status", value: status }
 		},
+		embeddingName: `A file with status ${status}`,
 	})),
 	...["Workflow", "Reference"].map((type) => ({
 		id: `tag:${stringifyTag({ category: TagCategory.DocumentType, name: type })}`,
@@ -75,6 +79,7 @@ const searchFilters: SearchFilterItem[] = [
 				name: type,
 			}
 		},
+		embeddingName: `A file with document type ${type}`,
 	})),
 	...Object.values(EmployeeRole).map((role) => ({
 		id: `tag:${stringifyTag({ category: TagCategory.IntendedAudience, name: role })}`,
@@ -87,6 +92,7 @@ const searchFilters: SearchFilterItem[] = [
 				name: role,
 			}
 		},
+		embeddingName: `A file intended for ${employeeRoleDisplayName[role]}`,
 	})),
 	...Object.values(ContentType).map((type) => ({
 		id: `contenttype:${type}`,
@@ -98,6 +104,7 @@ const searchFilters: SearchFilterItem[] = [
 				value: type,
 			}
 		},
+		embeddingName: `A file that is a ${contentTypeDisplayName[type]}`,
 	})),
 	...Object.values(FileType).map((fileType) => ({
 		id: `filetype:${fileType}`,
@@ -109,6 +116,7 @@ const searchFilters: SearchFilterItem[] = [
 				value: fileType,
 			}
 		},
+		embeddingName: `A file that is a ${fileTypeDisplayName[fileType]}`,
 	})),
 ]
 
@@ -121,13 +129,19 @@ function createSearchIndex(items: ContentListItem[], activeFilters: SearchFilter
 				email: "string",
 			},
 			url: "string",
+			embedding: "vector[768]",
 		},
-		plugins: [pluginQPS()],
+		// plugins: [pluginQPS()],
 	})
 
 	insertMultiple(
 		index,
-		searchFilters.filter((f) => !activeFilters.some((af) => af.id === f.id))
+		searchFilters
+			.filter((f) => !activeFilters.some((af) => af.id === f.id))
+			.map((filter) => ({
+				...filter,
+				embedding: filterEmbeddings[filter.id],
+			}))
 	)
 
 	insertMultiple(
@@ -146,7 +160,7 @@ function createSearchIndex(items: ContentListItem[], activeFilters: SearchFilter
 export class SearchWorker {
 	readonly trpc: TRPCClient<AppRouter>
 	ready: Promise<void>
-	items = new Map<string, ContentListItem>()
+	items = new Map<string, ContentListItem & { embedding: number[] }>()
 	index = createSearchIndex([], [])
 	filters: SearchFilter[] = []
 
@@ -176,12 +190,27 @@ export class SearchWorker {
 	}
 
 	async #downloadIndex(): Promise<void> {
-		const items = await this.trpc.content.list.query({ filter: ContentFilter.All })
-		console.log("Downloaded content list", items)
+		const items = await this.trpc.search.getIndex.query()
 		this.items.clear()
-		for (const item of items.content) {
-			this.items.set(item.id, item)
+		for (const item of items) {
+			this.items.set(item.id, {
+				...item,
+				embedding: unpackFloat16Array(item.embedding),
+			})
 		}
+		console.log("Downloaded content list", this.items.values())
+
+		const filterEmbeddingResults = await Promise.all(
+			searchFilters.map(async (filter) => {
+				const embedding = await this.trpc.search.embedFilter.query({ filter: filter.embeddingName })
+				return { id: filter.id, embedding: unpackFloat16Array(embedding) }
+			})
+		)
+		for (const { id, embedding } of filterEmbeddingResults) {
+			filterEmbeddings[id] = embedding
+		}
+		console.log("Downloaded filter embeddings", filterEmbeddings)
+
 		this.rebuildIndex()
 	}
 
@@ -231,11 +260,18 @@ export class SearchWorker {
 	async search(query: string): Promise<(ContentListItem | SearchFilter)[]> {
 		await this.ready
 
+		const queryEmbedding = await this.trpc.search.embedQuery.query({ query })
+		const embeddingArray = unpackFloat16Array(queryEmbedding)
+
 		const results = await search(this.index, {
-			mode: "fulltext",
-			limit: 20,
+			mode: "hybrid",
 			term: query,
-			tolerance: 1,
+			vector: {
+				value: embeddingArray,
+				property: "embedding",
+			},
+			limit: 20,
+			similarity: 0.6,
 		})
 
 		return results.hits
@@ -253,3 +289,8 @@ export class SearchWorker {
 }
 
 Comlink.expose(SearchWorker)
+
+function unpackFloat16Array(queryEmbedding: string) {
+	const bytes = Uint8Array.fromBase64(queryEmbedding)
+	return Array.from(new Float16Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 2))
+}

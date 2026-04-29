@@ -18,7 +18,8 @@
 				"ms-azuretools.vscode-docker",
 				"editorconfig.editorconfig",
 				"esbenp.prettier-vscode",
-				"tamasfe.even-better-toml"
+				"tamasfe.even-better-toml",
+				"oven.bun-vscode"
 			],
 			"settings": {
 				"editor.defaultFormatter": "biomejs.biome",
@@ -37,6 +38,29 @@
 		"AUTH0_CLIENT_SECRET": "${localEnv:AUTH0_CLIENT_SECRET}",
 		"AUTH0_TENANT": "${localEnv:AUTH0_TENANT}",
 		"AUTH0_MANAGEMENT_CLIENT_ID": "${localEnv:AUTH0_MANAGEMENT_CLIENT_ID}",
-		"AUTH0_MANAGEMENT_CLIENT_SECRET": "${localEnv:AUTH0_MANAGEMENT_CLIENT_SECRET}"
+		"AUTH0_MANAGEMENT_CLIENT_SECRET": "${localEnv:AUTH0_MANAGEMENT_CLIENT_SECRET}",
+		"OPENROUTER_API_KEY": "${localEnv:OPENROUTER_API_KEY}"
+	},
+	"portsAttributes": {
+		"3000": {
+			"label": "Webserver",
+			"requireLocalPort": true
+		},
+		"Vite WS/SSE": {
+			"label": "Vite HMR",
+			"requireLocalPort": true
+		},
+		"9000": {
+			"label": "Minio Probably",
+			"requireLocalPort": true
+		},
+		"9001": {
+			"label": "Minio",
+			"requireLocalPort": true
+		},
+		"24678": {
+			"label": "Vite HMR",
+			"requireLocalPort": true
+		}
 	}
 }

@@ -59,6 +59,8 @@ export const ModelName = {
   ContentTag: 'ContentTag',
   FavoriteContent: 'FavoriteContent',
   UserActivity: 'UserActivity',
+  Embedding: 'Embedding',
+  TextExtractionCache: 'TextExtractionCache',
   RecentTimestamps: 'RecentTimestamps',
   PushSubscription: 'PushSubscription',
   Notification: 'Notification'
@@ -172,6 +174,24 @@ export const UserActivityScalarFieldEnum = {
 } as const
 
 export type UserActivityScalarFieldEnum = (typeof UserActivityScalarFieldEnum)[keyof typeof UserActivityScalarFieldEnum]
+
+
+export const EmbeddingScalarFieldEnum = {
+  hash: 'hash',
+  type: 'type'
+} as const
+
+export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
+
+
+export const TextExtractionCacheScalarFieldEnum = {
+  hash: 'hash',
+  skipRecPDFTextNative: 'skipRecPDFTextNative',
+  skipRecPDFTextOCR: 'skipRecPDFTextOCR',
+  text: 'text'
+} as const
+
+export type TextExtractionCacheScalarFieldEnum = (typeof TextExtractionCacheScalarFieldEnum)[keyof typeof TextExtractionCacheScalarFieldEnum]
 
 
 export const RecentTimestampsScalarFieldEnum = {
