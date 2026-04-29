@@ -104,7 +104,13 @@ export function AppSpotlight() {
 	}, [worker, query])
 
 	return (
-		<Spotlight.Root query={query} onQueryChange={setQuery}>
+		<Spotlight.Root
+			query={query}
+			onQueryChange={setQuery}
+			onSpotlightClose={() => {
+				setFilters([])
+			}}
+		>
 			<Spotlight.Search
 				placeholder="Search..."
 				leftSection={<IconSearch size={20} />}
