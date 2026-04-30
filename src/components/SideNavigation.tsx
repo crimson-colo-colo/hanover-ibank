@@ -5,17 +5,22 @@ import { ContentType } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconBolt,
+	IconBoltFilled,
 	IconBuildingBank,
 	IconChartBarPopular,
 	IconChevronRight,
 	IconCompass,
 	IconHome,
+	IconHomeFilled,
 	IconInfoCircle,
+	IconInfoCircleFilled,
 	IconLayoutSidebarLeftExpand,
 	IconLayoutSidebarRightExpand,
 	IconList,
+	IconListFilled,
 	IconPointFilled,
 	IconStar,
+	IconStarFilled,
 	IconUsers,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
@@ -34,13 +39,25 @@ export type SideNavigationProps = {
 }
 
 const routeLinks = [
-	{ pathName: "/dashboard", name: "Home", icon: IconHome },
-	{ pathName: "/content-table", name: "Content", icon: IconList },
-	{ pathName: "/favorites", name: "Favorites", icon: IconStar },
-	{ pathName: "/about", name: "About", icon: IconInfoCircle },
-	{ pathName: "/technology", name: "Technology", icon: IconBolt },
-	{ pathName: "/admin/manage-users", name: "Employees", icon: IconUsers, admin: true },
-	{ pathName: "/admin/analytics", name: "Analytics", icon: IconChartBarPopular, admin: true },
+	{ pathName: "/dashboard", name: "Home", icon: IconHome, iconFilled: IconHomeFilled },
+	{ pathName: "/content-table", name: "Content", icon: IconList, iconFilled: IconListFilled },
+	{ pathName: "/favorites", name: "Favorites", icon: IconStar, iconFilled: IconStarFilled },
+	{ pathName: "/about", name: "About", icon: IconInfoCircle, iconFilled: IconInfoCircleFilled },
+	{ pathName: "/technology", name: "Technology", icon: IconBolt, iconFilled: IconBoltFilled },
+	{
+		pathName: "/admin/manage-users",
+		name: "Employees",
+		icon: IconUsers,
+		iconFilled: IconUsers,
+		admin: true,
+	},
+	{
+		pathName: "/admin/analytics",
+		name: "Analytics",
+		icon: IconChartBarPopular,
+		iconFilled: IconChartBarPopular,
+		admin: true,
+	},
 ]
 
 function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; collapsed: boolean }) {
@@ -169,7 +186,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 					radius={0}
 					className={clsx(collapsed && "px-0")}
 				>
-					{<link.icon />}
+					{location.pathname === link.pathName ? <link.iconFilled /> : <link.icon />}
 					{!collapsed && <span className="p-2">{link.name}</span>}
 				</Button>
 			</Tooltip>
