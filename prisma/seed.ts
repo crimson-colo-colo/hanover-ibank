@@ -60,7 +60,7 @@ async function main() {
 		createNotifications(),
 	])
 
-	await embedAllContent()
+	// await embedAllContent()
 }
 
 async function confirmOverwrite() {
