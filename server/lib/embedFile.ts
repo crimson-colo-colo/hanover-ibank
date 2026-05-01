@@ -49,11 +49,14 @@ export async function embedFile(content: Prisma.ContentGetPayload<{ include: { t
 		}
 		if (fileType === "plaintext") text = Buffer.from(buffer).toString("utf-8")
 		if (pdfBuffer !== undefined) {
-			text = await pdfText(pdfBuffer)
+			text = await toMarkdown(
+				new Blob([pdfBuffer], { type: "application/pdf" }),
+				`${content.title}.pdf`
+			)
 		}
 		if (fileType === "image") {
 			const image = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
-			text = (await toMarkdown(new Blob([image]))) || text
+			text = (await toMarkdown(new Blob([image]), content.title)) || text
 		}
 	} else if (content.type === "Link") {
 		if (content.url !== null) {
