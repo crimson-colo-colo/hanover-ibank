@@ -6,7 +6,7 @@ import type { ContentListItem } from "@shared/types.ts"
 import { createTRPCClient, httpBatchLink, loggerLink, type TRPCClient } from "@trpc/client"
 import * as Comlink from "comlink"
 import superjson from "superjson"
-import { isDevelopment } from "@/env.ts"
+import { env, isDevelopment } from "@/env.ts"
 import {
 	contentTypeDisplayName,
 	employeeRoleDisplayName,
@@ -271,7 +271,7 @@ export class SearchWorker {
 				property: "embedding",
 			},
 			limit: 20,
-			similarity: 0.6,
+			similarity: env.VITE_SEARCH_SIMILARITY_THRESHOLD,
 		})
 
 		return results.hits

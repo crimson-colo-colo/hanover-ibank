@@ -3,12 +3,7 @@ import { OpenRouter } from "@openrouter/sdk"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { EmbeddingType } from "../generated/prisma/enums.ts"
-import {
-	type DocumentImagePiece,
-	type DocumentTextPiece,
-	type Embedding,
-	embedOne,
-} from "./embeddings.ts"
+import { type Embedding, embedOne } from "./embeddings.ts"
 
 export type ImageUrl = {
 	url: string
@@ -32,27 +27,23 @@ export const openrouter: Omit<OpenRouter, "embeddings"> = new OpenRouter({
 
 const chunker = await RecursiveChunker.create({
 	tokenizer: "character",
-	chunkSize: 6000,
+	chunkSize: env.CHUNK_LENGTH,
 	minCharactersPerChunk: 24,
 })
 
 export async function embed(value: string, type: "Query"): Promise<Embedding>
-export async function embed(
-	value: string,
-	type?: Exclude<EmbeddingType, "Query">
-): Promise<Embedding[]>
+export async function embed(value: string[], type?: EmbeddingType): Promise<Embedding[]>
 /**
  * Embed content.
- * @param value the text to be embedded
+ * @param value the unchunked text to be embedded
  * @param type If the text is content or a query.
  */
 export async function embed(
-	value: string,
+	value: string | string[],
 	type: EmbeddingType = "Content"
 ): Promise<Embedding | Embedding[]> {
-	if (type === "Query") return embedOne([{ type: "text", text: value }], type)
-	const chunks = await chunker.chunk(value)
-	return Promise.all(chunks.map((chunk) => embedOne([{ type: "text", text: chunk.text }], type)))
+	if (typeof value === "string") return embedOne(value, type)
+	return await Promise.all(value.map((value) => embedOne(value, type)))
 }
 /**
  * Embed a document.
@@ -60,78 +51,46 @@ export async function embed(
  * @param values a pair of text and image, where the text metadata precedes the text.
  * @param type
  */
-export async function embedDocument(
-	title: string,
-	values: string[],
-	type: EmbeddingType & "Content" = "Content"
-): Promise<Embedding[]> {
-	const chunks = (await Promise.all(values.map((value) => chunker.chunk(value)))).flat()
-	return Promise.all(
-		chunks.map((chunk) => {
-			const template = `title: ${title} | text: ${chunk.text}`
-			return embedOne([{ type: "text", text: template }], type)
-		})
-	)
+export async function embedDocument({
+	metadata,
+	content,
+}: {
+	metadata: string
+	content: string
+}): Promise<Embedding[]> {
+	const strings = await buildTemplate({
+		type: "document",
+		metadata: metadata,
+		content: content,
+	})
+	return await embed(strings, "Content")
 }
 
-/**
- * Embed an image document with its metadata.
- * @param title
- * @param values a pair of text and image, where the text metadata precedes the text.
- * @param type
- */
-export async function embedImage(
-	title: string,
-	values: [DocumentTextPiece, DocumentImagePiece],
-	type: EmbeddingType & "Content" = "Content"
-): Promise<Embedding> {
-	const template = `title: ${title} | text: ${values[0].text}`
-	return embedOne(
-		[
-			{ type: "text", text: template },
-			{ type: "image", image: values[1].image },
-		],
-		type
-	)
-}
+export const DEFAULT_MODEL_TEMPLATE = "qwen3-embedding" satisfies SupportedModels
 
-type SupportedModels = "gemini-embedding-2" | "qwen3-embedding"
-type GeminiTasks =
-	| "search result"
-	| "question answering"
-	| "fact checking"
-	| "code retrieval"
-	| "classification"
-	| "clustering"
-	| "sentence similarity"
-export function buildInstructionTemplate(
-	task_description: GeminiTasks,
-	query: string,
-	model: "gemini-embedding-2"
-): string
-export function buildInstructionTemplate(
-	task_description: string,
-	query: string,
-	model: Exclude<SupportedModels, "gemini-embedding-2">
-): string
-/**
- * Create an query instruction template for creating a query embedding.
- * @param task_description
- * @param query
- * @param model
- */
-export function buildInstructionTemplate(
-	task_description: string,
-	query: string,
-	model: SupportedModels
-): string {
-	let out: string | undefined
-	if (model === "gemini-embedding-2") out = `task: ${task_description} | query: ${query}`
-	else if (model === "qwen3-embedding")
-		out = `Instruct: ${task_description}
-Query:${query}`
-	if (out === undefined) throw Error("Invalid input somehow.")
-	return out
+type SupportedModels = "qwen3-embedding"
+type BuildTemplateParamDocument = {
+	type: "document"
+	metadata: string
+	content: string
+}
+type BuildTemplateParamQuery = { type: "query"; instruction?: string; search: string }
+type BuildTemplateParameters = BuildTemplateParamDocument | BuildTemplateParamQuery
+export async function buildTemplate(input: BuildTemplateParamQuery): Promise<[string]>
+export async function buildTemplate(input: BuildTemplateParamDocument): Promise<string[]>
+export async function buildTemplate(input: BuildTemplateParameters): Promise<string[]> {
+	if (input.type === "document") {
+		const chunks = await chunker.chunk(input.content)
+		return chunks.map(
+			(v) =>
+				`${input.metadata}\n---\n${v.startIndex > 10 ? "..." : ""} + ${v.text} + ${v.endIndex < input.content.length - 10 ? "..." : ""}`
+		)
+	} else {
+		return [
+			`Instruct: ${input.instruction}
+Query:${input.search}`,
+		]
+	}
 }
 
 async function findSimilarByHash(hash: Uint8Array): Promise<Uint8Array[]> {
@@ -154,11 +113,12 @@ async function findSimilarByHash(hash: Uint8Array): Promise<Uint8Array[]> {
  */
 export async function search(query: string) {
 	const embedding = await embed(
-		buildInstructionTemplate(
-			"search result", //"Given a web search query, retrieve relevant passages that answer the query",
-			query,
-			"gemini-embedding-2"
-		),
+		(
+			await buildTemplate({
+				type: "query",
+				search: query,
+			})
+		)[0],
 		"Query"
 	)
 	const similar = await findSimilarByHash(embedding.hash)

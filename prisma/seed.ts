@@ -60,7 +60,7 @@ async function main() {
 		createNotifications(),
 	])
 
-	// await embedAllContent()
+	await embedAllContent()
 }
 
 async function confirmOverwrite() {
@@ -471,12 +471,19 @@ async function embedAllContent() {
 		if (data.textExtractionCache) {
 			console.log(`Restoring ${data.textExtractionCache.length} text extraction cache entries...`)
 			await prisma.textExtractionCache.createMany({
-				data: data.textExtractionCache.map((entry: any) => ({
-					hash: Buffer.from(entry.hash, "hex"),
-					skipRecPDFTextNative: entry.skipRecPDFTextNative,
-					skipRecPDFTextOCR: entry.skipRecPDFTextOCR,
-					text: entry.text,
-				})),
+				data: data.textExtractionCache.map(
+					(entry: {
+						hash: string
+						skipRecPDFTextNative: boolean
+						skipRecPDFTextOCR: boolean
+						text: string
+					}) => ({
+						hash: Buffer.from(entry.hash, "hex"),
+						skipRecPDFTextNative: entry.skipRecPDFTextNative,
+						skipRecPDFTextOCR: entry.skipRecPDFTextOCR,
+						text: entry.text,
+					})
+				),
 				skipDuplicates: true,
 			})
 		}
