@@ -1,9 +1,10 @@
 import { OpenRouter } from "@openrouter/sdk"
 import hash from "object-hash"
+import z from "zod"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { EmbeddingType } from "../generated/prisma/enums.ts"
-import type { ContentImageURL, ContentText } from "./openrouter.ts"
+import { type ContentImageURL, type ContentText, openrouter } from "./openrouter.ts"
 
 const openrouterInternal = new OpenRouter({
 	apiKey: env.OPENROUTER_API_KEY,
@@ -40,24 +41,9 @@ async function processBatch(batch: PendingEmbedding[]) {
 		const response = await openrouterInternal.embeddings.generate({
 			requestBody: {
 				encodingFormat: "float",
-				model: "google/gemini-embedding-2-preview",
+				model: "perplexity/pplx-embed-v1-4b",
 				dimensions: 1536,
-				input: batch.map((item) => ({
-					content: item.value.map((value) => {
-						if (value.type === "text")
-							return {
-								type: "text",
-								text: value.text,
-							} satisfies ContentText | ContentImageURL
-						else
-							return {
-								type: "image_url",
-								imageUrl: {
-									url: `data:image/jpeg;base64,${Buffer.from(value.image).toString("base64")}`,
-								},
-							} satisfies ContentText | ContentImageURL
-					}),
-				})),
+				input: batch.map((value) => value.value),
 			},
 		})
 		if (typeof response === "string") throw Error("Improper embedding response.")
@@ -116,8 +102,7 @@ function setEmbedding(value: EmbedMultimodalDocument): Promise<Embedding> {
 }
 
 export type DocumentTextPiece = { type: "text"; text: string }
-export type DocumentImagePiece = { type: "image"; image: Uint8Array<ArrayBufferLike> }
-export type EmbedMultimodalDocument = (DocumentTextPiece | DocumentImagePiece)[]
+export type EmbedMultimodalDocument = string
 
 /**
  * Get the embedding for a prechunked string.

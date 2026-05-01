@@ -1,7 +1,7 @@
 import z from "zod"
 import { db } from "../database.ts"
 import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
-import { buildInstructionTemplate, embed, embedDocument } from "../lib/openrouter.ts"
+import { buildTemplate, DEFAULT_MODEL_TEMPLATE, embed, embedDocument } from "../lib/openrouter.ts"
 import { authProcedure, router } from "../trpc.ts"
 
 export const searchRouter = router({
@@ -11,11 +11,11 @@ export const searchRouter = router({
 		})
 
 		const embeddings = await db.$queryRaw<{ contentId: string; embedding: string }[]>`
-            SELECT "Content"."id" as "contentId", "Embedding"."embedding"::text
-            FROM "Embedding"
-            JOIN "_ContentToEmbedding" ON "Embedding"."hash" = "_ContentToEmbedding"."B"
-            JOIN "Content" ON "Content"."id" = "_ContentToEmbedding"."A"
-        `
+			SELECT "Content"."id" as "contentId", "Embedding"."embedding"::text
+			FROM "Embedding"
+					 JOIN "_ContentToEmbedding" ON "Embedding"."hash" = "_ContentToEmbedding"."B"
+				     JOIN "Content" ON "Content"."id" = "_ContentToEmbedding"."A"
+		`
 
 		const embeddingMap = new Map<string, { count: number; totals: number[] }>()
 		for (const { contentId, embedding } of embeddings) {
@@ -50,11 +50,13 @@ export const searchRouter = router({
 
 	embedQuery: authProcedure.input(z.object({ query: z.string() })).query(async (opts) => {
 		const embedding = await embed(
-			buildInstructionTemplate(
-				"search result", //"Given a web search query, retrieve relevant passages that answer the query",
-				opts.input.query,
-				"gemini-embedding-2"
-			),
+			(
+				await buildTemplate({
+					type: "query",
+					search: opts.input.query,
+					instruction: "Given a web search query, retrieve relevant passages that answer the query",
+				})
+			)[0],
 			"Query"
 		)
 		return new Uint8Array(
@@ -63,7 +65,7 @@ export const searchRouter = router({
 	}),
 
 	embedFilter: authProcedure.input(z.object({ filter: z.string() })).query(async (opts) => {
-		const embedding = await embedDocument("Tags", [opts.input.filter])
+		const embedding = await embedDocument({ metadata: "Tag", content: opts.input.filter })
 		return new Uint8Array(
 			new Float16Array(normalizeVector(embedding[0].embedding.slice(0, 768))).buffer
 		).toBase64()

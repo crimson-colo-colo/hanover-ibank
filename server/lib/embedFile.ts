@@ -5,16 +5,18 @@ import type { Prisma } from "../generated/prisma/client.ts"
 import { convertToPDF } from "../routers/preview.ts"
 import { bucketName, s3 } from "../s3.ts"
 import type { Embedding } from "./embeddings.ts"
-import { embedDocument, embedImage } from "./openrouter.ts"
-import { pdfText } from "./pdf-extractor.ts"
+import { embedDocument } from "./openrouter.ts"
+import { pdfText, toMarkdown } from "./pdf-extractor.ts"
 
 type NotNull<Type> = Exclude<Type, undefined | null>
 
+type S3Object = Parameters<Parameters<(typeof s3)["getObject"]>[2]>[1]
+
 export async function embedFile(content: Prisma.ContentGetPayload<{ include: { tags: true } }>) {
+	// the resulting text that describes the document
 	let text: string | undefined
-	let image: Uint8Array<ArrayBufferLike> | undefined
 	if (content.type === "Object") {
-		let object: Parameters<Parameters<(typeof s3)["getObject"]>[2]>[1] | undefined // probably a better way
+		let object: S3Object | undefined
 		if (content.objectId !== null) {
 			object = await s3.getObject({
 				Bucket: bucketName satisfies NotNull<typeof bucketName>,
@@ -49,7 +51,10 @@ export async function embedFile(content: Prisma.ContentGetPayload<{ include: { t
 		if (pdfBuffer !== undefined) {
 			text = await pdfText(pdfBuffer)
 		}
-		if (fileType === "image") image = buffer
+		if (fileType === "image") {
+			const image = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength)
+			text = (await toMarkdown(new Blob([image]))) || text
+		}
 	} else if (content.type === "Link") {
 		if (content.url !== null) {
 			const parts = [content.url]
@@ -73,29 +78,10 @@ tags: ${content.tags
 		.map((v) => `${v.tagCategory} - ${v.tagName.substring(0, 500)}`)
 		.join(", ")
 		.substring(0, 5000)}`
-	let embeddings: Embedding[] = []
-	if (image !== undefined) {
-		embeddings = [
-			...embeddings,
-			await embedImage(content.title.substring(0, 3000), [
-				{ type: "text", text: formattedText },
-				{ type: "image", image: image },
-			]),
-		]
-	} else {
-		// console.log("Embeddings generated from text:")
-		// console.group()
-		// console.log(formattedText)
-		// console.log(text)
-		// console.groupEnd()
-		embeddings = [
-			...embeddings,
-			...(await embedDocument(content.title.substring(0, 3000), [
-				formattedText,
-				...(text ? [text] : []),
-			])),
-		]
-	}
+	const embeddings: Embedding[] = await embedDocument({
+		metadata: formattedText,
+		content: text ?? "",
+	})
 	await db.content.update({
 		where: { id: content.id },
 		data: {
