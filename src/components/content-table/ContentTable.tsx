@@ -516,15 +516,17 @@ export function ContentTable({
 				</Title>
 
 				<Flex gap="sm">
-					<SegmentedControl
-						id="content-filter-control"
-						data={[
-							{ label: "For You", value: ContentFilter.Own },
-							{ label: "Show All", value: ContentFilter.All },
-						]}
-						value={filter}
-						onChange={changeFilter}
-					/>
+					{profile?.role === "Admin" ? null : (
+						<SegmentedControl
+							id="content-filter-control"
+							data={[
+								{ label: "For You", value: ContentFilter.Own },
+								{ label: "Show All", value: ContentFilter.All },
+							]}
+							value={filter}
+							onChange={changeFilter}
+						/>
+					)}
 
 					<Button
 						id="upload-content-btn"
@@ -533,7 +535,6 @@ export function ContentTable({
 					>
 						Upload content
 					</Button>
-
 					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"
