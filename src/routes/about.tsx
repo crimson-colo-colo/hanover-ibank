@@ -61,17 +61,26 @@ const rows: TeamMember[][] = [
 			quote: "Placeholder Quote",
 		},
 		{
-			name: "Everett Wilber",
-			role: "Assistant Lead Software Engineer",
-			photo: everettPhoto,
-			alt: "Everett",
+			name: "Justin Fletcher",
+			role: "Project Manager",
+			photo: justinPhoto,
+			alt: "Justin",
 			quote: "Placeholder Quote",
 		},
+	],
+	[
 		{
 			name: "Phil Banoub",
 			role: "Assistant Lead Software Engineer",
 			photo: philPhoto,
 			alt: "Phil",
+			quote: "Placeholder Quote",
+		},
+		{
+			name: "Everett Wilber",
+			role: "Assistant Lead Software Engineer",
+			photo: everettPhoto,
+			alt: "Everett",
 			quote: "Placeholder Quote",
 		},
 	],
@@ -90,20 +99,13 @@ const rows: TeamMember[][] = [
 			alt: "Brandon",
 			quote: "Placeholder Quote",
 		},
+	],
+	[
 		{
 			name: "Lucas Zaki",
 			role: "Full Time Software Engineer",
 			photo: lucasPhoto,
 			alt: "Lucas",
-			quote: "Placeholder Quote",
-		},
-	],
-	[
-		{
-			name: "Justin Fletcher",
-			role: "Project Manager",
-			photo: justinPhoto,
-			alt: "Justin",
 			quote: "Placeholder Quote",
 		},
 		{
@@ -113,6 +115,8 @@ const rows: TeamMember[][] = [
 			alt: "Julien",
 			quote: "Placeholder Quote",
 		},
+	],
+	[
 		{
 			name: "Jace Bonjorno",
 			role: "Documentation Analyst",
@@ -151,6 +155,7 @@ function TeamCard({ name, role, photo, alt, quote }: TeamMember) {
 			style={{
 				display: "flex",
 				flexDirection: "row",
+				alignItems: "center",
 				transition: "transform 0.2s ease, box-shadow 0.2s ease",
 				transform: hovered ? "translateY(-6px)" : "translateY(0)",
 				boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.12)" : undefined,
@@ -161,9 +166,9 @@ function TeamCard({ name, role, photo, alt, quote }: TeamMember) {
 					src={photo}
 					alt={alt}
 					w={120}
-					h="auto"
+					h={120}
 					fit="cover"
-					style={{ flexShrink: 0, borderRadius: 60, cursor: "pointer" }}
+					style={{ borderRadius: 60, cursor: "pointer", display: "block" }}
 					onClick={() => setShowQuote((v) => !v)}
 				/>
 
@@ -171,7 +176,7 @@ function TeamCard({ name, role, photo, alt, quote }: TeamMember) {
 					<div
 						style={{
 							position: "absolute",
-							top: "80%",
+							top: "50%",
 							left: "calc(100% + 14px)",
 							transform: "translateY(-50%)",
 							background: bubbleBg,
@@ -204,16 +209,36 @@ function TeamCard({ name, role, photo, alt, quote }: TeamMember) {
 					</div>
 				)}
 			</div>
+
 			<div
 				style={{
 					padding: "0 12px",
 					display: "flex",
 					flexDirection: "column",
 					justifyContent: "center",
+					minWidth: 0,
+					flex: 1,
 				}}
 			>
-				<Title fz="xl">{name}</Title>
-				<small className="mb-3 font-semibold tracking-wider text-gray-400 uppercase">{role}</small>
+				<Title
+					style={{
+						wordBreak: "break-word",
+						fontSize: "1.5rem",
+						lineHeight: 1.3,
+					}}
+				>
+					{name}
+				</Title>
+				<small
+					className="mb-3 font-semibold tracking-wider text-gray-400 uppercase"
+					style={{
+						wordBreak: "break-word",
+						fontSize: "1rem",
+						lineHeight: 1.3,
+					}}
+				>
+					{role}
+				</small>
 			</div>
 		</Card>
 	)
@@ -229,15 +254,17 @@ function AboutPage() {
 				</small>
 			</header>
 
-			{rows.map((row, rowIndex) => (
-				<Grid mt="md" gap="md" key={row[0].name}>
-					{row.map((member) => (
-						<Grid.Col span={12 / row.length} key={member.name}>
-							<TeamCard {...member} />
-						</Grid.Col>
-					))}
-				</Grid>
-			))}
+			<div style={{ maxWidth: 1400, margin: "0 auto" }}>
+				{rows.map((row) => (
+					<Grid mt="md" gap="md" key={row[0].name}>
+						{row.map((member) => (
+							<Grid.Col span={6} key={member.name}>
+								<TeamCard {...member} />
+							</Grid.Col>
+						))}
+					</Grid>
+				))}
+			</div>
 
 			<Grid mt="md" gap="md">
 				<Grid.Col span={12}>
