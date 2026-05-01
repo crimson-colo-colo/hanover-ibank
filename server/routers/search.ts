@@ -1,7 +1,7 @@
 import z from "zod"
 import { db } from "../database.ts"
 import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
-import { buildTemplate, DEFAULT_MODEL_TEMPLATE, embed, embedDocument } from "../lib/openrouter.ts"
+import { buildTemplate, embed, embedDocument } from "../lib/openrouter.ts"
 import { authProcedure, router } from "../trpc.ts"
 
 export const searchRouter = router({

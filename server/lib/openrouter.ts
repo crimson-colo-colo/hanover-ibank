@@ -3,7 +3,7 @@ import { OpenRouter } from "@openrouter/sdk"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { EmbeddingType } from "../generated/prisma/enums.ts"
-import { type DocumentTextPiece, type Embedding, embedOne } from "./embeddings.ts"
+import { type Embedding, embedOne } from "./embeddings.ts"
 
 export type ImageUrl = {
 	url: string
