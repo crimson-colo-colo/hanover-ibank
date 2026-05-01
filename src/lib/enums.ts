@@ -43,10 +43,12 @@ export const fileTypeDisplayName: Record<FileType, string> = {
 export const ContentViews = {
 	Default: "default",
 	ExpiringSoon: "expiringSoon",
+	OwnedContent: "owned",
 	RecentlyViewed: "recentlyViewed",
 	RecentlyEdited: "recentlyEdited",
+	PopularFiles: "popularFiles",
+	PopularLinks: "popularLinks",
 	CheckedOut: "checkedOut",
-	OwnedContent: "owned",
 } as const
 
 export type ContentViews = (typeof ContentViews)[keyof typeof ContentViews]
