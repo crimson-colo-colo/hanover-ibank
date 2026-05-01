@@ -24,7 +24,11 @@ export function PopularLinksModule({
 	return (
 		<Paper p="lg" withBorder>
 			<Group mb="sm">
-				<Link to="/content-table" search={{ view: "popularLinks" }} className="no-underline text-inherit flex items-center mb-sm gap-2 w-fit hover:underline">
+				<Link
+					to="/content-table"
+					search={{ view: "popularLinks" }}
+					className="no-underline text-inherit flex items-center mb-sm gap-2 w-fit hover:underline"
+				>
 					<Title order={3}>Popular Links</Title>
 				</Link>
 				{popularLinks.isFetching && <IconLoader2 className="animate-spin flex" size={24} />}

@@ -343,7 +343,7 @@ export function ContentTable({
 				cell: (info) => {
 					return info.getValue()
 				},
-				filterFn: (item) => item.original.type === ContentType.Object
+				filterFn: (item) => item.original.type === ContentType.Object,
 			}),
 			columnHelper.accessor("viewCount", {
 				id: "popularLinks",
@@ -351,7 +351,7 @@ export function ContentTable({
 				cell: (info) => {
 					return info.getValue()
 				},
-				filterFn: (item) => item.original.type === ContentType.Link
+				filterFn: (item) => item.original.type === ContentType.Link,
 			}),
 			columnHelper.accessor(
 				(row) =>
@@ -540,7 +540,7 @@ export function ContentTable({
 			setSorting([{ id: "popularFiles", desc: true }])
 			setColumnVisibility({
 				...defaultColumns,
-				popularFiles: true
+				popularFiles: true,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
@@ -553,14 +553,13 @@ export function ContentTable({
 			setSorting([{ id: "popularLinks", desc: true }])
 			setColumnVisibility({
 				...defaultColumns,
-				popularLinks: true
+				popularLinks: true,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
 			table.getColumn("popularFiles")?.setFilterValue(undefined)
 			table.getColumn("popularLinks")?.setFilterValue(ContentType.Link)
 			table.setPageIndex(0)
-
 		}
 	}, [activeView])
 
