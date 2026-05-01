@@ -19,8 +19,8 @@ const TOPICS = fs
 	.split("\n")
 	.filter(Boolean)
 
-const COUNT_PER_DOCUMENT_TYPE = 10
-const COUNT_PER_MEDIA_TYPE = 5
+const COUNT_PER_DOCUMENT_TYPE = 20
+const COUNT_PER_MEDIA_TYPE = 10
 
 async function ensureDir() {
 	if (fs.existsSync(OUTPUT_DIR)) {
