@@ -3,7 +3,6 @@ import hash from "object-hash"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
 import type { EmbeddingType } from "../generated/prisma/enums.ts"
-import { type ContentImageURL, type ContentText } from "./openrouter.ts"
 
 const openrouterInternal = new OpenRouter({
 	apiKey: env.OPENROUTER_API_KEY,
