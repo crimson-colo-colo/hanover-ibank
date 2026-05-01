@@ -1,4 +1,12 @@
-import { Card, Grid, Image, Text, Title } from "@mantine/core"
+import {
+	Card,
+	Grid,
+	Image,
+	Text,
+	Title,
+	useMantineColorScheme,
+	useMantineTheme,
+} from "@mantine/core"
 import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 
@@ -24,6 +32,7 @@ interface TeamMember {
 	role: string
 	photo: string
 	alt: string
+	quote: string
 }
 
 const rows: TeamMember[][] = [
@@ -33,12 +42,14 @@ const rows: TeamMember[][] = [
 			role: "Software Engineering Professor",
 			photo: wwong2Photo,
 			alt: "Wong",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Jose Manuel Perez Jimenez",
 			role: "Team Coach",
 			photo: josePhoto,
 			alt: "Jose",
+			quote: "Placeholder Quote",
 		},
 	],
 	[
@@ -47,18 +58,21 @@ const rows: TeamMember[][] = [
 			role: "Lead Software Engineer",
 			photo: calebPhoto,
 			alt: "Caleb",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Everett Wilber",
 			role: "Assistant Lead Software Engineer",
 			photo: everettPhoto,
 			alt: "Everett",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Phil Banoub",
 			role: "Assistant Lead Software Engineer",
 			photo: philPhoto,
 			alt: "Phil",
+			quote: "Placeholder Quote",
 		},
 	],
 	[
@@ -67,18 +81,21 @@ const rows: TeamMember[][] = [
 			role: "Full Time Software Engineer",
 			photo: josuePhoto,
 			alt: "Josue",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Brandon Gainey",
 			role: "Full Time Software Engineer",
 			photo: brandonPhoto,
 			alt: "Brandon",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Lucas Zaki",
 			role: "Full Time Software Engineer",
 			photo: lucasPhoto,
 			alt: "Lucas",
+			quote: "Placeholder Quote",
 		},
 	],
 	[
@@ -87,30 +104,42 @@ const rows: TeamMember[][] = [
 			role: "Project Manager",
 			photo: justinPhoto,
 			alt: "Justin",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Julien Polycarpe",
 			role: "Product Owner",
 			photo: julienPhoto,
 			alt: "Julien",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Jace Bonjorno",
 			role: "Documentation Analyst",
 			photo: jacePhoto,
 			alt: "Jace",
+			quote: "Placeholder Quote",
 		},
 		{
 			name: "Elijah King",
 			role: "Scrum Master",
 			photo: elijahPhoto,
 			alt: "Elijah",
+			quote: "Placeholder Quote",
 		},
 	],
 ]
 
-function TeamCard({ name, role, photo, alt }: TeamMember) {
+function TeamCard({ name, role, photo, alt, quote }: TeamMember) {
 	const [hovered, setHovered] = useState(false)
+	const [showQuote, setShowQuote] = useState(false)
+	const { colorScheme } = useMantineColorScheme()
+	const theme = useMantineTheme()
+
+	const isDark = colorScheme === "dark"
+	const bubbleBg = isDark ? theme.colors.dark[5] : "white"
+	const bubbleBorder = isDark ? theme.colors.dark[4] : "#dee2e6"
+	const bubbleText = isDark ? theme.colors.dark[0] : "#495057"
 
 	return (
 		<Card
@@ -127,14 +156,54 @@ function TeamCard({ name, role, photo, alt }: TeamMember) {
 				boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.12)" : undefined,
 			}}
 		>
-			<Image
-				src={photo}
-				alt={alt}
-				w={120}
-				h="auto"
-				fit="cover"
-				style={{ flexShrink: 0, borderRadius: 60 }}
-			/>
+			<div style={{ position: "relative", flexShrink: 0 }}>
+				<Image
+					src={photo}
+					alt={alt}
+					w={120}
+					h="auto"
+					fit="cover"
+					style={{ flexShrink: 0, borderRadius: 60, cursor: "pointer" }}
+					onClick={() => setShowQuote((v) => !v)}
+				/>
+
+				{showQuote && (
+					<div
+						style={{
+							position: "absolute",
+							top: "80%",
+							left: "calc(100% + 14px)",
+							transform: "translateY(-50%)",
+							background: bubbleBg,
+							border: `1px solid ${bubbleBorder}`,
+							borderRadius: 8,
+							padding: "8px 12px",
+							width: 180,
+							boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+							zIndex: 100,
+							fontSize: 13,
+							color: bubbleText,
+							fontStyle: "italic",
+						}}
+					>
+						<div
+							style={{
+								position: "absolute",
+								top: "50%",
+								left: -8,
+								transform: "translateY(-50%)",
+								width: 0,
+								height: 0,
+								borderTop: "8px solid transparent",
+								borderBottom: "8px solid transparent",
+								borderRight: `8px solid ${bubbleBg}`,
+								filter: `drop-shadow(-1px 0 0 ${bubbleBorder})`,
+							}}
+						/>
+						"{quote}"
+					</div>
+				)}
+			</div>
 			<div
 				style={{
 					padding: "0 12px",
