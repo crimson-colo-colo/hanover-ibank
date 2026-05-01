@@ -90,7 +90,7 @@ const rows: TeamMember[][] = [
 			role: "Full Time Software Engineer",
 			photo: josuePhoto,
 			alt: "Josue",
-			quote: "Placeholder Quote",
+			quote: "Keep it pushing, the only moment you fail is when you give up.",
 		},
 		{
 			name: "Brandon Gainey",
@@ -254,7 +254,7 @@ function AboutPage() {
 				</small>
 			</header>
 
-			<div style={{ maxWidth: 1400, margin: "0 auto" }}>
+			<div style={{ maxWidth: 1200, margin: "0 auto" }}>
 				{rows.map((row) => (
 					<Grid mt="md" gap="md" key={row[0].name}>
 						{row.map((member) => (
