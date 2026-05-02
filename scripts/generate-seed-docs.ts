@@ -1,6 +1,6 @@
 // This script generates a variety of seed documents (TXT, CSV, PDF, DOCX, XLSX,
-// PPTX) with random content using the Faker library. It also downloads sample
-// media files (images, video, audio).
+// PPTX) with random content using the Faker library and an LLM. It also
+// downloads sample media files (images, video, audio).
 
 // This script was generated using an AI assistant with permission from the
 // professor.
@@ -8,10 +8,12 @@
 import fs from "node:fs"
 import path from "node:path"
 import { faker } from "@faker-js/faker"
-import { Document, HeadingLevel, Packer, Paragraph } from "docx"
+import { Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow } from "docx"
 import ExcelJS from "exceljs"
 import PDFDocument from "pdfkit"
 import PptxGenJS from "pptxgenjs"
+import { generate, seed } from "./_generate.ts"
+import { DocxSchema, PdfSchema, PptxSchema, prompts, XlsxSchema } from "./_prompts.ts"
 
 const OUTPUT_DIR = path.join(process.cwd(), "prisma", "seed-data", "generated")
 const TOPICS = fs
@@ -50,26 +52,20 @@ function getFilename(topic: string, ext: string) {
 }
 
 async function generateTxt() {
+	faker.seed(seed)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "txt")
-		const content =
-			`CONFIDENTIAL - INTERNAL USE ONLY\n\n` +
-			`Subject: ${topic}\n` +
-			`Date: ${faker.date.recent().toISOString().split("T")[0]}\n` +
-			`Author: ${faker.person.fullName()} (${faker.person.jobTitle()})\n\n` +
-			`Executive Summary:\n${faker.lorem.paragraph()}\n\n` +
-			`Key Findings:\n` +
-			`- ${faker.company.catchPhrase()}\n` +
-			`- ${faker.company.buzzPhrase()}\n` +
-			`- ${faker.hacker.phrase()}\n\n` +
-			`Detailed Analysis:\n${faker.lorem.paragraphs(3, "\n\n")}\n\n` +
-			`Conclusion:\n${faker.lorem.paragraph()}\n`
-		fs.writeFileSync(path.join(OUTPUT_DIR, filename), content)
+
+		const res = await generate({ prompt: prompts.txt(filename) })
+		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+
+		fs.writeFileSync(path.join(OUTPUT_DIR, filename), res.response)
 	}
 }
 
 async function generateCsv() {
+	faker.seed(seed + 1)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "csv")
@@ -84,52 +80,85 @@ async function generateCsv() {
 }
 
 async function generatePdf() {
+	faker.seed(seed + 2)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "pdf")
 		const doc = new PDFDocument()
 		doc.pipe(fs.createWriteStream(path.join(OUTPUT_DIR, filename)))
 
-		// Title
-		doc.fontSize(24).text(topic, { align: "center" })
-		doc.moveDown()
+		const content = await generate({ prompt: prompts.pdf(filename), schema: PdfSchema })
+		console.log(`Generated content for ${filename} in ${content.total_duration / 1e9} seconds`)
 
-		// Meta
-		doc
-			.fontSize(12)
-			.fillColor("gray")
-			.text(`Document ID: ${faker.string.uuid()}`, { align: "center" })
-		doc.text(`Generated: ${faker.date.recent().toISOString().split("T")[0]}`, { align: "center" })
-		doc.text(`Author: ${faker.person.fullName()}`, { align: "center" })
-		doc.moveDown(2)
+		const response = PdfSchema.parse(JSON.parse(content.response))
 
-		// Content
-		doc.fillColor("black").fontSize(14).text("Executive Summary", { underline: true })
-		doc.moveDown(0.5)
-		doc.fontSize(12).text(faker.lorem.paragraph())
-		doc.moveDown()
+		for (const item of response) {
+			try {
+				switch (item.type) {
+					case "h1":
+						doc.fontSize(24).text(item.content, { underline: true })
+						break
+					case "h2":
+						doc.fontSize(20).text(item.content, { underline: true })
+						break
+					case "h3":
+						doc.fontSize(16).text(item.content, { underline: true })
+						break
+					case "p":
+						doc.fontSize(12).text(item.content)
+						break
+					case "ul":
+						item.items.forEach((line) => {
+							doc.fontSize(12).text(`• ${line}`)
+						})
+						break
+					case "ol":
+						item.items.forEach((line, index) => {
+							doc.fontSize(12).text(`${index + 1}. ${line}`)
+						})
+						break
+					case "table": {
+						const tableTop = doc.y
+						const cellPadding = 5
 
-		doc.fontSize(14).text("Key Findings", { underline: true })
-		doc.moveDown(0.5)
-		for (let k = 0; k < 4; k++) {
-			doc.fontSize(12).text(`• ${faker.company.catchPhrase()}`)
-		}
-
-		const numPages = faker.number.int({ min: 3, max: 10 })
-		for (let p = 2; p <= numPages; p++) {
-			doc.addPage()
-			doc.fontSize(18).text(`Section ${p - 1}: ${faker.company.catchPhrase()}`, { underline: true })
-			doc.moveDown()
-			doc.fontSize(12).text(faker.lorem.paragraphs(4))
-			doc.moveDown(2)
-			doc.fontSize(14).text("Key Metrics & Data Points", { underline: true })
-			doc.moveDown(0.5)
-			const numBullets = faker.number.int({ min: 3, max: 6 })
-			for (let k = 0; k < numBullets; k++) {
-				doc
-					.fontSize(12)
-					.text(`• ${toTitleCase(faker.company.buzzPhrase())}: $${faker.finance.amount()}`)
-			}
+						const columnWidths = item.headers.map(() => 150)
+						// Render headers
+						item.headers.forEach((header, index) => {
+							doc
+								.rect(doc.x + index * columnWidths[index], tableTop, columnWidths[index], 20)
+								.stroke()
+							doc.text(
+								header,
+								doc.x + index * columnWidths[index] + cellPadding,
+								tableTop + cellPadding
+							)
+						})
+						// Render rows
+						item.rows.forEach((row, rowIndex) => {
+							const rowTop = tableTop + 20 + rowIndex * 20
+							row.forEach((cell, cellIndex) => {
+								doc
+									.rect(
+										doc.x + cellIndex * columnWidths[cellIndex],
+										rowTop,
+										columnWidths[cellIndex],
+										20
+									)
+									.stroke()
+								doc.text(
+									cell,
+									doc.x + cellIndex * columnWidths[cellIndex] + cellPadding,
+									rowTop + cellPadding
+								)
+							})
+						})
+						break
+					}
+					case "pagebreak":
+						doc.addPage()
+						break
+				}
+			} catch {}
 		}
 
 		doc.end()
@@ -137,65 +166,81 @@ async function generatePdf() {
 }
 
 async function generateDocx() {
+	faker.seed(seed + 3)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "docx")
-		const content = [
-			new Paragraph({
-				text: topic,
-				heading: HeadingLevel.HEADING_1,
-			}),
-			new Paragraph({
-				text: `Author: ${faker.person.fullName()} | Date: ${faker.date.recent().toISOString().split("T")[0]}`,
-				spacing: { after: 400 },
-			}),
-			new Paragraph({
-				text: "Executive Summary",
-				heading: HeadingLevel.HEADING_2,
-			}),
-			new Paragraph({
-				text: faker.lorem.paragraph(),
-			}),
-		]
-		const numSections = faker.number.int({ min: 3, max: 8 })
-		for (let i = 0; i < numSections; i++) {
-			content.push(
-				new Paragraph({
-					text: toTitleCase(faker.company.buzzPhrase()),
-					heading: HeadingLevel.HEADING_2,
-					spacing: {
-						before: 400,
-					},
-				}),
-				new Paragraph({
-					text: faker.lorem.paragraphs(5),
-				}),
-				new Paragraph({
-					text: toTitleCase(faker.company.buzzPhrase()),
-					heading: HeadingLevel.HEADING_3,
-					spacing: {
-						before: 200,
-					},
-				}),
-				new Paragraph({
-					text: faker.lorem.paragraphs(2),
-				}),
-				new Paragraph({
-					text: toTitleCase(faker.company.buzzPhrase()),
-					heading: HeadingLevel.HEADING_3,
-					spacing: {
-						before: 200,
-					},
-				}),
-				new Paragraph({
-					text: faker.lorem.paragraphs(2),
-				})
-			)
+
+		const res = await generate({ prompt: prompts.docx(filename), schema: DocxSchema })
+		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+
+		const response = DocxSchema.parse(JSON.parse(res.response))
+
+		const docxChildren: any[] = []
+
+		for (const item of response) {
+			try {
+				switch (item.type) {
+					case "h1":
+						docxChildren.push(
+							new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_1 })
+						)
+						break
+					case "h2":
+						docxChildren.push(
+							new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_2 })
+						)
+						break
+					case "h3":
+						docxChildren.push(
+							new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_3 })
+						)
+						break
+					case "p":
+						docxChildren.push(new Paragraph({ text: item.content }))
+						break
+					case "ul":
+						item.items.forEach((line) => {
+							docxChildren.push(new Paragraph({ text: line, bullet: { level: 0 } }))
+						})
+						break
+					case "ol":
+						item.items.forEach((line, index) => {
+							docxChildren.push(new Paragraph({ text: `${index + 1}. ${line}` }))
+						})
+						break
+					case "table":
+						docxChildren.push(
+							new Table({
+								rows: [
+									new TableRow({
+										children: item.headers.map(
+											(header) => new TableCell({ children: [new Paragraph(header)] })
+										),
+									}),
+									...item.rows.map(
+										(row) =>
+											new TableRow({
+												children: row.map(
+													(cell) => new TableCell({ children: [new Paragraph(cell)] })
+												),
+											})
+									),
+								],
+							})
+						)
+						break
+					case "pagebreak":
+						docxChildren.push(new Paragraph({ pageBreakBefore: true }))
+						break
+				}
+			} catch {}
 		}
+
 		const doc = new Document({
 			sections: [
 				{
-					children: content,
+					children: docxChildren,
 				},
 			],
 		})
@@ -213,40 +258,39 @@ function toTitleCase(str: string) {
 }
 
 async function generateXlsx() {
+	faker.seed(seed + 4)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "xlsx")
+
+		const res = await generate({ prompt: prompts.xlsx(filename), schema: XlsxSchema })
+		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+
+		const response = XlsxSchema.parse(JSON.parse(res.response))
+
 		const workbook = new ExcelJS.Workbook()
-		const cleanTopic = topic.slice(0, 31).replace(/[*?/\\[\]]/g, "")
-		const sheet = workbook.addWorksheet(cleanTopic || "Data")
-		sheet.columns = [
-			{ header: "Transaction ID", key: "id", width: 40 },
-			{ header: "Date", key: "date", width: 15 },
-			{ header: "Department", key: "department", width: 25 },
-			{ header: "Event/Category", key: "event", width: 30 },
-			{ header: "User/Assignee", key: "user", width: 25 },
-			{ header: "Action/Status", key: "action", width: 15 },
-			{ header: "Amount", key: "amount", width: 15 },
-		]
-		const rowCount = faker.number.int({ min: 20, max: 200 })
-		for (let j = 0; j < rowCount; j++) {
-			sheet.addRow({
-				id: faker.string.uuid(),
-				date: faker.date.recent(),
-				department: faker.commerce.department(),
-				event: faker.hacker.phrase(),
-				user: faker.person.fullName(),
-				action: faker.helpers.arrayElement([
-					"Created",
-					"Updated",
-					"Deleted",
-					"Reviewed",
-					"Approved",
-				]),
-				amount: parseFloat(faker.finance.amount()),
-			})
+
+		for (const sheetData of response) {
+			const cleanName = sheetData.name.slice(0, 31).replace(/[*?/\\[\]]/g, "")
+			const sheet = workbook.addWorksheet(cleanName || "Data")
+
+			sheet.columns = sheetData.headers.map((header) => ({
+				header,
+				key: header.toLowerCase().replace(/[^a-z0-9]/g, ""),
+				width: 25,
+			}))
+
+			for (const row of sheetData.rows) {
+				const rowData: Record<string, any> = {}
+				sheetData.headers.forEach((header, index) => {
+					rowData[header.toLowerCase().replace(/[^a-z0-9]/g, "")] = row[index]
+				})
+				sheet.addRow(rowData)
+			}
+
+			sheet.getRow(1).font = { bold: true }
 		}
-		sheet.getRow(1).font = { bold: true }
+
 		await workbook.xlsx.writeFile(path.join(OUTPUT_DIR, filename))
 	}
 }
@@ -264,46 +308,47 @@ const backgroundColors = [
 	"C7F464",
 ]
 async function generatePptx() {
+	faker.seed(seed + 5)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
-		const bg = faker.helpers.arrayElement(backgroundColors)
-		const topic = faker.company.name()
+		const topic = getRandomTopic()
 		const filename = getFilename(topic, "pptx")
+		const bg = faker.helpers.arrayElement(backgroundColors)
+
+		const res = await generate({ prompt: prompts.pptx(filename), schema: PptxSchema })
+		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+
+		const response = PptxSchema.parse(JSON.parse(res.response))
+
 		const pres = new PptxGenJS()
-		const slide = pres.addSlide()
-		slide.background = { color: bg }
-		slide.addText(topic, { x: 1, y: 1, fontSize: 36, color: "363636", bold: true })
-		slide.addText(
-			`Prepared by: ${faker.person.fullName()}\nDate: ${faker.date.recent().toISOString().split("T")[0]}`,
-			{ x: 1, y: 2, fontSize: 18 }
-		)
-		const numSlides = faker.number.int({ min: 3, max: 7 })
-		for (let j = 0; j < numSlides; j++) {
+
+		for (const slideData of response) {
 			const slide = pres.addSlide()
 			slide.background = { color: bg }
-			slide.addText(toTitleCase(faker.company.buzzPhrase()), {
-				x: 1,
-				y: 1,
-				fontSize: 36,
-				color: "363636",
-			})
-			slide.addText(faker.lorem.paragraph(), { x: 1, y: 2, fontSize: 18 })
-			const slide2 = pres.addSlide()
-			slide.background = { color: bg }
-			slide2.addText(toTitleCase(faker.company.catchPhrase()), { x: 1, y: 0.5, fontSize: 24 })
-			slide2.addText(
-				`- ${faker.hacker.phrase()}\n- ${faker.hacker.phrase()}\n- ${faker.hacker.phrase()}`,
-				{
-					x: 1,
-					y: 1.5,
-					fontSize: 16,
+
+			slide.addText(slideData.title, { x: 1, y: 0.5, fontSize: 32, color: "363636", bold: true })
+
+			let currentY = 1.5
+			for (const contentItem of slideData.content) {
+				if (contentItem.type === "p") {
+					slide.addText(contentItem.content, { x: 1, y: currentY, fontSize: 18 })
+					currentY += 1
+				} else if (contentItem.type === "ul" || contentItem.type === "ol") {
+					const textArray = contentItem.items.map((item) => ({
+						text: item,
+						options: { bullet: true },
+					}))
+					slide.addText(textArray, { x: 1, y: currentY, fontSize: 18 })
+					currentY += contentItem.items.length * 0.4 + 0.5
 				}
-			)
+			}
 		}
+
 		await pres.writeFile({ fileName: path.join(OUTPUT_DIR, filename) })
 	}
 }
 
 async function downloadMedia() {
+	faker.seed(seed + 6)
 	const mediaTypes = [
 		{
 			ext: "jpg",
@@ -366,8 +411,8 @@ async function main() {
 	console.log("Generating TXT files...")
 	await generateTxt()
 
-	console.log("Generating CSV files...")
-	await generateCsv()
+	// console.log("Generating CSV files...")
+	// await generateCsv()
 
 	console.log("Generating PDF files...")
 	await generatePdf()
@@ -381,8 +426,8 @@ async function main() {
 	console.log("Generating PPTX files...")
 	await generatePptx()
 
-	console.log("Downloading media files (Images, Video, Audio)...")
-	await downloadMedia()
+	// console.log("Downloading media files (Images, Video, Audio)...")
+	// await downloadMedia()
 
 	console.log("Seed data generation complete!")
 }
