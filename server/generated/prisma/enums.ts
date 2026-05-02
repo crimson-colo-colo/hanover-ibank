@@ -95,9 +95,7 @@ export const UserAction = {
   DELETE_CONTENT: 'DELETE_CONTENT',
   UPLOAD_CONTENT: 'UPLOAD_CONTENT',
   EDIT_AVATAR: 'EDIT_AVATAR',
-  EDIT_DISPLAY_NAME: 'EDIT_DISPLAY_NAME',
-  EDIT_USERNAME: 'EDIT_USERNAME',
-  EDIT_EMAIL: 'EDIT_EMAIL'
+  EDIT_PROFILE: 'EDIT_PROFILE'
 } as const
 
 export type UserAction = (typeof UserAction)[keyof typeof UserAction]
