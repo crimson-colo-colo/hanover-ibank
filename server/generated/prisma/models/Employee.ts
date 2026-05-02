@@ -193,6 +193,7 @@ export type EmployeeWhereInput = {
   recentTimestamps?: Prisma.RecentTimestampsListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   actorNotifications?: Prisma.NotificationListRelationFilter
+  activityLogs?: Prisma.ActivityLogListRelationFilter
 }
 
 export type EmployeeOrderByWithRelationInput = {
@@ -212,6 +213,7 @@ export type EmployeeOrderByWithRelationInput = {
   recentTimestamps?: Prisma.RecentTimestampsOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   actorNotifications?: Prisma.NotificationOrderByRelationAggregateInput
+  activityLogs?: Prisma.ActivityLogOrderByRelationAggregateInput
 }
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
@@ -234,6 +236,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   recentTimestamps?: Prisma.RecentTimestampsListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   actorNotifications?: Prisma.NotificationListRelationFilter
+  activityLogs?: Prisma.ActivityLogListRelationFilter
 }, "id">
 
 export type EmployeeOrderByWithAggregationInput = {
@@ -275,6 +278,7 @@ export type EmployeeCreateInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateInput = {
@@ -294,6 +298,7 @@ export type EmployeeUncheckedCreateInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUpdateInput = {
@@ -313,6 +318,7 @@ export type EmployeeUpdateInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateInput = {
@@ -332,6 +338,7 @@ export type EmployeeUncheckedUpdateInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateManyInput = {
@@ -568,6 +575,20 @@ export type EmployeeUpdateOneWithoutActorNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutActorNotificationsInput, Prisma.EmployeeUpdateWithoutActorNotificationsInput>, Prisma.EmployeeUncheckedUpdateWithoutActorNotificationsInput>
 }
 
+export type EmployeeCreateNestedOneWithoutActivityLogsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutActivityLogsInput, Prisma.EmployeeUncheckedCreateWithoutActivityLogsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutActivityLogsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneRequiredWithoutActivityLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutActivityLogsInput, Prisma.EmployeeUncheckedCreateWithoutActivityLogsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutActivityLogsInput
+  upsert?: Prisma.EmployeeUpsertWithoutActivityLogsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutActivityLogsInput, Prisma.EmployeeUpdateWithoutActivityLogsInput>, Prisma.EmployeeUncheckedUpdateWithoutActivityLogsInput>
+}
+
 export type EmployeeCreateWithoutContentInput = {
   id: string
   createdAt?: Date | string
@@ -584,6 +605,7 @@ export type EmployeeCreateWithoutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutContentInput = {
@@ -602,6 +624,7 @@ export type EmployeeUncheckedCreateWithoutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutContentInput = {
@@ -625,6 +648,7 @@ export type EmployeeCreateWithoutCheckedOutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
@@ -643,6 +667,7 @@ export type EmployeeUncheckedCreateWithoutCheckedOutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutCheckedOutContentInput = {
@@ -677,6 +702,7 @@ export type EmployeeUpdateWithoutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutContentInput = {
@@ -695,6 +721,7 @@ export type EmployeeUncheckedUpdateWithoutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUpsertWithoutCheckedOutContentInput = {
@@ -724,6 +751,7 @@ export type EmployeeUpdateWithoutCheckedOutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
@@ -742,6 +770,7 @@ export type EmployeeUncheckedUpdateWithoutCheckedOutContentInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutResolvedThreadsInput = {
@@ -760,6 +789,7 @@ export type EmployeeCreateWithoutResolvedThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutResolvedThreadsInput = {
@@ -778,6 +808,7 @@ export type EmployeeUncheckedCreateWithoutResolvedThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutResolvedThreadsInput = {
@@ -801,6 +832,7 @@ export type EmployeeCreateWithoutThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutThreadsInput = {
@@ -819,6 +851,7 @@ export type EmployeeUncheckedCreateWithoutThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutThreadsInput = {
@@ -853,6 +886,7 @@ export type EmployeeUpdateWithoutResolvedThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutResolvedThreadsInput = {
@@ -871,6 +905,7 @@ export type EmployeeUncheckedUpdateWithoutResolvedThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUpsertWithoutThreadsInput = {
@@ -900,6 +935,7 @@ export type EmployeeUpdateWithoutThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutThreadsInput = {
@@ -918,6 +954,7 @@ export type EmployeeUncheckedUpdateWithoutThreadsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutCommentsInput = {
@@ -936,6 +973,7 @@ export type EmployeeCreateWithoutCommentsInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutCommentsInput = {
@@ -954,6 +992,7 @@ export type EmployeeUncheckedCreateWithoutCommentsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutCommentsInput = {
@@ -988,6 +1027,7 @@ export type EmployeeUpdateWithoutCommentsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutCommentsInput = {
@@ -1006,6 +1046,7 @@ export type EmployeeUncheckedUpdateWithoutCommentsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutFavoriteInput = {
@@ -1024,6 +1065,7 @@ export type EmployeeCreateWithoutFavoriteInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutFavoriteInput = {
@@ -1042,6 +1084,7 @@ export type EmployeeUncheckedCreateWithoutFavoriteInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutFavoriteInput = {
@@ -1076,6 +1119,7 @@ export type EmployeeUpdateWithoutFavoriteInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
@@ -1094,6 +1138,7 @@ export type EmployeeUncheckedUpdateWithoutFavoriteInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutActivityInput = {
@@ -1112,6 +1157,7 @@ export type EmployeeCreateWithoutActivityInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutActivityInput = {
@@ -1130,6 +1176,7 @@ export type EmployeeUncheckedCreateWithoutActivityInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutActivityInput = {
@@ -1164,6 +1211,7 @@ export type EmployeeUpdateWithoutActivityInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutActivityInput = {
@@ -1182,6 +1230,7 @@ export type EmployeeUncheckedUpdateWithoutActivityInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutRecentTimestampsInput = {
@@ -1200,6 +1249,7 @@ export type EmployeeCreateWithoutRecentTimestampsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutRecentTimestampsInput = {
@@ -1218,6 +1268,7 @@ export type EmployeeUncheckedCreateWithoutRecentTimestampsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutRecentTimestampsInput = {
@@ -1252,6 +1303,7 @@ export type EmployeeUpdateWithoutRecentTimestampsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutRecentTimestampsInput = {
@@ -1270,6 +1322,7 @@ export type EmployeeUncheckedUpdateWithoutRecentTimestampsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutPushSubscriptionsInput = {
@@ -1288,6 +1341,7 @@ export type EmployeeCreateWithoutPushSubscriptionsInput = {
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutPushSubscriptionsInput = {
@@ -1306,6 +1360,7 @@ export type EmployeeUncheckedCreateWithoutPushSubscriptionsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutPushSubscriptionsInput = {
@@ -1340,6 +1395,7 @@ export type EmployeeUpdateWithoutPushSubscriptionsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutPushSubscriptionsInput = {
@@ -1358,6 +1414,7 @@ export type EmployeeUncheckedUpdateWithoutPushSubscriptionsInput = {
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutNotificationsInput = {
@@ -1376,6 +1433,7 @@ export type EmployeeCreateWithoutNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutNotificationsInput = {
@@ -1394,6 +1452,7 @@ export type EmployeeUncheckedCreateWithoutNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutNotificationsInput = {
@@ -1417,6 +1476,7 @@ export type EmployeeCreateWithoutActorNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutActorNotificationsInput = {
@@ -1435,6 +1495,7 @@ export type EmployeeUncheckedCreateWithoutActorNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutActorNotificationsInput = {
@@ -1469,6 +1530,7 @@ export type EmployeeUpdateWithoutNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutNotificationsInput = {
@@ -1487,6 +1549,7 @@ export type EmployeeUncheckedUpdateWithoutNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUpsertWithoutActorNotificationsInput = {
@@ -1516,6 +1579,7 @@ export type EmployeeUpdateWithoutActorNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutActorNotificationsInput = {
@@ -1534,6 +1598,99 @@ export type EmployeeUncheckedUpdateWithoutActorNotificationsInput = {
   pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeCreateWithoutActivityLogsInput = {
+  id: string
+  createdAt?: Date | string
+  role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
+  content?: Prisma.ContentCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadCreateNestedManyWithoutResolvedByInput
+  pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutEmployeeInput
+  recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationCreateNestedManyWithoutActorInput
+}
+
+export type EmployeeUncheckedCreateWithoutActivityLogsInput = {
+  id: string
+  createdAt?: Date | string
+  role: $Enums.EmployeeRole
+  emailNotifications?: boolean
+  pushNotifications?: boolean
+  content?: Prisma.ContentUncheckedCreateNestedManyWithoutOwnerInput
+  favorite?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutEmployeeInput
+  checkedOutContent?: Prisma.ContentUncheckedCreateNestedManyWithoutCheckedOutByInput
+  activity?: Prisma.UserActivityUncheckedCreateNestedManyWithoutEmployeeInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutCreatedByInput
+  comments?: Prisma.TalkThreadCommentUncheckedCreateNestedManyWithoutAuthorInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutResolvedByInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutEmployeeInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutEmployeeInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutEmployeeInput
+  actorNotifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type EmployeeCreateOrConnectWithoutActivityLogsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutActivityLogsInput, Prisma.EmployeeUncheckedCreateWithoutActivityLogsInput>
+}
+
+export type EmployeeUpsertWithoutActivityLogsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutActivityLogsInput, Prisma.EmployeeUncheckedUpdateWithoutActivityLogsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutActivityLogsInput, Prisma.EmployeeUncheckedCreateWithoutActivityLogsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutActivityLogsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutActivityLogsInput, Prisma.EmployeeUncheckedUpdateWithoutActivityLogsInput>
+}
+
+export type EmployeeUpdateWithoutActivityLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  content?: Prisma.ContentUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUpdateManyWithoutResolvedByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutEmployeeNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutActivityLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumEmployeeRoleFieldUpdateOperationsInput | $Enums.EmployeeRole
+  emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  content?: Prisma.ContentUncheckedUpdateManyWithoutOwnerNestedInput
+  favorite?: Prisma.FavoriteContentUncheckedUpdateManyWithoutEmployeeNestedInput
+  checkedOutContent?: Prisma.ContentUncheckedUpdateManyWithoutCheckedOutByNestedInput
+  activity?: Prisma.UserActivityUncheckedUpdateManyWithoutEmployeeNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutCreatedByNestedInput
+  comments?: Prisma.TalkThreadCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  resolvedThreads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutResolvedByNestedInput
+  pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutEmployeeNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutEmployeeNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutEmployeeNestedInput
+  actorNotifications?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
 }
 
 
@@ -1553,6 +1710,7 @@ export type EmployeeCountOutputType = {
   recentTimestamps: number
   notifications: number
   actorNotifications: number
+  activityLogs: number
 }
 
 export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1567,6 +1725,7 @@ export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   recentTimestamps?: boolean | EmployeeCountOutputTypeCountRecentTimestampsArgs
   notifications?: boolean | EmployeeCountOutputTypeCountNotificationsArgs
   actorNotifications?: boolean | EmployeeCountOutputTypeCountActorNotificationsArgs
+  activityLogs?: boolean | EmployeeCountOutputTypeCountActivityLogsArgs
 }
 
 /**
@@ -1656,6 +1815,13 @@ export type EmployeeCountOutputTypeCountActorNotificationsArgs<ExtArgs extends r
   where?: Prisma.NotificationWhereInput
 }
 
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountActivityLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityLogWhereInput
+}
+
 
 export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1674,6 +1840,7 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   recentTimestamps?: boolean | Prisma.Employee$recentTimestampsArgs<ExtArgs>
   notifications?: boolean | Prisma.Employee$notificationsArgs<ExtArgs>
   actorNotifications?: boolean | Prisma.Employee$actorNotificationsArgs<ExtArgs>
+  activityLogs?: boolean | Prisma.Employee$activityLogsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -1714,6 +1881,7 @@ export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   recentTimestamps?: boolean | Prisma.Employee$recentTimestampsArgs<ExtArgs>
   notifications?: boolean | Prisma.Employee$notificationsArgs<ExtArgs>
   actorNotifications?: boolean | Prisma.Employee$actorNotificationsArgs<ExtArgs>
+  activityLogs?: boolean | Prisma.Employee$activityLogsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1733,6 +1901,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     recentTimestamps: Prisma.$RecentTimestampsPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     actorNotifications: Prisma.$NotificationPayload<ExtArgs>[]
+    activityLogs: Prisma.$ActivityLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2145,6 +2314,7 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
   recentTimestamps<T extends Prisma.Employee$recentTimestampsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$recentTimestampsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecentTimestampsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Employee$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   actorNotifications<T extends Prisma.Employee$actorNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$actorNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activityLogs<T extends Prisma.Employee$activityLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$activityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2833,6 +3003,30 @@ export type Employee$actorNotificationsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * Employee.activityLogs
+ */
+export type Employee$activityLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActivityLog
+   */
+  select?: Prisma.ActivityLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ActivityLog
+   */
+  omit?: Prisma.ActivityLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityLogInclude<ExtArgs> | null
+  where?: Prisma.ActivityLogWhereInput
+  orderBy?: Prisma.ActivityLogOrderByWithRelationInput | Prisma.ActivityLogOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityLogScalarFieldEnum | Prisma.ActivityLogScalarFieldEnum[]
 }
 
 /**

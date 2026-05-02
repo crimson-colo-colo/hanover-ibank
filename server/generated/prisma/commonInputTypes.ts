@@ -294,6 +294,23 @@ export type EnumNotificationTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumNotificationTypeFilter<$PrismaModel>
 }
 
+export type EnumUserActionFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserAction | Prisma.EnumUserActionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserActionFilter<$PrismaModel> | $Enums.UserAction
+}
+
+export type EnumUserActionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserAction | Prisma.EnumUserActionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserActionWithAggregatesFilter<$PrismaModel> | $Enums.UserAction
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserActionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserActionFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -585,6 +602,23 @@ export type NestedEnumNotificationTypeWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumNotificationTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumNotificationTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumUserActionFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserAction | Prisma.EnumUserActionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserActionFilter<$PrismaModel> | $Enums.UserAction
+}
+
+export type NestedEnumUserActionWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.UserAction | Prisma.EnumUserActionFieldRefInput<$PrismaModel>
+  in?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  notIn?: $Enums.UserAction[] | Prisma.ListEnumUserActionFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumUserActionWithAggregatesFilter<$PrismaModel> | $Enums.UserAction
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumUserActionFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumUserActionFilter<$PrismaModel>
 }
 
 

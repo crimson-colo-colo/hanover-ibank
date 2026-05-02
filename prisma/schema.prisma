@@ -1,118 +1,120 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../server/generated/prisma"
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
 }
 
 enum ThreadStatus {
-    Open
-    Resolved
-    Archived
+  Open
+  Resolved
+  Archived
 }
 
 model Employee {
-    id                 String              @id
-    createdAt          DateTime            @default(now())
-    role               EmployeeRole
-    emailNotifications Boolean             @default(true)
-    pushNotifications  Boolean             @default(true)
-    content            Content[]           @relation("Owner")
-    favorite           FavoriteContent[]
-    checkedOutContent  Content[]           @relation("CheckedOutContent")
-    activity           UserActivity[]
-    threads            ContentTalkThread[] @relation("ThreadCreatedBy")
-    comments           TalkThreadComment[] @relation("CommentAuthor")
-    resolvedThreads    ContentTalkThread[]
-    pushSubscriptions  PushSubscription[]
-    recentTimestamps   RecentTimestamps[]
-    notifications      Notification[]
-    actorNotifications Notification[]      @relation("Actor")
+  id                 String              @id
+  createdAt          DateTime            @default(now())
+  role               EmployeeRole
+  emailNotifications Boolean             @default(true)
+  pushNotifications  Boolean             @default(true)
+  content            Content[]           @relation("Owner")
+  favorite           FavoriteContent[]
+  checkedOutContent  Content[]           @relation("CheckedOutContent")
+  activity           UserActivity[]
+  threads            ContentTalkThread[] @relation("ThreadCreatedBy")
+  comments           TalkThreadComment[] @relation("CommentAuthor")
+  resolvedThreads    ContentTalkThread[]
+  pushSubscriptions  PushSubscription[]
+  recentTimestamps   RecentTimestamps[]
+  notifications      Notification[]
+  actorNotifications Notification[]      @relation("Actor")
+  activityLogs       ActivityLog[]
 }
 
 model Content {
-    id               String              @id @default(cuid())
-    title            String
-    description      String?
-    status           ContentStatus       @default(Incomplete)
-    type             ContentType
-    createdAt        DateTime            @default(now())
-    updatedAt        DateTime            @updatedAt
-    lastModifiedDate DateTime
-    expirationDate   DateTime
-    /// S3 Object ID
-    objectId         String?
-    /// URL for links
-    url              String?
-    ownerId          String
-    owner            Employee            @relation("Owner", fields: [ownerId], references: [id])
-    tags             ContentTag[]
-    favoritedBy      FavoriteContent[]
-    checkedOutById   String?
-    checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
-    threads          ContentTalkThread[]
+  id               String              @id @default(cuid())
+  title            String
+  description      String?
+  status           ContentStatus       @default(Incomplete)
+  type             ContentType
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  lastModifiedDate DateTime
+  expirationDate   DateTime
+  /// S3 Object ID
+  objectId         String?
+  /// URL for links
+  url              String?
+  ownerId          String
+  owner            Employee            @relation("Owner", fields: [ownerId], references: [id])
+  tags             ContentTag[]
+  favoritedBy      FavoriteContent[]
+  checkedOutById   String?
+  checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
+  threads          ContentTalkThread[]
   embeddings       Embedding[]
-    recentTimestamps RecentTimestamps[]
-    notifications    Notification[]
+  recentTimestamps RecentTimestamps[]
+  notifications    Notification[]
+  activityLogs     ActivityLog[]
 }
 
 model ContentTalkThread {
-    id           String       @id @default(cuid())
-    title        String?
-    status       ThreadStatus @default(Open)
-    createdAt    DateTime     @default(now())
-    updatedAt    DateTime     @updatedAt
-    resolvedAt   DateTime?
-    resolvedById String?
-    resolvedBy   Employee?    @relation(fields: [resolvedById], references: [id])
+  id           String       @id @default(cuid())
+  title        String?
+  status       ThreadStatus @default(Open)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   Employee?    @relation(fields: [resolvedById], references: [id])
 
-    createdById String
-    createdBy   Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
-    contentId   String
-    content     Content             @relation(fields: [contentId], references: [id], onDelete: Cascade)
-    comments    TalkThreadComment[]
+  createdById String
+  createdBy   Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
+  contentId   String
+  content     Content             @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  comments    TalkThreadComment[]
 }
 
 model TalkThreadComment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    body      String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  body      String
 
-    threadId String
-    thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId String
+  thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
-    authorId String
-    author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
+  authorId String
+  author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
 }
 
 model Tag {
-    name     String
-    category TagCategory
-    contents ContentTag[]
+  name     String
+  category TagCategory
+  contents ContentTag[]
 
-    @@id([category, name])
+  @@id([category, name])
 }
 
 model ContentTag {
-    contentId   String
-    tagCategory TagCategory
-    tagName     String
+  contentId   String
+  tagCategory TagCategory
+  tagName     String
   content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
   tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
 
-    @@id([contentId, tagCategory, tagName])
+  @@id([contentId, tagCategory, tagName])
 }
 
 model FavoriteContent {
   contentId  String
   employeeId String
-    content    Content  @relation(fields: [contentId], references: [id])
-    employee   Employee @relation(fields: [employeeId], references: [id])
+  content    Content  @relation(fields: [contentId], references: [id])
+  employee   Employee @relation(fields: [employeeId], references: [id])
 
-    @@id([contentId, employeeId])
+  @@id([contentId, employeeId])
 }
 
 model UserActivity {
@@ -130,8 +132,8 @@ model UserActivity {
 model Embedding {
   hash      Bytes                 @id
   embedding Unsupported("vector")
-  content  Content[]
-  type     EmbeddingType[]        @default([Unknown])
+  content   Content[]
+  type      EmbeddingType[]       @default([Unknown])
 }
 
 enum EmbeddingType {
@@ -142,10 +144,10 @@ enum EmbeddingType {
 }
 
 model TextExtractionCache {
-  hash Bytes
+  hash                 Bytes
   skipRecPDFTextNative Boolean
-  skipRecPDFTextOCR Boolean
-  text String
+  skipRecPDFTextOCR    Boolean
+  text                 String
 
   @@id([hash, skipRecPDFTextNative, skipRecPDFTextOCR])
 }
@@ -166,52 +168,86 @@ enum TagCategory {
 }
 
 enum ContentStatus {
-    Incomplete
-    UnderReview
-    Complete
+  Incomplete
+  UnderReview
+  Complete
 }
 
 enum ContentType {
-    Object
-    Link
+  Object
+  Link
 }
-model RecentTimestamps {
-    recentlyEdited DateTime
-    recentlyViewed DateTime
-    viewCount      Int      @default(0)
-    employeeId     String
-    employee       Employee @relation(fields: [employeeId], references: [id])
-    contentId      String
-    content        Content  @relation(fields: [contentId], references: [id])
 
-    @@id([employeeId, contentId])
+model RecentTimestamps {
+  recentlyEdited DateTime
+  recentlyViewed DateTime
+  viewCount      Int      @default(0)
+  employeeId     String
+  employee       Employee @relation(fields: [employeeId], references: [id])
+  contentId      String
+  content        Content  @relation(fields: [contentId], references: [id])
+
+  @@id([employeeId, contentId])
 }
 
 model PushSubscription {
-    endpoint   String   @id
-    p256dh     String
-    auth       String
-    employeeId String
-    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  endpoint   String   @id
+  p256dh     String
+  auth       String
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
 
 enum NotificationType {
-    ContentTransferred /// Content is transferred to the current user by another user
-    ContentEdited /// Owned content is edited by another user
-    ExpiringOneDay /// Owned content is expiring in one day
-    ContentCheckedOut /// Owned content is checked out by another user
-    ContentCheckedIn /// Owned content is checked in by another user
-    ContentAdded /// New content that the user is part of the intended audience for is added
+  ContentTransferred /// Content is transferred to the current user by another user
+  ContentEdited /// Owned content is edited by another user
+  ExpiringOneDay /// Owned content is expiring in one day
+  ContentCheckedOut /// Owned content is checked out by another user
+  ContentCheckedIn /// Owned content is checked in by another user
+  ContentAdded /// New content that the user is part of the intended audience for is added
 }
 
 model Notification {
-    id         String           @id @default(cuid())
-    employeeId String
-    employee   Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-    type       NotificationType
-    contentId  String? /// ID of the content associated with the notification, if applicable
-    content    Content?         @relation(fields: [contentId], references: [id], onDelete: Cascade)
-    actorId    String? /// ID of the employee that triggered the notification, if applicable
-    actor      Employee?        @relation("Actor", fields: [actorId], references: [id], onDelete: Cascade)
-    createdAt  DateTime         @default(now())
+  id         String           @id @default(cuid())
+  employeeId String
+  employee   Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  type       NotificationType
+  contentId  String? /// ID of the content associated with the notification, if applicable
+  content    Content?         @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  actorId    String? /// ID of the employee that triggered the notification, if applicable
+  actor      Employee?        @relation("Actor", fields: [actorId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+}
+
+enum UserAction {
+  CHECK_OUT_CONTENT
+  CHECK_IN_CONTENT
+  EDIT_TITLE
+  TRANSFER_OWNERSHIP
+  EDIT_LAST_MODIFIED_DATE
+  EDIT_EXPIRATION_DATE
+  EDIT_CONTENT_STATUS
+  EDIT_CONTENT_TAGS
+  REUPLOAD_FILE
+  EDIT_LINK
+  CREATE_DISCUSSION
+  COMMENT
+  VIEW_CONTENT
+  DOWNLOAD_FILE
+  DELETE_CONTENT
+  UPLOAD_CONTENT
+  EDIT_AVATAR
+  EDIT_DISPLAY_NAME
+  EDIT_USERNAME
+  EDIT_EMAIL
+}
+
+model ActivityLog {
+  id         String     @id @default(cuid())
+  employeeId String
+  employee   Employee   @relation(fields: [employeeId], references: [id])
+  action     UserAction
+  contentId  String?
+  content    Content?   @relation(fields: [contentId], references: [id])
+  timestamp  DateTime   @default(now())
 }

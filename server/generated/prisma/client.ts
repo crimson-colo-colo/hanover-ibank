@@ -106,3 +106,8 @@ export type PushSubscription = Prisma.PushSubscriptionModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model ActivityLog
+ * 
+ */
+export type ActivityLog = Prisma.ActivityLogModel
