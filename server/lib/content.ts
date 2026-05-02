@@ -1,9 +1,10 @@
 import type { HeadObjectOutput } from "@aws-sdk/client-s3"
 import type { Management } from "auth0"
 import type { ContentListItem } from "../../shared/types.ts"
-import type { Prisma } from "../generated/prisma/client.ts"
+import type { Prisma, UserAction } from "../generated/prisma/client.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { auth0Cache } from "./auth0.ts"
+import { db } from "../database.ts"
 
 export const getContentInclude = (userId: string) =>
 	({
@@ -118,4 +119,18 @@ export async function fetchAndTransformToContentListItems(
 ): Promise<ContentListItem[]> {
 	const [users, metadata] = await Promise.all([auth0Cache.listUsers(), getS3Metadata(data)])
 	return data.map((item) => transformToContentListItem(item, users.data, metadata, userId))
+}
+
+export async function logActivity(
+	employeeId: string,
+	action: UserAction,
+	contentId?: string)
+{
+	await db.activityLog.create({
+		data: {
+			employeeId,
+			action,
+			contentId,
+		},
+	})
 }

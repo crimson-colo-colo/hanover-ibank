@@ -10,6 +10,8 @@ import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { sendPushNotification } from "../lib/notifications.tsx"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
+import { logActivity } from "../lib/content.ts"
+import { UserAction } from "../generated/prisma/client.ts"
 
 export const userRouter = router({
 	getProfile: authProcedure.query(async (opts) => {
@@ -65,6 +67,8 @@ export const userRouter = router({
 				})
 				auth0Cache.invalidate()
 
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_PROFILE, undefined)
+
 				const avatar = await s3.headObject({
 					Bucket: bucketName,
 					Key: `avatar/${opts.ctx.auth.sub}.png`,
@@ -106,7 +110,10 @@ export const userRouter = router({
 					source: "user",
 				},
 			})
-		}),
+
+			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_AVATAR, undefined)
+		})
+	,
 	getAvatarUrl: authProcedure.input(z.object({ userId: z.string() })).query(async (opts) => {
 		let object: { ETag?: string }
 		try {

@@ -8,6 +8,8 @@ import { env } from "../env.ts"
 import { logger } from "../logger.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
+import { logActivity } from "../lib/content.ts"
+import { UserAction } from "../generated/prisma/client.ts"
 
 export async function convertToPDF(key: string, filename: string) {
 	const formData = new FormData()
@@ -162,6 +164,7 @@ export const previewRouter = router({
 		})
 
 		const url = await getSignedUrl(s3, command, { expiresIn: 300 })
+		await logActivity(opts.ctx.auth.sub, UserAction.VIEW_CONTENT,opts.input.id )
 		return { url }
 	}),
 
@@ -216,6 +219,8 @@ export const previewRouter = router({
 				},
 			},
 		})
+
+		await logActivity(opts.ctx.auth.sub, UserAction.VIEW_CONTENT, opts.input.id)
 		const text = await data.Body!.transformToString()
 
 		return { text }
