@@ -374,6 +374,7 @@ export function NewUserTutorial() {
 		options: {
 			primaryColor: "var(--mantine-primary-color-filled)",
 			zIndex: 10000,
+			skipBeacon: true,
 		},
 	})
 
