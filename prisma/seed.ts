@@ -95,7 +95,6 @@ async function wipeDBandS3() {
 		prisma.tag.deleteMany(),
 		prisma.content.deleteMany(),
 		prisma.employee.deleteMany(),
-		prisma.recentTimestamps.deleteMany(),
 	])
 
 	console.log("Emptied database tables")
@@ -216,6 +215,7 @@ async function createContentTags(
 	fileContent: { id: string; objectId: string | null; ownerId: string }[],
 	linkContent: { id: string; ownerId: string }[]
 ) {
+	console.log("Creating content tags...")
 	await prisma.contentTag.createMany({
 		data: [
 			...fileContent.flatMap(generateContentTags),
