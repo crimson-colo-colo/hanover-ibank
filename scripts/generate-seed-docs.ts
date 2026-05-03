@@ -8,6 +8,7 @@
 import fs from "node:fs"
 import path from "node:path"
 import { faker } from "@faker-js/faker"
+import { TaskQueue } from "@typescript-package/queue"
 import { Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow } from "docx"
 import ExcelJS from "exceljs"
 import PDFDocument from "pdfkit"
@@ -51,17 +52,20 @@ function getFilename(topic: string, ext: string) {
 	return `${safeTopic} ${docType} ${year} ${quarter} v${version}.${ext}`
 }
 
-async function generateTxt() {
+async function generateTxt(concurrency: number) {
+	const taskQueue = new TaskQueue<{ params: { prompt: string }; filename: string }>(concurrency)
 	faker.seed(seed)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "txt")
-
-		const res = await generate({ prompt: prompts.txt(filename) })
+		taskQueue.enqueue({ params: { prompt: prompts.txt(filename) }, filename })
+	}
+	await taskQueue.asyncRun(async ({ params, filename }) => {
+		const res = await generate(params)
 		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
 
-		fs.writeFileSync(path.join(OUTPUT_DIR, filename), res.response)
-	}
+		fs.writeFileSync(path.join(OUTPUT_DIR, filename), res.message.content)
+	})
 }
 
 async function generateCsv() {
@@ -79,20 +83,31 @@ async function generateCsv() {
 	}
 }
 
-async function generatePdf() {
+async function generatePdf(concurrency: number) {
 	faker.seed(seed + 2)
+	const taskQueue = new TaskQueue<{
+		params: Parameters<typeof generate>[0]
+		filename: string
+		topic: string
+	}>(concurrency)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "pdf")
+		taskQueue.enqueue({
+			params: { prompt: prompts.pdf(filename), schema: PdfSchema },
+			topic,
+			filename,
+		})
+	}
+	await taskQueue.asyncRun(async ({ topic, filename, params }) => {
+		const content = await generate(params)
 		const doc = new PDFDocument()
 		doc.pipe(fs.createWriteStream(path.join(OUTPUT_DIR, filename)))
-
-		const content = await generate({ prompt: prompts.pdf(filename), schema: PdfSchema })
 		console.log(`Generated content for ${filename} in ${content.total_duration / 1e9} seconds`)
 
-		const response = PdfSchema.parse(JSON.parse(content.response))
+		const response = PdfSchema.parse(JSON.parse(content.message.content))
 
-		for (const item of response) {
+		for (const item of response.documentContent) {
 			try {
 				switch (item.type) {
 					case "h1":
@@ -162,23 +177,34 @@ async function generatePdf() {
 		}
 
 		doc.end()
-	}
+	})
 }
 
-async function generateDocx() {
+async function generateDocx(concurrency: number) {
 	faker.seed(seed + 3)
+	const taskQueue = new TaskQueue<{
+		params: Parameters<typeof generate>[0]
+		filename: string
+		topic: string
+	}>(concurrency)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "docx")
-
+		taskQueue.enqueue({
+			params: { prompt: prompts.docx(filename), schema: DocxSchema },
+			filename,
+			topic,
+		})
+	}
+	await taskQueue.asyncRun(async ({ params, filename, topic }) => {
 		const res = await generate({ prompt: prompts.docx(filename), schema: DocxSchema })
 		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
 
-		const response = DocxSchema.parse(JSON.parse(res.response))
+		const response = DocxSchema.parse(JSON.parse(res.message.content))
 
 		const docxChildren: any[] = []
 
-		for (const item of response) {
+		for (const item of response.documentContent) {
 			try {
 				switch (item.type) {
 					case "h1":
@@ -246,7 +272,7 @@ async function generateDocx() {
 		})
 		const buffer = await Packer.toBuffer(doc)
 		fs.writeFileSync(path.join(OUTPUT_DIR, filename), buffer)
-	}
+	})
 }
 
 function toTitleCase(str: string) {
@@ -257,20 +283,31 @@ function toTitleCase(str: string) {
 		.join(" ")
 }
 
-async function generateXlsx() {
+async function generateXlsx(concurrency: number) {
 	faker.seed(seed + 4)
+	const taskQueue = new TaskQueue<{
+		params: Parameters<typeof generate>[0]
+		filename: string
+		topic: string
+	}>(concurrency)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "xlsx")
-
-		const res = await generate({ prompt: prompts.xlsx(filename), schema: XlsxSchema })
+		taskQueue.enqueue({
+			params: { prompt: prompts.xlsx(filename), schema: XlsxSchema },
+			filename,
+			topic,
+		})
+	}
+	await taskQueue.asyncRun(async ({ params, filename, topic }) => {
+		const res = await generate(params)
 		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
 
-		const response = XlsxSchema.parse(JSON.parse(res.response))
+		const response = XlsxSchema.parse(JSON.parse(res.message.content))
 
 		const workbook = new ExcelJS.Workbook()
 
-		for (const sheetData of response) {
+		for (const sheetData of response.documentContent) {
 			const cleanName = sheetData.name.slice(0, 31).replace(/[*?/\\[\]]/g, "")
 			const sheet = workbook.addWorksheet(cleanName || "Data")
 
@@ -292,7 +329,7 @@ async function generateXlsx() {
 		}
 
 		await workbook.xlsx.writeFile(path.join(OUTPUT_DIR, filename))
-	}
+	})
 }
 
 const backgroundColors = [
@@ -307,21 +344,34 @@ const backgroundColors = [
 	"4ECDC4",
 	"C7F464",
 ]
-async function generatePptx() {
+async function generatePptx(concurrency: number) {
 	faker.seed(seed + 5)
+	const taskQueue = new TaskQueue<{
+		params: Parameters<typeof generate>[0]
+		filename: string
+		topic: string
+		bg: string
+	}>(concurrency)
 	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
 		const topic = getRandomTopic()
 		const filename = getFilename(topic, "pptx")
 		const bg = faker.helpers.arrayElement(backgroundColors)
-
-		const res = await generate({ prompt: prompts.pptx(filename), schema: PptxSchema })
+		taskQueue.enqueue({
+			params: { prompt: prompts.pptx(filename), schema: PptxSchema },
+			filename,
+			topic,
+			bg,
+		})
+	}
+	await taskQueue.asyncRun(async ({ params, filename, topic, bg }) => {
+		const res = await generate(params)
 		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
 
-		const response = PptxSchema.parse(JSON.parse(res.response))
+		const response = PptxSchema.parse(JSON.parse(res.message.content))
 
 		const pres = new PptxGenJS()
 
-		for (const slideData of response) {
+		for (const slideData of response.documentContent) {
 			const slide = pres.addSlide()
 			slide.background = { color: bg }
 
@@ -344,7 +394,7 @@ async function generatePptx() {
 		}
 
 		await pres.writeFile({ fileName: path.join(OUTPUT_DIR, filename) })
-	}
+	})
 }
 
 async function downloadMedia() {
@@ -408,26 +458,28 @@ async function main() {
 	console.log("Starting seed data generation...")
 	await ensureDir()
 
+	const concurrency = 2
+	const promises: Promise<void>[] = []
 	console.log("Generating TXT files...")
-	await generateTxt()
+	await generateTxt(concurrency)
 
 	// console.log("Generating CSV files...")
 	// await generateCsv()
 
 	console.log("Generating PDF files...")
-	await generatePdf()
+	await generatePdf(concurrency)
 
 	console.log("Generating DOCX files...")
-	await generateDocx()
+	await generateDocx(concurrency)
 
 	console.log("Generating XLSX files...")
-	await generateXlsx()
+	await generateXlsx(concurrency)
 
 	console.log("Generating PPTX files...")
-	await generatePptx()
+	await generatePptx(concurrency)
 
 	// console.log("Downloading media files (Images, Video, Audio)...")
-	// await downloadMedia()
+	// promises.push(downloadMedia())
 
 	console.log("Seed data generation complete!")
 }
