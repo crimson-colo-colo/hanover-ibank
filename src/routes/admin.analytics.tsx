@@ -131,7 +131,7 @@ function AnalyticsDashboard() {
 	}
 
 	return (
-		<Stack mt="md" gap="lg">
+		<Stack gap="lg">
 			<Title order={2}>Analytics Dashboard</Title>
 			<div>
 				<Group gap="xs" mb="xs">
