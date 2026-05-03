@@ -44,7 +44,7 @@ export function PreviewModal({
 				<div className="absolute inset-0 z-0" onClick={closePreview} />
 				<Modal.Header bdrs="md" px="lg" className="z-1">
 					<Flex gap="sm" align="center">
-						<FileTypeIcon fileType={fileType} />
+						<FileTypeIcon fileType={fileType} strokeWidth={1.5} />
 						<Modal.Title className="text-lg font-semibold font-display">
 							{content.title}
 						</Modal.Title>
