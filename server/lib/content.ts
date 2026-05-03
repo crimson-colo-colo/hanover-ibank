@@ -130,3 +130,18 @@ export async function logActivity(employeeId: string, action: UserAction, conten
 		},
 	})
 }
+
+const [users] = await Promise.all([auth0Cache.listUsers()])
+
+export function getDisplayName(employeeId: string) {
+	const unknownUser = {
+		name: "Unknown User",
+		email: "unknown",
+		username: "unknown",
+		avatarUrl: "",
+		nickname: null,
+		picture: null,
+	}
+	const owner = users.data.find((u) => u.user_id === employeeId) ?? unknownUser
+	return owner.name ?? owner.nickname ?? owner.username!
+}

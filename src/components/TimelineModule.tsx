@@ -24,14 +24,8 @@ import { trpc } from "@/lib/trpc.ts"
 export function TimelineModule() {
 	const [employeeID, setEmployeeID] = useState<string | undefined>(undefined)
 
-	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
 	const { data: allUserActivity } = useQuery(
 		trpc.activityLogging.listUserActivity.queryOptions({ employeeId: employeeID })
-	)
-	const { data: userInfo } = useQuery(trpc.admin.listUsers.queryOptions())
-	const contentIDs = allUserActivity?.map((item) => item.contentId ?? "") ?? []
-	const { data: allContentTitles } = useQuery(
-		trpc.content.getTitles.queryOptions({ contentIds: contentIDs })
 	)
 	const [searching, setSearching] = useState(false)
 
@@ -68,11 +62,9 @@ export function TimelineModule() {
 				)}
 			</Group>
 			<div style={{ maxHeight: 200, overflowY: "auto" }}>
-				<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
+				<Timeline active={allUserActivity?.length ?? 0} bulletSize={24} lineWidth={2}>
 					{allUserActivity?.map((item, i) => {
 						const title = activityLabelToStringTimeline[item.action]
-						const display_name = userInfo?.find((entry) => entry.id === item.employeeId)?.name
-						const content = allContentTitles?.find((entry) => entry.id === item.contentId)
 						return (
 							<Timeline.Item // biome-ignore lint/suspicious/noArrayIndexKey: foo
 								key={i}
@@ -81,16 +73,16 @@ export function TimelineModule() {
 							>
 								<Flex gap={6} align="center" wrap="nowrap">
 									<Text size="sm" c="dimmed" style={{ flexShrink: 0 }} className="truncate">
-										{display_name}
+										{item.displayName}
 									</Text>
-									{content?.title !== undefined && (
+									{item.contentTitle !== "" && (
 										<>
 											<Text c="dimmed" className="text-sm">
 												·
 											</Text>
-											<Tooltip label={content.title} withArrow arrowSize={8} openDelay={300}>
+											<Tooltip label={item.contentTitle} withArrow arrowSize={8} openDelay={300}>
 												<Text c="dimmed" className="text-sm truncate">
-													{content.title}
+													{item.contentTitle}
 												</Text>
 											</Tooltip>
 										</>

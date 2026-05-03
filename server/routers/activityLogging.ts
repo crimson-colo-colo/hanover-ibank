@@ -1,5 +1,6 @@
 import z from "zod"
 import { db } from "../database.ts"
+import { getDisplayName } from "../lib/content.ts"
 import { adminProcedure, router } from "../trpc.ts"
 
 export const activityLoggingRouter = router({
@@ -11,6 +12,22 @@ export const activityLoggingRouter = router({
 				orderBy: { timestamp: "desc" },
 				take: 100,
 			})
-			return activity
+
+			const content = await db.content.findMany({
+				where: {
+					id: {
+						in: activity.map((item) => item.contentId ?? ""),
+					},
+				},
+				select: { title: true, id: true },
+			})
+
+			const contentMap = new Map(content.map((item) => [item.id, item.title]))
+			const output = activity.map((item) => ({
+				...item,
+				displayName: getDisplayName(item.employeeId),
+				contentTitle: item.contentId ? (contentMap.get(item.contentId) ?? "") : "",
+			}))
+			return output
 		}),
 })
