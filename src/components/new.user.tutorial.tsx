@@ -1,7 +1,33 @@
 import { Button } from "@mantine/core"
+import {
+	IconAlertCircle,
+	IconCalendarStats,
+	IconCamera,
+	IconChartBar,
+	IconChartPie,
+	IconClock,
+	IconFile,
+	IconFilter,
+	IconHeart,
+	IconLayoutDashboard,
+	IconLayoutGrid,
+	IconLayoutSidebar,
+	IconLink,
+	IconSearch,
+	IconSettings,
+	IconStar,
+	IconTable,
+	IconTrendingUp,
+	IconUpload,
+	IconUserPlus,
+	IconUsers,
+	IconX,
+} from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import type { MouseEvent, ReactNode } from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
+import type { TooltipRenderProps } from "react-joyride"
 import {
 	ACTIONS,
 	type Controls,
@@ -16,6 +42,195 @@ import { trpc } from "@/lib/trpc.ts"
 const TUTORIAL_STORAGE_KEY = "ibank-tutorial-completed"
 
 export const TUTORIAL_START_EVENT = "ibank:start-tutorial"
+
+const STEP_ICONS: Record<string, ReactNode> = {
+	"#dashboard-welcome": <IconLayoutDashboard size={18} />,
+	"#side-navigation": <IconLayoutSidebar size={18} />,
+	"#dashboard-module-favorite-content": <IconStar size={18} />,
+	"#dashboard-module-recently-viewed": <IconClock size={18} />,
+	"#dashboard-module-popular-links": <IconLink size={18} />,
+	"#dashboard-module-popular-files": <IconFile size={18} />,
+	"#dashboard-module-expiring-content": <IconAlertCircle size={18} />,
+	"#dashboard-module-account-statistics": <IconChartBar size={18} />,
+	"#content-filter-control": <IconFilter size={18} />,
+	"#upload-content-btn": <IconUpload size={18} />,
+	"#content-search-input": <IconSearch size={18} />,
+	"#content-table": <IconTable size={18} />,
+	"#favorites-header": <IconHeart size={18} />,
+	"#favorites-view-toggle": <IconLayoutGrid size={18} />,
+	"#profile-avatar-section": <IconCamera size={18} />,
+	"#profile-form": <IconSettings size={18} />,
+	"#analytics-metrics": <IconChartBar size={18} />,
+	"#analytics-uploads-chart": <IconTrendingUp size={18} />,
+	"#analytics-file-charts": <IconChartPie size={18} />,
+	"#analytics-heatmap": <IconCalendarStats size={18} />,
+	"#manage-users-header": <IconUsers size={18} />,
+	"#add-user-btn": <IconUserPlus size={18} />,
+}
+
+interface StepData {
+	globalNum: number
+	totalSteps: number
+	isLastPage: boolean
+	skipPage: (controls: Controls) => void
+}
+
+function TutorialTooltip({
+	backProps,
+	closeProps,
+	controls,
+	index,
+	isLastStep,
+	primaryProps,
+	skipProps,
+	step,
+	tooltipProps,
+}: TooltipRenderProps) {
+	const data = step.data as StepData | undefined
+	const globalNum = data?.globalNum ?? index + 1
+	const total = data?.totalSteps ?? 1
+	const lastPage = data?.isLastPage ?? false
+	const progress = (globalNum / total) * 100
+	const icon = STEP_ICONS[step.target as string]
+	const primaryLabel = isLastStep ? (lastPage ? "Finish" : "Next page →") : "Next"
+	const skipLabel = lastPage ? "Skip tour" : "Skip page"
+	const handleSkip = lastPage
+		? skipProps.onClick
+		: (e: MouseEvent<HTMLButtonElement>) => {
+				e.preventDefault()
+				data?.skipPage(controls)
+			}
+
+	return (
+		<div
+			{...tooltipProps}
+			style={{
+				background: "var(--mantine-color-body)",
+				border: "2px solid var(--mantine-primary-color-filled)",
+				borderRadius: 12,
+				maxWidth: 400,
+				boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+				overflow: "hidden",
+				fontFamily: "var(--mantine-font-family)",
+			}}
+		>
+			<div
+				style={{
+					height: 4,
+					background: "var(--mantine-color-default-border)",
+				}}
+			>
+				<div
+					style={{
+						height: "100%",
+						width: `${progress}%`,
+						background: "var(--mantine-primary-color-filled)",
+						transition: "width 0.3s ease",
+					}}
+				/>
+			</div>
+
+			<div style={{ padding: "14px 18px 18px", position: "relative" }}>
+				<button
+					{...closeProps}
+					style={{
+						position: "absolute",
+						top: 10,
+						right: 10,
+						background: "none",
+						border: "none",
+						cursor: "pointer",
+						padding: 4,
+						color: "var(--mantine-color-dimmed)",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						borderRadius: 4,
+					}}
+				>
+					<IconX size={14} />
+				</button>
+
+				<div
+					style={{
+						fontSize: 11,
+						color: "var(--mantine-color-dimmed)",
+						marginBottom: 8,
+					}}
+				>
+					Step {globalNum} of {total}
+				</div>
+
+				<div
+					style={{
+						display: "flex",
+						alignItems: "center",
+						gap: 8,
+						marginBottom: 8,
+						paddingRight: 24,
+					}}
+				>
+					{icon && (
+						<div
+							style={{
+								color: "var(--mantine-primary-color-filled)",
+								flexShrink: 0,
+								display: "flex",
+							}}
+						>
+							{icon}
+						</div>
+					)}
+					{step.title && (
+						<div
+							style={{
+								fontWeight: 600,
+								fontSize: 15,
+								color: "var(--mantine-color-text)",
+								lineHeight: 1.3,
+							}}
+						>
+							{step.title as ReactNode}
+						</div>
+					)}
+				</div>
+
+				<div
+					style={{
+						fontSize: 13,
+						color: "var(--mantine-color-dimmed)",
+						marginBottom: 16,
+						lineHeight: 1.6,
+					}}
+				>
+					{step.content as ReactNode}
+				</div>
+
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "space-between",
+						alignItems: "center",
+					}}
+				>
+					<Button variant="subtle" color="gray" size="xs" {...skipProps} onClick={handleSkip}>
+						{skipLabel}
+					</Button>
+					<div style={{ display: "flex", gap: 8 }}>
+						{index > 0 && (
+							<Button variant="subtle" size="xs" {...backProps}>
+								Back
+							</Button>
+						)}
+						<Button size="xs" {...primaryProps}>
+							{primaryLabel}
+						</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
 
 const DASHBOARD_STEPS: Step[] = [
 	{
@@ -112,6 +327,7 @@ const FAVORITES_STEPS: Step[] = [
 		content:
 			"Anything you star anywhere in the app shows up here for quick access. You can preview, download, or unfavorite items right from this page.",
 		placement: "bottom",
+		scrollOffset: 1000,
 	},
 	{
 		target: "#favorites-view-toggle",
@@ -119,6 +335,7 @@ const FAVORITES_STEPS: Step[] = [
 		content:
 			"Switch between a visual grid of thumbnails and a sortable list. List view also lets you select multiple favorites and unfavorite them in bulk.",
 		placement: "bottom",
+		scrollOffset: 1000,
 	},
 ]
 
@@ -146,6 +363,7 @@ const ADMIN_ANALYTICS_STEPS: Step[] = [
 		content:
 			"A quick snapshot of platform activity: time on site, total uploads, file and link counts, your busiest month, and total employee count.",
 		placement: "bottom",
+		scrollOffset: 500,
 	},
 	{
 		target: "#analytics-uploads-chart",
@@ -356,25 +574,36 @@ export function NewUserTutorial() {
 		},
 		[currentSteps.length, goToNextPage, goToPrevPage]
 	)
+	const totalSteps = boundaries.reduce((sum, boundary) => sum + boundary.steps.length, 0)
+	const stepsBeforeCurrentPage = boundaries
+		.slice(0, pageIndex)
+		.reduce((sum, boundary) => sum + boundary.steps.length, 0)
 
+	const stepsWithData: Step[] = currentSteps.map((step, index) => ({
+		...step,
+		data: {
+			globalNum: stepsBeforeCurrentPage + index + 1,
+			totalSteps,
+			isLastPage,
+			skipPage: goToNextPage,
+		} satisfies StepData,
+	}))
 	const { Tour } = useJoyride({
-		steps: currentSteps,
+		steps: stepsWithData,
 		stepIndex,
 		run,
 		continuous: true,
 		scrollToFirstStep: true,
 		onEvent: handleEvent,
-		locale: {
-			back: "Back",
-			close: "Close",
-			last: isLastPage ? "Finish" : "Next page →",
-			next: "Next",
-			skip: "Skip tour",
-		},
+		tooltipComponent: TutorialTooltip,
 		options: {
 			primaryColor: "var(--mantine-primary-color-filled)",
 			zIndex: 10000,
 			skipBeacon: true,
+			backgroundColor: "var(--mantine-color-body)",
+			textColor: "var(--mantine-color-text)",
+			arrowColor: "var(--mantine-color-body)",
+			overlayColor: "rgba(0, 0, 0, 0.5)",
 		},
 	})
 
