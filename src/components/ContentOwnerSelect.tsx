@@ -34,7 +34,7 @@ export function ContentOwnerSelect({
 	})
 
 	const options = (searchResults.data ?? []).map((user) => (
-		<Combobox.Option value={user.id} key={user.id}>
+		<Combobox.Option value={user.id} key={user.id} className="combobox-option">
 			<Flex gap="md">
 				<Image src={`/avatar/${user.id}`} radius="100%" h={40} w={40} />
 				<Stack gap={0}>
@@ -84,12 +84,13 @@ export function ContentOwnerSelect({
 						placeholder="Search users..."
 						onKeyDown={(event) => {
 							if (event.key === "Enter") {
-								const firstResult = searchResults.data?.[0]
-								if (firstResult) {
-									form.setFieldValue("ownerId", firstResult.id)
-									setSearchValue(firstResult.email)
+								const selectedIndex = combobox.getSelectedOptionIndex()
+								const result = searchResults.data?.[selectedIndex]
+								if (result) {
+									form.setFieldValue("ownerId", result.id)
+									setSearchValue(result.email)
 									combobox.closeDropdown()
-									onSelect?.(firstResult.id, firstResult.name)
+									onSelect?.(result.id, result.name)
 								}
 							}
 						}}

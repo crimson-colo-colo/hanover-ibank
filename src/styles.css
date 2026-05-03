@@ -130,3 +130,8 @@ html.color-scheme-transitioning * {
 .thumb .react-pdf__Thumbnail__page {
     @apply -translate-x-1/4 -translate-y-1/4 scale-50;
 }
+
+.combobox-option[data-combobox-selected]{
+    background-color: #f2f2f2;
+    color: black
+}
