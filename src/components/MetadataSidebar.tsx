@@ -9,6 +9,7 @@ import {
 	Popover,
 	Stack,
 	Text,
+	TextInput,
 	Title,
 	Tooltip,
 } from "@mantine/core"
@@ -17,7 +18,7 @@ import { useForm } from "@mantine/form"
 
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import { type ContentStatus, EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { type ContentStatus, ContentType, EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import type { ContentListItem } from "@shared/types.ts"
 import {
@@ -28,6 +29,7 @@ import {
 	IconDoorEnter,
 	IconDoorExit,
 	IconDownload,
+	IconEdit,
 	IconFileUpload,
 	IconMessageCircleUser,
 	IconPencil,
@@ -68,6 +70,7 @@ export function MetadataSidebar({
 }) {
 	const { data: profile } = useQuery(trpc.user.getProfile.queryOptions())
 	const [editingField, _setEditingField] = useState<EditableField | null>(null)
+	const [urlEdit, setURLEdit] = useState<string | undefined>(undefined)
 	const options = {
 		async onSuccess() {
 			await Promise.all([
@@ -127,6 +130,7 @@ export function MetadataSidebar({
 			},
 		})
 	)
+	const updateLink = useMutation(trpc.content.updateLink.mutationOptions(options))
 
 	const [pendingOwner, setPendingOwner] = useState<{ id: string; name: string } | null>(null)
 	const [pendingTagChange, setPendingTagChange] = useState<{ stringifiedTags: string } | null>(null)
@@ -158,6 +162,10 @@ export function MetadataSidebar({
 	const ableToDelete =
 		profile?.role === EmployeeRole.Admin || (!isCheckedOutByOther && isIntendedAudience)
 	const canDelete = ableToDelete && isCheckedOut
+	const canUpdateLink =
+		content.type !== ContentType.Object &&
+		(content.checkedOutBy?.id === profile?.id ||
+			(content.checkedOutBy?.id && profile?.role === EmployeeRole.Admin))
 
 	const [confirmCheckoutOpen, { open: openConfirmCheckout, close: closeConfirmCheckout }] =
 		useDisclosure(false)
@@ -171,6 +179,9 @@ export function MetadataSidebar({
 		useDisclosure(false)
 
 	const [confirmTagChange, { open: openConfirmTagChange, close: closeConfirmTagChange }] =
+		useDisclosure(false)
+
+	const [linkEditDialogOpen, { open: openLinkEditDialog, close: closeLinkEditDialog }] =
 		useDisclosure(false)
 
 	const titleRef = useRef<HTMLInputElement>(null)
@@ -472,6 +483,11 @@ export function MetadataSidebar({
 						Update file
 					</Button>
 				)}
+				{canUpdateLink && (
+					<Button fullWidth variant="light" leftSection={<IconEdit />} onClick={openLinkEditDialog}>
+						Update Link
+					</Button>
+				)}
 
 				{content.checkedOutBy ? null : canCheckOut ? (
 					<Popover
@@ -742,6 +758,39 @@ export function MetadataSidebar({
 						color="red"
 					>
 						Continue
+					</Button>
+				</Flex>
+			</Modal>
+			<Modal opened={linkEditDialogOpen} onClose={closeLinkEditDialog} title="Edit Link">
+				<Text>Enter a new link URL</Text>
+				<TextInput
+					mt="sm"
+					withAsterisk={false}
+					placeholder={"https://example.com/"}
+					value={urlEdit}
+				/>
+				<Flex gap="md" justify="flex-end" mt="md">
+					<Button
+						variant="subtle"
+						color="gray"
+						onClick={() => {
+							closeLinkEditDialog()
+						}}
+						disabled={updateLink.isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						loading={updateLink.isPending}
+						onClick={async () => {
+							if (urlEdit !== undefined) {
+								await updateLink.mutateAsync({ id: content.id, url: urlEdit })
+							}
+							closeLinkEditDialog()
+						}}
+						leftSection={<IconEdit />}
+					>
+						Confirm edit
 					</Button>
 				</Flex>
 			</Modal>
