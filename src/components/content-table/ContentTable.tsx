@@ -14,6 +14,7 @@ import {
 	Text,
 	Title,
 	Tooltip,
+	useMantineColorScheme,
 } from "@mantine/core"
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
@@ -24,7 +25,6 @@ import type { FileType } from "@shared/filetype.ts"
 import type { ContentList, ContentListItem } from "@shared/types.ts"
 import {
 	IconChevronLeft,
-	IconChevronRight,
 	IconCircleCheck,
 	IconCloudUpload,
 	IconDoorEnter,
@@ -64,6 +64,7 @@ import {
 } from "@tanstack/react-table"
 import clsx from "clsx"
 import { formatDate, formatDistanceToNow } from "date-fns"
+import { AnimatePresence, motion } from "motion/react"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { TagFilterPopup } from "@/components/content-table/TagFilterPopup.tsx"
@@ -95,19 +96,22 @@ const mutationOptions = {
 	},
 }
 
-export const contentViewLabels: Record<
+const contentViewLabels: Record<
 	ContentViews,
 	{ label: string; icon: (props: IconProps) => React.ReactNode }
 > = {
 	[ContentViews.Default]: { icon: () => null, label: "Default" },
 	[ContentViews.ExpiringSoon]: { icon: IconHourglassEmpty, label: "Expiring soon" },
-	[ContentViews.OwnedContent]: { icon: IconUser, label: "Owned by You" },
+	[ContentViews.OwnedContent]: { icon: IconUser, label: "Owned by you" },
 	[ContentViews.RecentlyViewed]: { icon: IconEye, label: "Recently viewed" },
 	[ContentViews.RecentlyEdited]: { icon: IconPencil, label: "Recently edited by you" },
 	[ContentViews.PopularFiles]: { icon: IconFile, label: "Popular Files" },
 	[ContentViews.PopularLinks]: { icon: IconLink, label: "Popular Links" },
 	[ContentViews.CheckedOut]: { icon: IconDoorExit, label: "Checked out" },
 } as const
+
+const MotionGroup = motion.create(Group)
+const MotionIconChevronLeft = motion.create(IconChevronLeft)
 
 export function ContentTable({
 	loading,
@@ -133,6 +137,7 @@ export function ContentTable({
 	const deleteContent = useMutation(trpc.content.delete.mutationOptions(mutationOptions))
 	const favoriteContent = useMutation(trpc.content.favorite.mutationOptions(mutationOptions))
 	const unfavoriteContent = useMutation(trpc.content.unfavorite.mutationOptions(mutationOptions))
+	const isDark = useMantineColorScheme().colorScheme === "dark"
 
 	const [debouncedGlobalFilter] = useDebouncedValue(globalFilter, 250)
 
@@ -155,8 +160,7 @@ export function ContentTable({
 		expirationDate: false,
 		recentlyViewed: false,
 		recentlyEdited: false,
-		popularFiles: false,
-		popularLinks: false,
+		viewCount: false,
 		tags: true,
 		actions: true,
 		checkedOutBy: false,
@@ -337,20 +341,12 @@ export function ContentTable({
 				},
 			}),
 			columnHelper.accessor("viewCount", {
-				id: "popularFiles",
-				header: () => <span className="min-w-max">View Count</span>,
+				id: "views",
+				header: () => <span className="min-w-max">Views</span>,
 				cell: (info) => {
-					return info.getValue()
+					return info.getValue().toLocaleString()
 				},
-				filterFn: (item) => item.original.type === ContentType.Object,
-			}),
-			columnHelper.accessor("viewCount", {
-				id: "popularLinks",
-				header: () => <span className="min-w-max">View Count</span>,
-				cell: (info) => {
-					return info.getValue()
-				},
-				filterFn: (item) => item.original.type === ContentType.Link,
+				filterFn: (item, col, fv) => !fv || item.original.type === fv,
 			}),
 			columnHelper.accessor(
 				(row) =>
@@ -464,8 +460,7 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(undefined)
-			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.getColumn("views")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -478,8 +473,7 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(undefined)
-			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.getColumn("views")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -492,8 +486,7 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(undefined)
-			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.getColumn("views")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -506,8 +499,7 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(undefined)
-			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.getColumn("views")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -518,8 +510,7 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue("active")
 			table.getColumn("owner")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(undefined)
-			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.getColumn("views")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -530,34 +521,31 @@ export function ContentTable({
 			})
 			table.getColumn("owner")?.setFilterValue(profile?.name ?? "")
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(undefined)
-			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.getColumn("views")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
 		if (activeView === "popularFiles") {
-			setSorting([{ id: "popularFiles", desc: true }])
+			setSorting([{ id: "views", desc: true }])
 			setColumnVisibility({
 				...defaultColumns,
-				popularFiles: true,
+				views: true,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(ContentType.Object)
-			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.getColumn("views")?.setFilterValue(ContentType.Object)
 			table.setPageIndex(0)
 		}
 
 		if (activeView === "popularLinks") {
-			setSorting([{ id: "popularLinks", desc: true }])
+			setSorting([{ id: "views", desc: true }])
 			setColumnVisibility({
 				...defaultColumns,
-				popularLinks: true,
+				views: true,
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
-			table.getColumn("popularFiles")?.setFilterValue(undefined)
-			table.getColumn("popularLinks")?.setFilterValue(ContentType.Link)
+			table.getColumn("views")?.setFilterValue(ContentType.Link)
 			table.setPageIndex(0)
 		}
 	}, [activeView])
@@ -606,7 +594,7 @@ export function ContentTable({
 						leftSection={<IconCloudUpload />}
 						onClick={openCreateModal}
 					>
-						Upload content
+						Upload
 					</Button>
 					<Button
 						leftSection={<IconTrash />}
@@ -634,61 +622,72 @@ export function ContentTable({
 					}
 				}}
 			>
-				<Group justify="left" gap="xs" mb="md" align="stretch">
-					{Object.entries(contentViewLabels)
-						.slice(0, chipsExpanded ? undefined : 3)
-						.map(([key, { label, icon: Icon }], i) => {
-							if (
-								!chipsExpanded &&
-								i === 2 &&
-								!Object.entries(contentViewLabels)
-									.slice(0, 3)
-									.find(([k]) => k === activeView)
-							) {
-								key = activeView
-								label = contentViewLabels[activeView].label
-								Icon = contentViewLabels[activeView].icon
-							}
-							return (
-								<Chip
-									key={key}
-									icon={null}
-									value={key}
-									className="p-0"
-									styles={{
-										label: {
-											padding: 15,
-										},
-									}}
-								>
-									<Group wrap="nowrap">
-										<Icon className="size-4" />
-										{label}
-									</Group>
-								</Chip>
-							)
-						})}
-					<Chip
-						value="$toggle"
-						className="h-full p-0"
-						styles={{
-							label: {
-								paddingLeft: 8,
-								paddingRight: 8,
-								paddingTop: 15,
-								paddingBottom: 15,
-							},
-						}}
-					>
-						<Group wrap="nowrap">
-							{chipsExpanded ? (
-								<IconChevronLeft className="size-4" />
-							) : (
-								<IconChevronRight className="size-4" />
-							)}
-						</Group>
-					</Chip>
-				</Group>
+				<MotionGroup layout="position" justify="left" gap="xs" mb="md" align="stretch">
+					<AnimatePresence initial={false} mode="popLayout">
+						{Object.entries(contentViewLabels)
+							.slice(0, chipsExpanded ? undefined : 3)
+							.map(([key, { label, icon: Icon }], i) => {
+								if (
+									!chipsExpanded &&
+									i === 2 &&
+									!Object.entries(contentViewLabels)
+										.slice(0, 3)
+										.find(([k]) => k === activeView)
+								) {
+									key = activeView
+									label = contentViewLabels[activeView].label
+									Icon = contentViewLabels[activeView].icon
+								}
+								return (
+									<motion.div
+										key={key}
+										layout
+										layoutId={`chip-${key}`}
+										initial={{ opacity: 0, scale: 0.8, dur: 0.1 }}
+										animate={{ opacity: 1, scale: 1, dur: 0.1 }}
+										exit={{ opacity: 0, scale: 0.8, dur: 0.1 }}
+									>
+										<Chip
+											icon={null}
+											value={key}
+											className="p-0"
+											styles={{
+												label: {
+													padding: 15,
+												},
+											}}
+											color={!isDark ? "emerald.6" : "emerald.8"}
+										>
+											<Group wrap="nowrap">
+												<Icon className="size-4" />
+												{label}
+											</Group>
+										</Chip>
+									</motion.div>
+								)
+							})}
+						<motion.div layout key="toggle" layoutId="chip-toggle">
+							<Chip
+								value="$toggle"
+								className="h-full p-0"
+								styles={{
+									label: {
+										paddingLeft: 8,
+										paddingRight: 8,
+										paddingTop: 15,
+										paddingBottom: 15,
+									},
+								}}
+							>
+								<Group wrap="nowrap">
+									<MotionIconChevronLeft
+										className={clsx("size-4", !chipsExpanded && "rotate-180")}
+									/>
+								</Group>
+							</Chip>
+						</motion.div>
+					</AnimatePresence>
+				</MotionGroup>
 			</Chip.Group>
 			<Table id="content-table" className="w-full">
 				<Table.Thead>
