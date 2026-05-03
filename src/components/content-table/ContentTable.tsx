@@ -336,7 +336,6 @@ export function ContentTable({
 					return <span title={titleTimestamp}>{elapsedTime}</span>
 				},
 			}),
-
 			columnHelper.accessor("viewCount", {
 				id: "popularFiles",
 				header: () => <span className="min-w-max">View Count</span>,
@@ -604,7 +603,7 @@ export function ContentTable({
 
 					<Button
 						id="upload-content-btn"
-						leftSection={<IconCloudUpload size={16} stroke={1.5} />}
+						leftSection={<IconCloudUpload />}
 						onClick={openCreateModal}
 					>
 						Upload content
@@ -756,7 +755,10 @@ export function ContentTable({
 			</Table>
 			<CreateContentModal opened={createModalOpen} onClose={closeCreateModal} />
 			<Modal opened={deleteDialogOpen} onClose={closeDeleteDialog} title="Confirm Deletion">
-				<Text>Are you sure you want to delete the selected content?</Text>
+				<Text>
+					Are you sure you want to delete the selected content?{" "}
+					<strong>This action cannot be undone.</strong>
+				</Text>
 				<Flex mt="md" justify="flex-end" gap="sm">
 					<Button
 						variant="subtle"
@@ -769,6 +771,7 @@ export function ContentTable({
 					<Button
 						color="red"
 						loading={deleteContent.isPending}
+						leftSection={<IconTrash />}
 						onClick={async () => {
 							const idsToDelete = table.getSelectedRowModel().rows.map((r) => r.original.id)
 							await deleteContent.mutateAsync(
