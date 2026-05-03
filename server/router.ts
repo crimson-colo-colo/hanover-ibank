@@ -8,6 +8,7 @@ import { searchRouter } from "./routers/search.ts"
 import { userRouter } from "./routers/user.ts"
 import { userActivityRouter } from "./routers/userActivity.ts"
 import { router } from "./trpc.ts"
+import { activityLoggingRouter } from "./routers/activityLogging.ts";
 
 export type AppRouter = typeof appRouter
 export const appRouter = router({
@@ -20,4 +21,5 @@ export const appRouter = router({
 	opengraph: opengraphRouter,
 	userActivity: userActivityRouter,
 	search: searchRouter,
+	activityLogging: activityLoggingRouter,
 })

@@ -1,12 +1,12 @@
-import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
-import { Grid, Group, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
-import { IconUserKey } from "@tabler/icons-react"
+import { AreaChart, BarChart, Heatmap, PieChart} from "@mantine/charts"
+import { Grid, Group, Paper, Stack, Text, Title } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { HelpHint } from "@/components/help.hint.tsx"
 import { trpc } from "@/lib/trpc.ts"
+import {TimelineModule} from "@/components/TimelineModule.tsx";
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,
@@ -21,10 +21,7 @@ function AnalyticsDashboard() {
 		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions()
 	)
 
-	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
-
 	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions())
-
 	const COLORS = [
 		"violet.6",
 		"blue.6",
@@ -209,42 +206,7 @@ function AnalyticsDashboard() {
 					</Grid.Col>
 
 					<Grid.Col span={{ base: 12, md: 5 }}>
-						<Paper withBorder p="md" radius="md" h="100%">
-							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-								Recent User Activity
-							</Text>
-							<div style={{ maxHeight: 200, overflowY: "auto" }}>
-								<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
-									{/*hot fix for removing notification api calls from user activity*/}
-									{(userData ?? [])
-										.filter(
-											(item) =>
-												item.path !== "user.getNotifications" &&
-												item.path !== "user.createPushSubscription"
-										)
-										.map((activity, i) => {
-											const { title, description } = getActivityLabel(activity.path)
-											return (
-												<Timeline.Item
-													// biome-ignore lint/suspicious/noArrayIndexKey: foo
-													key={i}
-													bullet={<IconUserKey size={12} />}
-													title={title}
-												>
-													<Text size="sm" c="dimmed">
-														{activity.contentTitle
-															? `Uploaded "${activity.contentTitle}"`
-															: description}
-													</Text>
-													<Text size="xs" mt={4}>
-														{new Date(activity.timestamp).toLocaleTimeString()}
-													</Text>
-												</Timeline.Item>
-											)
-										})}
-								</Timeline>
-							</div>
-						</Paper>
+						<TimelineModule />
 					</Grid.Col>
 				</Grid>
 			</div>
