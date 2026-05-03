@@ -102,6 +102,7 @@ function RootComponent() {
 							<HeadContent />
 							<Outlet />
 							<AppSpotlight />
+							{!isPreview && <Space h={64} />}
 						</AppShell.Main>
 					</AppShell>
 					<Notifications />
