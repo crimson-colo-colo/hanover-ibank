@@ -32,7 +32,7 @@ interface TeamMember {
 	role: string
 	photo: string
 	alt: string
-	quote: string
+	quote?: string
 }
 
 const rows: TeamMember[][] = [
@@ -42,14 +42,12 @@ const rows: TeamMember[][] = [
 			role: "Software Engineering Professor",
 			photo: wwong2Photo,
 			alt: "Wong",
-			quote: "Placeholder Quote",
 		},
 		{
 			name: "Jose Manuel Perez Jimenez",
 			role: "Team Coach",
 			photo: josePhoto,
 			alt: "Jose",
-			quote: "Placeholder Quote",
 		},
 	],
 	[
@@ -168,11 +166,11 @@ function TeamCard({ name, role, photo, alt, quote }: TeamMember) {
 					w={120}
 					h={120}
 					fit="cover"
-					style={{ borderRadius: 60, cursor: "pointer", display: "block" }}
-					onClick={() => setShowQuote((v) => !v)}
+					style={{ borderRadius: 60, cursor: quote ? "pointer" : "default", display: "block" }}
+					onClick={() => quote && setShowQuote((v) => !v)}
 				/>
 
-				{showQuote && (
+				{quote && showQuote && (
 					<div
 						style={{
 							position: "absolute",
