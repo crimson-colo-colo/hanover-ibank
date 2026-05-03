@@ -8,9 +8,9 @@
 import fs from "node:fs"
 import path from "node:path"
 import { faker } from "@faker-js/faker"
-import { TaskQueue } from "@typescript-package/queue"
 import { Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow } from "docx"
 import ExcelJS from "exceljs"
+import pLimit from "p-limit"
 import PDFDocument from "pdfkit"
 import PptxGenJS from "pptxgenjs"
 import { generate, seed } from "./_generate.ts"
@@ -22,7 +22,7 @@ const TOPICS = fs
 	.split("\n")
 	.filter(Boolean)
 
-const COUNT_PER_DOCUMENT_TYPE = 20
+const COUNT_PER_DOCUMENT_TYPE = 40
 const COUNT_PER_MEDIA_TYPE = 10
 
 async function ensureDir() {
@@ -53,19 +53,19 @@ function getFilename(topic: string, ext: string) {
 }
 
 async function generateTxt(concurrency: number) {
-	const taskQueue = new TaskQueue<{ params: { prompt: string }; filename: string }>(concurrency)
+	const limit = pLimit(concurrency)
 	faker.seed(seed)
-	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
-		const topic = getRandomTopic()
-		const filename = getFilename(topic, "txt")
-		taskQueue.enqueue({ params: { prompt: prompts.txt(filename) }, filename })
-	}
-	await taskQueue.asyncRun(async ({ params, filename }) => {
-		const res = await generate(params)
-		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
-
-		fs.writeFileSync(path.join(OUTPUT_DIR, filename), res.message.content)
-	})
+	await Promise.all(
+		Array.from({ length: COUNT_PER_DOCUMENT_TYPE }, () => {
+			const topic = getRandomTopic()
+			const filename = getFilename(topic, "txt")
+			return limit(async () => {
+				const res = await generate({ prompt: prompts.txt(filename) })
+				console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+				fs.writeFileSync(path.join(OUTPUT_DIR, filename), res.message.content)
+			})
+		})
+	)
 }
 
 async function generateCsv() {
@@ -85,194 +85,180 @@ async function generateCsv() {
 
 async function generatePdf(concurrency: number) {
 	faker.seed(seed + 2)
-	const taskQueue = new TaskQueue<{
-		params: Parameters<typeof generate>[0]
-		filename: string
-		topic: string
-	}>(concurrency)
-	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
-		const topic = getRandomTopic()
-		const filename = getFilename(topic, "pdf")
-		taskQueue.enqueue({
-			params: { prompt: prompts.pdf(filename), schema: PdfSchema },
-			topic,
-			filename,
-		})
-	}
-	await taskQueue.asyncRun(async ({ topic, filename, params }) => {
-		const content = await generate(params)
-		const doc = new PDFDocument()
-		doc.pipe(fs.createWriteStream(path.join(OUTPUT_DIR, filename)))
-		console.log(`Generated content for ${filename} in ${content.total_duration / 1e9} seconds`)
+	const limit = pLimit(concurrency)
+	await Promise.all(
+		Array.from({ length: COUNT_PER_DOCUMENT_TYPE }, () => {
+			const topic = getRandomTopic()
+			const filename = getFilename(topic, "pdf")
+			return limit(async () => {
+				const content = await generate({ prompt: prompts.pdf(filename), schema: PdfSchema })
+				const doc = new PDFDocument()
+				doc.pipe(fs.createWriteStream(path.join(OUTPUT_DIR, filename)))
+				console.log(`Generated content for ${filename} in ${content.total_duration / 1e9} seconds`)
 
-		const response = PdfSchema.parse(JSON.parse(content.message.content))
+				const response = PdfSchema.parse(JSON.parse(content.message.content))
 
-		for (const item of response.documentContent) {
-			try {
-				switch (item.type) {
-					case "h1":
-						doc.fontSize(24).text(item.content, { underline: true })
-						break
-					case "h2":
-						doc.fontSize(20).text(item.content, { underline: true })
-						break
-					case "h3":
-						doc.fontSize(16).text(item.content, { underline: true })
-						break
-					case "p":
-						doc.fontSize(12).text(item.content)
-						break
-					case "ul":
-						item.items.forEach((line) => {
-							doc.fontSize(12).text(`• ${line}`)
-						})
-						break
-					case "ol":
-						item.items.forEach((line, index) => {
-							doc.fontSize(12).text(`${index + 1}. ${line}`)
-						})
-						break
-					case "table": {
-						const tableTop = doc.y
-						const cellPadding = 5
+				for (const item of response.documentContent) {
+					try {
+						switch (item.type) {
+							case "h1":
+								doc.fontSize(24).text(item.content, { underline: true })
+								break
+							case "h2":
+								doc.fontSize(20).text(item.content, { underline: true })
+								break
+							case "h3":
+								doc.fontSize(16).text(item.content, { underline: true })
+								break
+							case "p":
+								doc.fontSize(12).text(item.content)
+								break
+							case "ul":
+								item.items.forEach((line) => {
+									doc.fontSize(12).text(`• ${line}`)
+								})
+								break
+							case "ol":
+								item.items.forEach((line, index) => {
+									doc.fontSize(12).text(`${index + 1}. ${line}`)
+								})
+								break
+							case "table": {
+								const tableTop = doc.y
+								const cellPadding = 5
 
-						const columnWidths = item.headers.map(() => 150)
-						// Render headers
-						item.headers.forEach((header, index) => {
-							doc
-								.rect(doc.x + index * columnWidths[index], tableTop, columnWidths[index], 20)
-								.stroke()
-							doc.text(
-								header,
-								doc.x + index * columnWidths[index] + cellPadding,
-								tableTop + cellPadding
-							)
-						})
-						// Render rows
-						item.rows.forEach((row, rowIndex) => {
-							const rowTop = tableTop + 20 + rowIndex * 20
-							row.forEach((cell, cellIndex) => {
-								doc
-									.rect(
-										doc.x + cellIndex * columnWidths[cellIndex],
-										rowTop,
-										columnWidths[cellIndex],
-										20
+								const columnWidths = item.headers.map(() => 150)
+								// Render headers
+								item.headers.forEach((header, index) => {
+									doc
+										.rect(doc.x + index * columnWidths[index], tableTop, columnWidths[index], 20)
+										.stroke()
+									doc.text(
+										header,
+										doc.x + index * columnWidths[index] + cellPadding,
+										tableTop + cellPadding
 									)
-									.stroke()
-								doc.text(
-									cell,
-									doc.x + cellIndex * columnWidths[cellIndex] + cellPadding,
-									rowTop + cellPadding
-								)
-							})
-						})
-						break
-					}
-					case "pagebreak":
-						doc.addPage()
-						break
+								})
+								// Render rows
+								item.rows.forEach((row, rowIndex) => {
+									const rowTop = tableTop + 20 + rowIndex * 20
+									row.forEach((cell, cellIndex) => {
+										doc
+											.rect(
+												doc.x + cellIndex * columnWidths[cellIndex],
+												rowTop,
+												columnWidths[cellIndex],
+												20
+											)
+											.stroke()
+										doc.text(
+											cell,
+											doc.x + cellIndex * columnWidths[cellIndex] + cellPadding,
+											rowTop + cellPadding
+										)
+									})
+								})
+								break
+							}
+							case "pagebreak":
+								doc.addPage()
+								break
+						}
+					} catch {}
 				}
-			} catch {}
-		}
 
-		doc.end()
-	})
+				doc.end()
+			})
+		})
+	)
 }
 
 async function generateDocx(concurrency: number) {
 	faker.seed(seed + 3)
-	const taskQueue = new TaskQueue<{
-		params: Parameters<typeof generate>[0]
-		filename: string
-		topic: string
-	}>(concurrency)
-	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
-		const topic = getRandomTopic()
-		const filename = getFilename(topic, "docx")
-		taskQueue.enqueue({
-			params: { prompt: prompts.docx(filename), schema: DocxSchema },
-			filename,
-			topic,
-		})
-	}
-	await taskQueue.asyncRun(async ({ params, filename, topic }) => {
-		const res = await generate({ prompt: prompts.docx(filename), schema: DocxSchema })
-		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+	const limit = pLimit(concurrency)
+	await Promise.all(
+		Array.from({ length: COUNT_PER_DOCUMENT_TYPE }, () => {
+			const topic = getRandomTopic()
+			const filename = getFilename(topic, "docx")
+			return limit(async () => {
+				const res = await generate({ prompt: prompts.docx(filename), schema: DocxSchema })
+				console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
 
-		const response = DocxSchema.parse(JSON.parse(res.message.content))
+				const response = DocxSchema.parse(JSON.parse(res.message.content))
 
-		const docxChildren: any[] = []
+				const docxChildren: any[] = []
 
-		for (const item of response.documentContent) {
-			try {
-				switch (item.type) {
-					case "h1":
-						docxChildren.push(
-							new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_1 })
-						)
-						break
-					case "h2":
-						docxChildren.push(
-							new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_2 })
-						)
-						break
-					case "h3":
-						docxChildren.push(
-							new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_3 })
-						)
-						break
-					case "p":
-						docxChildren.push(new Paragraph({ text: item.content }))
-						break
-					case "ul":
-						item.items.forEach((line) => {
-							docxChildren.push(new Paragraph({ text: line, bullet: { level: 0 } }))
-						})
-						break
-					case "ol":
-						item.items.forEach((line, index) => {
-							docxChildren.push(new Paragraph({ text: `${index + 1}. ${line}` }))
-						})
-						break
-					case "table":
-						docxChildren.push(
-							new Table({
-								rows: [
-									new TableRow({
-										children: item.headers.map(
-											(header) => new TableCell({ children: [new Paragraph(header)] })
-										),
-									}),
-									...item.rows.map(
-										(row) =>
+				for (const item of response.documentContent) {
+					try {
+						switch (item.type) {
+							case "h1":
+								docxChildren.push(
+									new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_1 })
+								)
+								break
+							case "h2":
+								docxChildren.push(
+									new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_2 })
+								)
+								break
+							case "h3":
+								docxChildren.push(
+									new Paragraph({ text: item.content, heading: HeadingLevel.HEADING_3 })
+								)
+								break
+							case "p":
+								docxChildren.push(new Paragraph({ text: item.content }))
+								break
+							case "ul":
+								item.items.forEach((line) => {
+									docxChildren.push(new Paragraph({ text: line, bullet: { level: 0 } }))
+								})
+								break
+							case "ol":
+								item.items.forEach((line, index) => {
+									docxChildren.push(new Paragraph({ text: `${index + 1}. ${line}` }))
+								})
+								break
+							case "table":
+								docxChildren.push(
+									new Table({
+										rows: [
 											new TableRow({
-												children: row.map(
-													(cell) => new TableCell({ children: [new Paragraph(cell)] })
+												children: item.headers.map(
+													(header) => new TableCell({ children: [new Paragraph(header)] })
 												),
-											})
-									),
-								],
-							})
-						)
-						break
-					case "pagebreak":
-						docxChildren.push(new Paragraph({ pageBreakBefore: true }))
-						break
+											}),
+											...item.rows.map(
+												(row) =>
+													new TableRow({
+														children: row.map(
+															(cell) => new TableCell({ children: [new Paragraph(cell)] })
+														),
+													})
+											),
+										],
+									})
+								)
+								break
+							case "pagebreak":
+								docxChildren.push(new Paragraph({ pageBreakBefore: true }))
+								break
+						}
+					} catch {}
 				}
-			} catch {}
-		}
 
-		const doc = new Document({
-			sections: [
-				{
-					children: docxChildren,
-				},
-			],
+				const doc = new Document({
+					sections: [
+						{
+							children: docxChildren,
+						},
+					],
+				})
+				const buffer = await Packer.toBuffer(doc)
+				fs.writeFileSync(path.join(OUTPUT_DIR, filename), buffer)
+			})
 		})
-		const buffer = await Packer.toBuffer(doc)
-		fs.writeFileSync(path.join(OUTPUT_DIR, filename), buffer)
-	})
+	)
 }
 
 function toTitleCase(str: string) {
@@ -285,51 +271,44 @@ function toTitleCase(str: string) {
 
 async function generateXlsx(concurrency: number) {
 	faker.seed(seed + 4)
-	const taskQueue = new TaskQueue<{
-		params: Parameters<typeof generate>[0]
-		filename: string
-		topic: string
-	}>(concurrency)
-	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
-		const topic = getRandomTopic()
-		const filename = getFilename(topic, "xlsx")
-		taskQueue.enqueue({
-			params: { prompt: prompts.xlsx(filename), schema: XlsxSchema },
-			filename,
-			topic,
+	const limit = pLimit(concurrency)
+	await Promise.all(
+		Array.from({ length: COUNT_PER_DOCUMENT_TYPE }, () => {
+			const topic = getRandomTopic()
+			const filename = getFilename(topic, "xlsx")
+			return limit(async () => {
+				const res = await generate({ prompt: prompts.xlsx(filename), schema: XlsxSchema })
+				console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+
+				const response = XlsxSchema.parse(JSON.parse(res.message.content))
+
+				const workbook = new ExcelJS.Workbook()
+
+				for (const sheetData of response.documentContent) {
+					const cleanName = sheetData.name.slice(0, 31).replace(/[*?/\\[\]]/g, "")
+					const sheet = workbook.addWorksheet(cleanName || "Data")
+
+					sheet.columns = sheetData.headers.map((header) => ({
+						header,
+						key: header.toLowerCase().replace(/[^a-z0-9]/g, ""),
+						width: 25,
+					}))
+
+					for (const row of sheetData.rows) {
+						const rowData: Record<string, any> = {}
+						sheetData.headers.forEach((header, index) => {
+							rowData[header.toLowerCase().replace(/[^a-z0-9]/g, "")] = row[index]
+						})
+						sheet.addRow(rowData)
+					}
+
+					sheet.getRow(1).font = { bold: true }
+				}
+
+				await workbook.xlsx.writeFile(path.join(OUTPUT_DIR, filename))
+			})
 		})
-	}
-	await taskQueue.asyncRun(async ({ params, filename, topic }) => {
-		const res = await generate(params)
-		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
-
-		const response = XlsxSchema.parse(JSON.parse(res.message.content))
-
-		const workbook = new ExcelJS.Workbook()
-
-		for (const sheetData of response.documentContent) {
-			const cleanName = sheetData.name.slice(0, 31).replace(/[*?/\\[\]]/g, "")
-			const sheet = workbook.addWorksheet(cleanName || "Data")
-
-			sheet.columns = sheetData.headers.map((header) => ({
-				header,
-				key: header.toLowerCase().replace(/[^a-z0-9]/g, ""),
-				width: 25,
-			}))
-
-			for (const row of sheetData.rows) {
-				const rowData: Record<string, any> = {}
-				sheetData.headers.forEach((header, index) => {
-					rowData[header.toLowerCase().replace(/[^a-z0-9]/g, "")] = row[index]
-				})
-				sheet.addRow(rowData)
-			}
-
-			sheet.getRow(1).font = { bold: true }
-		}
-
-		await workbook.xlsx.writeFile(path.join(OUTPUT_DIR, filename))
-	})
+	)
 }
 
 const backgroundColors = [
@@ -346,55 +325,52 @@ const backgroundColors = [
 ]
 async function generatePptx(concurrency: number) {
 	faker.seed(seed + 5)
-	const taskQueue = new TaskQueue<{
-		params: Parameters<typeof generate>[0]
-		filename: string
-		topic: string
-		bg: string
-	}>(concurrency)
-	for (let i = 0; i < COUNT_PER_DOCUMENT_TYPE; i++) {
-		const topic = getRandomTopic()
-		const filename = getFilename(topic, "pptx")
-		const bg = faker.helpers.arrayElement(backgroundColors)
-		taskQueue.enqueue({
-			params: { prompt: prompts.pptx(filename), schema: PptxSchema },
-			filename,
-			topic,
-			bg,
-		})
-	}
-	await taskQueue.asyncRun(async ({ params, filename, topic, bg }) => {
-		const res = await generate(params)
-		console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
+	const limit = pLimit(concurrency)
+	await Promise.all(
+		Array.from({ length: COUNT_PER_DOCUMENT_TYPE }, () => {
+			const topic = getRandomTopic()
+			const filename = getFilename(topic, "pptx")
+			const bg = faker.helpers.arrayElement(backgroundColors)
+			return limit(async () => {
+				const res = await generate({ prompt: prompts.pptx(filename), schema: PptxSchema })
+				console.log(`Generated content for ${filename} in ${res.total_duration / 1e9} seconds`)
 
-		const response = PptxSchema.parse(JSON.parse(res.message.content))
+				const response = PptxSchema.parse(JSON.parse(res.message.content))
 
-		const pres = new PptxGenJS()
+				const pres = new PptxGenJS()
 
-		for (const slideData of response.documentContent) {
-			const slide = pres.addSlide()
-			slide.background = { color: bg }
+				for (const slideData of response.documentContent) {
+					const slide = pres.addSlide()
+					slide.background = { color: bg }
 
-			slide.addText(slideData.title, { x: 1, y: 0.5, fontSize: 32, color: "363636", bold: true })
+					slide.addText(slideData.title, {
+						x: 1,
+						y: 0.5,
+						fontSize: 32,
+						color: "363636",
+						bold: true,
+					})
 
-			let currentY = 1.5
-			for (const contentItem of slideData.content) {
-				if (contentItem.type === "p") {
-					slide.addText(contentItem.content, { x: 1, y: currentY, fontSize: 18 })
-					currentY += 1
-				} else if (contentItem.type === "ul" || contentItem.type === "ol") {
-					const textArray = contentItem.items.map((item) => ({
-						text: item,
-						options: { bullet: true },
-					}))
-					slide.addText(textArray, { x: 1, y: currentY, fontSize: 18 })
-					currentY += contentItem.items.length * 0.4 + 0.5
+					let currentY = 1.5
+					for (const contentItem of slideData.content) {
+						if (contentItem.type === "p") {
+							slide.addText(contentItem.content, { x: 1, y: currentY, fontSize: 18 })
+							currentY += 1
+						} else if (contentItem.type === "ul" || contentItem.type === "ol") {
+							const textArray = contentItem.items.map((item) => ({
+								text: item,
+								options: { bullet: true },
+							}))
+							slide.addText(textArray, { x: 1, y: currentY, fontSize: 18 })
+							currentY += contentItem.items.length * 0.4 + 0.5
+						}
+					}
 				}
-			}
-		}
 
-		await pres.writeFile({ fileName: path.join(OUTPUT_DIR, filename) })
-	})
+				await pres.writeFile({ fileName: path.join(OUTPUT_DIR, filename) })
+			})
+		})
+	)
 }
 
 async function downloadMedia() {
@@ -465,7 +441,6 @@ async function main() {
 
 	// console.log("Generating CSV files...")
 	// await generateCsv()
-
 	console.log("Generating PDF files...")
 	await generatePdf(concurrency)
 
