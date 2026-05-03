@@ -17,9 +17,12 @@ function AnalyticsDashboard() {
 
 	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions())
 
+	const { data: statusStats } = useQuery(trpc.content.getStatusStats.queryOptions())
+
 	const { data: heatmapData } = useQuery(
 		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions()
 	)
+
 
 	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
 
@@ -35,6 +38,17 @@ function AnalyticsDashboard() {
 		"pink.6",
 		"cyan.6",
 	]
+	const statusColorMap: Record<string, string> = {
+		Incomplete: "red.6",
+		UnderReview: "yellow.6",
+		Complete: "green.6",
+	}
+
+	const statusPieData = (statusStats ?? []).map((item) => ({
+		name: item.name,
+		value: item.value,
+		color: statusColorMap[item.name] ?? "gray.5",
+	}))
 
 	const barData = (fileStats ?? []).map((item) => ({
 		type: item.type,
@@ -274,7 +288,7 @@ function AnalyticsDashboard() {
 							</Text>
 							{pieData.length > 0 ? (
 								<PieChart
-									size={200}
+									size={220}
 									data={pieData}
 									withTooltip
 									tooltipDataSource="segment"
@@ -319,29 +333,26 @@ function AnalyticsDashboard() {
 				</Grid>
 			</div>
 			<div>
-				<Group gap="xs" mb="xs">
-					<Text size="sm" fw={600}>
-						Activity Heatmap
-					</Text>
-					<HelpHint
-						feature="the activity heatmap"
-						steps={[
-							{
-								target: "#analytics-heatmap",
-								title: "User Activity Heatmap",
-								content:
-									"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
-								placement: "top",
-							},
-						]}
-					/>
-				</Group>
-				<Grid id="analytics-heatmap">
-					<Grid.Col span={12}>
+				<Grid id="analytics-heatmap" align="stretch">
+					<Grid.Col span={{ base: 12, md: 8 }}>
 						<Paper withBorder p="md" radius="md">
-							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+							<Group mb = "md">
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} >
 								User Activity Heatmap
 							</Text>
+							<HelpHint
+								feature="the activity heatmap"
+								steps={[
+									{
+										target: "#analytics-heatmap",
+										title: "User Activity Heatmap",
+										content:
+											"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
+										placement: "top",
+									},
+								]}
+							/>
+							</Group>
 							<Heatmap
 								data={heatmapData ?? {}}
 								startDate={startDate}
@@ -366,7 +377,24 @@ function AnalyticsDashboard() {
 							/>
 						</Paper>
 					</Grid.Col>
+					<Grid.Col span={{ base: 12, md: 4 }} style={{ display: "flex" }}>
+						<Paper withBorder p="md" radius="md" w={500}>
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="sm">
+								Document Status
+							</Text>
+
+							<Group justify="center">
+								<PieChart
+									size={180}
+									data={statusPieData}
+									withTooltip
+								/>
+							</Group>
+						</Paper>
+					</Grid.Col>
+
 				</Grid>
+
 			</div>
 		</Stack>
 	)
