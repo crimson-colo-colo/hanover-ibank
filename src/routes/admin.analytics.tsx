@@ -96,37 +96,6 @@ function AnalyticsDashboard() {
 		{ label: "Employees", value: userStats?.employeeCount ?? "-" },
 	]
 
-	function getActivityLabel(path: string): { title: string; description: string } {
-		if (path.includes("content.list"))
-			return { title: "Content Viewed", description: "Browsed content library" }
-		if (path.includes("content.get"))
-			return { title: "File Accessed", description: "Opened a file" }
-		if (path.includes("content.download"))
-			return { title: "File Downloaded", description: "Downloaded a file" }
-		if (path.includes("content.create") || path.includes("forms.createContent"))
-			return { title: "File Uploaded", description: "Uploaded new content" }
-		if (path.includes("content.update") || path.includes("content.updateFile"))
-			return { title: "File Edited", description: "Updated content" }
-		if (path.includes("content.delete"))
-			return { title: "File Deleted", description: "Deleted content" }
-		if (path.includes("content.favorite"))
-			return { title: "Content Favorited", description: "Marked content as favorite" }
-		if (path.includes("content.unfavorite"))
-			return { title: "Content Unfavorited", description: "Marked content as unfavorite" }
-		if (path.includes("content.checkOut"))
-			return { title: "File Checked Out", description: "Checked out a file" }
-		if (path.includes("content.checkIn"))
-			return { title: "File Checked In", description: "Checked in a file" }
-		if (path.includes("admin.listUsers"))
-			return {
-				title: "Employee Management Page Viewed",
-				description: "Visited employee management",
-			}
-		if (path.includes("admin."))
-			return { title: "Analytics Dashboard Viewed", description: "Visited analytics dashboard" }
-		return { title: path, description: "" }
-	}
-
 	return (
 		<Stack mt="md" gap="lg">
 			<Title order={2}>Analytics Dashboard</Title>
