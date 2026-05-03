@@ -135,6 +135,7 @@
 		"pptxgenjs": "^4.0.1",
 		"prisma": "^7.7.0",
 		"react-pdf": "^10.4.1",
+		"react-responsive-masonry": "^2.7.2",
 		"tailwind-merge": "^3.5.0",
 		"tailwindcss": "^4.2.2",
 		"typescript": "^6.0.2",
