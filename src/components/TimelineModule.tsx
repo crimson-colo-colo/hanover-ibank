@@ -1,25 +1,12 @@
-import {
-	ActionIcon,
-	Combobox,
-	Flex,
-	Group,
-	Image,
-	InputBase,
-	Paper,
-	Stack,
-	Text,
-	Timeline,
-	Tooltip,
-	useCombobox,
-} from "@mantine/core"
-import { useDebouncedValue } from "@mantine/hooks"
+import { ActionIcon, Flex, Group, Paper, Text, Timeline, Tooltip } from "@mantine/core"
 import { activityLabelToStringTimeline } from "@shared/activityLabels.ts"
-import { IconCircleX, IconLoader2, IconSearch } from "@tabler/icons-react"
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
-import { type RefObject, useEffect, useRef, useState } from "react"
+import { IconSearch } from "@tabler/icons-react"
+import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
+import { useEffect, useRef, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
-import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { trpc } from "@/lib/trpc.ts"
+import { EmployeeSearch } from "./EmployeeSearch.tsx"
 
 export function TimelineModule() {
 	const [employeeID, setEmployeeID] = useState<string | undefined>(undefined)
@@ -44,7 +31,7 @@ export function TimelineModule() {
 					Recent User Activity
 				</Text>
 				{searching ? (
-					<ContentOwnerSearch
+					<EmployeeSearch
 						onSubmit={setEmployeeID}
 						setSearching={setSearching}
 						inputRef={inputRef}
@@ -96,135 +83,14 @@ export function TimelineModule() {
 					})}
 				</Timeline>
 			</div>
+			<Link
+				to="/admin/activity-log"
+				className="no-underline text-inherit flex items-center gap-2 w-fit hover:underline mt-sm"
+			>
+				<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
+					View More
+				</Text>
+			</Link>
 		</Paper>
-	)
-}
-
-function ContentOwnerSearch({
-	onSubmit,
-	setSearching,
-	inputRef,
-}: {
-	onSubmit: (val: string | undefined) => void
-	setSearching: (val: boolean) => void
-	inputRef: RefObject<HTMLInputElement | null>
-}) {
-	const [searchValue, setSearchValue] = useState("")
-	const [selected, setSelected] = useState(false)
-	const [selectedVal, setSelectedVal] = useState<string | undefined>(undefined)
-	const [debouncedSearchValue] = useDebouncedValue(searchValue, 300)
-	const searchResults = useQuery(
-		trpc.forms.searchUsers.queryOptions(
-			{ query: debouncedSearchValue, roles: [] },
-			{
-				enabled: !!debouncedSearchValue,
-				placeholderData: keepPreviousData,
-			}
-		)
-	)
-
-	const combobox = useCombobox({
-		onDropdownClose: () => combobox.resetSelectedOption(),
-	})
-
-	const options = (searchResults.data ?? []).map((user) => (
-		<Combobox.Option value={user.id} key={user.id}>
-			<Flex gap="md">
-				<Image src={`/avatar/${user.id}`} radius="100%" h={40} w={40} />
-				<Stack gap={0}>
-					<Text size="sm" fw={500}>
-						{user.name}
-					</Text>
-					<Text size="xs" c="gray">
-						{user.email} · {employeeRoleDisplayName[user.role]}
-					</Text>
-				</Stack>
-			</Flex>
-		</Combobox.Option>
-	))
-
-	return (
-		<Combobox
-			store={combobox}
-			withinPortal={false}
-			onOptionSubmit={(val) => {
-				const user = searchResults.data?.find((user) => user.id === val)
-				setSearchValue(user?.name ?? "")
-				setSelected(true)
-				setSelectedVal(user?.name ?? "")
-				onSubmit(val)
-				combobox.closeDropdown()
-			}}
-		>
-			<Combobox.Target>
-				<InputBase
-					ref={inputRef}
-					rightSection={
-						searchResults.isFetching ? (
-							<IconLoader2 size={18} />
-						) : (
-							<ActionIcon
-								variant="transparent"
-								onClick={(e) => {
-									e.stopPropagation()
-									setSelected(false)
-									setSelectedVal(undefined)
-									onSubmit(undefined)
-									setSearchValue("")
-									setSearching(false)
-								}}
-							>
-								{" "}
-								<IconCircleX />{" "}
-							</ActionIcon>
-						)
-					}
-					onChange={(event) => {
-						setSearchValue(event.currentTarget.value)
-					}}
-					onClick={() => combobox.openDropdown()}
-					onFocus={() => combobox.openDropdown()}
-					onBlur={() => {
-						if (!selected) {
-							setSearchValue("")
-							setSearching(false)
-							onSubmit(undefined)
-						}
-						if (selected && searchValue !== selectedVal && selectedVal !== undefined) {
-							setSearchValue(selectedVal)
-						}
-
-						combobox.closeDropdown()
-					}}
-					rightSectionPointerEvents="all"
-					value={searchValue}
-					placeholder="Search users..."
-					onKeyDown={(event) => {
-						if (event.key === "Enter") {
-							const firstResult = searchResults.data?.[0]
-							if (firstResult) {
-								setSearchValue(firstResult.name)
-								setSelected(true)
-								setSelectedVal(firstResult.name)
-								combobox.closeDropdown()
-								onSubmit(firstResult.id)
-							}
-						}
-					}}
-				/>
-			</Combobox.Target>
-
-			<Combobox.Dropdown>
-				<Combobox.Options>
-					{searchResults.isFetching ? (
-						<Combobox.Empty>Loading....</Combobox.Empty>
-					) : !options.length ? (
-						<Combobox.Empty>No results found</Combobox.Empty>
-					) : (
-						options
-					)}
-				</Combobox.Options>
-			</Combobox.Dropdown>
-		</Combobox>
 	)
 }
