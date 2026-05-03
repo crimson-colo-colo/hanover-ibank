@@ -58,7 +58,7 @@ function RouteComponent() {
 			closeViewer={closePreview}
 			insideModal={false}
 		>
-			<div className="flex flex-col w-full h-[calc(100dvh-3.5rem)] overflow-hidden">
+			<div className="flex flex-col w-[calc(100%+32px)] h-[calc(100dvh-3.5rem)] overflow-hidden -m-md">
 				<Flex
 					justify="space-between"
 					className="w-full z-10 bg-white dark:bg-[#242424] py-4 border-b border-gray-200 dark:border-gray-800 px-4"
