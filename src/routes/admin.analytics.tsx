@@ -23,7 +23,6 @@ function AnalyticsDashboard() {
 		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions()
 	)
 
-
 	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
 
 	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions())
@@ -336,22 +335,22 @@ function AnalyticsDashboard() {
 				<Grid id="analytics-heatmap" align="stretch">
 					<Grid.Col span={{ base: 12, md: 8 }}>
 						<Paper withBorder p="md" radius="md">
-							<Group mb = "md">
-							<Text size="xs" c="dimmed" tt="uppercase" fw={500} >
-								User Activity Heatmap
-							</Text>
-							<HelpHint
-								feature="the activity heatmap"
-								steps={[
-									{
-										target: "#analytics-heatmap",
-										title: "User Activity Heatmap",
-										content:
-											"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
-										placement: "top",
-									},
-								]}
-							/>
+							<Group mb="md">
+								<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
+									User Activity Heatmap
+								</Text>
+								<HelpHint
+									feature="the activity heatmap"
+									steps={[
+										{
+											target: "#analytics-heatmap",
+											title: "User Activity Heatmap",
+											content:
+												"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
+											placement: "top",
+										},
+									]}
+								/>
 							</Group>
 							<Heatmap
 								data={heatmapData ?? {}}
@@ -384,17 +383,11 @@ function AnalyticsDashboard() {
 							</Text>
 
 							<Group justify="center">
-								<PieChart
-									size={180}
-									data={statusPieData}
-									withTooltip
-								/>
+								<PieChart size={180} data={statusPieData} withTooltip />
 							</Group>
 						</Paper>
 					</Grid.Col>
-
 				</Grid>
-
 			</div>
 		</Stack>
 	)
