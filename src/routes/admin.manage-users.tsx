@@ -7,6 +7,7 @@ import {
 	Modal,
 	NumberInput,
 	Pagination,
+	ScrollArea,
 	Select,
 	Table,
 	Text,
@@ -266,7 +267,12 @@ function RouteComponent() {
 					</Button>
 				</Group>
 			</Modal>
-			<Modal opened={createOpened} onClose={closeCreateDialog} title="Add User">
+			<Modal
+				opened={createOpened}
+				onClose={closeCreateDialog}
+				title="Add User"
+				scrollAreaComponent={ScrollArea.Autosize}
+			>
 				<CreateUserForm
 					onSuccess={() => {
 						users.refetch()

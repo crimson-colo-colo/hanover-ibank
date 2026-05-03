@@ -45,12 +45,7 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 			})}
 		>
 			<TextInput
-				withAsterisk={false}
-				label={
-					<LabelWithTooltip tooltip="User's full name, e.g. John Doe." required>
-						Name
-					</LabelWithTooltip>
-				}
+				label="Name"
 				placeholder="User name"
 				required
 				key={createForm.key("name")}
@@ -59,12 +54,7 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 
 			<TextInput
 				mt="sm"
-				withAsterisk={false}
-				label={
-					<LabelWithTooltip tooltip="Used for login, password resets, and notifications." required>
-						Email
-					</LabelWithTooltip>
-				}
+				label="Email"
 				placeholder="User email"
 				required
 				type="email"
@@ -91,12 +81,7 @@ export function CreateUserForm({ onSuccess, close }: { onSuccess: () => void; cl
 
 			<TextInput
 				mt="sm"
-				withAsterisk={false}
-				label={
-					<LabelWithTooltip tooltip="The initial password for the user." required>
-						Password
-					</LabelWithTooltip>
-				}
+				label="Password"
 				placeholder="User password"
 				type="password"
 				required
