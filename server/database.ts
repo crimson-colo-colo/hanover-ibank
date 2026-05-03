@@ -24,6 +24,9 @@ db.$on("query", (e) => {
 	// )
 })
 db.$on("error", (e) => {
+	if (e.message.includes("db.userActivity.upsert")) {
+		return
+	}
 	logger.error("[db] %s", e.message)
 })
 db.$on("warn", (e) => {
