@@ -56,14 +56,16 @@ const rows: TeamMember[][] = [
 			role: "Lead Software Engineer",
 			photo: calebPhoto,
 			alt: "Caleb",
-			quote: "Placeholder Quote",
+			quote:
+				"Limitations live only in our minds. But if we use our imaginations, our possibilities become limitless.",
 		},
 		{
 			name: "Justin Fletcher",
 			role: "Project Manager",
 			photo: justinPhoto,
 			alt: "Justin",
-			quote: "Placeholder Quote",
+			quote:
+				"If we back up the capacitor, we can get to the TLS driver through the primary USB sensor!",
 		},
 	],
 	[
@@ -72,14 +74,14 @@ const rows: TeamMember[][] = [
 			role: "Assistant Lead Software Engineer",
 			photo: philPhoto,
 			alt: "Phil",
-			quote: "Placeholder Quote",
+			quote: "Believe you can and you're halfway there.",
 		},
 		{
 			name: "Everett Wilber",
 			role: "Assistant Lead Software Engineer",
 			photo: everettPhoto,
 			alt: "Everett",
-			quote: "Placeholder Quote",
+			quote: "Build your own dreams, or someone else will hire you to build theirs.",
 		},
 	],
 	[
@@ -95,7 +97,7 @@ const rows: TeamMember[][] = [
 			role: "Full Time Software Engineer",
 			photo: brandonPhoto,
 			alt: "Brandon",
-			quote: "Placeholder Quote",
+			quote: "It is never too late to be what you might have been.",
 		},
 	],
 	[
@@ -104,14 +106,14 @@ const rows: TeamMember[][] = [
 			role: "Full Time Software Engineer",
 			photo: lucasPhoto,
 			alt: "Lucas",
-			quote: "Placeholder Quote",
+			quote: "Life shrinks or expands in proportion to one's courage.",
 		},
 		{
 			name: "Julien Polycarpe",
 			role: "Product Owner",
 			photo: julienPhoto,
 			alt: "Julien",
-			quote: "Placeholder Quote",
+			quote: "Either you run the day, or the day runs you.",
 		},
 	],
 	[
@@ -120,14 +122,14 @@ const rows: TeamMember[][] = [
 			role: "Documentation Analyst",
 			photo: jacePhoto,
 			alt: "Jace",
-			quote: "Placeholder Quote",
+			quote: "Winning isn't everything, but wanting to win is.",
 		},
 		{
 			name: "Elijah King",
 			role: "Scrum Master",
 			photo: elijahPhoto,
 			alt: "Elijah",
-			quote: "Placeholder Quote",
+			quote: "If you're offered a seat on a rocket ship, don't ask what seat! Just get on.",
 		},
 	],
 ]
