@@ -446,7 +446,7 @@ async function createRecentTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
-			const viewCount = Math.floor(Math.random() * 100) + 1
+			const viewCount = Math.floor(Math.random() * 20) + 1
 			data.push({
 				recentlyViewed: recentlyViewed,
 				recentlyEdited: recentlyEdited,
