@@ -638,7 +638,7 @@ export const contentRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				file: z.string(),
+				file: z.base64(),
 			})
 		)
 		.mutation(async (opts) => {
@@ -722,10 +722,6 @@ export const contentRouter = router({
 				},
 				data: {
 					recentlyEdited: new Date(),
-				},
-				select: {
-					contentId: true,
-					lastModifiedDate: true,
 				},
 			})
 			if (updated.ownerId !== opts.ctx.auth.sub) {
