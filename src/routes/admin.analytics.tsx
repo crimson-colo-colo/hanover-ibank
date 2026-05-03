@@ -332,9 +332,9 @@ function AnalyticsDashboard() {
 				</Grid>
 			</div>
 			<div>
-				<Grid id="analytics-heatmap" align="stretch">
+				<Grid align="stretch">
 					<Grid.Col span={{ base: 12, md: 8 }}>
-						<Paper withBorder p="md" radius="md">
+						<Paper withBorder p="md" radius="md" id="analytics-heatmap">
 							<Group mb="md">
 								<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
 									User Activity Heatmap
@@ -379,7 +379,7 @@ function AnalyticsDashboard() {
 					<Grid.Col span={{ base: 12, md: 4 }} style={{ display: "flex" }}>
 						<Paper withBorder p="md" radius="md" w={500}>
 							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="sm">
-								Document Status
+								Content Status
 							</Text>
 
 							<Group justify="center">
