@@ -22,7 +22,7 @@ const TOPICS = fs
 	.split("\n")
 	.filter(Boolean)
 
-const COUNT_PER_DOCUMENT_TYPE = 40
+const COUNT_PER_DOCUMENT_TYPE = 20
 const COUNT_PER_MEDIA_TYPE = 10
 
 async function ensureDir() {
