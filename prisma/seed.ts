@@ -2,6 +2,7 @@ import { UTCDate } from "@date-fns/utc"
 import { faker } from "@faker-js/faker"
 import { Temporal } from "@js-temporal/polyfill"
 import { PrismaPg } from "@prisma/adapter-pg"
+import { UserAction } from "@shared/activityLabels.ts"
 import type { FileType } from "@shared/filetype.ts"
 import {
 	ContentStatus,
@@ -58,6 +59,7 @@ async function main() {
 		createContentThreads(),
 		createRecentTimestamps(),
 		createNotifications(),
+		createActivityLogs(linkContent, fileContent),
 	])
 
 	await embedAllContent()
@@ -96,6 +98,7 @@ async function wipeDBandS3() {
 		prisma.content.deleteMany(),
 		prisma.employee.deleteMany(),
 		prisma.recentTimestamps.deleteMany(),
+		prisma.activityLog.deleteMany(),
 	])
 
 	console.log("Emptied database tables")
@@ -606,4 +609,41 @@ function generateNotification(
 			throw new Error(`Unhandled notification type: ${type}`)
 		}
 	}
+}
+
+async function createActivityLogs(
+	linkContent: { id: string; ownerId: string }[],
+	fileContent: { id: string; objectId: string | null; ownerId: string }[]
+) {
+	const data: Prisma.ActivityLogCreateManyInput[] = []
+	const ONE_DAY = 24 * 60 * 60 * 1000
+
+	for (const employee of employeeData) {
+		const actions = Array.from({ length: 8 }, () => {
+			const enumValues = Object.values(UserAction)
+			const randomIndex = Math.floor(Math.random() * enumValues.length)
+			return enumValues[randomIndex]
+		})
+		for (const action of actions) {
+			let contentId: string | undefined
+			if (action === "EDIT_AVATAR" || action === "EDIT_PROFILE") {
+				contentId = undefined
+			} else {
+				contentId =
+					Math.random() < 0.5
+						? linkContent[Math.floor(Math.random() * linkContent.length)].id
+						: fileContent[Math.floor(Math.random() * fileContent.length)].id
+			}
+			// within the past 5 days, at least one day ago
+			const timestamp = new Date(Date.now() - ONE_DAY - Math.floor(Math.random() * 5 * ONE_DAY))
+			data.push({
+				employeeId: employee.id,
+				timestamp: timestamp,
+				contentId: contentId,
+				action: action,
+			})
+		}
+	}
+	await prisma.activityLog.createMany({ data })
+	console.log(`Created activity logs for ${data.length} employee-content pairs`)
 }
