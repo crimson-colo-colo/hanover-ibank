@@ -60,7 +60,7 @@ async function main() {
 		createNotifications(),
 	])
 
-	// await embedAllContent()
+	await embedAllContent()
 }
 
 async function confirmOverwrite() {
@@ -446,7 +446,7 @@ async function createRecentTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
-			const viewCount = Math.floor(Math.random() * 100) + 1
+			const viewCount = Math.floor(Math.random() * 20) + 1
 			data.push({
 				recentlyViewed: recentlyViewed,
 				recentlyEdited: recentlyEdited,
@@ -471,12 +471,19 @@ async function embedAllContent() {
 		if (data.textExtractionCache) {
 			console.log(`Restoring ${data.textExtractionCache.length} text extraction cache entries...`)
 			await prisma.textExtractionCache.createMany({
-				data: data.textExtractionCache.map((entry: any) => ({
-					hash: Buffer.from(entry.hash, "hex"),
-					skipRecPDFTextNative: entry.skipRecPDFTextNative,
-					skipRecPDFTextOCR: entry.skipRecPDFTextOCR,
-					text: entry.text,
-				})),
+				data: data.textExtractionCache.map(
+					(entry: {
+						hash: string
+						skipRecPDFTextNative: boolean
+						skipRecPDFTextOCR: boolean
+						text: string
+					}) => ({
+						hash: Buffer.from(entry.hash, "hex"),
+						skipRecPDFTextNative: entry.skipRecPDFTextNative,
+						skipRecPDFTextOCR: entry.skipRecPDFTextOCR,
+						text: entry.text,
+					})
+				),
 				skipDuplicates: true,
 			})
 		}

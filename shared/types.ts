@@ -36,6 +36,7 @@ export type ContentListItem = {
 		recentlyEdited: Date
 		employeeId: string
 	}[]
+	viewCount: number
 	tags: {
 		category: TagCategory
 		name: string

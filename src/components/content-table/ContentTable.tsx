@@ -18,21 +18,26 @@ import {
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { spotlight } from "@mantine/spotlight"
-import { ContentStatus, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
+import { ContentStatus, ContentType, type EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
 import type { FileType } from "@shared/filetype.ts"
 import type { ContentList, ContentListItem } from "@shared/types.ts"
 import {
+	IconChevronLeft,
+	IconChevronRight,
 	IconCircleCheck,
 	IconCloudUpload,
 	IconDoorEnter,
 	IconDoorExit,
 	IconEye,
+	IconFile,
 	IconHourglassEmpty,
+	IconLink,
 	IconLoader2,
 	IconMessageCircleUser,
 	IconPencil,
 	IconProgress,
+	type IconProps,
 	IconSearch,
 	IconSortAscending2,
 	IconSortDescending2,
@@ -62,11 +67,7 @@ import { formatDate, formatDistanceToNow } from "date-fns"
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { CreateContentModal } from "@/components/CreateContentModal.tsx"
 import { TagFilterPopup } from "@/components/content-table/TagFilterPopup.tsx"
-import {
-	type ContentViews,
-	contentStatusDisplayName,
-	employeeRoleDisplayName,
-} from "@/lib/enums.ts"
+import { ContentViews, contentStatusDisplayName, employeeRoleDisplayName } from "@/lib/enums.ts"
 import {
 	checkedOutByFilterFn,
 	customFilterFunction,
@@ -93,6 +94,20 @@ const mutationOptions = {
 		])
 	},
 }
+
+export const contentViewLabels: Record<
+	ContentViews,
+	{ label: string; icon: (props: IconProps) => React.ReactNode }
+> = {
+	[ContentViews.Default]: { icon: () => null, label: "Default" },
+	[ContentViews.ExpiringSoon]: { icon: IconHourglassEmpty, label: "Expiring soon" },
+	[ContentViews.OwnedContent]: { icon: IconUser, label: "Owned by You" },
+	[ContentViews.RecentlyViewed]: { icon: IconEye, label: "Recently viewed" },
+	[ContentViews.RecentlyEdited]: { icon: IconPencil, label: "Recently edited by you" },
+	[ContentViews.PopularFiles]: { icon: IconFile, label: "Popular Files" },
+	[ContentViews.PopularLinks]: { icon: IconLink, label: "Popular Links" },
+	[ContentViews.CheckedOut]: { icon: IconDoorExit, label: "Checked out" },
+} as const
 
 export function ContentTable({
 	loading,
@@ -129,6 +144,7 @@ export function ContentTable({
 	const [contentSelectedForCheckout, selectContentForCheckout] = useState<ContentListItem | null>(
 		null
 	)
+	const [chipsExpanded, setChipsExpanded] = useState(false)
 
 	const defaultColumns = {
 		checkbox: true,
@@ -139,6 +155,8 @@ export function ContentTable({
 		expirationDate: false,
 		recentlyViewed: false,
 		recentlyEdited: false,
+		popularFiles: false,
+		popularLinks: false,
 		tags: true,
 		actions: true,
 		checkedOutBy: false,
@@ -318,6 +336,23 @@ export function ContentTable({
 					return <span title={titleTimestamp}>{elapsedTime}</span>
 				},
 			}),
+
+			columnHelper.accessor("viewCount", {
+				id: "popularFiles",
+				header: () => <span className="min-w-max">View Count</span>,
+				cell: (info) => {
+					return info.getValue()
+				},
+				filterFn: (item) => item.original.type === ContentType.Object,
+			}),
+			columnHelper.accessor("viewCount", {
+				id: "popularLinks",
+				header: () => <span className="min-w-max">View Count</span>,
+				cell: (info) => {
+					return info.getValue()
+				},
+				filterFn: (item) => item.original.type === ContentType.Link,
+			}),
 			columnHelper.accessor(
 				(row) =>
 					`${row.tags.map((t) => t.name).join(" ")} ${row.tags.filter((t) => t.category === TagCategory.IntendedAudience).map((t) => employeeRoleDisplayName[t.name as EmployeeRole])}`,
@@ -430,6 +465,8 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(undefined)
+			table.getColumn("popularLinks")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -442,6 +479,8 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(undefined)
+			table.getColumn("popularLinks")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -454,6 +493,8 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(undefined)
+			table.getColumn("popularLinks")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -466,6 +507,8 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
 			table.getColumn("owner")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(undefined)
+			table.getColumn("popularLinks")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -476,6 +519,8 @@ export function ContentTable({
 			})
 			table.getColumn("checkedOutBy")?.setFilterValue("active")
 			table.getColumn("owner")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(undefined)
+			table.getColumn("popularLinks")?.setFilterValue(undefined)
 			table.setPageIndex(0)
 		}
 
@@ -486,6 +531,34 @@ export function ContentTable({
 			})
 			table.getColumn("owner")?.setFilterValue(profile?.name ?? "")
 			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(undefined)
+			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "popularFiles") {
+			setSorting([{ id: "popularFiles", desc: true }])
+			setColumnVisibility({
+				...defaultColumns,
+				popularFiles: true,
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(ContentType.Object)
+			table.getColumn("popularLinks")?.setFilterValue(undefined)
+			table.setPageIndex(0)
+		}
+
+		if (activeView === "popularLinks") {
+			setSorting([{ id: "popularLinks", desc: true }])
+			setColumnVisibility({
+				...defaultColumns,
+				popularLinks: true,
+			})
+			table.getColumn("checkedOutBy")?.setFilterValue(undefined)
+			table.getColumn("owner")?.setFilterValue(undefined)
+			table.getColumn("popularFiles")?.setFilterValue(undefined)
+			table.getColumn("popularLinks")?.setFilterValue(ContentType.Link)
 			table.setPageIndex(0)
 		}
 	}, [activeView])
@@ -510,21 +583,24 @@ export function ContentTable({
 	return (
 		<>
 			<Flex align="center" justify="space-between" gap="md" mb="sm">
-				<Title order={3} className="flex items-center gap-4">
-					<span>Your Content ({table.getRowCount()})</span>
+				<Group>
+					<Title order={3} className="flex items-center gap-4">
+						<span>Your Content ({table.getRowCount()})</span>
+					</Title>
 					{loading && <IconLoader2 size={20} className="animate-spin" />}
-				</Title>
-
+				</Group>
 				<Flex gap="sm">
-					<SegmentedControl
-						id="content-filter-control"
-						data={[
-							{ label: "For You", value: ContentFilter.Own },
-							{ label: "Show All", value: ContentFilter.All },
-						]}
-						value={filter}
-						onChange={changeFilter}
-					/>
+					{profile?.role === "Admin" ? null : (
+						<SegmentedControl
+							id="content-filter-control"
+							data={[
+								{ label: "For You", value: ContentFilter.Own },
+								{ label: "Show All", value: ContentFilter.All },
+							]}
+							value={filter}
+							onChange={changeFilter}
+						/>
+					)}
 
 					<Button
 						id="upload-content-btn"
@@ -533,7 +609,6 @@ export function ContentTable({
 					>
 						Upload content
 					</Button>
-
 					<Button
 						leftSection={<IconTrash />}
 						variant="subtle"
@@ -550,110 +625,72 @@ export function ContentTable({
 					</ActionIcon>
 				</Flex>
 			</Flex>
-			<Chip.Group value={activeView} onChange={setActiveView}>
-				<Group justify="left">
+			<Chip.Group
+				value={activeView}
+				onChange={(value) => {
+					if ((value as string) === "$toggle") {
+						setChipsExpanded((prev) => !prev)
+					} else {
+						setActiveView(value as ContentViews)
+					}
+				}}
+			>
+				<Group justify="left" gap="xs" mb="md" align="stretch">
+					{Object.entries(contentViewLabels)
+						.slice(0, chipsExpanded ? undefined : 3)
+						.map(([key, { label, icon: Icon }], i) => {
+							if (
+								!chipsExpanded &&
+								i === 2 &&
+								!Object.entries(contentViewLabels)
+									.slice(0, 3)
+									.find(([k]) => k === activeView)
+							) {
+								key = activeView
+								label = contentViewLabels[activeView].label
+								Icon = contentViewLabels[activeView].icon
+							}
+							return (
+								<Chip
+									key={key}
+									icon={null}
+									value={key}
+									className="p-0"
+									styles={{
+										label: {
+											padding: 15,
+										},
+									}}
+								>
+									<Group wrap="nowrap">
+										<Icon className="size-4" />
+										{label}
+									</Group>
+								</Chip>
+							)
+						})}
 					<Chip
-						icon={null}
-						value="default"
+						value="$toggle"
+						className="h-full p-0"
 						styles={{
-							root: {
-								padding: 0,
-							},
 							label: {
-								padding: 15,
-							},
-						}}
-					>
-						Default
-					</Chip>
-					<Chip
-						icon={null}
-						value="expiringSoon"
-						styles={{
-							root: {
-								padding: 0,
-							},
-							label: {
-								padding: 15,
-							},
-						}}
-					>
-						<Group wrap="nowrap">
-							<IconHourglassEmpty size="1rem" />
-							Expiring Content
-						</Group>
-					</Chip>
-					<Chip
-						icon={null}
-						value="recentlyViewed"
-						styles={{
-							root: {
-								padding: 0,
-							},
-							label: {
-								padding: 15,
-							},
-						}}
-					>
-						<Group wrap="nowrap">
-							<IconEye size="1rem" />
-							Recently Viewed
-						</Group>
-					</Chip>
-					<Chip
-						icon={null}
-						value="recentlyEdited"
-						styles={{
-							root: {
-								padding: 0,
-							},
-							label: {
-								padding: 15,
+								paddingLeft: 8,
+								paddingRight: 8,
+								paddingTop: 15,
+								paddingBottom: 15,
 							},
 						}}
 					>
 						<Group wrap="nowrap">
-							<IconPencil size="1rem" />
-							Recently Edited By You
-						</Group>
-					</Chip>
-					<Chip
-						icon={null}
-						value="checkedOut"
-						styles={{
-							root: {
-								padding: 0,
-							},
-							label: {
-								padding: 15,
-							},
-						}}
-					>
-						<Group wrap="nowrap">
-							<IconDoorExit size="1rem" />
-							Checked Out
-						</Group>
-					</Chip>
-					<Chip
-						icon={null}
-						value="owned"
-						styles={{
-							root: {
-								padding: 0,
-							},
-							label: {
-								padding: 15,
-							},
-						}}
-					>
-						<Group wrap="nowrap">
-							<IconUser size="1rem" />
-							Owned By You
+							{chipsExpanded ? (
+								<IconChevronLeft className="size-4" />
+							) : (
+								<IconChevronRight className="size-4" />
+							)}
 						</Group>
 					</Chip>
 				</Group>
 			</Chip.Group>
-			<br />
 			<Table id="content-table" className="w-full">
 				<Table.Thead>
 					{table.getHeaderGroups().map((headerGroup) => (
