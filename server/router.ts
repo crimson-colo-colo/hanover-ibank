@@ -1,3 +1,4 @@
+import { activityLoggingRouter } from "./routers/activityLogging.ts"
 import { adminRouter } from "./routers/admin.ts"
 import { cliRouter } from "./routers/cli.ts"
 import { contentRouter } from "./routers/content.ts"
@@ -8,7 +9,6 @@ import { searchRouter } from "./routers/search.ts"
 import { userRouter } from "./routers/user.ts"
 import { userActivityRouter } from "./routers/userActivity.ts"
 import { router } from "./trpc.ts"
-import { activityLoggingRouter } from "./routers/activityLogging.ts";
 
 export type AppRouter = typeof appRouter
 export const appRouter = router({

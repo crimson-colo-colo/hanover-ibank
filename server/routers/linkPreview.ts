@@ -1,9 +1,9 @@
 import ogs from "open-graph-scraper"
 import z from "zod"
 import { db } from "../database.ts"
-import { authProcedure, router } from "../trpc.ts"
-import { logActivity } from "../lib/content.ts"
 import { UserAction } from "../generated/prisma/client.ts"
+import { logActivity } from "../lib/content.ts"
+import { authProcedure, router } from "../trpc.ts"
 
 export const opengraphRouter = router({
 	getOpenGraph: authProcedure

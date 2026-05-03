@@ -1,12 +1,12 @@
-import { AreaChart, BarChart, Heatmap, PieChart} from "@mantine/charts"
+import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
 import { Grid, Group, Paper, Stack, Text, Title } from "@mantine/core"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { HelpHint } from "@/components/help.hint.tsx"
+import { TimelineModule } from "@/components/TimelineModule.tsx"
 import { trpc } from "@/lib/trpc.ts"
-import {TimelineModule} from "@/components/TimelineModule.tsx";
 
 export const Route = createFileRoute("/admin/analytics")({
 	component: AnalyticsDashboard,

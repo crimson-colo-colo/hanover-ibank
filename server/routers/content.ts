@@ -15,7 +15,11 @@ import {
 	NotificationType,
 	TagCategory,
 } from "../generated/prisma/enums.ts"
-import { fetchAndTransformToContentListItems, getContentInclude, logActivity } from "../lib/content.ts"
+import {
+	fetchAndTransformToContentListItems,
+	getContentInclude,
+	logActivity,
+} from "../lib/content.ts"
 import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import {
@@ -821,7 +825,7 @@ export const contentRouter = router({
 				})
 				await notifyContentEdited(notification, updated, actor)
 			}
-			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LINK, opts.input.id  )
+			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LINK, opts.input.id)
 			await embedFile(updated)
 		}),
 
@@ -841,9 +845,7 @@ export const contentRouter = router({
 			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
 		])
 
-		opts.input.ids.map((id) => {
-					logActivity(opts.ctx.auth.sub, UserAction.DELETE_CONTENT, id)
-		})
+		opts.input.ids.map((id) => logActivity(opts.ctx.auth.sub, UserAction.DELETE_CONTENT, id))
 	}),
 	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const favorite = await db.favoriteContent.upsert({
@@ -1228,16 +1230,18 @@ export const contentRouter = router({
 
 		return await fetchAndTransformToContentListItems(expiringContent, opts.ctx.auth.sub)
 	}),
-	getTitles: authProcedure.input(z.object({ contentIds: z.array(z.string()) })).query(async (opts) => {
-		const titles = await db.content.findMany({
-			where: {
-				id: {
-					in: opts.input.contentIds
-				}
-			},
-			select: {title: true, id: true}
-		})
-		return titles
-	})
+	getTitles: authProcedure
+		.input(z.object({ contentIds: z.array(z.string()) }))
+		.query(async (opts) => {
+			const titles = await db.content.findMany({
+				where: {
+					id: {
+						in: opts.input.contentIds,
+					},
+				},
+				select: { title: true, id: true },
+			})
+			return titles
+		}),
 })
 export default contentRouter

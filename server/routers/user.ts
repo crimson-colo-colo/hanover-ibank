@@ -5,13 +5,13 @@ import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
+import { UserAction } from "../generated/prisma/client.ts"
 import { auth0Cache } from "../lib/auth0.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
+import { logActivity } from "../lib/content.ts"
 import { sendPushNotification } from "../lib/notifications.tsx"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
-import { logActivity } from "../lib/content.ts"
-import { UserAction } from "../generated/prisma/client.ts"
 
 export const userRouter = router({
 	getProfile: authProcedure.query(async (opts) => {
@@ -112,8 +112,7 @@ export const userRouter = router({
 			})
 
 			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_AVATAR, undefined)
-		})
-	,
+		}),
 	getAvatarUrl: authProcedure.input(z.object({ userId: z.string() })).query(async (opts) => {
 		let object: { ETag?: string }
 		try {

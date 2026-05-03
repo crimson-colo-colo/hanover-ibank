@@ -2,9 +2,9 @@ import { TRPCError } from "@trpc/server"
 import z from "zod"
 import { db } from "../database.ts"
 import { UserAction } from "../generated/prisma/client.ts"
-import { logActivity } from "../lib/content.ts"
 import { ThreadStatus } from "../generated/prisma/enums.ts"
 import { auth0Cache } from "../lib/auth0.ts"
+import { logActivity } from "../lib/content.ts"
 import { authProcedure, router } from "../trpc.ts"
 
 export const discussionRouter = router({
