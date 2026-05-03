@@ -133,7 +133,6 @@ function RouteComponent() {
 
 	const setFilter = (val: string | undefined) => {
 		table.getColumn("employee")?.setFilterValue(val)
-		console.log(val)
 		table.setPageIndex(0)
 	}
 
