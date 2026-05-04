@@ -1,22 +1,28 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import { ActionIcon, Button, Flex, Paper, Stack, Text, Tooltip } from "@mantine/core"
+import { ActionIcon, Button, Flex, Paper, ScrollArea, Stack, Text, Tooltip } from "@mantine/core"
 import { useHover, useLocalStorage } from "@mantine/hooks"
 import { ContentType } from "@prisma/browser.ts"
 import { FileType } from "@shared/filetype.ts"
 import {
 	IconBolt,
+	IconBoltFilled,
 	IconBuildingBank,
 	IconChartBarPopular,
 	IconChevronRight,
 	IconCompass,
 	IconHome,
+	IconHomeFilled,
 	IconInfoCircle,
+	IconInfoCircleFilled,
 	IconLayoutSidebarLeftExpand,
 	IconLayoutSidebarRightExpand,
 	IconList,
+	IconListFilled,
 	IconPointFilled,
 	IconStar,
+	IconStarFilled,
 	IconUsers,
+	IconWood,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
@@ -34,13 +40,32 @@ export type SideNavigationProps = {
 }
 
 const routeLinks = [
-	{ pathName: "/dashboard", name: "Home", icon: IconHome },
-	{ pathName: "/content-table", name: "Content", icon: IconList },
-	{ pathName: "/favorites", name: "Favorites", icon: IconStar },
-	{ pathName: "/about", name: "About", icon: IconInfoCircle },
-	{ pathName: "/technology", name: "Technology", icon: IconBolt },
-	{ pathName: "/admin/manage-users", name: "Employees", icon: IconUsers, admin: true },
-	{ pathName: "/admin/analytics", name: "Analytics", icon: IconChartBarPopular, admin: true },
+	{ pathName: "/dashboard", name: "Home", icon: IconHome, iconFilled: IconHomeFilled },
+	{ pathName: "/content-table", name: "Content", icon: IconList, iconFilled: IconListFilled },
+	{ pathName: "/favorites", name: "Favorites", icon: IconStar, iconFilled: IconStarFilled },
+	{ pathName: "/about", name: "About", icon: IconInfoCircle, iconFilled: IconInfoCircleFilled },
+	{ pathName: "/technology", name: "Technology", icon: IconBolt, iconFilled: IconBoltFilled },
+	{
+		pathName: "/admin/manage-users",
+		name: "Employees",
+		icon: IconUsers,
+		iconFilled: IconUsers,
+		admin: true,
+	},
+	{
+		pathName: "/admin/analytics",
+		name: "Analytics",
+		icon: IconChartBarPopular,
+		iconFilled: IconChartBarPopular,
+		admin: true,
+	},
+	{
+		pathName: "/admin/activity-log",
+		name: "Activity Log",
+		icon: IconWood,
+		iconFilled: IconWood,
+		admin: true,
+	},
 ]
 
 function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; collapsed: boolean }) {
@@ -64,7 +89,8 @@ function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; coll
 					rightSection={!collapsed && <IconChevronRight size={20} />}
 					justify={collapsed ? "center" : "space-between"}
 					radius={0}
-					className={clsx(collapsed && "px-0")}
+					className={clsx(collapsed && "px-0", "dark:text-gray-200")}
+					pl={collapsed ? undefined : "12"}
 				>
 					{<link.icon />}
 					{!collapsed && <span className="p-2">{link.name}</span>}
@@ -79,16 +105,16 @@ function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; coll
 					<div>
 						<Stack gap={0}>
 							<div className="flex justify-center my-2 py-1">
-								<IconPointFilled className="fill-gray-300" size={20} />
+								<IconPointFilled className="fill-gray-300" size={19} />
 							</div>
 							{adminNavLinks}
 						</Stack>
 					</div>
 				) : (
 					<div>
-						<hr />
+						<hr className="dark:border-gray-800" />
 						<Stack gap={0}>
-							<Text c="dimmed" className="ml-5 mb-2 text-xs uppercase tracking-wider font-semibold">
+							<Text className="text-gray-500 dark:text-gray-700 ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
 								Administration
 							</Text>
 							{adminNavLinks}
@@ -113,10 +139,11 @@ function TutorialLink({ collapsed }: { collapsed: boolean }) {
 				rightSection={!collapsed && <IconChevronRight size={20} />}
 				justify={collapsed ? "center" : "space-between"}
 				radius={0}
-				className={clsx(collapsed && "px-0")}
+				className={clsx(collapsed && "px-0", "dark:text-gray-200")}
+				pl={collapsed ? undefined : "12"}
 			>
 				<IconCompass size={20} />
-				{!collapsed && <span className="p-2">Tutorial</span>}
+				{!collapsed && <span className="p-2">Take a tour</span>}
 			</Button>
 		</Tooltip>
 	)
@@ -149,51 +176,25 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 		})
 	}, [])
 
-	const navLinks = routeLinks
-		.filter((link) => !link.admin)
-		.map((link) => (
-			<Tooltip
-				key={link.pathName}
-				label={link.name}
-				position="right"
-				withArrow={true}
-				arrowSize={8}
-				disabled={!collapsed}
-			>
-				<Button
-					component={Link}
-					variant={location.pathname === link.pathName ? "light" : "subtle"}
-					to={link.pathName}
-					rightSection={!collapsed && <IconChevronRight size={20} />}
-					justify={collapsed ? "center" : "space-between"}
-					radius={0}
-					className={clsx(collapsed && "px-0")}
-				>
-					{<link.icon />}
-					{!collapsed && <span className="p-2">{link.name}</span>}
-				</Button>
-			</Tooltip>
-		))
-
 	return (
 		<header
 			id="side-navigation"
 			className="relative h-full bg-gray-50 dark:bg-gray-900 dark:border-gray-700 flex flex-col"
 			ref={ref}
 		>
-			<div className={`flex py-4 mb-2 ${collapsed ? "justify-center" : "px-4"}`}>
+			<div
+				className={clsx(
+					"flex mt-4 mb-4 h-8.25 items-center",
+					collapsed ? "justify-center" : "px-3 justify-between"
+				)}
+			>
 				{!collapsed && (
 					<Link to="/" className="flex items-center gap-2 no-underline active:text-primary-hover">
 						<IconBuildingBank />
 						<span className="text-xl font-semibold font-display">iBank</span>
 					</Link>
 				)}
-				<ActionIcon
-					variant="subtle"
-					size="md"
-					onClick={toggleCollapsed}
-					className={`${!collapsed && "absolute right-3"}`}
-				>
+				<ActionIcon variant="subtle" size="md" onClick={toggleCollapsed} className={``}>
 					{collapsed ? (
 						hovered ? (
 							<IconLayoutSidebarLeftExpand size={26} />
@@ -207,72 +208,102 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 					)}
 				</ActionIcon>
 			</div>
-			<Stack gap={0}>{navLinks}</Stack>
-			{<AdminLinks isAdmin={isAdmin.data} collapsed={collapsed}></AdminLinks>}
-			{collapsed ? (
-				<div>
-					<Stack gap={0}>
-						<div className="flex justify-center my-2 py-1">
-							<IconPointFilled className="fill-gray-300" size={20} />
-						</div>
-						<TutorialLink collapsed={collapsed} />
-					</Stack>
-				</div>
-			) : (
-				<div>
-					<hr />
-					<Stack gap={0}>
-						<Text c="dimmed" className="ml-5 mb-2 text-xs uppercase tracking-wider font-semibold">
-							Help
-						</Text>
-						<TutorialLink collapsed={collapsed} />
-					</Stack>
-				</div>
-			)}
-			{!collapsed && (
-				<div>
-					<hr />
-					<Stack gap={0}>
-						<Text c="dimmed" className="ml-5 mb-2 text-xs uppercase tracking-wider font-semibold">
-							Recently Viewed
-						</Text>
+			<ScrollArea.Autosize>
+				<Stack gap={0}>
+					{routeLinks
+						.filter((link) => !link.admin)
+						.map((link) => (
+							<Tooltip
+								key={link.pathName}
+								label={link.name}
+								position="right"
+								withArrow={true}
+								arrowSize={8}
+								disabled={!collapsed}
+							>
+								<Button
+									component={Link}
+									variant={location.pathname === link.pathName ? "light" : "subtle"}
+									to={link.pathName}
+									rightSection={!collapsed && <IconChevronRight size={20} />}
+									justify={collapsed ? "center" : "space-between"}
+									radius={0}
+									className={clsx(collapsed && "px-0", "dark:text-gray-200")}
+									pl={collapsed ? undefined : "12"}
+								>
+									{location.pathname === link.pathName ? <link.iconFilled /> : <link.icon />}
+									{!collapsed && <span className="p-2">{link.name}</span>}
+								</Button>
+							</Tooltip>
+						))}
+				</Stack>
+				<AdminLinks isAdmin={isAdmin.data} collapsed={collapsed}></AdminLinks>
+				{collapsed ? (
+					<div>
 						<Stack gap={0}>
-							{recentlyViewedContent.data?.map((item) => {
-								const contentType =
-									item.type === ContentType.Link
-										? FileType.Link
-										: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
-								return (
-									<Button
-										key={item.id}
-										component={Link}
-										to={`${item.type === ContentType.Link ? item.url : `/preview/${item.id}`}`}
-										target={item.type === ContentType.Link ? "_blank" : "_self"}
-										variant="subtle"
-										radius={0}
-										leftSection={<FileTypeIcon fileType={contentType} />}
-										onClick={async () => {
-											if (item.type === ContentType.Link) {
-												await recentlyViewed.mutateAsync({ id: item.id })
-											}
-										}}
-										className="flex justify-left"
-									>
-										<span className="h-full content-center max-w-[20ch] truncate">
-											{item.title}
-										</span>
-									</Button>
-								)
-							})}
+							<div className="flex justify-center my-2 py-1">
+								<IconPointFilled className="fill-gray-300" size={19} />
+							</div>
+							<TutorialLink collapsed={collapsed} />
 						</Stack>
-					</Stack>
-				</div>
-			)}
+					</div>
+				) : (
+					<div>
+						<hr className="dark:border-gray-800" />
+						<Stack gap={0}>
+							<Text className="text-gray-500 dark:text-gray-700 ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
+								Help
+							</Text>
+							<TutorialLink collapsed={collapsed} />
+						</Stack>
+					</div>
+				)}
+				{!collapsed && (
+					<div>
+						<hr className="dark:border-gray-800" />
+						<Stack gap={0}>
+							<Text className="text-gray-500 dark:text-gray-700 ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
+								Recently Viewed
+							</Text>
+							<Stack gap={0}>
+								{recentlyViewedContent.data?.map((item) => {
+									const contentType =
+										item.type === ContentType.Link
+											? FileType.Link
+											: ((item.object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
+									return (
+										<Button
+											key={item.id}
+											component={Link}
+											replace={location.pathname.startsWith("/preview/")}
+											to={`${item.type === ContentType.Link ? item.url : `/preview/${item.id}`}`}
+											target={item.type === ContentType.Link ? "_blank" : "_self"}
+											variant={location.pathname === `/preview/${item.id}` ? "light" : "subtle"}
+											radius={0}
+											leftSection={<FileTypeIcon strokeWidth={1.5} fileType={contentType} />}
+											onClick={async () => {
+												if (item.type === ContentType.Link) {
+													await recentlyViewed.mutateAsync({ id: item.id })
+												}
+											}}
+											className="flex justify-left dark:text-gray-200"
+										>
+											<span className="h-full content-center max-w-[20ch] truncate">
+												{item.title}
+											</span>
+										</Button>
+									)
+								})}
+							</Stack>
+						</Stack>
+					</div>
+				)}
+			</ScrollArea.Autosize>
 
 			<div className="flex-1" />
 
 			{!collapsed && !pushSubscribed && showPushNag && auth0.isAuthenticated && (
-				<Paper withBorder className="mx-3 mb-3 p-3 bg-white">
+				<Paper withBorder className="mx-3 mt-3 mb-3 p-3 bg-white dark:bg-gray-900">
 					<Text className="text-sm" fw={600}>
 						Stay up to date
 					</Text>
@@ -307,12 +338,11 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 						component={Link}
 						to="/profile"
 						justify="left"
-						variant="subtle"
-						color="gray"
+						variant={location.pathname === "/profile" ? "light" : "subtle"}
 						className={clsx(
-							"h-14",
+							"h-14 shrink-0",
 							!collapsed
-								? "border-0 border-t border-gray-500 gap-3 py-1"
+								? "border-0 border-t border-gray-500 dark:border-gray-800 gap-3 py-1"
 								: "px-0 flex items-center justify-center"
 						)}
 						radius={0}

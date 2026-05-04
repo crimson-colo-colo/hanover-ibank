@@ -29,7 +29,7 @@ export function RecentlyViewedModule({
 	const displayedContent = recentlyViewedContent.data?.slice(0, items) ?? []
 
 	return (
-		<Paper p="lg" withBorder>
+		<Paper p="lg" withBorder className="h-full">
 			<Link
 				to="/content-table"
 				search={{ view: "recentlyViewed" }}
@@ -43,7 +43,7 @@ export function RecentlyViewedModule({
 					const contentType =
 						item.type === ContentType.Link
 							? FileType.Link
-							: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
+							: ((item.object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 					return (
 						<Button
 							key={item.id}

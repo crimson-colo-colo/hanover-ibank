@@ -63,7 +63,8 @@ export const ModelName = {
   TextExtractionCache: 'TextExtractionCache',
   RecentTimestamps: 'RecentTimestamps',
   PushSubscription: 'PushSubscription',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  ActivityLog: 'ActivityLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -225,6 +226,18 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const ActivityLogScalarFieldEnum = {
+  id: 'id',
+  employeeId: 'employeeId',
+  action: 'action',
+  contentId: 'contentId',
+  contentTitle: 'contentTitle',
+  timestamp: 'timestamp'
+} as const
+
+export type ActivityLogScalarFieldEnum = (typeof ActivityLogScalarFieldEnum)[keyof typeof ActivityLogScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -16,7 +16,7 @@ import {
 	IconStarFilled,
 	IconTag,
 } from "@tabler/icons-react"
-import { useNavigate } from "@tanstack/react-router"
+import { useLocation, useNavigate } from "@tanstack/react-router"
 import clsx from "clsx"
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
@@ -38,8 +38,9 @@ export function AppSpotlight() {
 	const [items, setItems] = useState<React.ReactNode[]>([])
 	const [filters, setFilters] = useState<SearchFilter[]>([])
 
-	const [debouncedQuery] = useDebouncedValue(query, 250)
+	const [debouncedQuery] = useDebouncedValue(query, 50)
 
+	const version = useRef(0)
 	const worker = useRef<SearchWorker | null>(null)
 
 	useEffect(() => {
@@ -77,7 +78,13 @@ export function AppSpotlight() {
 			}
 			if (!worker.current) return
 
+			const v = version.current + 1
+			version.current = v
 			const results = await worker.current.search(debouncedQuery)
+			if (version.current !== v) {
+				// A newer search has been initiated, discard these results
+				return
+			}
 
 			setItems(
 				results.map((item) =>
@@ -162,11 +169,12 @@ export function AppSpotlight() {
 
 function SearchResult({ item }: { item: ContentListItem }) {
 	const navigate = useNavigate()
+	const pathname = useLocation({ select: (location) => location.pathname })
 	return (
 		<Spotlight.Action
 			key={item.id}
 			onClick={() => {
-				navigate({ to: `/preview/${item.id}` })
+				navigate({ to: `/preview/${item.id}`, replace: pathname.startsWith("/preview/") })
 			}}
 		>
 			<Flex gap="sm">
@@ -174,7 +182,7 @@ function SearchResult({ item }: { item: ContentListItem }) {
 					fileType={
 						item.type === ContentType.Link
 							? FileType.Link
-							: (item.object.Metadata?.filetype as FileType)
+							: (item.object?.Metadata?.filetype as FileType)
 					}
 					size={24}
 					strokeWidth={1.5}

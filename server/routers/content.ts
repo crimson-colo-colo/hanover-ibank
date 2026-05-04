@@ -7,7 +7,7 @@ import * as jose from "jose"
 import z from "zod"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
-import type { Employee, Tag } from "../generated/prisma/client.ts"
+import { type Employee, type Tag, UserAction } from "../generated/prisma/client.ts"
 import {
 	ContentStatus,
 	ContentType,
@@ -15,7 +15,11 @@ import {
 	NotificationType,
 	TagCategory,
 } from "../generated/prisma/enums.ts"
-import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
+import {
+	fetchAndTransformToContentListItems,
+	getContentInclude,
+	logActivity,
+} from "../lib/content.ts"
 import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import {
@@ -26,6 +30,7 @@ import {
 } from "../lib/notify.ts"
 import { search } from "../lib/openrouter.ts"
 import { isoDateToTimestamp } from "../lib.ts"
+import { logger } from "../logger.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 import { discussionRouter } from "./discussion.ts"
@@ -63,9 +68,31 @@ export const contentRouter = router({
 				include: getContentInclude(opts.ctx.auth.sub),
 			})
 
+			const sums = await db.recentTimestamps.groupBy({
+				by: ["contentId"],
+				_sum: {
+					viewCount: true,
+				},
+				orderBy: {
+					_sum: {
+						viewCount: "desc",
+					},
+				},
+			})
+
+			const items = await fetchAndTransformToContentListItems(data, opts.ctx.auth.sub)
+
+			const content = items.map((item) => {
+				const sum = sums.find((s) => s.contentId === item.id)
+				return {
+					...item,
+					viewCount: sum?._sum.viewCount ?? 0,
+				}
+			})
+
 			return {
 				role: user.role,
-				content: await fetchAndTransformToContentListItems(data, opts.ctx.auth.sub),
+				content: content,
 			}
 		}),
 
@@ -193,6 +220,8 @@ export const contentRouter = router({
 					},
 				})
 
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_TITLE, opts.input.id)
+
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
 						where: { id: opts.ctx.auth.sub },
@@ -248,6 +277,8 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LAST_MODIFIED_DATE, opts.input.id)
 
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
@@ -307,6 +338,8 @@ export const contentRouter = router({
 					},
 				})
 
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_EXPIRATION_DATE, opts.input.id)
+
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
 						where: { id: opts.ctx.auth.sub },
@@ -353,6 +386,9 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.TRANSFER_OWNERSHIP, opts.input.id)
+
 				const actor = (await db.employee.findUnique({
 					where: { id: opts.ctx.auth.sub },
 				})) as Employee
@@ -397,6 +433,8 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_CONTENT_STATUS, opts.input.id)
 
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
@@ -499,6 +537,8 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_CONTENT_TAGS, opts.input.id)
 
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
@@ -609,6 +649,8 @@ export const contentRouter = router({
 			},
 		})
 
+		await logActivity(opts.ctx.auth.sub, UserAction.DOWNLOAD_FILE, opts.input.id)
+
 		return { url: `/content/download?token=${token}` }
 	}),
 
@@ -616,7 +658,7 @@ export const contentRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				file: z.string(),
+				file: z.base64(),
 			})
 		)
 		.mutation(async (opts) => {
@@ -701,11 +743,10 @@ export const contentRouter = router({
 				data: {
 					recentlyEdited: new Date(),
 				},
-				select: {
-					contentId: true,
-					lastModifiedDate: true,
-				},
 			})
+
+			await logActivity(opts.ctx.auth.sub, UserAction.REUPLOAD_FILE, opts.input.id)
+
 			if (updated.ownerId !== opts.ctx.auth.sub) {
 				const actor = (await db.employee.findUnique({
 					where: { id: opts.ctx.auth.sub },
@@ -792,6 +833,7 @@ export const contentRouter = router({
 				},
 				include: { tags: true },
 			})
+			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LINK, opts.input.id)
 			if (updated.ownerId !== opts.ctx.auth.sub) {
 				const actor = (await db.employee.findUnique({
 					where: { id: opts.ctx.auth.sub },
@@ -806,6 +848,7 @@ export const contentRouter = router({
 				})
 				await notifyContentEdited(notification, updated, actor)
 			}
+			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LINK, opts.input.id)
 			await embedFile(updated)
 		}),
 
@@ -818,12 +861,24 @@ export const contentRouter = router({
 			.filter((content) => content.type === "Object")
 			.map((content) => content.objectId!)
 
-		await Promise.all([
-			db.content.deleteMany({
-				where: { id: { in: opts.input.ids } },
-			}),
-			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
-		])
+		await db.content.deleteMany({
+			where: { id: { in: opts.input.ids } },
+		})
+
+		try {
+			await Promise.all(
+				objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId }))
+			)
+		} catch (error) {
+			logger.error({
+				message: "Error deleting objects from S3",
+				error,
+			})
+		}
+
+		contents.map((content) =>
+			logActivity(opts.ctx.auth.sub, UserAction.DELETE_CONTENT, undefined, content.title)
+		)
 	}),
 	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const favorite = await db.favoriteContent.upsert({
@@ -947,6 +1002,8 @@ export const contentRouter = router({
 			data: { checkedOutById: user.id },
 		})
 
+		await logActivity(opts.ctx.auth.sub, UserAction.CHECK_OUT_CONTENT, opts.input.id)
+
 		if (updated.ownerId !== opts.ctx.auth.sub) {
 			const notification = await db.notification.create({
 				data: {
@@ -1003,6 +1060,8 @@ export const contentRouter = router({
 			where: { id: opts.input.id },
 			data: { checkedOutById: null },
 		})
+
+		await logActivity(opts.ctx.auth.sub, UserAction.CHECK_IN_CONTENT, opts.input.id)
 
 		if (updated.ownerId !== opts.ctx.auth.sub) {
 			const notification = await db.notification.create({
@@ -1182,12 +1241,21 @@ export const contentRouter = router({
 				include: getContentInclude(opts.ctx.auth.sub),
 			})
 
-			const contentMap = new Map(contentDetails.map((item) => [item.id, item]))
-			const sortedContent = sums
-				.map((sum) => contentMap.get(sum.contentId))
-				.filter((item) => item !== undefined)
+			// sort contentDetails in the same order as sums
+			contentDetails.sort((a, b) => {
+				const aIndex = sums.findIndex((s) => s.contentId === a.id)
+				const bIndex = sums.findIndex((s) => s.contentId === b.id)
+				return aIndex - bIndex
+			})
 
-			return await fetchAndTransformToContentListItems(sortedContent, opts.ctx.auth.sub)
+			const items = await fetchAndTransformToContentListItems(contentDetails, opts.ctx.auth.sub)
+			return items.map((item) => {
+				const sum = sums.find((s) => s.contentId === item.id)
+				return {
+					...item,
+					viewCount: sum?._sum.viewCount ?? 0,
+				}
+			})
 		}),
 
 	getExpiringContent: authProcedure.query(async (opts) => {
@@ -1203,6 +1271,19 @@ export const contentRouter = router({
 		})
 
 		return await fetchAndTransformToContentListItems(expiringContent, opts.ctx.auth.sub)
+	}),
+	getStatusStats: authProcedure.query(async () => {
+		const statuses = await db.content.groupBy({
+			by: ["status"],
+			_count: {
+				status: true,
+			},
+		})
+
+		return statuses.map((item) => ({
+			name: item.status,
+			value: item._count.status,
+		}))
 	}),
 })
 export default contentRouter

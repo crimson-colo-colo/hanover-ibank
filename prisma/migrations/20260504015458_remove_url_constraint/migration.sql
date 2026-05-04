@@ -1,0 +1,1 @@
+ALTER TABLE "Content" DROP CONSTRAINT "Content_url_valid";

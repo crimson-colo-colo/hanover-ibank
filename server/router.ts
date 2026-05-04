@@ -1,3 +1,4 @@
+import { activityLoggingRouter } from "./routers/activityLogging.ts"
 import { adminRouter } from "./routers/admin.ts"
 import { cliRouter } from "./routers/cli.ts"
 import { contentRouter } from "./routers/content.ts"
@@ -20,4 +21,5 @@ export const appRouter = router({
 	opengraph: opengraphRouter,
 	userActivity: userActivityRouter,
 	search: searchRouter,
+	activityLogging: activityLoggingRouter,
 })

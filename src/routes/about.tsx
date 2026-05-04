@@ -1,7 +1,6 @@
-import { Card, Grid, Image, Text, Title } from "@mantine/core"
+import { Card, Flex, HoverCard, Image, SimpleGrid, Text, Title } from "@mantine/core"
 import { createFileRoute } from "@tanstack/react-router"
-import { useState } from "react"
-
+import clsx from "clsx"
 import brandonPhoto from "../assets/teamphotos/brandon.png"
 import calebPhoto from "../assets/teamphotos/caleb.png"
 import elijahPhoto from "../assets/teamphotos/elijah.png"
@@ -24,127 +23,120 @@ interface TeamMember {
 	role: string
 	photo: string
 	alt: string
+	quote?: string
 }
 
-const rows: TeamMember[][] = [
-	[
-		{
-			name: "Prof. Wilson Wong",
-			role: "Software Engineering Professor",
-			photo: wwong2Photo,
-			alt: "Wong",
-		},
-		{
-			name: "Jose Manuel Perez Jimenez",
-			role: "Team Coach",
-			photo: josePhoto,
-			alt: "Jose",
-		},
-	],
-	[
-		{
-			name: "Caleb Chan",
-			role: "Lead Software Engineer",
-			photo: calebPhoto,
-			alt: "Caleb",
-		},
-		{
-			name: "Everett Wilber",
-			role: "Assistant Lead Software Engineer",
-			photo: everettPhoto,
-			alt: "Everett",
-		},
-		{
-			name: "Phil Banoub",
-			role: "Assistant Lead Software Engineer",
-			photo: philPhoto,
-			alt: "Phil",
-		},
-	],
-	[
-		{
-			name: "Josue Hernandez",
-			role: "Full Time Software Engineer",
-			photo: josuePhoto,
-			alt: "Josue",
-		},
-		{
-			name: "Brandon Gainey",
-			role: "Full Time Software Engineer",
-			photo: brandonPhoto,
-			alt: "Brandon",
-		},
-		{
-			name: "Lucas Zaki",
-			role: "Full Time Software Engineer",
-			photo: lucasPhoto,
-			alt: "Lucas",
-		},
-	],
-	[
-		{
-			name: "Justin Fletcher",
-			role: "Project Manager",
-			photo: justinPhoto,
-			alt: "Justin",
-		},
-		{
-			name: "Julien Polycarpe",
-			role: "Product Owner",
-			photo: julienPhoto,
-			alt: "Julien",
-		},
-		{
-			name: "Jace Bonjorno",
-			role: "Documentation Analyst",
-			photo: jacePhoto,
-			alt: "Jace",
-		},
-		{
-			name: "Elijah King",
-			role: "Scrum Master",
-			photo: elijahPhoto,
-			alt: "Elijah",
-		},
-	],
+const cards: TeamMember[] = [
+	{
+		name: "Prof. Wilson Wong",
+		role: "Software Engineering Professor",
+		photo: wwong2Photo,
+		alt: "Wong",
+	},
+	{
+		name: "Jose Manuel Perez Jimenez",
+		role: "Team Coach",
+		photo: josePhoto,
+		alt: "Jose",
+	},
+	{
+		name: "Caleb Chan",
+		role: "Lead Software Engineer",
+		photo: calebPhoto,
+		alt: "Caleb",
+		quote: "You're telling me a shrimp fried this rice?",
+	},
+	{
+		name: "Justin Fletcher",
+		role: "Project Manager",
+		photo: justinPhoto,
+		alt: "Justin",
+		quote:
+			"If we back up the capacitor, we can get to the TLS driver through the primary USB sensor!",
+	},
+	{
+		name: "Phil Banoub",
+		role: "Assistant Lead Software Engineer",
+		photo: philPhoto,
+		alt: "Phil",
+		quote: "Believe you can and you're halfway there.",
+	},
+	{
+		name: "Everett Wilber",
+		role: "Assistant Lead Software Engineer",
+		photo: everettPhoto,
+		alt: "Everett",
+		quote: "Build your own dreams, or someone else will hire you to build theirs.",
+	},
+	{
+		name: "Josue Hernandez",
+		role: "Full Time Software Engineer",
+		photo: josuePhoto,
+		alt: "Josue",
+		quote: "Keep it pushing, the only moment you fail is when you give up.",
+	},
+	{
+		name: "Brandon Gainey",
+		role: "Full Time Software Engineer",
+		photo: brandonPhoto,
+		alt: "Brandon",
+		quote: "It is never too late to be what you might have been.",
+	},
+	{
+		name: "Lucas Zaki",
+		role: "Full Time Software Engineer",
+		photo: lucasPhoto,
+		alt: "Lucas",
+		quote: "Life shrinks or expands in proportion to one's courage.",
+	},
+	{
+		name: "Julien Polycarpe",
+		role: "Product Owner",
+		photo: julienPhoto,
+		alt: "Julien",
+		quote: "Either you run the day, or the day runs you.",
+	},
+	{
+		name: "Jace Bonjorno",
+		role: "Documentation Analyst",
+		photo: jacePhoto,
+		alt: "Jace",
+		quote: "Winning isn't everything, but wanting to win is.",
+	},
+	{
+		name: "Elijah King",
+		role: "Scrum Master",
+		photo: elijahPhoto,
+		alt: "Elijah",
+		quote: "If you're offered a seat on a rocket ship, don't ask what seat! Just get on.",
+	},
 ]
 
-function TeamCard({ name, role, photo, alt }: TeamMember) {
-	const [hovered, setHovered] = useState(false)
-
+function TeamCard({ name, role, photo, alt, quote }: TeamMember) {
 	return (
 		<Card
 			padding="sm"
 			withBorder
 			h="100%"
-			onMouseEnter={() => setHovered(true)}
-			onMouseLeave={() => setHovered(false)}
-			style={{
-				display: "flex",
-				flexDirection: "row",
-				transition: "transform 0.2s ease, box-shadow 0.2s ease",
-				transform: hovered ? "translateY(-6px)" : "translateY(0)",
-				boxShadow: hovered ? "0 8px 24px rgba(0, 0, 0, 0.12)" : undefined,
-			}}
+			className="hover:-translate-y-1.5 hover:shadow-lg transition flex flex-row"
 		>
-			<Image
-				src={photo}
-				alt={alt}
-				w={120}
-				h="auto"
-				fit="cover"
-				style={{ flexShrink: 0, borderRadius: 60 }}
-			/>
-			<div
-				style={{
-					padding: "0 12px",
-					display: "flex",
-					flexDirection: "column",
-					justifyContent: "center",
-				}}
-			>
-				<Title fz="xl">{name}</Title>
-				<small className="mb-3 font-semibold tracking-wider text-gray-400 uppercase">{role}</small>
+			<HoverCard withArrow arrowSize={10} position="right" shadow="sm" disabled={!quote}>
+				<HoverCard.Target>
+					<Image
+						src={photo}
+						alt={alt}
+						w={120}
+						h={120}
+						fit="cover"
+						className={clsx("shrink-0 rounded-full", quote && "cursor-pointer")}
+					/>
+				</HoverCard.Target>
+				<HoverCard.Dropdown maw="300">&ldquo;{quote}&rdquo;</HoverCard.Dropdown>
+			</HoverCard>
+
+			<div className="px-3 flex flex-col justify-center min-w-0 flex-1">
+				<Title className="text-2xl">{name}</Title>
+				<span className="mb-3 font-semibold tracking-wider text-gray-400 uppercase">{role}</span>
 			</div>
 		</Card>
 	)
@@ -153,42 +145,27 @@ function TeamCard({ name, role, photo, alt }: TeamMember) {
 function AboutPage() {
 	return (
 		<main>
-			<header className="w-full p-4 text-white rounded-lg bg-primary">
+			<header className="w-full p-4 text-white rounded-lg bg-primary dark:bg-fuchsia-800">
 				<Title>About This Project</Title>
 				<small className="mb-3 font-semibold tracking-wider text-gray-200 uppercase">
 					WPI Computer Science Department - CS3733-D26 Software Engineering
 				</small>
 			</header>
 
-			{rows.map((row, rowIndex) => (
-				<Grid mt="md" gap="md" key={row[0].name}>
-					{row.map((member) => (
-						<Grid.Col span={12 / row.length} key={member.name}>
-							<TeamCard {...member} />
-						</Grid.Col>
-					))}
-				</Grid>
-			))}
+			<SimpleGrid maw="1200" mx="auto" minColWidth={400} mt="md">
+				{cards.map((member) => (
+					<TeamCard key={member.name} {...member} />
+				))}
+			</SimpleGrid>
 
-			<Grid mt="md" gap="md">
-				<Grid.Col span={12}>
-					<Card padding="sm" withBorder>
-						<Title fz="xl">Special Thanks To:</Title>
-						<br />
-						<Text className="mb-0 font-semibold tracking-wider text-gray-400">
-							Hanover Insurance
-						</Text>
-						<br />
-						<Text className="mb-0 font-semibold tracking-wider text-gray-400">
-							Brandon Roche, Deputy CIO
-						</Text>
-						<br />
-						<Text className="mb-0 font-semibold tracking-wider text-gray-400">
-							Meaghan Jenket, Principle Business Architect
-						</Text>
-					</Card>
-				</Grid.Col>
-			</Grid>
+			<Card padding="sm" mt="md" withBorder maw="1200" mx="auto">
+				<Title fz="xl">Special Thanks</Title>
+				<Flex gap="4" mt="sm" direction="column">
+					<Text fw="700">Hanover Insurance</Text>
+					<Text className="ml-md">Brandon Roche, Deputy CIO</Text>
+					<Text className="ml-md">Meaghan Jenket, Principle Business Architect</Text>
+				</Flex>
+			</Card>
 		</main>
 	)
 }

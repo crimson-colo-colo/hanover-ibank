@@ -30,6 +30,7 @@ model Employee {
     recentTimestamps   RecentTimestamps[]
     notifications      Notification[]
     actorNotifications Notification[]      @relation("Actor")
+    activityLogs       ActivityLog[]
 }
 
 model Content {
@@ -53,9 +54,10 @@ model Content {
     checkedOutById   String?
     checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
     threads          ContentTalkThread[]
-  embeddings       Embedding[]
+    embeddings       Embedding[]
     recentTimestamps RecentTimestamps[]
     notifications    Notification[]
+    activityLogs     ActivityLog[]
 }
 
 model ContentTalkThread {
@@ -69,7 +71,7 @@ model ContentTalkThread {
     resolvedBy   Employee?    @relation(fields: [resolvedById], references: [id])
 
     createdById String
-    createdBy   Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id])
+    createdBy   Employee            @relation("ThreadCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
     contentId   String
     content     Content             @relation(fields: [contentId], references: [id], onDelete: Cascade)
     comments    TalkThreadComment[]
@@ -85,7 +87,7 @@ model TalkThreadComment {
     thread   ContentTalkThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
     authorId String
-    author   Employee @relation("CommentAuthor", fields: [authorId], references: [id])
+    author   Employee @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Tag {
@@ -100,69 +102,69 @@ model ContentTag {
     contentId   String
     tagCategory TagCategory
     tagName     String
-  content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name])
+    content     Content     @relation(fields: [contentId], references: [id], onDelete: Cascade)
+    tag         Tag         @relation(fields: [tagCategory, tagName], references: [category, name], onDelete: Cascade)
 
     @@id([contentId, tagCategory, tagName])
 }
 
 model FavoriteContent {
-  contentId  String
-  employeeId String
-    content    Content  @relation(fields: [contentId], references: [id])
-    employee   Employee @relation(fields: [employeeId], references: [id])
+    contentId  String
+    employeeId String
+    content    Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
     @@id([contentId, employeeId])
 }
 
 model UserActivity {
-  timestamp  DateTime
-  employeeId String
-  path       String
-  count      Int      @default(1)
-  day        DateTime
-  hour       DateTime
-  employee   Employee @relation(fields: [employeeId], references: [id])
+    timestamp  DateTime
+    employeeId String
+    path       String
+    count      Int      @default(1)
+    day        DateTime
+    hour       DateTime
+    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  @@id([timestamp, employeeId, path])
+    @@id([timestamp, employeeId, path])
 }
 
 model Embedding {
-  hash      Bytes                 @id
-  embedding Unsupported("vector")
-  content  Content[]
-  type     EmbeddingType[]        @default([Unknown])
+    hash      Bytes                 @id
+    embedding Unsupported("vector")
+    content   Content[]
+    type      EmbeddingType[]       @default([Unknown])
 }
 
 enum EmbeddingType {
-  Query
-  Content
+    Query
+    Content
 
-  Unknown
+    Unknown
 }
 
 model TextExtractionCache {
-  hash Bytes
-  skipRecPDFTextNative Boolean
-  skipRecPDFTextOCR Boolean
-  text String
+    hash                 Bytes
+    skipRecPDFTextNative Boolean
+    skipRecPDFTextOCR    Boolean
+    text                 String
 
-  @@id([hash, skipRecPDFTextNative, skipRecPDFTextOCR])
+    @@id([hash, skipRecPDFTextNative, skipRecPDFTextOCR])
 }
 
 enum EmployeeRole {
-  BusinessAnalyst
-  Underwriter
-  Admin
-  ActuarialAnalyst
-  ExlOperations
-  BusinessOperations
+    BusinessAnalyst
+    Underwriter
+    Admin
+    ActuarialAnalyst
+    ExlOperations
+    BusinessOperations
 }
 
 enum TagCategory {
-  DocumentType
-  IntendedAudience
-  Custom
+    DocumentType
+    IntendedAudience
+    Custom
 }
 
 enum ContentStatus {
@@ -175,14 +177,15 @@ enum ContentType {
     Object
     Link
 }
+
 model RecentTimestamps {
     recentlyEdited DateTime
     recentlyViewed DateTime
     viewCount      Int      @default(0)
     employeeId     String
-    employee       Employee @relation(fields: [employeeId], references: [id])
+    employee       Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
     contentId      String
-    content        Content  @relation(fields: [contentId], references: [id])
+    content        Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
     @@id([employeeId, contentId])
 }
@@ -214,4 +217,36 @@ model Notification {
     actorId    String? /// ID of the employee that triggered the notification, if applicable
     actor      Employee?        @relation("Actor", fields: [actorId], references: [id], onDelete: Cascade)
     createdAt  DateTime         @default(now())
+}
+
+enum UserAction {
+    CHECK_OUT_CONTENT
+    CHECK_IN_CONTENT
+    EDIT_TITLE
+    TRANSFER_OWNERSHIP
+    EDIT_LAST_MODIFIED_DATE
+    EDIT_EXPIRATION_DATE
+    EDIT_CONTENT_STATUS
+    EDIT_CONTENT_TAGS
+    REUPLOAD_FILE
+    EDIT_LINK
+    CREATE_DISCUSSION
+    COMMENT
+    VIEW_CONTENT
+    DOWNLOAD_FILE
+    DELETE_CONTENT
+    UPLOAD_CONTENT
+    EDIT_AVATAR
+    EDIT_PROFILE
+}
+
+model ActivityLog {
+    id           String     @id @default(cuid())
+    employeeId   String
+    employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+    action       UserAction
+    contentId    String?
+    content      Content?   @relation(fields: [contentId], references: [id], onDelete: SetNull)
+    contentTitle String?
+    timestamp    DateTime   @default(now())
 }

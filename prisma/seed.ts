@@ -2,6 +2,7 @@ import { UTCDate } from "@date-fns/utc"
 import { faker } from "@faker-js/faker"
 import { Temporal } from "@js-temporal/polyfill"
 import { PrismaPg } from "@prisma/adapter-pg"
+import { UserAction } from "@shared/activityLabels.ts"
 import type { FileType } from "@shared/filetype.ts"
 import {
 	ContentStatus,
@@ -58,6 +59,7 @@ async function main() {
 		createContentThreads(),
 		createRecentTimestamps(),
 		createNotifications(),
+		createActivityLogs(linkContent, fileContent),
 	])
 
 	await embedAllContent()
@@ -86,6 +88,7 @@ async function confirmOverwrite() {
 
 async function wipeDBandS3() {
 	await prisma.$transaction([
+		prisma.activityLog.deleteMany(),
 		prisma.recentTimestamps.deleteMany(),
 		prisma.talkThreadComment.deleteMany(),
 		prisma.contentTalkThread.deleteMany(),
@@ -95,7 +98,6 @@ async function wipeDBandS3() {
 		prisma.tag.deleteMany(),
 		prisma.content.deleteMany(),
 		prisma.employee.deleteMany(),
-		prisma.recentTimestamps.deleteMany(),
 	])
 
 	console.log("Emptied database tables")
@@ -216,6 +218,7 @@ async function createContentTags(
 	fileContent: { id: string; objectId: string | null; ownerId: string }[],
 	linkContent: { id: string; ownerId: string }[]
 ) {
+	console.log("Creating content tags...")
 	await prisma.contentTag.createMany({
 		data: [
 			...fileContent.flatMap(generateContentTags),
@@ -263,20 +266,22 @@ async function createFavoriteContent(
 	const admin = "auth0|69d57cf83f6e9b609fe8a92f"
 	const emp1 = "auth0|69d57d03e7bf39d172e84921"
 	const emp2 = "auth0|69d57d0af36c0b4100640b0a"
-
-	const thingsToFavorite = [
-		...linkContent
-			.sort(() => 0.5 - Math.random())
-			.slice(0, 3)
-			.map((c) => c.id),
-		...Array.from(fileTypeToContent.values()).flatMap((contentIds) =>
-			contentIds.sort(() => 0.5 - Math.random()).slice(0, 3)
-		),
-	]
+	const admind26c = "auth0|69f80751cfa07ae558f27ac0"
+	const analystd26c = "auth0|69f8076c0677be688bbcf532"
+	const underwriterd26c = "auth0|69f8075d6aea0d1fa52cffe2"
 
 	await Promise.all(
-		[admin, emp1, emp2].flatMap((userId) =>
-			thingsToFavorite.map((contentId) =>
+		[admin, emp1, emp2, admind26c, analystd26c, underwriterd26c].flatMap((userId) => {
+			const thingsToFavorite = [
+				...linkContent
+					.sort(() => 0.5 - Math.random())
+					.slice(0, 3)
+					.map((c) => c.id),
+				...Array.from(fileTypeToContent.values()).flatMap((contentIds) =>
+					contentIds.sort(() => 0.5 - Math.random()).slice(0, 3)
+				),
+			]
+			return thingsToFavorite.map((contentId) =>
 				prisma.favoriteContent.create({
 					data: {
 						contentId,
@@ -284,10 +289,10 @@ async function createFavoriteContent(
 					},
 				})
 			)
-		)
+		})
 	)
 
-	console.log(`Favorited ${thingsToFavorite.length} content items for each of the 3 users`)
+	console.log(`Favorited content items for 6 users`)
 }
 
 async function createUserActivity() {
@@ -446,7 +451,7 @@ async function createRecentTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
-			const viewCount = Math.floor(Math.random() * 100) + 1
+			const viewCount = Math.floor(Math.random() * 20) + 1
 			data.push({
 				recentlyViewed: recentlyViewed,
 				recentlyEdited: recentlyEdited,
@@ -471,12 +476,19 @@ async function embedAllContent() {
 		if (data.textExtractionCache) {
 			console.log(`Restoring ${data.textExtractionCache.length} text extraction cache entries...`)
 			await prisma.textExtractionCache.createMany({
-				data: data.textExtractionCache.map((entry: any) => ({
-					hash: Buffer.from(entry.hash, "hex"),
-					skipRecPDFTextNative: entry.skipRecPDFTextNative,
-					skipRecPDFTextOCR: entry.skipRecPDFTextOCR,
-					text: entry.text,
-				})),
+				data: data.textExtractionCache.map(
+					(entry: {
+						hash: string
+						skipRecPDFTextNative: boolean
+						skipRecPDFTextOCR: boolean
+						text: string
+					}) => ({
+						hash: Buffer.from(entry.hash, "hex"),
+						skipRecPDFTextNative: entry.skipRecPDFTextNative,
+						skipRecPDFTextOCR: entry.skipRecPDFTextOCR,
+						text: entry.text,
+					})
+				),
 				skipDuplicates: true,
 			})
 		}
@@ -599,4 +611,41 @@ function generateNotification(
 			throw new Error(`Unhandled notification type: ${type}`)
 		}
 	}
+}
+
+async function createActivityLogs(
+	linkContent: { id: string; ownerId: string }[],
+	fileContent: { id: string; objectId: string | null; ownerId: string }[]
+) {
+	const data: Prisma.ActivityLogCreateManyInput[] = []
+	const ONE_DAY = 24 * 60 * 60 * 1000
+
+	for (const employee of employeeData) {
+		const actions = Array.from({ length: 8 }, () => {
+			const enumValues = Object.values(UserAction)
+			const randomIndex = Math.floor(Math.random() * enumValues.length)
+			return enumValues[randomIndex]
+		})
+		for (const action of actions) {
+			let contentId: string | undefined
+			if (action === "EDIT_AVATAR" || action === "EDIT_PROFILE") {
+				contentId = undefined
+			} else {
+				contentId =
+					Math.random() < 0.5
+						? linkContent[Math.floor(Math.random() * linkContent.length)].id
+						: fileContent[Math.floor(Math.random() * fileContent.length)].id
+			}
+			// within the past 5 days, at least one day ago
+			const timestamp = new Date(Date.now() - ONE_DAY - Math.floor(Math.random() * 5 * ONE_DAY))
+			data.push({
+				employeeId: employee.id,
+				timestamp: timestamp,
+				contentId: contentId,
+				action: action,
+			})
+		}
+	}
+	await prisma.activityLog.createMany({ data })
+	console.log(`Created activity logs for ${data.length} employee-content pairs`)
 }

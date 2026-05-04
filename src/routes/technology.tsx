@@ -11,6 +11,7 @@ import {
 	Title,
 } from "@mantine/core"
 import { createFileRoute } from "@tanstack/react-router"
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 
 import auth0Icon from "../assets/techIcons/auth0.svg"
 import biomeIcon from "../assets/techIcons/biome.svg"
@@ -46,16 +47,28 @@ function TechPage() {
 					Software tools, libraries, and frameworks that power this project
 				</small>
 			</header>
-			<SimpleGrid cols={{ base: 2, sm: 4 }} mt="md">
+			<SimpleGrid cols={{ base: 2, md: 4 }} my="md">
 				{pernStack.map((pernStack) => (
 					<PernCard key={pernStack.category} {...pernStack} />
 				))}
 			</SimpleGrid>
-			<SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} mt="md">
-				{technology.map((tech) => (
-					<TechCard key={tech.category} {...tech} />
-				))}
-			</SimpleGrid>
+			{/* <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} mt="md"> */}
+			<ResponsiveMasonry
+				columnsCountBreakPoints={{
+					700: 1,
+					1000: 2,
+					1400: 3,
+					1800: 4,
+				}}
+				gutterBreakPoints={{ 700: 16, 1000: 16, 1400: 16, 1800: 16 }}
+			>
+				<Masonry gutter="1rem">
+					{technology.map((tech) => (
+						<TechCard key={tech.category} {...tech} />
+					))}
+				</Masonry>
+			</ResponsiveMasonry>
+			{/* </SimpleGrid> */}
 		</main>
 	)
 }
@@ -325,7 +338,7 @@ function PernCard({
 	items: { name: string; description: string; url: string; icon: string }[]
 }) {
 	return (
-		<Card withBorder className="hover:-translate-y-1.5 transition hover:shadow-sm">
+		<Card withBorder className="hover:-translate-y-1.5 transition hover:shadow-sm w-full">
 			<Group justify="center" className="mb-md">
 				<Text
 					key={category}
@@ -361,7 +374,7 @@ function TechCard({
 			padding="md"
 			withBorder
 			h="100%"
-			className="hover:-translate-y-1.5 transition hover:shadow-sm"
+			className="hover:-translate-y-1.5 transition hover:shadow-sm w-full"
 		>
 			<Title order={4} mb="sm">
 				{category}

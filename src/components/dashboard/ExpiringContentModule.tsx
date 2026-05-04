@@ -20,7 +20,7 @@ export function ExpiringContentModule({
 	const expiringContent = useQuery(trpc.content.getExpiringContent.queryOptions())
 	const topFiveExpiring = expiringContent.data?.slice(0, 5)
 	return (
-		<Paper p="lg" withBorder>
+		<Paper p="lg" withBorder className="h-full">
 			<Link
 				to="/content-table"
 				search={{ view: "expiringSoon" }}
@@ -34,7 +34,7 @@ export function ExpiringContentModule({
 					const contentType =
 						item.type === "Link"
 							? FileType.Link
-							: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
+							: ((item.object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 					return (
 						<Button
 							variant="subtle"

@@ -6,7 +6,7 @@ import type { ContentListItem } from "@shared/types.ts"
 import { createTRPCClient, httpBatchLink, loggerLink, type TRPCClient } from "@trpc/client"
 import * as Comlink from "comlink"
 import superjson from "superjson"
-import { isDevelopment } from "@/env.ts"
+import { env, isDevelopment } from "@/env.ts"
 import {
 	contentTypeDisplayName,
 	employeeRoleDisplayName,
@@ -195,7 +195,7 @@ export class SearchWorker {
 		for (const item of items) {
 			this.items.set(item.id, {
 				...item,
-				embedding: unpackFloat16Array(item.embedding),
+				embedding: item.embedding ? unpackFloat16Array(item.embedding) : Array(768).fill(0.001),
 			})
 		}
 		console.log("Downloaded content list", this.items.values())
@@ -241,7 +241,7 @@ export class SearchWorker {
 							return item.type === ContentType.Link
 						}
 						return (
-							item.type === ContentType.Object && item.object.Metadata?.filetype === filter.value
+							item.type === ContentType.Object && item.object?.Metadata?.filetype === filter.value
 						)
 					case "contenttype":
 						return item.type === filter.value
@@ -271,7 +271,7 @@ export class SearchWorker {
 				property: "embedding",
 			},
 			limit: 20,
-			similarity: 0.6,
+			similarity: env.VITE_SEARCH_SIMILARITY_THRESHOLD,
 		})
 
 		return results.hits

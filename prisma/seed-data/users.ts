@@ -1,13 +1,13 @@
+import { EmployeeRole } from "../../server/generated/prisma/browser.ts"
+import { auth0Cache } from "../../server/lib/auth0.ts"
+
 // admins: admin, mjordan, wharper, djohnson, sjohansson
+// business analyst: emp2
 // underwriter: emp1
 
-import { EmployeeRole } from "../../server/generated/prisma/browser.ts"
-
-// business analyst: emp2
 export const employeeData = [
 	{ id: "auth0|69d3f8c36ddd007770a559bb", role: EmployeeRole.BusinessAnalyst },
 	{ id: "auth0|69d57c86bebf497028094f86", role: EmployeeRole.Admin },
-	{ id: "auth0|69d57cb6f36c0b4100640abb", role: EmployeeRole.Underwriter },
 	{ id: "auth0|69db05b92c0b718e1d54aaec", role: EmployeeRole.BusinessAnalyst },
 	{ id: "auth0|69d57cd6e7bf39d172e848f0", role: EmployeeRole.Underwriter },
 	{ id: "auth0|69d57cdf3f6e9b609fe8a916", role: EmployeeRole.BusinessAnalyst },
@@ -25,7 +25,6 @@ export const employeeData = [
 	{ id: "auth0|69e7fb58edd4fcd00a459792", role: EmployeeRole.ActuarialAnalyst },
 	{ id: "auth0|69e7fb598943d0107ceef475", role: EmployeeRole.ActuarialAnalyst },
 	{ id: "auth0|69e7fb598943d0107ceef476", role: EmployeeRole.ActuarialAnalyst },
-	{ id: "auth0|69e7fb5a8943d0107ceef478", role: EmployeeRole.ActuarialAnalyst },
 	{ id: "auth0|69e7fb5b8943d0107ceef47b", role: EmployeeRole.ExlOperations },
 	{ id: "auth0|69e7fb5cedd4fcd00a459794", role: EmployeeRole.ExlOperations },
 	{ id: "auth0|69e7fb5d94b003bb2d76a03f", role: EmployeeRole.ExlOperations },
@@ -36,11 +35,27 @@ export const employeeData = [
 	{ id: "auth0|69e7fb62edd4fcd00a45979a", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb62edd4fcd00a45979b", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb648943d0107ceef484", role: EmployeeRole.BusinessOperations },
-	{ id: "auth0|69eed7728e98f379ff437da2", role: EmployeeRole.Admin },
+	{ id: "auth0|69f80751cfa07ae558f27ac0", role: EmployeeRole.Admin }, // admind26c
+	{ id: "auth0|69f8076c0677be688bbcf532", role: EmployeeRole.BusinessAnalyst }, // analystd26c
+	{ id: "auth0|69f8075d6aea0d1fa52cffe2", role: EmployeeRole.Underwriter }, // underwriterd26c
+]
+
+export const usersWithContent = [
+	{ id: "auth0|69d57cf83f6e9b609fe8a92f", role: EmployeeRole.Admin }, // admin
+	{ id: "auth0|69d57d03e7bf39d172e84921", role: EmployeeRole.Underwriter }, // emp1
+	{ id: "auth0|69d57d0af36c0b4100640b0a", role: EmployeeRole.BusinessAnalyst }, // emp2
+	{ id: "auth0|69f80751cfa07ae558f27ac0", role: EmployeeRole.Admin }, // admind26c
+	{ id: "auth0|69f8076c0677be688bbcf532", role: EmployeeRole.BusinessAnalyst }, // analystd26c
+	{ id: "auth0|69f8075d6aea0d1fa52cffe2", role: EmployeeRole.Underwriter }, // underwriterd26c
 ]
 
 export function randomUserId() {
 	const randomEmployee = employeeData[Math.floor(Math.random() * employeeData.length)]
+	return randomEmployee.id
+}
+
+export function randomUserIdWithContent() {
+	const randomEmployee = usersWithContent[Math.floor(Math.random() * usersWithContent.length)]
 	return randomEmployee.id
 }
 
@@ -49,3 +64,16 @@ const userRoles = new Map(employeeData.map((e) => [e.id, e.role]))
 export function userRoleById(id: string) {
 	return userRoles.get(id)!
 }
+
+async function assertUsersExist() {
+	const auth0Users = await auth0Cache.listUsers()
+	const auth0UserIds = new Set(auth0Users.data.map((user) => user.user_id))
+	const missingUsers = employeeData.filter((user) => !auth0UserIds.has(user.id))
+	if (missingUsers.length > 0) {
+		throw new Error(
+			`The following users are missing in Auth0: ${missingUsers.map((u) => u.id).join(", ")}`
+		)
+	}
+}
+
+await assertUsersExist()

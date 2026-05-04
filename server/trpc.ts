@@ -100,7 +100,7 @@ export const authProcedure = publicProcedure.use(async (opts) => {
 		try {
 			await logActivity(auth, nowTruncated, opts, day, hour)
 		} catch {
-			await logActivity(auth, nowTruncated, opts, day, hour)
+			await logActivity(auth, nowTruncated, opts, day, hour).catch(() => null)
 		}
 	}
 

@@ -16,6 +16,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminManageUsersRouteImport } from './routes/admin.manage-users'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminActivityLogRouteImport } from './routes/admin.activity-log'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated.profile'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated.favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
@@ -56,6 +57,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminActivityLogRoute = AdminActivityLogRouteImport.update({
+  id: '/activity-log',
+  path: '/activity-log',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/admin/activity-log': typeof AdminActivityLogRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
   '/preview/$contentId': typeof AuthenticatedPreviewContentIdRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/admin/activity-log': typeof AdminActivityLogRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
   '/preview/$contentId': typeof AuthenticatedPreviewContentIdRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/admin/activity-log': typeof AdminActivityLogRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/manage-users': typeof AdminManageUsersRoute
   '/_authenticated/preview/$contentId': typeof AuthenticatedPreviewContentIdRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/favorites'
     | '/profile'
+    | '/admin/activity-log'
     | '/admin/analytics'
     | '/admin/manage-users'
     | '/preview/$contentId'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/favorites'
     | '/profile'
+    | '/admin/activity-log'
     | '/admin/analytics'
     | '/admin/manage-users'
     | '/preview/$contentId'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/profile'
+    | '/admin/activity-log'
     | '/admin/analytics'
     | '/admin/manage-users'
     | '/_authenticated/preview/$contentId'
@@ -227,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/activity-log': {
+      id: '/admin/activity-log'
+      path: '/activity-log'
+      fullPath: '/admin/activity-log'
+      preLoaderRoute: typeof AdminActivityLogRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -286,11 +305,13 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminActivityLogRoute: typeof AdminActivityLogRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminManageUsersRoute: typeof AdminManageUsersRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivityLogRoute: AdminActivityLogRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminManageUsersRoute: AdminManageUsersRoute,
 }

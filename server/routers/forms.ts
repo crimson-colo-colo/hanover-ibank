@@ -7,7 +7,9 @@ import {
 	EmployeeRole,
 	TagCategory,
 } from "../generated/prisma/browser.ts"
+import { UserAction } from "../generated/prisma/client.ts"
 import { auth0Cache } from "../lib/auth0.ts"
+import { logActivity } from "../lib/content.ts"
 import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import { getGravatarUrl, isoDateToTimestamp } from "../lib.ts"
@@ -87,6 +89,9 @@ export const formsRouter = router({
 			},
 			include: { tags: true },
 		})
+
+		await logActivity(opts.ctx.auth.sub, UserAction.UPLOAD_CONTENT, content.id)
+
 		await embedFile(content)
 		return content
 	}),

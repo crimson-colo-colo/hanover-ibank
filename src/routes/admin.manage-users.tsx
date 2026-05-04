@@ -7,6 +7,7 @@ import {
 	Modal,
 	NumberInput,
 	Pagination,
+	ScrollArea,
 	Select,
 	Table,
 	Text,
@@ -36,11 +37,11 @@ import clsx from "clsx"
 import { useMemo, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { CreateUserForm } from "@/components/CreateUserForm.tsx"
+import { HelpHint } from "@/components/help.hint.tsx"
 import { UpdateUserForm, type UpdateUserValues } from "@/components/UpdateUserForm.tsx"
 import { employeeRoleDisplayName } from "@/lib/enums.ts"
 import { checkedOutByFilterFn, fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
 import { trpc } from "@/lib/trpc.ts"
-import { HelpHint } from "@/components/help.hint.tsx"
 
 export const Route = createFileRoute("/admin/manage-users")({
 	component: RouteComponent,
@@ -59,7 +60,7 @@ function RouteComponent() {
 	const [rowSelection, setRowSelection] = useState({})
 	const [pagination, setPagination] = useState({
 		pageIndex: 0, //initial page index
-		pageSize: 10, //default page size
+		pageSize: 20, //default page size
 	})
 
 	const columnHelper = createColumnHelper<NonNullable<(typeof users)["data"]>[number]>()
@@ -133,7 +134,7 @@ function RouteComponent() {
 			sorting: [{ id: "name", desc: false }],
 			pagination: {
 				pageIndex: 0, //custom initial page index
-				pageSize: 10, //custom default page size
+				pageSize: 20, //custom default page size
 			},
 		},
 		filterFns: {
@@ -167,7 +168,10 @@ function RouteComponent() {
 	}
 
 	const rows = table.getRowModel().rows.map((row) => (
-		<Table.Tr key={row.id} bg={row.getIsSelected() ? "fuchsia.0" : undefined}>
+		<Table.Tr
+			key={row.id}
+			className={clsx("content-row", row.getIsSelected() && "bg-fuchsia-50 dark:bg-fuchsia-900/40")}
+		>
 			{row.getVisibleCells().map((cell) => (
 				<Table.Td key={cell.id}>
 					{flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -185,7 +189,7 @@ function RouteComponent() {
 				className="flex-col sm:flex-row"
 			>
 				<Group gap="xs" align="center" wrap="nowrap">
-					<Title order={2}>Manage Users</Title>
+					<Title order={2}>Manage Users ({users.data?.length ?? 0})</Title>
 					<HelpHint
 						feature="employee management"
 						steps={[
@@ -266,7 +270,12 @@ function RouteComponent() {
 					</Button>
 				</Group>
 			</Modal>
-			<Modal opened={createOpened} onClose={closeCreateDialog} title="Add User">
+			<Modal
+				opened={createOpened}
+				onClose={closeCreateDialog}
+				title="Add User"
+				scrollAreaComponent={ScrollArea.Autosize}
+			>
 				<CreateUserForm
 					onSuccess={() => {
 						users.refetch()
@@ -346,6 +355,7 @@ function RouteComponent() {
 				<Group gap="xs" align="center">
 					<Text>Items per page:</Text>
 					<Select
+						w={70}
 						size="sm"
 						value={table.getState().pagination.pageSize}
 						onChange={(value) => {

@@ -1,7 +1,7 @@
 import { Treemap } from "@mantine/charts"
 import { Flex, Group, Paper, SimpleGrid, Skeleton, Text, Title } from "@mantine/core"
 import { FileType } from "@shared/filetype.ts"
-import { IconLoader2 } from "@tabler/icons-react"
+import { IconFileSmile, IconLoader2 } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { FileTypeIcon } from "@/components/FileTypeIcon.tsx"
 import { formatBytes } from "@/lib/content.ts"
@@ -42,7 +42,15 @@ export function AccountStatisticsModule() {
 				</SimpleGrid>
 			</Skeleton>
 
-			{stats.data && (
+			{!stats.data || !Object.values(stats.data.fileStorage ?? {}).length ? (
+				<div className="flex flex-col min-h-60 p-8 items-center justify-center text-center border border-dashed rounded-md border-gray-200 dark:border-gray-800 mt-md flex-1">
+					<IconFileSmile size={40} strokeWidth={1} className="stroke-dimmed" />
+					<Text mt="md" c="dimmed" className="text-sm text-balance">
+						No files uploaded yet. Upload some files to see a breakdown of your storage usage by
+						file type.
+					</Text>
+				</div>
+			) : (
 				<Treemap
 					data={Object.entries(stats.data.fileStorage ?? {}).map(([group, files]) => ({
 						name: group,
@@ -60,7 +68,7 @@ export function AccountStatisticsModule() {
 							return (
 								<Flex
 									style={{ visibility: isVisible ? "visible" : "hidden" }}
-									className="bg-white px-3 py-2 rounded-md shadow-sm border border-gray-200"
+									className="bg-white dark:bg-gray-900 px-3 py-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-800"
 								>
 									{isVisible && (
 										<>
@@ -89,7 +97,7 @@ export function AccountStatisticsModule() {
 									width={props.width}
 									height={props.height}
 									fill={!props.children?.length ? (props.color as string) : "transparent"}
-									stroke="#fff"
+									className="stroke-white dark:stroke-[#242424]"
 									rx={4}
 									ry={4}
 								/>
@@ -99,7 +107,7 @@ export function AccountStatisticsModule() {
 									x={props.x + props.width / 2 - 12}
 									y={props.y + props.height / 2 - 12}
 									strokeWidth={1.5}
-									className="stroke-white"
+									className="stroke-white dark:stroke-white"
 								/>
 							</>
 						),
