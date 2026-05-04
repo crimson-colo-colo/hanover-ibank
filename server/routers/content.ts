@@ -26,6 +26,7 @@ import {
 } from "../lib/notify.ts"
 import { search } from "../lib/openrouter.ts"
 import { isoDateToTimestamp } from "../lib.ts"
+import { logger } from "../logger.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 import { discussionRouter } from "./discussion.ts"
@@ -836,12 +837,20 @@ export const contentRouter = router({
 			.filter((content) => content.type === "Object")
 			.map((content) => content.objectId!)
 
-		await Promise.all([
-			db.content.deleteMany({
-				where: { id: { in: opts.input.ids } },
-			}),
-			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
-		])
+		await db.content.deleteMany({
+			where: { id: { in: opts.input.ids } },
+		})
+
+		try {
+			await Promise.all(
+				objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId }))
+			)
+		} catch (error) {
+			logger.error({
+				message: "Error deleting objects from S3",
+				error,
+			})
+		}
 	}),
 	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const favorite = await db.favoriteContent.upsert({
