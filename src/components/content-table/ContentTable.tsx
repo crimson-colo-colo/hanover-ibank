@@ -160,7 +160,7 @@ export function ContentTable({
 		expirationDate: false,
 		recentlyViewed: false,
 		recentlyEdited: false,
-		viewCount: false,
+		views: false,
 		tags: true,
 		actions: true,
 		checkedOutBy: false,
