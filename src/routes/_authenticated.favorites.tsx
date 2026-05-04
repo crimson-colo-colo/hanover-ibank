@@ -145,7 +145,7 @@ function FavoritesPage() {
 										contentType={
 											item.type === "Link"
 												? FileType.Link
-												: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
+												: ((item.object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 										}
 										item={item}
 										openFilePreview={(file, type) => {

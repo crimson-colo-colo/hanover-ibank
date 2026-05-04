@@ -34,7 +34,7 @@ export function ExpiringContentModule({
 					const contentType =
 						item.type === "Link"
 							? FileType.Link
-							: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
+							: ((item.object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 					return (
 						<Button
 							variant="subtle"

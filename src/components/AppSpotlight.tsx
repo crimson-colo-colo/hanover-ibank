@@ -181,7 +181,7 @@ function SearchResult({ item }: { item: ContentListItem }) {
 					fileType={
 						item.type === ContentType.Link
 							? FileType.Link
-							: (item.object.Metadata?.filetype as FileType)
+							: (item.object?.Metadata?.filetype as FileType)
 					}
 					size={24}
 					strokeWidth={1.5}

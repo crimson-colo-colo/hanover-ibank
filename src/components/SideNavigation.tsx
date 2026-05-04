@@ -262,7 +262,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 									const contentType =
 										item.type === ContentType.Link
 											? FileType.Link
-											: ((item.object.Metadata?.filetype as FileType) ?? FileType.Unknown)
+											: ((item.object?.Metadata?.filetype as FileType) ?? FileType.Unknown)
 									return (
 										<Button
 											key={item.id}
