@@ -30,6 +30,7 @@ import {
 } from "../lib/notify.ts"
 import { search } from "../lib/openrouter.ts"
 import { isoDateToTimestamp } from "../lib.ts"
+import { logger } from "../logger.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 import { discussionRouter } from "./discussion.ts"
@@ -67,9 +68,31 @@ export const contentRouter = router({
 				include: getContentInclude(opts.ctx.auth.sub),
 			})
 
+			const sums = await db.recentTimestamps.groupBy({
+				by: ["contentId"],
+				_sum: {
+					viewCount: true,
+				},
+				orderBy: {
+					_sum: {
+						viewCount: "desc",
+					},
+				},
+			})
+
+			const items = await fetchAndTransformToContentListItems(data, opts.ctx.auth.sub)
+
+			const content = items.map((item) => {
+				const sum = sums.find((s) => s.contentId === item.id)
+				return {
+					...item,
+					viewCount: sum?._sum.viewCount ?? 0,
+				}
+			})
+
 			return {
 				role: user.role,
-				content: await fetchAndTransformToContentListItems(data, opts.ctx.auth.sub),
+				content: content,
 			}
 		}),
 
@@ -635,7 +658,7 @@ export const contentRouter = router({
 		.input(
 			z.object({
 				id: z.string(),
-				file: z.string(),
+				file: z.base64(),
 			})
 		)
 		.mutation(async (opts) => {
@@ -838,12 +861,20 @@ export const contentRouter = router({
 			.filter((content) => content.type === "Object")
 			.map((content) => content.objectId!)
 
-		await Promise.all([
-			db.content.deleteMany({
-				where: { id: { in: opts.input.ids } },
-			}),
-			...objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId })),
-		])
+		await db.content.deleteMany({
+			where: { id: { in: opts.input.ids } },
+		})
+
+		try {
+			await Promise.all(
+				objectsToDelete.map((objectId) => s3.deleteObject({ Bucket: bucketName, Key: objectId }))
+			)
+		} catch (error) {
+			logger.error({
+				message: "Error deleting objects from S3",
+				error,
+			})
+		}
 
 		opts.input.ids.map((id) => logActivity(opts.ctx.auth.sub, UserAction.DELETE_CONTENT, id))
 	}),
@@ -1208,12 +1239,21 @@ export const contentRouter = router({
 				include: getContentInclude(opts.ctx.auth.sub),
 			})
 
-			const contentMap = new Map(contentDetails.map((item) => [item.id, item]))
-			const sortedContent = sums
-				.map((sum) => contentMap.get(sum.contentId))
-				.filter((item) => item !== undefined)
+			// sort contentDetails in the same order as sums
+			contentDetails.sort((a, b) => {
+				const aIndex = sums.findIndex((s) => s.contentId === a.id)
+				const bIndex = sums.findIndex((s) => s.contentId === b.id)
+				return aIndex - bIndex
+			})
 
-			return await fetchAndTransformToContentListItems(sortedContent, opts.ctx.auth.sub)
+			const items = await fetchAndTransformToContentListItems(contentDetails, opts.ctx.auth.sub)
+			return items.map((item) => {
+				const sum = sums.find((s) => s.contentId === item.id)
+				return {
+					...item,
+					viewCount: sum?._sum.viewCount ?? 0,
+				}
+			})
 		}),
 
 	getExpiringContent: authProcedure.query(async (opts) => {
@@ -1229,6 +1269,19 @@ export const contentRouter = router({
 		})
 
 		return await fetchAndTransformToContentListItems(expiringContent, opts.ctx.auth.sub)
+	}),
+	getStatusStats: authProcedure.query(async () => {
+		const statuses = await db.content.groupBy({
+			by: ["status"],
+			_count: {
+				status: true,
+			},
+		})
+
+		return statuses.map((item) => ({
+			name: item.status,
+			value: item._count.status,
+		}))
 	}),
 })
 export default contentRouter

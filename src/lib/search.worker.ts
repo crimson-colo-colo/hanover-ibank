@@ -241,7 +241,7 @@ export class SearchWorker {
 							return item.type === ContentType.Link
 						}
 						return (
-							item.type === ContentType.Object && item.object.Metadata?.filetype === filter.value
+							item.type === ContentType.Object && item.object?.Metadata?.filetype === filter.value
 						)
 					case "contenttype":
 						return item.type === filter.value

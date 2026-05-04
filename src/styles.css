@@ -130,3 +130,11 @@ html.color-scheme-transitioning * {
 .thumb .react-pdf__Thumbnail__page {
     @apply -translate-x-1/4 -translate-y-1/4 scale-50;
 }
+
+.combobox-option[data-combobox-selected]{
+    @apply bg-[#f2f2f2] text-black dark:bg-gray-800 dark:text-gray-200!;
+}
+
+#react-joyride-portal button {
+    @apply dark:text-gray-50!;
+}

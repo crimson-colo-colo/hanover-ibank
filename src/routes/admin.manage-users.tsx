@@ -7,6 +7,7 @@ import {
 	Modal,
 	NumberInput,
 	Pagination,
+	ScrollArea,
 	Select,
 	Table,
 	Text,
@@ -59,7 +60,7 @@ function RouteComponent() {
 	const [rowSelection, setRowSelection] = useState({})
 	const [pagination, setPagination] = useState({
 		pageIndex: 0, //initial page index
-		pageSize: 10, //default page size
+		pageSize: 20, //default page size
 	})
 
 	const columnHelper = createColumnHelper<NonNullable<(typeof users)["data"]>[number]>()
@@ -133,7 +134,7 @@ function RouteComponent() {
 			sorting: [{ id: "name", desc: false }],
 			pagination: {
 				pageIndex: 0, //custom initial page index
-				pageSize: 10, //custom default page size
+				pageSize: 20, //custom default page size
 			},
 		},
 		filterFns: {
@@ -185,7 +186,7 @@ function RouteComponent() {
 				className="flex-col sm:flex-row"
 			>
 				<Group gap="xs" align="center" wrap="nowrap">
-					<Title order={2}>Manage Users</Title>
+					<Title order={2}>Manage Users ({users.data?.length ?? 0})</Title>
 					<HelpHint
 						feature="employee management"
 						steps={[
@@ -266,7 +267,12 @@ function RouteComponent() {
 					</Button>
 				</Group>
 			</Modal>
-			<Modal opened={createOpened} onClose={closeCreateDialog} title="Add User">
+			<Modal
+				opened={createOpened}
+				onClose={closeCreateDialog}
+				title="Add User"
+				scrollAreaComponent={ScrollArea.Autosize}
+			>
 				<CreateUserForm
 					onSuccess={() => {
 						users.refetch()
@@ -346,6 +352,7 @@ function RouteComponent() {
 				<Group gap="xs" align="center">
 					<Text>Items per page:</Text>
 					<Select
+						w={70}
 						size="sm"
 						value={table.getState().pagination.pageSize}
 						onChange={(value) => {

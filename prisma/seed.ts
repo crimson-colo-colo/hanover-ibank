@@ -88,6 +88,7 @@ async function confirmOverwrite() {
 
 async function wipeDBandS3() {
 	await prisma.$transaction([
+		prisma.activityLog.deleteMany(),
 		prisma.recentTimestamps.deleteMany(),
 		prisma.talkThreadComment.deleteMany(),
 		prisma.contentTalkThread.deleteMany(),
@@ -97,8 +98,6 @@ async function wipeDBandS3() {
 		prisma.tag.deleteMany(),
 		prisma.content.deleteMany(),
 		prisma.employee.deleteMany(),
-		prisma.recentTimestamps.deleteMany(),
-		prisma.activityLog.deleteMany(),
 	])
 
 	console.log("Emptied database tables")
@@ -219,6 +218,7 @@ async function createContentTags(
 	fileContent: { id: string; objectId: string | null; ownerId: string }[],
 	linkContent: { id: string; ownerId: string }[]
 ) {
+	console.log("Creating content tags...")
 	await prisma.contentTag.createMany({
 		data: [
 			...fileContent.flatMap(generateContentTags),
@@ -449,7 +449,7 @@ async function createRecentTimestamps() {
 			const recentlyEdited = new Date(
 				Date.now() - ONE_DAY - Math.floor(Math.random() * 30 * ONE_DAY)
 			)
-			const viewCount = Math.floor(Math.random() * 100) + 1
+			const viewCount = Math.floor(Math.random() * 20) + 1
 			data.push({
 				recentlyViewed: recentlyViewed,
 				recentlyEdited: recentlyEdited,
