@@ -51,7 +51,7 @@ export function NameColumn({
 			</div>
 		)
 	} else if (item.type === "Object") {
-		const size = formatBytes(item.object.ContentLength ?? 0)
+		const size = formatBytes(item.object?.ContentLength ?? 0)
 		const fileType = item.object?.Metadata?.filetype as FileType | undefined
 		return (
 			<div className="flex items-center gap-2">
