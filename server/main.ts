@@ -6,6 +6,7 @@ import { env } from "./env.ts"
 import { appRouter } from "./router.ts"
 import { avatarRouter } from "./routers/avatar.ts"
 import { contentDownloadRouter } from "./routers/download.ts"
+import { webdavMiddleware } from "./routers/webdav.ts"
 import { createContext } from "./trpc.ts"
 
 const __filename = fileURLToPath(import.meta.url)
@@ -16,6 +17,7 @@ const app = express()
 
 app.use(contentDownloadRouter)
 app.use(avatarRouter)
+app.use("/webdav", webdavMiddleware)
 
 app.use(
 	"/trpc",

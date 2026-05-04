@@ -16,3 +16,4 @@ todos.json
 /prisma/seed-data/generated
 /*.traineddata
 /embeddings.json
+*.pem

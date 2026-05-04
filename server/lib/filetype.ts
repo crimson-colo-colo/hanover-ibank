@@ -78,3 +78,28 @@ export async function getFileTypeFromFile(filename: string, buffer: Buffer): Pro
 	}
 	return FileType.Unknown
 }
+
+export function getFileExtensionForType(fileType: string): string {
+	switch (fileType) {
+		case FileType.WordDocument:
+			return ".docx"
+		case FileType.Excel:
+			return ".xlsx"
+		case FileType.Powerpoint:
+			return ".pptx"
+		case FileType.Pdf:
+			return ".pdf"
+		case FileType.Plaintext:
+			return ".txt"
+		case FileType.Audio:
+			return ".mp3"
+		case FileType.Video:
+			return ".mp4"
+		case FileType.Image:
+			return ".png"
+		case FileType.Link:
+			return ".html"
+		default:
+			return ".bin"
+	}
+}
