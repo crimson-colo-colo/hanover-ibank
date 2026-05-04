@@ -17,7 +17,7 @@ declare module "@mantine/core" {
 
 export const theme = createTheme({
 	primaryColor: "fuchsia",
-	primaryShade: { light: 6, dark: 8 },
+	primaryShade: { light: 6, dark: 7 },
 	colors: colors,
 
 	headings: {
