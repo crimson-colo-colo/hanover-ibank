@@ -94,6 +94,8 @@ export function ContentOwnerSelect({
 									combobox.closeDropdown()
 									onSelect?.(result.id, result.name)
 								}
+							} else {
+								combobox.openDropdown()
 							}
 						}}
 					/>

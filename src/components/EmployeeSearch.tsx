@@ -43,7 +43,7 @@ export function EmployeeSearch({
 	})
 
 	const options = (searchResults.data ?? []).map((user) => (
-		<Combobox.Option value={user.id} key={user.id}>
+		<Combobox.Option value={user.id} key={user.id} className="combobox-option">
 			<Flex gap="md">
 				<Image src={`/avatar/${user.id}`} radius="100%" h={40} w={40} />
 				<Stack gap={0}>
@@ -125,6 +125,8 @@ export function EmployeeSearch({
 								combobox.closeDropdown()
 								onSubmit(result.id)
 							}
+						} else {
+							combobox.openDropdown()
 						}
 					}}
 				/>
