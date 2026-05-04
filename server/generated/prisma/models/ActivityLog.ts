@@ -29,6 +29,7 @@ export type ActivityLogMinAggregateOutputType = {
   employeeId: string | null
   action: $Enums.UserAction | null
   contentId: string | null
+  contentTitle: string | null
   timestamp: Date | null
 }
 
@@ -37,6 +38,7 @@ export type ActivityLogMaxAggregateOutputType = {
   employeeId: string | null
   action: $Enums.UserAction | null
   contentId: string | null
+  contentTitle: string | null
   timestamp: Date | null
 }
 
@@ -45,6 +47,7 @@ export type ActivityLogCountAggregateOutputType = {
   employeeId: number
   action: number
   contentId: number
+  contentTitle: number
   timestamp: number
   _all: number
 }
@@ -55,6 +58,7 @@ export type ActivityLogMinAggregateInputType = {
   employeeId?: true
   action?: true
   contentId?: true
+  contentTitle?: true
   timestamp?: true
 }
 
@@ -63,6 +67,7 @@ export type ActivityLogMaxAggregateInputType = {
   employeeId?: true
   action?: true
   contentId?: true
+  contentTitle?: true
   timestamp?: true
 }
 
@@ -71,6 +76,7 @@ export type ActivityLogCountAggregateInputType = {
   employeeId?: true
   action?: true
   contentId?: true
+  contentTitle?: true
   timestamp?: true
   _all?: true
 }
@@ -152,6 +158,7 @@ export type ActivityLogGroupByOutputType = {
   employeeId: string
   action: $Enums.UserAction
   contentId: string | null
+  contentTitle: string | null
   timestamp: Date
   _count: ActivityLogCountAggregateOutputType | null
   _min: ActivityLogMinAggregateOutputType | null
@@ -181,6 +188,7 @@ export type ActivityLogWhereInput = {
   employeeId?: Prisma.StringFilter<"ActivityLog"> | string
   action?: Prisma.EnumUserActionFilter<"ActivityLog"> | $Enums.UserAction
   contentId?: Prisma.StringNullableFilter<"ActivityLog"> | string | null
+  contentTitle?: Prisma.StringNullableFilter<"ActivityLog"> | string | null
   timestamp?: Prisma.DateTimeFilter<"ActivityLog"> | Date | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   content?: Prisma.XOR<Prisma.ContentNullableScalarRelationFilter, Prisma.ContentWhereInput> | null
@@ -191,6 +199,7 @@ export type ActivityLogOrderByWithRelationInput = {
   employeeId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   contentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   timestamp?: Prisma.SortOrder
   employee?: Prisma.EmployeeOrderByWithRelationInput
   content?: Prisma.ContentOrderByWithRelationInput
@@ -204,6 +213,7 @@ export type ActivityLogWhereUniqueInput = Prisma.AtLeast<{
   employeeId?: Prisma.StringFilter<"ActivityLog"> | string
   action?: Prisma.EnumUserActionFilter<"ActivityLog"> | $Enums.UserAction
   contentId?: Prisma.StringNullableFilter<"ActivityLog"> | string | null
+  contentTitle?: Prisma.StringNullableFilter<"ActivityLog"> | string | null
   timestamp?: Prisma.DateTimeFilter<"ActivityLog"> | Date | string
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
   content?: Prisma.XOR<Prisma.ContentNullableScalarRelationFilter, Prisma.ContentWhereInput> | null
@@ -214,6 +224,7 @@ export type ActivityLogOrderByWithAggregationInput = {
   employeeId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   contentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  contentTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   timestamp?: Prisma.SortOrder
   _count?: Prisma.ActivityLogCountOrderByAggregateInput
   _max?: Prisma.ActivityLogMaxOrderByAggregateInput
@@ -228,12 +239,14 @@ export type ActivityLogScalarWhereWithAggregatesInput = {
   employeeId?: Prisma.StringWithAggregatesFilter<"ActivityLog"> | string
   action?: Prisma.EnumUserActionWithAggregatesFilter<"ActivityLog"> | $Enums.UserAction
   contentId?: Prisma.StringNullableWithAggregatesFilter<"ActivityLog"> | string | null
+  contentTitle?: Prisma.StringNullableWithAggregatesFilter<"ActivityLog"> | string | null
   timestamp?: Prisma.DateTimeWithAggregatesFilter<"ActivityLog"> | Date | string
 }
 
 export type ActivityLogCreateInput = {
   id?: string
   action: $Enums.UserAction
+  contentTitle?: string | null
   timestamp?: Date | string
   employee: Prisma.EmployeeCreateNestedOneWithoutActivityLogsInput
   content?: Prisma.ContentCreateNestedOneWithoutActivityLogsInput
@@ -244,12 +257,14 @@ export type ActivityLogUncheckedCreateInput = {
   employeeId: string
   action: $Enums.UserAction
   contentId?: string | null
+  contentTitle?: string | null
   timestamp?: Date | string
 }
 
 export type ActivityLogUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutActivityLogsNestedInput
   content?: Prisma.ContentUpdateOneWithoutActivityLogsNestedInput
@@ -260,6 +275,7 @@ export type ActivityLogUncheckedUpdateInput = {
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
   contentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -268,12 +284,14 @@ export type ActivityLogCreateManyInput = {
   employeeId: string
   action: $Enums.UserAction
   contentId?: string | null
+  contentTitle?: string | null
   timestamp?: Date | string
 }
 
 export type ActivityLogUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -282,6 +300,7 @@ export type ActivityLogUncheckedUpdateManyInput = {
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
   contentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -300,6 +319,7 @@ export type ActivityLogCountOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
+  contentTitle?: Prisma.SortOrder
   timestamp?: Prisma.SortOrder
 }
 
@@ -308,6 +328,7 @@ export type ActivityLogMaxOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
+  contentTitle?: Prisma.SortOrder
   timestamp?: Prisma.SortOrder
 }
 
@@ -316,6 +337,7 @@ export type ActivityLogMinOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   action?: Prisma.SortOrder
   contentId?: Prisma.SortOrder
+  contentTitle?: Prisma.SortOrder
   timestamp?: Prisma.SortOrder
 }
 
@@ -410,6 +432,7 @@ export type EnumUserActionFieldUpdateOperationsInput = {
 export type ActivityLogCreateWithoutEmployeeInput = {
   id?: string
   action: $Enums.UserAction
+  contentTitle?: string | null
   timestamp?: Date | string
   content?: Prisma.ContentCreateNestedOneWithoutActivityLogsInput
 }
@@ -418,6 +441,7 @@ export type ActivityLogUncheckedCreateWithoutEmployeeInput = {
   id?: string
   action: $Enums.UserAction
   contentId?: string | null
+  contentTitle?: string | null
   timestamp?: Date | string
 }
 
@@ -455,12 +479,14 @@ export type ActivityLogScalarWhereInput = {
   employeeId?: Prisma.StringFilter<"ActivityLog"> | string
   action?: Prisma.EnumUserActionFilter<"ActivityLog"> | $Enums.UserAction
   contentId?: Prisma.StringNullableFilter<"ActivityLog"> | string | null
+  contentTitle?: Prisma.StringNullableFilter<"ActivityLog"> | string | null
   timestamp?: Prisma.DateTimeFilter<"ActivityLog"> | Date | string
 }
 
 export type ActivityLogCreateWithoutContentInput = {
   id?: string
   action: $Enums.UserAction
+  contentTitle?: string | null
   timestamp?: Date | string
   employee: Prisma.EmployeeCreateNestedOneWithoutActivityLogsInput
 }
@@ -469,6 +495,7 @@ export type ActivityLogUncheckedCreateWithoutContentInput = {
   id?: string
   employeeId: string
   action: $Enums.UserAction
+  contentTitle?: string | null
   timestamp?: Date | string
 }
 
@@ -502,12 +529,14 @@ export type ActivityLogCreateManyEmployeeInput = {
   id?: string
   action: $Enums.UserAction
   contentId?: string | null
+  contentTitle?: string | null
   timestamp?: Date | string
 }
 
 export type ActivityLogUpdateWithoutEmployeeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   content?: Prisma.ContentUpdateOneWithoutActivityLogsNestedInput
 }
@@ -516,6 +545,7 @@ export type ActivityLogUncheckedUpdateWithoutEmployeeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
   contentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -523,6 +553,7 @@ export type ActivityLogUncheckedUpdateManyWithoutEmployeeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
   contentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -530,12 +561,14 @@ export type ActivityLogCreateManyContentInput = {
   id?: string
   employeeId: string
   action: $Enums.UserAction
+  contentTitle?: string | null
   timestamp?: Date | string
 }
 
 export type ActivityLogUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutActivityLogsNestedInput
 }
@@ -544,6 +577,7 @@ export type ActivityLogUncheckedUpdateWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -551,6 +585,7 @@ export type ActivityLogUncheckedUpdateManyWithoutContentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumUserActionFieldUpdateOperationsInput | $Enums.UserAction
+  contentTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -561,6 +596,7 @@ export type ActivityLogSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   employeeId?: boolean
   action?: boolean
   contentId?: boolean
+  contentTitle?: boolean
   timestamp?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ActivityLog$contentArgs<ExtArgs>
@@ -571,6 +607,7 @@ export type ActivityLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   employeeId?: boolean
   action?: boolean
   contentId?: boolean
+  contentTitle?: boolean
   timestamp?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ActivityLog$contentArgs<ExtArgs>
@@ -581,6 +618,7 @@ export type ActivityLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   employeeId?: boolean
   action?: boolean
   contentId?: boolean
+  contentTitle?: boolean
   timestamp?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ActivityLog$contentArgs<ExtArgs>
@@ -591,10 +629,11 @@ export type ActivityLogSelectScalar = {
   employeeId?: boolean
   action?: boolean
   contentId?: boolean
+  contentTitle?: boolean
   timestamp?: boolean
 }
 
-export type ActivityLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "action" | "contentId" | "timestamp", ExtArgs["result"]["activityLog"]>
+export type ActivityLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "action" | "contentId" | "contentTitle" | "timestamp", ExtArgs["result"]["activityLog"]>
 export type ActivityLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   content?: boolean | Prisma.ActivityLog$contentArgs<ExtArgs>
@@ -619,6 +658,7 @@ export type $ActivityLogPayload<ExtArgs extends runtime.Types.Extensions.Interna
     employeeId: string
     action: $Enums.UserAction
     contentId: string | null
+    contentTitle: string | null
     timestamp: Date
   }, ExtArgs["result"]["activityLog"]>
   composites: {}
@@ -1049,6 +1089,7 @@ export interface ActivityLogFieldRefs {
   readonly employeeId: Prisma.FieldRef<"ActivityLog", 'String'>
   readonly action: Prisma.FieldRef<"ActivityLog", 'UserAction'>
   readonly contentId: Prisma.FieldRef<"ActivityLog", 'String'>
+  readonly contentTitle: Prisma.FieldRef<"ActivityLog", 'String'>
   readonly timestamp: Prisma.FieldRef<"ActivityLog", 'DateTime'>
 }
     

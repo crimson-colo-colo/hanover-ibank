@@ -1626,6 +1626,7 @@ export const ActivityLogScalarFieldEnum = {
   employeeId: 'employeeId',
   action: 'action',
   contentId: 'contentId',
+  contentTitle: 'contentTitle',
   timestamp: 'timestamp'
 } as const
 

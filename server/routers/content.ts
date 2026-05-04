@@ -876,7 +876,9 @@ export const contentRouter = router({
 			})
 		}
 
-		opts.input.ids.map((id) => logActivity(opts.ctx.auth.sub, UserAction.DELETE_CONTENT, id))
+		contents.map((content) =>
+			logActivity(opts.ctx.auth.sub, UserAction.DELETE_CONTENT, undefined, content.title)
+		)
 	}),
 	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const favorite = await db.favoriteContent.upsert({

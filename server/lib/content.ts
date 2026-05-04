@@ -121,12 +121,21 @@ export async function fetchAndTransformToContentListItems(
 	return data.map((item) => transformToContentListItem(item, users.data, metadata, userId))
 }
 
-export async function logActivity(employeeId: string, action: UserAction, contentId?: string) {
+export async function logActivity(
+	employeeId: string,
+	action: UserAction,
+	contentId?: string,
+	contentTitle?: string
+) {
 	await db.activityLog.create({
 		data: {
 			employeeId,
 			action,
 			contentId,
+			contentTitle: contentId
+				? (await db.content.findUnique({ where: { id: contentId }, select: { title: true } }))
+						?.title
+				: contentTitle,
 		},
 	})
 }

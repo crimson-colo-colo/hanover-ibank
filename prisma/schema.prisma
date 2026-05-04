@@ -241,11 +241,12 @@ enum UserAction {
 }
 
 model ActivityLog {
-    id         String     @id @default(cuid())
-    employeeId String
-    employee   Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-    action     UserAction
-    contentId  String?
-    content    Content?   @relation(fields: [contentId], references: [id], onDelete: Cascade)
-    timestamp  DateTime   @default(now())
+    id           String     @id @default(cuid())
+    employeeId   String
+    employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+    action       UserAction
+    contentId    String?
+    content      Content?   @relation(fields: [contentId], references: [id], onDelete: SetNull)
+    contentTitle String?
+    timestamp    DateTime   @default(now())
 }
