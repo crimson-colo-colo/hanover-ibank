@@ -116,13 +116,14 @@ export function EmployeeSearch({
 					placeholder="Search users..."
 					onKeyDown={(event) => {
 						if (event.key === "Enter") {
-							const firstResult = searchResults.data?.[0]
-							if (firstResult) {
-								setSearchValue(firstResult.name)
+							const selectedIndex = combobox.getSelectedOptionIndex()
+							const result = searchResults.data?.[selectedIndex]
+							if (result) {
+								setSearchValue(result.name)
 								setSelected(true)
-								setSelectedVal(firstResult.name)
+								setSelectedVal(result.name)
 								combobox.closeDropdown()
-								onSubmit(firstResult.id)
+								onSubmit(result.id)
 							}
 						}
 					}}
