@@ -1,5 +1,6 @@
 import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
 import { Grid, Group, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import { useResizeObserver } from "@mantine/hooks"
 import { IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
@@ -14,15 +15,13 @@ export const Route = createFileRoute("/admin/analytics")({
 
 function AnalyticsDashboard() {
 	const { data: fileStats } = useQuery(trpc.content.getFileStats.queryOptions())
-
 	const { data: uploadStats } = useQuery(trpc.content.getUploadStats.queryOptions())
-
+	const { data: statusStats } = useQuery(trpc.content.getStatusStats.queryOptions())
 	const { data: heatmapData } = useQuery(
 		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions()
 	)
 
 	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
-
 	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions())
 
 	const COLORS = [
@@ -35,6 +34,17 @@ function AnalyticsDashboard() {
 		"pink.6",
 		"cyan.6",
 	]
+	const statusColorMap: Record<string, string> = {
+		Incomplete: "red.6",
+		UnderReview: "yellow.6",
+		Complete: "green.6",
+	}
+
+	const statusPieData = (statusStats ?? []).map((item) => ({
+		name: item.name,
+		value: item.value,
+		color: statusColorMap[item.name] ?? "gray.5",
+	}))
 
 	const barData = (fileStats ?? []).map((item) => ({
 		type: item.type,
@@ -47,8 +57,12 @@ function AnalyticsDashboard() {
 		color: COLORS[i % COLORS.length],
 	}))
 
+	const [ref, rect] = useResizeObserver()
+
+	const monthsToShow = rect.width > 822 ? 6 : rect.width > 707 ? 5 : 4
+
 	const endDate = new Date().toISOString().slice(0, 10)
-	const startDate = new Date(new Date().setMonth(new Date().getMonth() - 6))
+	const startDate = new Date(new Date().setMonth(new Date().getMonth() - monthsToShow))
 		.toISOString()
 		.slice(0, 10)
 
@@ -249,32 +263,29 @@ function AnalyticsDashboard() {
 				</Grid>
 			</div>
 			<div>
-				<Group gap="xs" mb="xs">
-					<Text size="sm" fw={600}>
-						File Type Breakdown
-					</Text>
-					<HelpHint
-						feature="the file type charts"
-						steps={[
-							{
-								target: "#analytics-file-charts",
-								title: "File Type Breakdown",
-								content:
-									"The pie chart shows the distribution of content types, and the bar chart compares how much storage each type is consuming.",
-								placement: "top",
-							},
-						]}
-					/>
-				</Group>
 				<Grid id="analytics-file-charts">
 					<Grid.Col span={{ base: 12, md: 6 }}>
 						<Paper withBorder p="md" radius="md">
-							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-								File Types
-							</Text>
+							<Group gap="xs" mb="md">
+								<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
+									File Type Breakdown
+								</Text>
+								<HelpHint
+									feature="the file type charts"
+									steps={[
+										{
+											target: "#analytics-file-charts",
+											title: "File Type Breakdown",
+											content:
+												"The pie chart shows the distribution of content types, and the bar chart compares how much storage each type is consuming.",
+											placement: "top",
+										},
+									]}
+								/>
+							</Group>
 							{pieData.length > 0 ? (
 								<PieChart
-									size={200}
+									size={220}
 									data={pieData}
 									withTooltip
 									tooltipDataSource="segment"
@@ -293,7 +304,7 @@ function AnalyticsDashboard() {
 					</Grid.Col>
 
 					<Grid.Col span={{ base: 12, md: 6 }}>
-						<Paper withBorder p="md" radius="md">
+						<Paper withBorder p="md" radius="md" className="h-full">
 							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
 								Storage Used by Type
 							</Text>
@@ -319,29 +330,34 @@ function AnalyticsDashboard() {
 				</Grid>
 			</div>
 			<div>
-				<Group gap="xs" mb="xs">
-					<Text size="sm" fw={600}>
-						Activity Heatmap
-					</Text>
-					<HelpHint
-						feature="the activity heatmap"
-						steps={[
-							{
-								target: "#analytics-heatmap",
-								title: "User Activity Heatmap",
-								content:
-									"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
-								placement: "top",
-							},
-						]}
-					/>
-				</Group>
-				<Grid id="analytics-heatmap">
-					<Grid.Col span={12}>
-						<Paper withBorder p="md" radius="md">
-							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-								User Activity Heatmap
-							</Text>
+				<Grid align="stretch">
+					<Grid.Col span={{ base: 12, md: 8 }}>
+						<Paper
+							withBorder
+							p="md"
+							radius="md"
+							id="analytics-heatmap"
+							className="flex flex-col h-full"
+							ref={ref}
+						>
+							<Group mb="md">
+								<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
+									User Activity Heatmap
+								</Text>
+								<HelpHint
+									feature="the activity heatmap"
+									steps={[
+										{
+											target: "#analytics-heatmap",
+											title: "User Activity Heatmap",
+											content:
+												"Each circle represents a day. Darker circles mean more active users that day. Hover a circle for an exact count.",
+											placement: "top",
+										},
+									]}
+								/>
+							</Group>
+							<div className="flex-1" />
 							<Heatmap
 								data={heatmapData ?? {}}
 								startDate={startDate}
@@ -357,13 +373,34 @@ function AnalyticsDashboard() {
 								weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
 								withMonthLabels
 								firstDayOfWeek={0}
-								rectSize={20}
+								rectSize={23}
 								rectRadius={20}
 								gap={5}
 								getTooltipLabel={({ date, value }) =>
 									`${dayjs(date).format("D MMM, YYYY")} – ${value === null || value === 0 ? "No Active Users" : `${value} Active User${value > 1 ? "s" : ""}`}`
 								}
 							/>
+							<div className="flex-1" />
+						</Paper>
+					</Grid.Col>
+					<Grid.Col span={{ base: 12, md: 4 }} style={{ display: "flex" }}>
+						<Paper withBorder p="md" radius="md" w={500}>
+							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="sm">
+								Content Status Breakdown
+							</Text>
+
+							<Group justify="center">
+								<PieChart
+									size={180}
+									data={statusPieData}
+									withTooltip
+									tooltipDataSource="segment"
+									withLabels
+									withLabelsLine
+									labelsType="value"
+									className="mx-auto"
+								/>
+							</Group>
 						</Paper>
 					</Grid.Col>
 				</Grid>
