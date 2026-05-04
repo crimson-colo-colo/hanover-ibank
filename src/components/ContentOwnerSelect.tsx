@@ -84,6 +84,8 @@ export function ContentOwnerSelect({
 						placeholder="Search users..."
 						onKeyDown={(event) => {
 							if (event.key === "Enter") {
+								event.preventDefault()
+								event.stopPropagation()
 								const selectedIndex = combobox.getSelectedOptionIndex()
 								const result = searchResults.data?.[selectedIndex]
 								if (result) {
