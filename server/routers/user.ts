@@ -5,8 +5,10 @@ import sharp from "sharp"
 import z from "zod"
 import { auth0Management } from "../auth.ts"
 import { db } from "../database.ts"
+import { UserAction } from "../generated/prisma/client.ts"
 import { auth0Cache } from "../lib/auth0.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
+import { logActivity } from "../lib/content.ts"
 import { sendPushNotification } from "../lib/notifications.tsx"
 import { logger } from "../logger.ts"
 import { bucketName, s3 } from "../s3.ts"
@@ -66,6 +68,8 @@ export const userRouter = router({
 				})
 				auth0Cache.invalidate()
 
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_PROFILE, undefined)
+
 				const avatar = await s3.headObject({
 					Bucket: bucketName,
 					Key: `avatar/${opts.ctx.auth.sub}.png`,
@@ -107,6 +111,8 @@ export const userRouter = router({
 					source: "user",
 				},
 			})
+
+			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_AVATAR, undefined)
 		}),
 	getAvatarUrl: authProcedure.input(z.object({ userId: z.string() })).query(async (opts) => {
 		let object: { ETag?: string }

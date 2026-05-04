@@ -60,13 +60,13 @@ export function FavoriteContentCard({
 
 	const { data: contentThumbnail, isFetching } = useQuery(
 		trpc.preview.getContentUrl.queryOptions(
-			{ id: item.id },
+			{ id: item.id, thumbnail: true },
 			{ enabled: item.type === ContentType.Object }
 		)
 	)
 	const { data: plaintextThumbnail, isFetching: isPlaintextFetching } = useQuery(
 		trpc.preview.getPlaintextContent.queryOptions(
-			{ id: item.id },
+			{ id: item.id, thumbnail: true },
 			{ enabled: contentType === FileType.Plaintext }
 		)
 	)

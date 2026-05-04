@@ -1,12 +1,12 @@
 import { AreaChart, BarChart, Heatmap, PieChart } from "@mantine/charts"
-import { Grid, Group, Paper, Stack, Text, Timeline, Title } from "@mantine/core"
+import { Grid, Group, Paper, Stack, Text, Title } from "@mantine/core"
 import { useResizeObserver } from "@mantine/hooks"
-import { IconUserKey } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 import { HelpHint } from "@/components/help.hint.tsx"
+import { TimelineModule } from "@/components/TimelineModule.tsx"
 import { trpc } from "@/lib/trpc.ts"
 
 export const Route = createFileRoute("/admin/analytics")({
@@ -21,9 +21,7 @@ function AnalyticsDashboard() {
 		trpc.userActivity.viewActivityHeatmapWithDates.queryOptions()
 	)
 
-	const { data: userData } = useQuery(trpc.userActivity.viewRecentActivity.queryOptions())
 	const { data: userStats } = useQuery(trpc.admin.getStats.queryOptions())
-
 	const COLORS = [
 		"violet.6",
 		"blue.6",
@@ -113,37 +111,6 @@ function AnalyticsDashboard() {
 		{ label: "Employees", value: userStats?.employeeCount ?? "-" },
 	]
 
-	function getActivityLabel(path: string): { title: string; description: string } {
-		if (path.includes("content.list"))
-			return { title: "Content Viewed", description: "Browsed content library" }
-		if (path.includes("content.get"))
-			return { title: "File Accessed", description: "Opened a file" }
-		if (path.includes("content.download"))
-			return { title: "File Downloaded", description: "Downloaded a file" }
-		if (path.includes("content.create") || path.includes("forms.createContent"))
-			return { title: "File Uploaded", description: "Uploaded new content" }
-		if (path.includes("content.update") || path.includes("content.updateFile"))
-			return { title: "File Edited", description: "Updated content" }
-		if (path.includes("content.delete"))
-			return { title: "File Deleted", description: "Deleted content" }
-		if (path.includes("content.favorite"))
-			return { title: "Content Favorited", description: "Marked content as favorite" }
-		if (path.includes("content.unfavorite"))
-			return { title: "Content Unfavorited", description: "Marked content as unfavorite" }
-		if (path.includes("content.checkOut"))
-			return { title: "File Checked Out", description: "Checked out a file" }
-		if (path.includes("content.checkIn"))
-			return { title: "File Checked In", description: "Checked in a file" }
-		if (path.includes("admin.listUsers"))
-			return {
-				title: "Employee Management Page Viewed",
-				description: "Visited employee management",
-			}
-		if (path.includes("admin."))
-			return { title: "Analytics Dashboard Viewed", description: "Visited analytics dashboard" }
-		return { title: path, description: "" }
-	}
-
 	return (
 		<Stack gap="lg">
 			<Title order={2}>Analytics Dashboard</Title>
@@ -223,42 +190,7 @@ function AnalyticsDashboard() {
 					</Grid.Col>
 
 					<Grid.Col span={{ base: 12, md: 5 }}>
-						<Paper withBorder p="md" radius="md" h="100%">
-							<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
-								Recent User Activity
-							</Text>
-							<div style={{ maxHeight: 200, overflowY: "auto" }}>
-								<Timeline active={userData?.length ?? 0} bulletSize={24} lineWidth={2}>
-									{/*hot fix for removing notification api calls from user activity*/}
-									{(userData ?? [])
-										.filter(
-											(item) =>
-												item.path !== "user.getNotifications" &&
-												item.path !== "user.createPushSubscription"
-										)
-										.map((activity, i) => {
-											const { title, description } = getActivityLabel(activity.path)
-											return (
-												<Timeline.Item
-													// biome-ignore lint/suspicious/noArrayIndexKey: foo
-													key={i}
-													bullet={<IconUserKey size={12} />}
-													title={title}
-												>
-													<Text size="sm" c="dimmed">
-														{activity.contentTitle
-															? `Uploaded "${activity.contentTitle}"`
-															: description}
-													</Text>
-													<Text size="xs" mt={4}>
-														{new Date(activity.timestamp).toLocaleTimeString()}
-													</Text>
-												</Timeline.Item>
-											)
-										})}
-								</Timeline>
-							</div>
-						</Paper>
+						<TimelineModule />
 					</Grid.Col>
 				</Grid>
 			</div>

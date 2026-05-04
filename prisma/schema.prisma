@@ -30,6 +30,7 @@ model Employee {
     recentTimestamps   RecentTimestamps[]
     notifications      Notification[]
     actorNotifications Notification[]      @relation("Actor")
+    activityLogs       ActivityLog[]
 }
 
 model Content {
@@ -47,15 +48,16 @@ model Content {
     /// URL for links
     url              String?
     ownerId          String
-    owner            Employee            @relation("Owner", fields: [ownerId], references: [id], onDelete: Restrict)
+    owner            Employee            @relation("Owner", fields: [ownerId], references: [id])
     tags             ContentTag[]
     favoritedBy      FavoriteContent[]
     checkedOutById   String?
-    checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id], onDelete: SetNull)
+    checkedOutBy     Employee?           @relation("CheckedOutContent", fields: [checkedOutById], references: [id])
     threads          ContentTalkThread[]
     embeddings       Embedding[]
     recentTimestamps RecentTimestamps[]
     notifications    Notification[]
+    activityLogs     ActivityLog[]
 }
 
 model ContentTalkThread {
@@ -215,4 +217,36 @@ model Notification {
     actorId    String? /// ID of the employee that triggered the notification, if applicable
     actor      Employee?        @relation("Actor", fields: [actorId], references: [id], onDelete: Cascade)
     createdAt  DateTime         @default(now())
+}
+
+enum UserAction {
+    CHECK_OUT_CONTENT
+    CHECK_IN_CONTENT
+    EDIT_TITLE
+    TRANSFER_OWNERSHIP
+    EDIT_LAST_MODIFIED_DATE
+    EDIT_EXPIRATION_DATE
+    EDIT_CONTENT_STATUS
+    EDIT_CONTENT_TAGS
+    REUPLOAD_FILE
+    EDIT_LINK
+    CREATE_DISCUSSION
+    COMMENT
+    VIEW_CONTENT
+    DOWNLOAD_FILE
+    DELETE_CONTENT
+    UPLOAD_CONTENT
+    EDIT_AVATAR
+    EDIT_PROFILE
+}
+
+model ActivityLog {
+    id           String     @id @default(cuid())
+    employeeId   String
+    employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+    action       UserAction
+    contentId    String?
+    content      Content?   @relation(fields: [contentId], references: [id], onDelete: SetNull)
+    contentTitle String?
+    timestamp    DateTime   @default(now())
 }

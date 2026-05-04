@@ -1,8 +1,10 @@
 import { TRPCError } from "@trpc/server"
 import z from "zod"
 import { db } from "../database.ts"
+import { UserAction } from "../generated/prisma/client.ts"
 import { ThreadStatus } from "../generated/prisma/enums.ts"
 import { auth0Cache } from "../lib/auth0.ts"
+import { logActivity } from "../lib/content.ts"
 import { authProcedure, router } from "../trpc.ts"
 
 export const discussionRouter = router({
@@ -80,6 +82,7 @@ export const discussionRouter = router({
 					message: "Content not found",
 				})
 			}
+			await logActivity(opts.ctx.auth.sub, UserAction.CREATE_DISCUSSION, opts.input.contentId)
 
 			return db.contentTalkThread.create({
 				data: {
@@ -139,6 +142,7 @@ export const discussionRouter = router({
 					message: "Cannot comment on archived thread",
 				})
 			}
+			await logActivity(opts.ctx.auth.sub, UserAction.COMMENT, thread.contentId)
 
 			return db.contentTalkThread.update({
 				where: {

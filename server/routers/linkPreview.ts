@@ -1,6 +1,8 @@
 import ogs from "open-graph-scraper"
 import z from "zod"
 import { db } from "../database.ts"
+import { UserAction } from "../generated/prisma/client.ts"
+import { logActivity } from "../lib/content.ts"
 import { authProcedure, router } from "../trpc.ts"
 
 export const opengraphRouter = router({
@@ -31,6 +33,8 @@ export const opengraphRouter = router({
 						viewCount: { increment: 1 },
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.VIEW_CONTENT, opts.input.id)
 
 				if (!error) {
 					return { response: result }

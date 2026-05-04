@@ -7,7 +7,7 @@ import * as jose from "jose"
 import z from "zod"
 import { db } from "../database.ts"
 import { env } from "../env.ts"
-import type { Employee, Tag } from "../generated/prisma/client.ts"
+import { type Employee, type Tag, UserAction } from "../generated/prisma/client.ts"
 import {
 	ContentStatus,
 	ContentType,
@@ -15,7 +15,11 @@ import {
 	NotificationType,
 	TagCategory,
 } from "../generated/prisma/enums.ts"
-import { fetchAndTransformToContentListItems, getContentInclude } from "../lib/content.ts"
+import {
+	fetchAndTransformToContentListItems,
+	getContentInclude,
+	logActivity,
+} from "../lib/content.ts"
 import { embedFile } from "../lib/embedFile.ts"
 import { getFileTypeFromFile } from "../lib/filetype.ts"
 import {
@@ -216,6 +220,8 @@ export const contentRouter = router({
 					},
 				})
 
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_TITLE, opts.input.id)
+
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
 						where: { id: opts.ctx.auth.sub },
@@ -271,6 +277,8 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LAST_MODIFIED_DATE, opts.input.id)
 
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
@@ -330,6 +338,8 @@ export const contentRouter = router({
 					},
 				})
 
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_EXPIRATION_DATE, opts.input.id)
+
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
 						where: { id: opts.ctx.auth.sub },
@@ -376,6 +386,9 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.TRANSFER_OWNERSHIP, opts.input.id)
+
 				const actor = (await db.employee.findUnique({
 					where: { id: opts.ctx.auth.sub },
 				})) as Employee
@@ -420,6 +433,8 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_CONTENT_STATUS, opts.input.id)
 
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
@@ -522,6 +537,8 @@ export const contentRouter = router({
 						recentlyEdited: new Date(),
 					},
 				})
+
+				await logActivity(opts.ctx.auth.sub, UserAction.EDIT_CONTENT_TAGS, opts.input.id)
 
 				if (updated.ownerId !== opts.ctx.auth.sub) {
 					const actor = (await db.employee.findUnique({
@@ -632,6 +649,8 @@ export const contentRouter = router({
 			},
 		})
 
+		await logActivity(opts.ctx.auth.sub, UserAction.DOWNLOAD_FILE, opts.input.id)
+
 		return { url: `/content/download?token=${token}` }
 	}),
 
@@ -725,6 +744,9 @@ export const contentRouter = router({
 					recentlyEdited: new Date(),
 				},
 			})
+
+			await logActivity(opts.ctx.auth.sub, UserAction.REUPLOAD_FILE, opts.input.id)
+
 			if (updated.ownerId !== opts.ctx.auth.sub) {
 				const actor = (await db.employee.findUnique({
 					where: { id: opts.ctx.auth.sub },
@@ -811,6 +833,7 @@ export const contentRouter = router({
 				},
 				include: { tags: true },
 			})
+			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LINK, opts.input.id)
 			if (updated.ownerId !== opts.ctx.auth.sub) {
 				const actor = (await db.employee.findUnique({
 					where: { id: opts.ctx.auth.sub },
@@ -825,6 +848,7 @@ export const contentRouter = router({
 				})
 				await notifyContentEdited(notification, updated, actor)
 			}
+			await logActivity(opts.ctx.auth.sub, UserAction.EDIT_LINK, opts.input.id)
 			await embedFile(updated)
 		}),
 
@@ -851,6 +875,10 @@ export const contentRouter = router({
 				error,
 			})
 		}
+
+		contents.map((content) =>
+			logActivity(opts.ctx.auth.sub, UserAction.DELETE_CONTENT, undefined, content.title)
+		)
 	}),
 	favorite: authProcedure.input(z.object({ id: z.string() })).mutation(async (opts) => {
 		const favorite = await db.favoriteContent.upsert({
@@ -974,6 +1002,8 @@ export const contentRouter = router({
 			data: { checkedOutById: user.id },
 		})
 
+		await logActivity(opts.ctx.auth.sub, UserAction.CHECK_OUT_CONTENT, opts.input.id)
+
 		if (updated.ownerId !== opts.ctx.auth.sub) {
 			const notification = await db.notification.create({
 				data: {
@@ -1030,6 +1060,8 @@ export const contentRouter = router({
 			where: { id: opts.input.id },
 			data: { checkedOutById: null },
 		})
+
+		await logActivity(opts.ctx.auth.sub, UserAction.CHECK_IN_CONTENT, opts.input.id)
 
 		if (updated.ownerId !== opts.ctx.auth.sub) {
 			const notification = await db.notification.create({

@@ -254,6 +254,7 @@ export type ContentWhereInput = {
   embeddings?: Prisma.EmbeddingListRelationFilter
   recentTimestamps?: Prisma.RecentTimestampsListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  activityLogs?: Prisma.ActivityLogListRelationFilter
 }
 
 export type ContentOrderByWithRelationInput = {
@@ -278,6 +279,7 @@ export type ContentOrderByWithRelationInput = {
   embeddings?: Prisma.EmbeddingOrderByRelationAggregateInput
   recentTimestamps?: Prisma.RecentTimestampsOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  activityLogs?: Prisma.ActivityLogOrderByRelationAggregateInput
 }
 
 export type ContentWhereUniqueInput = Prisma.AtLeast<{
@@ -305,6 +307,7 @@ export type ContentWhereUniqueInput = Prisma.AtLeast<{
   embeddings?: Prisma.EmbeddingListRelationFilter
   recentTimestamps?: Prisma.RecentTimestampsListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  activityLogs?: Prisma.ActivityLogListRelationFilter
 }, "id">
 
 export type ContentOrderByWithAggregationInput = {
@@ -365,6 +368,7 @@ export type ContentCreateInput = {
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateInput = {
@@ -387,6 +391,7 @@ export type ContentUncheckedCreateInput = {
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentUpdateInput = {
@@ -409,6 +414,7 @@ export type ContentUpdateInput = {
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateInput = {
@@ -431,6 +437,7 @@ export type ContentUncheckedUpdateInput = {
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyInput = {
@@ -741,6 +748,22 @@ export type ContentUpdateOneWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutNotificationsInput, Prisma.ContentUpdateWithoutNotificationsInput>, Prisma.ContentUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type ContentCreateNestedOneWithoutActivityLogsInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutActivityLogsInput, Prisma.ContentUncheckedCreateWithoutActivityLogsInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutActivityLogsInput
+  connect?: Prisma.ContentWhereUniqueInput
+}
+
+export type ContentUpdateOneWithoutActivityLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContentCreateWithoutActivityLogsInput, Prisma.ContentUncheckedCreateWithoutActivityLogsInput>
+  connectOrCreate?: Prisma.ContentCreateOrConnectWithoutActivityLogsInput
+  upsert?: Prisma.ContentUpsertWithoutActivityLogsInput
+  disconnect?: Prisma.ContentWhereInput | boolean
+  delete?: Prisma.ContentWhereInput | boolean
+  connect?: Prisma.ContentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContentUpdateToOneWithWhereWithoutActivityLogsInput, Prisma.ContentUpdateWithoutActivityLogsInput>, Prisma.ContentUncheckedUpdateWithoutActivityLogsInput>
+}
+
 export type ContentCreateWithoutOwnerInput = {
   id?: string
   title: string
@@ -760,6 +783,7 @@ export type ContentCreateWithoutOwnerInput = {
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutOwnerInput = {
@@ -781,6 +805,7 @@ export type ContentUncheckedCreateWithoutOwnerInput = {
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutOwnerInput = {
@@ -812,6 +837,7 @@ export type ContentCreateWithoutCheckedOutByInput = {
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutCheckedOutByInput = {
@@ -833,6 +859,7 @@ export type ContentUncheckedCreateWithoutCheckedOutByInput = {
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutCheckedOutByInput = {
@@ -915,6 +942,7 @@ export type ContentCreateWithoutThreadsInput = {
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutThreadsInput = {
@@ -936,6 +964,7 @@ export type ContentUncheckedCreateWithoutThreadsInput = {
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutThreadsInput = {
@@ -973,6 +1002,7 @@ export type ContentUpdateWithoutThreadsInput = {
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutThreadsInput = {
@@ -994,6 +1024,7 @@ export type ContentUncheckedUpdateWithoutThreadsInput = {
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateWithoutTagsInput = {
@@ -1015,6 +1046,7 @@ export type ContentCreateWithoutTagsInput = {
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutTagsInput = {
@@ -1036,6 +1068,7 @@ export type ContentUncheckedCreateWithoutTagsInput = {
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutTagsInput = {
@@ -1073,6 +1106,7 @@ export type ContentUpdateWithoutTagsInput = {
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutTagsInput = {
@@ -1094,6 +1128,7 @@ export type ContentUncheckedUpdateWithoutTagsInput = {
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateWithoutFavoritedByInput = {
@@ -1115,6 +1150,7 @@ export type ContentCreateWithoutFavoritedByInput = {
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutFavoritedByInput = {
@@ -1136,6 +1172,7 @@ export type ContentUncheckedCreateWithoutFavoritedByInput = {
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutFavoritedByInput = {
@@ -1173,6 +1210,7 @@ export type ContentUpdateWithoutFavoritedByInput = {
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutFavoritedByInput = {
@@ -1194,6 +1232,7 @@ export type ContentUncheckedUpdateWithoutFavoritedByInput = {
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateWithoutEmbeddingsInput = {
@@ -1215,6 +1254,7 @@ export type ContentCreateWithoutEmbeddingsInput = {
   threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutEmbeddingsInput = {
@@ -1236,6 +1276,7 @@ export type ContentUncheckedCreateWithoutEmbeddingsInput = {
   threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutEmbeddingsInput = {
@@ -1278,6 +1319,7 @@ export type ContentCreateWithoutRecentTimestampsInput = {
   threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutRecentTimestampsInput = {
@@ -1299,6 +1341,7 @@ export type ContentUncheckedCreateWithoutRecentTimestampsInput = {
   threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutRecentTimestampsInput = {
@@ -1336,6 +1379,7 @@ export type ContentUpdateWithoutRecentTimestampsInput = {
   threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutRecentTimestampsInput = {
@@ -1357,6 +1401,7 @@ export type ContentUncheckedUpdateWithoutRecentTimestampsInput = {
   threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateWithoutNotificationsInput = {
@@ -1378,6 +1423,7 @@ export type ContentCreateWithoutNotificationsInput = {
   threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
   embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogCreateNestedManyWithoutContentInput
 }
 
 export type ContentUncheckedCreateWithoutNotificationsInput = {
@@ -1399,6 +1445,7 @@ export type ContentUncheckedCreateWithoutNotificationsInput = {
   threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
   embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
+  activityLogs?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutContentInput
 }
 
 export type ContentCreateOrConnectWithoutNotificationsInput = {
@@ -1436,6 +1483,7 @@ export type ContentUpdateWithoutNotificationsInput = {
   threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutNotificationsInput = {
@@ -1457,6 +1505,111 @@ export type ContentUncheckedUpdateWithoutNotificationsInput = {
   threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
+}
+
+export type ContentCreateWithoutActivityLogsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  owner: Prisma.EmployeeCreateNestedOneWithoutContentInput
+  tags?: Prisma.ContentTagCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentCreateNestedManyWithoutContentInput
+  checkedOutBy?: Prisma.EmployeeCreateNestedOneWithoutCheckedOutContentInput
+  threads?: Prisma.ContentTalkThreadCreateNestedManyWithoutContentInput
+  embeddings?: Prisma.EmbeddingCreateNestedManyWithoutContentInput
+  recentTimestamps?: Prisma.RecentTimestampsCreateNestedManyWithoutContentInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutContentInput
+}
+
+export type ContentUncheckedCreateWithoutActivityLogsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  status?: $Enums.ContentStatus
+  type: $Enums.ContentType
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  lastModifiedDate: Date | string
+  expirationDate: Date | string
+  objectId?: string | null
+  url?: string | null
+  ownerId: string
+  checkedOutById?: string | null
+  tags?: Prisma.ContentTagUncheckedCreateNestedManyWithoutContentInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedCreateNestedManyWithoutContentInput
+  threads?: Prisma.ContentTalkThreadUncheckedCreateNestedManyWithoutContentInput
+  embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutContentInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedCreateNestedManyWithoutContentInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutContentInput
+}
+
+export type ContentCreateOrConnectWithoutActivityLogsInput = {
+  where: Prisma.ContentWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContentCreateWithoutActivityLogsInput, Prisma.ContentUncheckedCreateWithoutActivityLogsInput>
+}
+
+export type ContentUpsertWithoutActivityLogsInput = {
+  update: Prisma.XOR<Prisma.ContentUpdateWithoutActivityLogsInput, Prisma.ContentUncheckedUpdateWithoutActivityLogsInput>
+  create: Prisma.XOR<Prisma.ContentCreateWithoutActivityLogsInput, Prisma.ContentUncheckedCreateWithoutActivityLogsInput>
+  where?: Prisma.ContentWhereInput
+}
+
+export type ContentUpdateToOneWithWhereWithoutActivityLogsInput = {
+  where?: Prisma.ContentWhereInput
+  data: Prisma.XOR<Prisma.ContentUpdateWithoutActivityLogsInput, Prisma.ContentUncheckedUpdateWithoutActivityLogsInput>
+}
+
+export type ContentUpdateWithoutActivityLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  owner?: Prisma.EmployeeUpdateOneRequiredWithoutContentNestedInput
+  tags?: Prisma.ContentTagUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUpdateManyWithoutContentNestedInput
+  checkedOutBy?: Prisma.EmployeeUpdateOneWithoutCheckedOutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
+  embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+}
+
+export type ContentUncheckedUpdateWithoutActivityLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumContentStatusFieldUpdateOperationsInput | $Enums.ContentStatus
+  type?: Prisma.EnumContentTypeFieldUpdateOperationsInput | $Enums.ContentType
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastModifiedDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expirationDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  objectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  checkedOutById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContentTagUncheckedUpdateManyWithoutContentNestedInput
+  favoritedBy?: Prisma.FavoriteContentUncheckedUpdateManyWithoutContentNestedInput
+  threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
+  embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
+  recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentCreateManyOwnerInput = {
@@ -1508,6 +1661,7 @@ export type ContentUpdateWithoutOwnerInput = {
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutOwnerInput = {
@@ -1529,6 +1683,7 @@ export type ContentUncheckedUpdateWithoutOwnerInput = {
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutOwnerInput = {
@@ -1565,6 +1720,7 @@ export type ContentUpdateWithoutCheckedOutByInput = {
   embeddings?: Prisma.EmbeddingUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutCheckedOutByInput = {
@@ -1586,6 +1742,7 @@ export type ContentUncheckedUpdateWithoutCheckedOutByInput = {
   embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutCheckedOutByInput = {
@@ -1622,6 +1779,7 @@ export type ContentUpdateWithoutEmbeddingsInput = {
   threads?: Prisma.ContentTalkThreadUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateWithoutEmbeddingsInput = {
@@ -1643,6 +1801,7 @@ export type ContentUncheckedUpdateWithoutEmbeddingsInput = {
   threads?: Prisma.ContentTalkThreadUncheckedUpdateManyWithoutContentNestedInput
   recentTimestamps?: Prisma.RecentTimestampsUncheckedUpdateManyWithoutContentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutContentNestedInput
+  activityLogs?: Prisma.ActivityLogUncheckedUpdateManyWithoutContentNestedInput
 }
 
 export type ContentUncheckedUpdateManyWithoutEmbeddingsInput = {
@@ -1673,6 +1832,7 @@ export type ContentCountOutputType = {
   embeddings: number
   recentTimestamps: number
   notifications: number
+  activityLogs: number
 }
 
 export type ContentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1682,6 +1842,7 @@ export type ContentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   embeddings?: boolean | ContentCountOutputTypeCountEmbeddingsArgs
   recentTimestamps?: boolean | ContentCountOutputTypeCountRecentTimestampsArgs
   notifications?: boolean | ContentCountOutputTypeCountNotificationsArgs
+  activityLogs?: boolean | ContentCountOutputTypeCountActivityLogsArgs
 }
 
 /**
@@ -1736,6 +1897,13 @@ export type ContentCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime
   where?: Prisma.NotificationWhereInput
 }
 
+/**
+ * ContentCountOutputType without action
+ */
+export type ContentCountOutputTypeCountActivityLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityLogWhereInput
+}
+
 
 export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1759,6 +1927,7 @@ export type ContentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   embeddings?: boolean | Prisma.Content$embeddingsArgs<ExtArgs>
   recentTimestamps?: boolean | Prisma.Content$recentTimestampsArgs<ExtArgs>
   notifications?: boolean | Prisma.Content$notificationsArgs<ExtArgs>
+  activityLogs?: boolean | Prisma.Content$activityLogsArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["content"]>
 
@@ -1824,6 +1993,7 @@ export type ContentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   embeddings?: boolean | Prisma.Content$embeddingsArgs<ExtArgs>
   recentTimestamps?: boolean | Prisma.Content$recentTimestampsArgs<ExtArgs>
   notifications?: boolean | Prisma.Content$notificationsArgs<ExtArgs>
+  activityLogs?: boolean | Prisma.Content$activityLogsArgs<ExtArgs>
   _count?: boolean | Prisma.ContentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1846,6 +2016,7 @@ export type $ContentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     embeddings: Prisma.$EmbeddingPayload<ExtArgs>[]
     recentTimestamps: Prisma.$RecentTimestampsPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    activityLogs: Prisma.$ActivityLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2269,6 +2440,7 @@ export interface Prisma__ContentClient<T, Null = never, ExtArgs extends runtime.
   embeddings<T extends Prisma.Content$embeddingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$embeddingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmbeddingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recentTimestamps<T extends Prisma.Content$recentTimestampsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$recentTimestampsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecentTimestampsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Content$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activityLogs<T extends Prisma.Content$activityLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Content$activityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2872,6 +3044,30 @@ export type Content$notificationsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * Content.activityLogs
+ */
+export type Content$activityLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActivityLog
+   */
+  select?: Prisma.ActivityLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ActivityLog
+   */
+  omit?: Prisma.ActivityLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityLogInclude<ExtArgs> | null
+  where?: Prisma.ActivityLogWhereInput
+  orderBy?: Prisma.ActivityLogOrderByWithRelationInput | Prisma.ActivityLogOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityLogScalarFieldEnum | Prisma.ActivityLogScalarFieldEnum[]
 }
 
 /**

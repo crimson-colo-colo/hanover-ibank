@@ -1,7 +1,8 @@
 import type { HeadObjectOutput } from "@aws-sdk/client-s3"
 import type { Management } from "auth0"
 import type { ContentListItem } from "../../shared/types.ts"
-import type { Prisma } from "../generated/prisma/client.ts"
+import { db } from "../database.ts"
+import type { Prisma, UserAction } from "../generated/prisma/client.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { auth0Cache } from "./auth0.ts"
 
@@ -118,4 +119,38 @@ export async function fetchAndTransformToContentListItems(
 ): Promise<ContentListItem[]> {
 	const [users, metadata] = await Promise.all([auth0Cache.listUsers(), getS3Metadata(data)])
 	return data.map((item) => transformToContentListItem(item, users.data, metadata, userId))
+}
+
+export async function logActivity(
+	employeeId: string,
+	action: UserAction,
+	contentId?: string,
+	contentTitle?: string
+) {
+	await db.activityLog.create({
+		data: {
+			employeeId,
+			action,
+			contentId,
+			contentTitle: contentId
+				? (await db.content.findUnique({ where: { id: contentId }, select: { title: true } }))
+						?.title
+				: contentTitle,
+		},
+	})
+}
+
+const [users] = await Promise.all([auth0Cache.listUsers()])
+
+export function getDisplayName(employeeId: string) {
+	const unknownUser = {
+		name: "Unknown User",
+		email: "unknown",
+		username: "unknown",
+		avatarUrl: "",
+		nickname: null,
+		picture: null,
+	}
+	const owner = users.data.find((u) => u.user_id === employeeId) ?? unknownUser
+	return owner.name ?? owner.nickname ?? owner.username!
 }

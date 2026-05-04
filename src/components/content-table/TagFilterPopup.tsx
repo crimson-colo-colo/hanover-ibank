@@ -136,7 +136,6 @@ export function TagFilterPopup({ column, allTags, resetPage }: TagFilterPopupPro
 												checked={filterValue.includes(tag.name)}
 												onChange={() => {
 													toggleTag(tag.name)
-													console.log("Hello")
 													resetPage()
 												}}
 												size="sm"
