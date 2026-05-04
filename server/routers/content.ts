@@ -1231,5 +1231,18 @@ export const contentRouter = router({
 
 		return await fetchAndTransformToContentListItems(expiringContent, opts.ctx.auth.sub)
 	}),
+	getStatusStats: authProcedure.query(async () => {
+		const statuses = await db.content.groupBy({
+			by: ["status"],
+			_count: {
+				status: true,
+			},
+		})
+
+		return statuses.map((item) => ({
+			name: item.status,
+			value: item._count.status,
+		}))
+	}),
 })
 export default contentRouter
