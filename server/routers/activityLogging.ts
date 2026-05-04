@@ -5,12 +5,12 @@ import { adminProcedure, router } from "../trpc.ts"
 
 export const activityLoggingRouter = router({
 	listUserActivity: adminProcedure
-		.input(z.object({ employeeId: z.string().optional() }))
+		.input(z.object({ employeeId: z.string().optional(), limit: z.number().default(10) }))
 		.query(async (opts) => {
 			const activity = await db.activityLog.findMany({
 				where: { employeeId: opts.input.employeeId },
 				orderBy: { timestamp: "desc" },
-				take: 100,
+				take: opts.input.limit,
 			})
 
 			const content = await db.content.findMany({
@@ -26,7 +26,9 @@ export const activityLoggingRouter = router({
 			const output = activity.map((item) => ({
 				...item,
 				displayName: getDisplayName(item.employeeId),
-				contentTitle: item.contentId ? (contentMap.get(item.contentId) ?? "") : "",
+				contentTitle: item.contentId
+					? (contentMap.get(item.contentId) ?? "")
+					: (item.contentTitle ?? ""),
 			}))
 			return output
 		}),

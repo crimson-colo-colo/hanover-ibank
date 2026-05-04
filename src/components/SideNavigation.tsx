@@ -22,6 +22,7 @@ import {
 	IconStar,
 	IconStarFilled,
 	IconUsers,
+	IconWood,
 } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Link, useLocation } from "@tanstack/react-router"
@@ -56,6 +57,13 @@ const routeLinks = [
 		name: "Analytics",
 		icon: IconChartBarPopular,
 		iconFilled: IconChartBarPopular,
+		admin: true,
+	},
+	{
+		pathName: "/admin/activity-log",
+		name: "Activity Log",
+		icon: IconWood,
+		iconFilled: IconWood,
 		admin: true,
 	},
 ]

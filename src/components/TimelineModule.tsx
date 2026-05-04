@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, Group, Paper, Text, Timeline, Tooltip } from "@mantine/core"
+import { ActionIcon, Flex, Group, Paper, ScrollArea, Text, Timeline, Tooltip } from "@mantine/core"
 import { activityLabelToStringTimeline } from "@shared/activityLabels.ts"
 import { IconSearch } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
@@ -48,7 +48,7 @@ export function TimelineModule() {
 					</ActionIcon>
 				)}
 			</Group>
-			<div style={{ maxHeight: 200, overflowY: "auto" }}>
+			<ScrollArea h={200}>
 				<Timeline active={allUserActivity?.length ?? 0} bulletSize={24} lineWidth={2}>
 					{allUserActivity?.map((item, i) => {
 						const title = activityLabelToStringTimeline[item.action]
@@ -82,7 +82,7 @@ export function TimelineModule() {
 						)
 					})}
 				</Timeline>
-			</div>
+			</ScrollArea>
 			<Link
 				to="/admin/activity-log"
 				className="no-underline text-inherit flex items-center gap-2 w-fit hover:underline mt-sm"
