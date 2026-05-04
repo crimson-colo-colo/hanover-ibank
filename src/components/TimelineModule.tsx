@@ -26,8 +26,8 @@ export function TimelineModule() {
 
 	return (
 		<Paper withBorder p="md" radius="md" h="100%">
-			<Group gap={6} justify="space-between">
-				<Text size="xs" c="dimmed" tt="uppercase" fw={500} mb="md">
+			<Group gap={6} justify="space-between" align="start">
+				<Text size="xs" c="dimmed" tt="uppercase" fw={500}>
 					Recent User Activity
 				</Text>
 				{searching ? (

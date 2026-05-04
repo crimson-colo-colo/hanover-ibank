@@ -49,13 +49,13 @@ export function FilePreviewProvider({
 }) {
 	const { data: contentPreview, isFetching } = useQuery(
 		trpc.preview.getContentUrl.queryOptions(
-			{ id: content.id },
-			{ enabled: content.type === ContentType.Object }
+			{ id: content.id, thumbnail: false },
+			{ enabled: content.type === ContentType.Object && fileType !== FileType.Plaintext }
 		)
 	)
 	const { data: plaintextContent, isFetching: isPlaintextFetching } = useQuery(
 		trpc.preview.getPlaintextContent.queryOptions(
-			{ id: content.id },
+			{ id: content.id, thumbnail: false },
 			{ enabled: fileType === FileType.Plaintext }
 		)
 	)

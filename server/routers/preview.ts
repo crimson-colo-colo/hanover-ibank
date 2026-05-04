@@ -32,197 +32,208 @@ export async function convertToPDF(key: string, filename: string) {
 }
 
 export const previewRouter = router({
-	getContentUrl: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
-		const content = await db.content.findUnique({
-			where: { id: opts.input.id },
-		})
-		if (!content) {
-			throw new TRPCError({
-				code: "NOT_FOUND",
-				message: "Content not found",
+	getContentUrl: authProcedure
+		.input(z.object({ id: z.string(), thumbnail: z.boolean() }))
+		.query(async (opts) => {
+			const content = await db.content.findUnique({
+				where: { id: opts.input.id },
 			})
-		}
-
-		if (content.type === "Link") {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: "Content is a link",
-				cause: content.url,
-			})
-		}
-
-		await db.recentTimestamps.upsert({
-			where: {
-				employeeId_contentId: {
-					contentId: opts.input.id,
-					employeeId: opts.ctx.auth.sub,
-				},
-			},
-			create: {
-				recentlyViewed: new Date(),
-				recentlyEdited: new Date(),
-				viewCount: 1,
-				contentId: opts.input.id,
-				employeeId: opts.ctx.auth.sub,
-			},
-			update: {
-				recentlyViewed: new Date(),
-				viewCount: {
-					increment: 1,
-				},
-			},
-		})
-
-		const metadata = await s3.headObject({
-			Bucket: bucketName,
-			Key: content.objectId!,
-		})
-
-		const fileType = metadata.Metadata?.filetype ?? FileType.Unknown
-
-		if (
-			fileType === FileType.WordDocument ||
-			fileType === FileType.Excel ||
-			fileType === FileType.Powerpoint
-		) {
-			const previewKey = `preview/${content.objectId!}`
-
-			let previewMetadata: HeadObjectCommandOutput | undefined
-			try {
-				previewMetadata = await s3.headObject({
-					Bucket: bucketName,
-					Key: previewKey,
+			if (!content) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Content not found",
 				})
-			} catch {}
+			}
 
-			if (previewMetadata?.Metadata) {
-				// ensure preview file is up to date
-				if (previewMetadata.Metadata.original_etag === metadata.ETag) {
-					const command = new GetObjectCommand({
+			if (content.type === "Link") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Content is a link",
+					cause: content.url,
+				})
+			}
+
+			if (!opts.input.thumbnail) {
+				await db.recentTimestamps.upsert({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					create: {
+						recentlyViewed: new Date(),
+						recentlyEdited: new Date(),
+						viewCount: 1,
+						contentId: opts.input.id,
+						employeeId: opts.ctx.auth.sub,
+					},
+					update: {
+						recentlyViewed: new Date(),
+						viewCount: {
+							increment: 1,
+						},
+					},
+				})
+			}
+
+			const metadata = await s3.headObject({
+				Bucket: bucketName,
+				Key: content.objectId!,
+			})
+
+			const fileType = metadata.Metadata?.filetype ?? FileType.Unknown
+
+			if (
+				fileType === FileType.WordDocument ||
+				fileType === FileType.Excel ||
+				fileType === FileType.Powerpoint
+			) {
+				const previewKey = `preview/${content.objectId!}`
+
+				let previewMetadata: HeadObjectCommandOutput | undefined
+				try {
+					previewMetadata = await s3.headObject({
 						Bucket: bucketName,
 						Key: previewKey,
 					})
-					const url = await getSignedUrl(s3, command, { expiresIn: 300 })
-					return { url }
+				} catch {}
+
+				if (previewMetadata?.Metadata) {
+					// ensure preview file is up to date
+					if (previewMetadata.Metadata.original_etag === metadata.ETag) {
+						const command = new GetObjectCommand({
+							Bucket: bucketName,
+							Key: previewKey,
+						})
+						const url = await getSignedUrl(s3, command, { expiresIn: 300 })
+						return { url }
+					}
+
+					// otherwise, convert the file again
 				}
 
-				// otherwise, convert the file again
+				let res: Response
+				try {
+					res = await convertToPDF(content.objectId!, content.title)
+				} catch (error) {
+					logger.error({
+						message: "Failed to connect to document conversion service",
+						contentId: content.id,
+						cause: error instanceof Error ? error.message : String(error),
+					})
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to connect to document conversion service",
+						cause: error instanceof Error ? error.message : String(error),
+					})
+				}
+				if (!res.ok) {
+					logger.error({
+						message: "Document conversion failed",
+						contentId: content.id,
+						status: res.status,
+						statusText: res.statusText,
+						body: await res.text(),
+					})
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to convert document for preview",
+					})
+				}
+				const pdfBlob = await res.blob()
+				const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer())
+				await s3.putObject({
+					Bucket: bucketName,
+					Key: previewKey,
+					Body: pdfBuffer,
+					ContentType: "application/pdf",
+					Metadata: {
+						filetype: FileType.Pdf,
+						original_filetype: fileType,
+						original_etag: metadata.ETag!,
+					},
+				})
+				const command = new GetObjectCommand({
+					Bucket: bucketName,
+					Key: previewKey,
+				})
+				const url = await getSignedUrl(s3, command, { expiresIn: 300 })
+				return { url }
 			}
 
-			let res: Response
-			try {
-				res = await convertToPDF(content.objectId!, content.title)
-			} catch (error) {
-				logger.error({
-					message: "Failed to connect to document conversion service",
-					contentId: content.id,
-					cause: error instanceof Error ? error.message : String(error),
-				})
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to connect to document conversion service",
-					cause: error instanceof Error ? error.message : String(error),
-				})
-			}
-			if (!res.ok) {
-				logger.error({
-					message: "Document conversion failed",
-					contentId: content.id,
-					status: res.status,
-					statusText: res.statusText,
-					body: await res.text(),
-				})
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to convert document for preview",
-				})
-			}
-			const pdfBlob = await res.blob()
-			const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer())
-			await s3.putObject({
-				Bucket: bucketName,
-				Key: previewKey,
-				Body: pdfBuffer,
-				ContentType: "application/pdf",
-				Metadata: {
-					filetype: FileType.Pdf,
-					original_filetype: fileType,
-					original_etag: metadata.ETag!,
-				},
-			})
 			const command = new GetObjectCommand({
 				Bucket: bucketName,
-				Key: previewKey,
+				Key: content.objectId!,
 			})
+
 			const url = await getSignedUrl(s3, command, { expiresIn: 300 })
+			if (!opts.input.thumbnail) {
+				await logActivity(opts.ctx.auth.sub, UserAction.VIEW_CONTENT, opts.input.id)
+			}
 			return { url }
-		}
+		}),
 
-		const command = new GetObjectCommand({
-			Bucket: bucketName,
-			Key: content.objectId!,
-		})
-
-		const url = await getSignedUrl(s3, command, { expiresIn: 300 })
-		await logActivity(opts.ctx.auth.sub, UserAction.VIEW_CONTENT, opts.input.id)
-		return { url }
-	}),
-
-	getPlaintextContent: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
-		const content = await db.content.findUnique({
-			where: { id: opts.input.id },
-		})
-		if (!content) {
-			throw new TRPCError({
-				code: "NOT_FOUND",
-				message: "Content not found",
+	getPlaintextContent: authProcedure
+		.input(z.object({ id: z.string(), thumbnail: z.boolean() }))
+		.query(async (opts) => {
+			const content = await db.content.findUnique({
+				where: { id: opts.input.id },
 			})
-		}
+			if (!content) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Content not found",
+				})
+			}
 
-		if (content.type === "Link") {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: "Content is a link",
+			if (content.type === "Link") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Content is a link",
+				})
+			}
+
+			const metadata = await s3.headObject({
+				Bucket: bucketName,
+				Key: content.objectId!,
 			})
-		}
 
-		const metadata = await s3.headObject({
-			Bucket: bucketName,
-			Key: content.objectId!,
-		})
+			const fileType = metadata.Metadata?.filetype ?? FileType.Unknown
 
-		const fileType = metadata.Metadata?.filetype ?? FileType.Unknown
+			if (fileType !== FileType.Plaintext) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Content is not plaintext",
+				})
+			}
 
-		if (fileType !== FileType.Plaintext) {
-			throw new TRPCError({
-				code: "BAD_REQUEST",
-				message: "Content is not plaintext",
+			const data = await s3.getObject({
+				Bucket: bucketName,
+				Key: content.objectId!,
 			})
-		}
 
-		const data = await s3.getObject({
-			Bucket: bucketName,
-			Key: content.objectId!,
-		})
+			if (!opts.input.thumbnail) {
+				await db.recentTimestamps.update({
+					where: {
+						employeeId_contentId: {
+							contentId: opts.input.id,
+							employeeId: opts.ctx.auth.sub,
+						},
+					},
+					data: {
+						recentlyViewed: new Date(),
+						viewCount: {
+							increment: 1,
+						},
+					},
+				})
 
-		await db.recentTimestamps.update({
-			where: {
-				employeeId_contentId: {
-					contentId: opts.input.id,
-					employeeId: opts.ctx.auth.sub,
-				},
-			},
-			data: {
-				recentlyViewed: new Date(),
-				viewCount: {
-					increment: 1,
-				},
-			},
-		})
+				await logActivity(opts.ctx.auth.sub, UserAction.VIEW_CONTENT, opts.input.id)
+			}
 
-		await logActivity(opts.ctx.auth.sub, UserAction.VIEW_CONTENT, opts.input.id)
-		const text = await data.Body!.transformToString()
+			const text = await data.Body!.transformToString()
 
-		return { text }
-	}),
+			return { text }
+		}),
 })
