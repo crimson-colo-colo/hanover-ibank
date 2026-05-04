@@ -178,7 +178,7 @@ export function MetadataSidebar({
 		if (fileType === FileType.Excel) {
 			return {
 				label: "Open in Excel",
-				color: "green",
+				color: "emerald",
 				scheme: "ms-excel:ofe|u|",
 				icon: <IconFileTypeXls strokeWidth={1.5} />,
 			}
