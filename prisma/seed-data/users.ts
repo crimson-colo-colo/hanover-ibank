@@ -1,10 +1,10 @@
-// admins: admin, mjordan, wharper, djohnson, sjohansson
-// underwriter: emp1
-
 import { EmployeeRole } from "../../server/generated/prisma/browser.ts"
 import { auth0Cache } from "../../server/lib/auth0.ts"
 
+// admins: admin, mjordan, wharper, djohnson, sjohansson
 // business analyst: emp2
+// underwriter: emp1
+
 export const employeeData = [
 	{ id: "auth0|69d3f8c36ddd007770a559bb", role: EmployeeRole.BusinessAnalyst },
 	{ id: "auth0|69d57c86bebf497028094f86", role: EmployeeRole.Admin },
@@ -35,10 +35,27 @@ export const employeeData = [
 	{ id: "auth0|69e7fb62edd4fcd00a45979a", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb62edd4fcd00a45979b", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb648943d0107ceef484", role: EmployeeRole.BusinessOperations },
+	{ id: "auth0|69f80751cfa07ae558f27ac0", role: EmployeeRole.Admin }, // admind26c
+	{ id: "auth0|69f8076c0677be688bbcf532", role: EmployeeRole.BusinessAnalyst }, // analystd26c
+	{ id: "auth0|69f8075d6aea0d1fa52cffe2", role: EmployeeRole.Underwriter }, // underwriterd26c
+]
+
+export const usersWithContent = [
+	{ id: "auth0|69d57cf83f6e9b609fe8a92f", role: EmployeeRole.Admin }, // admin
+	{ id: "auth0|69d57d03e7bf39d172e84921", role: EmployeeRole.Underwriter }, // emp1
+	{ id: "auth0|69d57d0af36c0b4100640b0a", role: EmployeeRole.BusinessAnalyst }, // emp2
+	{ id: "auth0|69f80751cfa07ae558f27ac0", role: EmployeeRole.Admin }, // admind26c
+	{ id: "auth0|69f8076c0677be688bbcf532", role: EmployeeRole.BusinessAnalyst }, // analystd26c
+	{ id: "auth0|69f8075d6aea0d1fa52cffe2", role: EmployeeRole.Underwriter }, // underwriterd26c
 ]
 
 export function randomUserId() {
 	const randomEmployee = employeeData[Math.floor(Math.random() * employeeData.length)]
+	return randomEmployee.id
+}
+
+export function randomUserIdWithContent() {
+	const randomEmployee = usersWithContent[Math.floor(Math.random() * usersWithContent.length)]
 	return randomEmployee.id
 }
 

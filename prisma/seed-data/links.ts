@@ -1,5 +1,5 @@
 import { ContentStatus, ContentType, type Prisma } from "../../server/generated/prisma/client.ts"
-import { randomUserId } from "./users.ts"
+import { randomUserIdWithContent } from "./users.ts"
 
 export const linkContentData = [
 	...[
@@ -558,7 +558,7 @@ export const linkContentData = [
 	].map((content) => ({
 		...content,
 		type: ContentType.Link,
-		ownerId: randomUserId(),
+		ownerId: randomUserIdWithContent(),
 		createdAt: content.lastModifiedDate,
 	})),
 ] satisfies Prisma.ContentCreateManyInput[]
