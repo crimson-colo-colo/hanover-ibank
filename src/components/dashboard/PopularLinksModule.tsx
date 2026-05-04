@@ -27,7 +27,7 @@ export function PopularLinksModule({
 				<Link
 					to="/content-table"
 					search={{ view: "popularLinks" }}
-					className="no-underline text-inherit flex items-center mb-sm gap-2 w-fit hover:underline"
+					className="no-underline text-inherit flex items-center gap-2 w-fit hover:underline"
 				>
 					<Title order={3}>Popular Links</Title>
 				</Link>
