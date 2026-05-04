@@ -31,6 +31,7 @@ export function ProfilePage() {
 	)
 	const profileQuery = useQuery(trpc.user.getProfile.queryOptions())
 	const [subscribePending, setSubscribePending] = useState(false)
+	const [edited, setEdited] = useState<boolean>(false)
 
 	useEffect(() => {
 		getPushSubscription().then(setPushSubscription)
@@ -236,42 +237,42 @@ export function ProfilePage() {
 			</Group>
 
 			<form id="profile-form" onSubmit={form.onSubmit(onSubmit)}>
-				<Group gap="xs" mb="xs">
-					<Text size="sm" fw="600">
-						Account Details
-					</Text>
-					<HelpHint
-						feature="profile settings"
-						steps={[
-							{
-								target: "#profile-form",
-								title: "Profile Settings",
-								content:
-									"Update your display name, username, and email address here. Changes are reflected immediately across the platform.",
-								placement: "top",
-							},
-						]}
-					/>
-				</Group>
 				<Stack gap="sm">
-					<Title order={4}>Profile Information</Title>
+					<Group>
+						<Title order={4}>Profile Information</Title>
+						<HelpHint
+							feature="profile settings"
+							steps={[
+								{
+									target: "#profile-form",
+									title: "Profile Settings",
+									content:
+										"Update your display name, username, and email address here. Changes are reflected immediately across the platform.",
+									placement: "top",
+								},
+							]}
+						/>
+					</Group>
 					<TextInput
 						label="Full name"
 						placeholder="John Doe"
 						key={form.key("name")}
 						{...form.getInputProps("name")}
+						onInput={() => setEdited(true)}
 					/>
 					<TextInput
 						label="Username"
 						placeholder="johndoe"
 						key={form.key("username")}
 						{...form.getInputProps("username")}
+						onInput={() => setEdited(true)}
 					/>
 					<TextInput
 						label="Email"
 						value={profileQuery.data?.email ?? user?.email ?? ""}
 						key={form.key("email")}
 						{...form.getInputProps("email")}
+						onInput={() => setEdited(true)}
 					/>
 					<Title order={4} mt="sm" mb="xs">
 						Notification Preferences
@@ -287,13 +288,11 @@ export function ProfilePage() {
 					/>
 
 					<Group justify="flex-end" mt="md">
-						<Button variant="subtle" color="gray" onClick={() => navigate({ to: "/" })}>
-							Cancel
-						</Button>
 						<Button
 							type="submit"
 							leftSection={<IconDeviceFloppy size={16} stroke={1.5} />}
 							loading={updateProfile.isPending}
+							disabled={!edited}
 						>
 							Save changes
 						</Button>
