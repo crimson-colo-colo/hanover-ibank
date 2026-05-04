@@ -8,11 +8,17 @@ import {
 	Table,
 	Text,
 	Title,
+	Tooltip,
 } from "@mantine/core"
 import { activityLabelToStringTable } from "@shared/activityLabels.ts"
-import { IconSearch, IconSortAscending2, IconSortDescending2 } from "@tabler/icons-react"
+import {
+	IconCircleArrowUpRight,
+	IconSearch,
+	IconSortAscending2,
+	IconSortDescending2,
+} from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import {
 	createColumnHelper,
 	flexRender,
@@ -23,7 +29,8 @@ import {
 	useReactTable,
 } from "@tanstack/react-table"
 import clsx from "clsx"
-import { useMemo, useRef, useState } from "react"
+import { formatDate, formatDistanceToNow } from "date-fns"
+import { useCallback, useMemo, useRef, useState } from "react"
 import { Avatar } from "@/components/Avatar.tsx"
 import { EmployeeSearch } from "@/components/EmployeeSearch.tsx"
 import { checkedOutByFilterFn, fuzzyFilter, fuzzySort, tagFilterFn } from "@/lib/table.ts"
@@ -34,18 +41,19 @@ export const Route = createFileRoute("/admin/activity-log")({
 })
 
 function RouteComponent() {
-	//May want to use this in the future if I decide to re-query the activity logs with a new employeeID filter
-	//For some reason doing that with the table crashed my browser
-	//const [employeeID, setEmployeeID] = useState<string | undefined>(undefined)
+	const [employeeId, setEmployeeID] = useState<string | undefined>(undefined)
 	const [searching, setSearching] = useState(false)
 	const inputRef = useRef<HTMLInputElement>(null)
 	const [pagination, setPagination] = useState({
 		pageIndex: 0, //initial page index
-		pageSize: 10, //default page size
+		pageSize: 20, //default page size
 	})
 
 	const allLogs = useQuery(
-		trpc.activityLogging.listUserActivity.queryOptions({ employeeId: undefined })
+		trpc.activityLogging.listUserActivity.queryOptions({
+			employeeId: employeeId,
+			limit: Number.MAX_SAFE_INTEGER,
+		})
 	)
 
 	const columnHelper = createColumnHelper<NonNullable<(typeof allLogs)["data"]>[number]>()
@@ -58,8 +66,7 @@ function RouteComponent() {
 				filterFn: "fuzzy",
 				enableSorting: true,
 				cell: (info) => (
-					<Group>
-						<Text>{info.row.original.displayName}</Text>
+					<Group gap={8}>
 						<Avatar
 							userId={info.row.original.employeeId}
 							alt={info.row.original.displayName}
@@ -67,7 +74,8 @@ function RouteComponent() {
 							height={24}
 							radius="100%"
 							className="w-6 h-6 shrink-0"
-						></Avatar>
+						/>
+						<Text>{info.row.original.displayName}</Text>
 					</Group>
 				),
 			}),
@@ -79,15 +87,39 @@ function RouteComponent() {
 			}),
 			columnHelper.accessor("contentTitle", {
 				id: "contentTitle",
-				header: "Content Title",
+				header: "Content",
 				enableSorting: true,
-				cell: (info) => <Text>{info.getValue()}</Text>,
+				cell: (info) =>
+					info.row.original.contentId ? (
+						<Link
+							to="/preview/$contentId"
+							params={{ contentId: info.row.original.contentId }}
+							className="no-underline text-current hover:underline text-base flex gap-2 items-center"
+						>
+							{info.getValue()}
+							<IconCircleArrowUpRight size={16} className="shrink-0" strokeWidth={1.5} />
+						</Link>
+					) : (
+						<Tooltip label="Content no longer exists" withArrow arrowSize={8} position="top">
+							<Text className="text-base w-max text-dimmed">{info.getValue()}</Text>
+						</Tooltip>
+					),
 			}),
 			columnHelper.accessor("timestamp", {
 				id: "timestamp",
-				header: "Timestamp",
+				header: "Time",
 				enableSorting: true,
-				cell: (info) => <Text>{info.getValue().toLocaleString()}</Text>,
+				cell: (info) => {
+					const date = info.getValue()
+					if (Date.now() - new Date(date).getTime() < 1000 * 60 * 60 * 24) {
+						return (
+							<Tooltip label={formatDate(date, "PPPpp")} withArrow arrowSize={8} position="top">
+								<Text className="w-max">{formatDistanceToNow(date, { addSuffix: true })}</Text>
+							</Tooltip>
+						)
+					}
+					return <Text>{formatDate(date, "PPPpp")}</Text>
+				},
 			}),
 		],
 		[]
@@ -98,6 +130,7 @@ function RouteComponent() {
 		columns: columns,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		autoResetPageIndex: false,
 		filterFns: {
 			fuzzy: fuzzyFilter,
 			tagFilterFn: tagFilterFn,
@@ -110,7 +143,7 @@ function RouteComponent() {
 			sorting: [{ id: "timestamp", desc: true }],
 			pagination: {
 				pageIndex: 0, //custom initial page index
-				pageSize: 10, //custom default page size
+				pageSize: 20, //custom default page size
 			},
 		},
 		state: {
@@ -120,6 +153,10 @@ function RouteComponent() {
 		onPaginationChange: setPagination,
 		getFilteredRowModel: getFilteredRowModel(),
 	})
+
+	const pageCount = table.getPageCount()
+	const pageValue = table.getState().pagination.pageIndex + 1
+	const hasPages = pageCount > 0
 
 	const rows = table.getRowModel().rows.map((row) => (
 		<Table.Tr key={row.id} bg={row.getIsSelected() ? "fuchsia.0" : undefined}>
@@ -131,10 +168,11 @@ function RouteComponent() {
 		</Table.Tr>
 	))
 
-	const setFilter = (val: string | undefined) => {
-		table.getColumn("employee")?.setFilterValue(val)
-		table.setPageIndex(0)
-	}
+	const setFilter = useCallback((val: string | undefined) => {
+		// table.getColumn("employee")?.setFilterValue(val)
+		setEmployeeID((prev) => (prev === val ? prev : val))
+		setPagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+	}, [])
 
 	return (
 		<div>
@@ -188,10 +226,10 @@ function RouteComponent() {
 					<Pagination.Root
 						siblings={1}
 						boundaries={1}
-						defaultValue={table.getState().pagination.pageIndex}
-						total={table.getPageCount()}
-						value={table.getState().pagination.pageIndex + 1}
+						total={hasPages ? pageCount : 1}
+						value={hasPages ? pageValue : 1}
 						onChange={(newPage) => {
+							if (!hasPages) return
 							table.setPageIndex(newPage - 1)
 						}}
 					>
@@ -208,29 +246,29 @@ function RouteComponent() {
 					<NumberInput
 						w={70}
 						placeholder="0"
-						defaultValue={table.getState().pagination.pageIndex}
-						value={table.getState().pagination.pageIndex + 1}
+						value={hasPages ? pageValue : 1}
 						onChange={(value) => {
 							if (value === "" || value === null) return
+							if (!hasPages) return
 							const page = Number(value) - 1
-							if (page >= 0 && page < table.getPageCount()) {
+							if (page >= 0 && page < pageCount) {
 								table.setPageIndex(page)
 							}
 						}}
 						min={1}
-						max={table.getPageCount()}
+						max={hasPages ? pageCount : 1}
 					/>
 				</Group>
 				<Group gap="xs" align="center">
 					<Text>Items per page:</Text>
 					<Select
+						w={70}
 						size="sm"
-						value={table.getState().pagination.pageSize}
+						value={String(table.getState().pagination.pageSize)}
 						onChange={(value) => {
 							value && table.setPageSize(Number(value))
 						}}
-						data={[10, 20, 30, 40, 50]}
-						defaultValue={table.getState().pagination.pageSize}
+						data={["10", "20", "30", "40", "50"]}
 					></Select>
 				</Group>
 			</Flex>
