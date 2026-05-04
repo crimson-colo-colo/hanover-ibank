@@ -266,20 +266,22 @@ async function createFavoriteContent(
 	const admin = "auth0|69d57cf83f6e9b609fe8a92f"
 	const emp1 = "auth0|69d57d03e7bf39d172e84921"
 	const emp2 = "auth0|69d57d0af36c0b4100640b0a"
-
-	const thingsToFavorite = [
-		...linkContent
-			.sort(() => 0.5 - Math.random())
-			.slice(0, 3)
-			.map((c) => c.id),
-		...Array.from(fileTypeToContent.values()).flatMap((contentIds) =>
-			contentIds.sort(() => 0.5 - Math.random()).slice(0, 3)
-		),
-	]
+	const admind26c = "auth0|69f80751cfa07ae558f27ac0"
+	const analystd26c = "auth0|69f8076c0677be688bbcf532"
+	const underwriterd26c = "auth0|69f8075d6aea0d1fa52cffe2"
 
 	await Promise.all(
-		[admin, emp1, emp2].flatMap((userId) =>
-			thingsToFavorite.map((contentId) =>
+		[admin, emp1, emp2, admind26c, analystd26c, underwriterd26c].flatMap((userId) => {
+			const thingsToFavorite = [
+				...linkContent
+					.sort(() => 0.5 - Math.random())
+					.slice(0, 3)
+					.map((c) => c.id),
+				...Array.from(fileTypeToContent.values()).flatMap((contentIds) =>
+					contentIds.sort(() => 0.5 - Math.random()).slice(0, 3)
+				),
+			]
+			return thingsToFavorite.map((contentId) =>
 				prisma.favoriteContent.create({
 					data: {
 						contentId,
@@ -287,10 +289,10 @@ async function createFavoriteContent(
 					},
 				})
 			)
-		)
+		})
 	)
 
-	console.log(`Favorited ${thingsToFavorite.length} content items for each of the 3 users`)
+	console.log(`Favorited content items for 6 users`)
 }
 
 async function createUserActivity() {

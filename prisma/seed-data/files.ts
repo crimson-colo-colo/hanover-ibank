@@ -7,7 +7,7 @@ import type { Prisma } from "../../server/generated/prisma/client.ts"
 import { ContentStatus, ContentType } from "../../server/generated/prisma/enums.ts"
 import { getFileTypeFromFile } from "../../server/lib/filetype.ts"
 import { bucketName, s3 } from "../../server/s3.ts"
-import { randomUserId } from "./users.ts"
+import { randomUserIdWithContent } from "./users.ts"
 
 const baseDir = "./prisma/seed-data"
 const contentDir = path.join(baseDir, "content")
@@ -89,7 +89,7 @@ export function fileContentData() {
 					: ContentStatus.UnderReview
 		return {
 			title: filename,
-			ownerId: randomUserId(),
+			ownerId: randomUserIdWithContent(),
 			lastModifiedDate,
 			expirationDate,
 			objectId: id,
