@@ -4,7 +4,6 @@ import { schemaResolver, useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 import { IconCamera, IconDeviceFloppy, IconMoon, IconSun } from "@tabler/icons-react"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react"
 import z from "zod"
 import { Avatar } from "@/components/Avatar.tsx"
@@ -23,7 +22,6 @@ const schema = z.object({
 
 export function ProfilePage() {
 	const { user, getAccessTokenSilently } = useAuth0()
-	const navigate = useNavigate()
 	const avatarInputRef = useRef<HTMLInputElement>(null)
 	const { colorScheme, toggleColorScheme } = useColorScheme()
 	const [pushSubscription, setPushSubscription] = useState<z.infer<typeof PushSubscription> | null>(
