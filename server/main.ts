@@ -17,7 +17,7 @@ const app = express()
 
 app.use(contentDownloadRouter)
 app.use(avatarRouter)
-app.use("/webdav", webdavMiddleware)
+app.use(webdavMiddleware)
 
 app.use(
 	"/trpc",
