@@ -485,7 +485,7 @@ export function MetadataSidebar({
 				)}
 				{canUpdateLink && (
 					<Button fullWidth variant="light" leftSection={<IconEdit />} onClick={openLinkEditDialog}>
-						Update Link
+						Update link
 					</Button>
 				)}
 
@@ -548,7 +548,7 @@ export function MetadataSidebar({
 							fullWidth
 							leftSection={<IconCircleArrowUpRight />}
 						>
-							Open Link
+							Open link
 						</Button>
 					) : (
 						<Button
@@ -761,13 +761,18 @@ export function MetadataSidebar({
 					</Button>
 				</Flex>
 			</Modal>
-			<Modal opened={linkEditDialogOpen} onClose={closeLinkEditDialog} title="Edit Link">
-				<Text>Enter a new link URL</Text>
+			<Modal
+				opened={linkEditDialogOpen}
+				onClose={closeLinkEditDialog}
+				title={<strong>Edit Link</strong>}
+			>
+				<Text>Enter a new link URL.</Text>
 				<TextInput
 					mt="sm"
 					withAsterisk={false}
-					placeholder={"https://example.com/"}
-					value={urlEdit}
+					placeholder={content.type === ContentType.Link ? content.url : "https://example.com/"}
+					value={urlEdit ?? ""}
+					onChange={(event) => setURLEdit(event.currentTarget.value)}
 				/>
 				<Flex gap="md" justify="flex-end" mt="md">
 					<Button
