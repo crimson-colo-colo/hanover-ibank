@@ -106,7 +106,7 @@ function TutorialTooltip({
 			{...tooltipProps}
 			style={{
 				background: "var(--mantine-color-body)",
-				border: "2px solid var(--mantine-primary-color-filled)",
+				// border: "2px solid var(--mantine-primary-color-filled)",
 				borderRadius: 12,
 				maxWidth: 400,
 				boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
@@ -617,7 +617,7 @@ export function NewUserTutorial() {
 					right: 24,
 					zIndex: 9999,
 					background: "var(--mantine-color-body)",
-					border: "1px solid var(--mantine-color-default-border)",
+					// border: "1px solid var(--mantine-color-default-border)",
 					borderRadius: 12,
 					padding: "20px 24px",
 					maxWidth: 340,
