@@ -599,9 +599,6 @@ export function NewUserTutorial() {
 		tooltipComponent: TutorialTooltip,
 		options: {
 			primaryColor: "var(--mantine-primary-color-filled)",
-			backgroundColor: "var(--mantine-color-body)",
-			textColor: "var(--mantine-color-text)",
-			arrowColor: "var(--mantine-color-body)",
 			zIndex: 10000,
 			skipBeacon: true,
 			backgroundColor: "var(--mantine-color-body)",
