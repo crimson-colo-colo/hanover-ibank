@@ -2,6 +2,7 @@
 // underwriter: emp1
 
 import { EmployeeRole } from "../../server/generated/prisma/browser.ts"
+import { auth0Cache } from "../../server/lib/auth0.ts"
 
 // business analyst: emp2
 export const employeeData = [
@@ -36,7 +37,6 @@ export const employeeData = [
 	{ id: "auth0|69e7fb62edd4fcd00a45979a", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb62edd4fcd00a45979b", role: EmployeeRole.BusinessOperations },
 	{ id: "auth0|69e7fb648943d0107ceef484", role: EmployeeRole.BusinessOperations },
-	{ id: "auth0|69eed7728e98f379ff437da2", role: EmployeeRole.Admin },
 ]
 
 export function randomUserId() {
@@ -49,3 +49,16 @@ const userRoles = new Map(employeeData.map((e) => [e.id, e.role]))
 export function userRoleById(id: string) {
 	return userRoles.get(id)!
 }
+
+async function assertUsersExist() {
+	const auth0Users = await auth0Cache.listUsers()
+	const auth0UserIds = new Set(auth0Users.data.map((user) => user.user_id))
+	const missingUsers = employeeData.filter((user) => !auth0UserIds.has(user.id))
+	if (missingUsers.length > 0) {
+		throw new Error(
+			`The following users are missing in Auth0: ${missingUsers.map((u) => u.id).join(", ")}`
+		)
+	}
+}
+
+await assertUsersExist()
