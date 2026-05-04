@@ -92,7 +92,7 @@ export const formsRouter = router({
 
 		await logActivity(opts.ctx.auth.sub, UserAction.UPLOAD_CONTENT, content.id)
 
-		await embedFile(content)
+		embedFile(content)
 		return content
 	}),
 	searchUsers: authProcedure

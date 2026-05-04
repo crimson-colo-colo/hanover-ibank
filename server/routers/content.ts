@@ -802,7 +802,7 @@ export const contentRouter = router({
 				})
 				await notifyContentEdited(notification, updated, actor)
 			}
-			await embedFile(content)
+			embedFile(content)
 		}),
 
 	updateLink: authProcedure
