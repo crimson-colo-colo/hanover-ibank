@@ -8,7 +8,6 @@ import { auth0Cache } from "../../server/lib/auth0.ts"
 export const employeeData = [
 	{ id: "auth0|69d3f8c36ddd007770a559bb", role: EmployeeRole.BusinessAnalyst },
 	{ id: "auth0|69d57c86bebf497028094f86", role: EmployeeRole.Admin },
-	{ id: "auth0|69d57cb6f36c0b4100640abb", role: EmployeeRole.Underwriter },
 	{ id: "auth0|69db05b92c0b718e1d54aaec", role: EmployeeRole.BusinessAnalyst },
 	{ id: "auth0|69d57cd6e7bf39d172e848f0", role: EmployeeRole.Underwriter },
 	{ id: "auth0|69d57cdf3f6e9b609fe8a916", role: EmployeeRole.BusinessAnalyst },
@@ -26,7 +25,6 @@ export const employeeData = [
 	{ id: "auth0|69e7fb58edd4fcd00a459792", role: EmployeeRole.ActuarialAnalyst },
 	{ id: "auth0|69e7fb598943d0107ceef475", role: EmployeeRole.ActuarialAnalyst },
 	{ id: "auth0|69e7fb598943d0107ceef476", role: EmployeeRole.ActuarialAnalyst },
-	{ id: "auth0|69e7fb5a8943d0107ceef478", role: EmployeeRole.ActuarialAnalyst },
 	{ id: "auth0|69e7fb5b8943d0107ceef47b", role: EmployeeRole.ExlOperations },
 	{ id: "auth0|69e7fb5cedd4fcd00a459794", role: EmployeeRole.ExlOperations },
 	{ id: "auth0|69e7fb5d94b003bb2d76a03f", role: EmployeeRole.ExlOperations },
