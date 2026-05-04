@@ -132,6 +132,9 @@ html.color-scheme-transitioning * {
 }
 
 .combobox-option[data-combobox-selected]{
-    background-color: #f2f2f2;
-    color: black
+    @apply bg-[#f2f2f2] text-black dark:bg-gray-800 dark:text-gray-200!;
+}
+
+#react-joyride-portal button {
+    @apply dark:text-gray-50!;
 }

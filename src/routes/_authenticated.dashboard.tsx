@@ -84,7 +84,10 @@ function RoleDashboard() {
 
 	return (
 		<main>
-			<header id="dashboard-welcome" className="w-full p-4 text-white rounded-lg bg-primary flex">
+			<header
+				id="dashboard-welcome"
+				className="w-full p-4 text-white rounded-lg bg-primary dark:bg-fuchsia-800 flex"
+			>
 				<Stack gap={0} className="flex-1">
 					<Title>
 						Welcome,{" "}
@@ -95,7 +98,11 @@ function RoleDashboard() {
 					</small>
 				</Stack>
 				<ActionIcon size="xl" variant="transparent">
-					<IconSettings size={28} onClick={openConfigModal} className="stroke-white" />
+					<IconSettings
+						size={28}
+						onClick={openConfigModal}
+						className="stroke-white dark:stroke-gray-100"
+					/>
 				</ActionIcon>
 			</header>
 

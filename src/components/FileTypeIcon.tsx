@@ -12,7 +12,6 @@ import {
 	IconPhoto,
 	type IconProps,
 } from "@tabler/icons-react"
-import clsx from "clsx"
 import { twMerge } from "tailwind-merge"
 
 const fileTypeIcons: Record<
@@ -22,19 +21,19 @@ const fileTypeIcons: Record<
 	[FileType.WordDocument]: (props) => (
 		<IconFileTypeDocx
 			{...props}
-			className={clsx(props.className, "stroke-blue-600 dark:stroke-blue-400")}
+			className={twMerge("stroke-blue-600 dark:stroke-blue-400", props.className)}
 		/>
 	),
 	[FileType.Powerpoint]: (props) => (
 		<IconFileTypePpt
 			{...props}
-			className={clsx(props.className, "stroke-orange-600 dark:stroke-orange-400")}
+			className={twMerge("stroke-orange-600 dark:stroke-orange-400", props.className)}
 		/>
 	),
 	[FileType.Excel]: (props) => (
 		<IconFileTypeXls
 			{...props}
-			className={clsx(props.className, "stroke-emerald-600 dark:stroke-emerald-400")}
+			className={twMerge("stroke-emerald-600 dark:stroke-emerald-400", props.className)}
 		/>
 	),
 	[FileType.Pdf]: (props) => (

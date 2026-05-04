@@ -110,7 +110,7 @@ export function ContentOwnerSelect({
 				</Combobox.Dropdown>
 			</Combobox>
 			{selectedUser && (
-				<Paper p="sm" bd="1px solid gray.3" mt="xs">
+				<Paper p="sm" withBorder mt="xs">
 					<Flex gap="md">
 						<Image src={`/avatar/${selectedUser.id}`} radius="100%" h={40} w={40} />
 						<Stack gap={0} justify="center">

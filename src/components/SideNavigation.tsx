@@ -81,7 +81,7 @@ function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; coll
 					rightSection={!collapsed && <IconChevronRight size={20} />}
 					justify={collapsed ? "center" : "space-between"}
 					radius={0}
-					className={clsx(collapsed && "px-0")}
+					className={clsx(collapsed && "px-0", "dark:text-gray-200")}
 					pl={collapsed ? undefined : "12"}
 				>
 					{<link.icon />}
@@ -104,9 +104,9 @@ function AdminLinks({ isAdmin, collapsed }: { isAdmin: boolean | undefined; coll
 					</div>
 				) : (
 					<div>
-						<hr />
+						<hr className="dark:border-gray-800" />
 						<Stack gap={0}>
-							<Text c="dimmed" className="ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
+							<Text className="text-gray-500 dark:text-gray-700 ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
 								Administration
 							</Text>
 							{adminNavLinks}
@@ -131,7 +131,7 @@ function TutorialLink({ collapsed }: { collapsed: boolean }) {
 				rightSection={!collapsed && <IconChevronRight size={20} />}
 				justify={collapsed ? "center" : "space-between"}
 				radius={0}
-				className={clsx(collapsed && "px-0")}
+				className={clsx(collapsed && "px-0", "dark:text-gray-200")}
 				pl={collapsed ? undefined : "12"}
 			>
 				<IconCompass size={20} />
@@ -220,7 +220,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 									rightSection={!collapsed && <IconChevronRight size={20} />}
 									justify={collapsed ? "center" : "space-between"}
 									radius={0}
-									className={clsx(collapsed && "px-0")}
+									className={clsx(collapsed && "px-0", "dark:text-gray-200")}
 									pl={collapsed ? undefined : "12"}
 								>
 									{location.pathname === link.pathName ? <link.iconFilled /> : <link.icon />}
@@ -241,9 +241,9 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 					</div>
 				) : (
 					<div>
-						<hr />
+						<hr className="dark:border-gray-800" />
 						<Stack gap={0}>
-							<Text c="dimmed" className="ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
+							<Text className="text-gray-500 dark:text-gray-700 ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
 								Help
 							</Text>
 							<TutorialLink collapsed={collapsed} />
@@ -252,9 +252,9 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 				)}
 				{!collapsed && (
 					<div>
-						<hr />
+						<hr className="dark:border-gray-800" />
 						<Stack gap={0}>
-							<Text c="dimmed" className="ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
+							<Text className="text-gray-500 dark:text-gray-700 ml-3 mb-2 text-xs uppercase tracking-wider font-semibold">
 								Recently Viewed
 							</Text>
 							<Stack gap={0}>
@@ -278,7 +278,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 													await recentlyViewed.mutateAsync({ id: item.id })
 												}
 											}}
-											className="flex justify-left"
+											className="flex justify-left dark:text-gray-200"
 										>
 											<span className="h-full content-center max-w-[20ch] truncate">
 												{item.title}
@@ -295,7 +295,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 			<div className="flex-1" />
 
 			{!collapsed && !pushSubscribed && showPushNag && auth0.isAuthenticated && (
-				<Paper withBorder className="mx-3 mt-3 mb-3 p-3 bg-white">
+				<Paper withBorder className="mx-3 mt-3 mb-3 p-3 bg-white dark:bg-gray-900">
 					<Text className="text-sm" fw={600}>
 						Stay up to date
 					</Text>
@@ -334,7 +334,7 @@ export function SideNavigation({ collapsed, toggleCollapsed }: SideNavigationPro
 						className={clsx(
 							"h-14 shrink-0",
 							!collapsed
-								? "border-0 border-t border-gray-500 gap-3 py-1"
+								? "border-0 border-t border-gray-500 dark:border-gray-800 gap-3 py-1"
 								: "px-0 flex items-center justify-center"
 						)}
 						radius={0}
