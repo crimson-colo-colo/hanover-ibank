@@ -65,7 +65,6 @@ contentDownloadRouter.get("/content/download", async (req: Request, res: Respons
 	if (object.ContentType && object.Metadata && object.Metadata) {
 		res.setHeader("Content-Type", contentType)
 	}
-	console.log(object)
 	assert(object.Body, "S3 object body is undefined")
 	assert(object.Body instanceof Readable, "S3 object body is not a stream.Readable")
 	object.Body.pipe(res)

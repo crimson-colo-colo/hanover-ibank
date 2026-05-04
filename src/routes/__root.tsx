@@ -1,5 +1,11 @@
 import { type Auth0ContextInterface, type User, useAuth0 } from "@auth0/auth0-react"
-import { AppShell, localStorageColorSchemeManager, MantineProvider, Text } from "@mantine/core"
+import {
+	AppShell,
+	localStorageColorSchemeManager,
+	MantineProvider,
+	Space,
+	Text,
+} from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
 import { DevSupport } from "@react-buddy/ide-toolbox"
@@ -69,7 +75,7 @@ function RootComponent() {
 				<DevSupport ComponentPreviews={() => null} useInitialHook={useInitial}>
 					<AppShell
 						layout="alt"
-						padding={isPreview ? 0 : "md"}
+						padding="md"
 						header={{ height: 56 }}
 						navbar={{
 							width: auth0.isAuthenticated && auth0.user ? (collapsed ? "50" : "260") : "0",
@@ -96,6 +102,7 @@ function RootComponent() {
 							<HeadContent />
 							<Outlet />
 							<AppSpotlight />
+							{!isPreview && <Space h={64} />}
 						</AppShell.Main>
 					</AppShell>
 					<Notifications />

@@ -8,6 +8,7 @@ import { db } from "../database.ts"
 import { auth0Cache } from "../lib/auth0.ts"
 import { generateDefaultAvatar } from "../lib/avatar.ts"
 import { sendPushNotification } from "../lib/notifications.tsx"
+import { logger } from "../logger.ts"
 import { bucketName, s3 } from "../s3.ts"
 import { authProcedure, router } from "../trpc.ts"
 
@@ -80,7 +81,7 @@ export const userRouter = router({
 
 				return { error: null }
 			} catch (err) {
-				console.log(err)
+				logger.error({ error: err }, "Failed to update user profile information")
 				return { error: "Failed to update user profile information (duplicate email or username)." }
 			}
 		}),
