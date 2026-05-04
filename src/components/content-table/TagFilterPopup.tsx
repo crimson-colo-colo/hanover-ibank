@@ -91,11 +91,11 @@ export function TagFilterPopup({ column, allTags, resetPage }: TagFilterPopupPro
 						disabled={!hasActiveFilters}
 						label={filterValue.length}
 						size={16}
-						color="fuchsia"
+						color="emerald"
 					>
 						<ActionIcon
 							variant={hasActiveFilters ? "light" : "subtle"}
-							color={hasActiveFilters ? "fuchsia" : "gray"}
+							color={hasActiveFilters ? "emerald" : "gray"}
 							size="sm"
 						>
 							<IconFilter size={15} />

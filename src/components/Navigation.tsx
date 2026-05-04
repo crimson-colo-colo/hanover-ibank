@@ -145,6 +145,7 @@ export function Navigation() {
 										label={notifications.data?.length ?? 0}
 										showZero={false}
 										size={16}
+										color="emerald"
 										className="flex items-center justify-center"
 									>
 										<ActionIcon variant="subtle" onClick={() => setNotificationsOpen((o) => !o)}>
