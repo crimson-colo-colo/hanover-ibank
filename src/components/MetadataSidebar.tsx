@@ -20,6 +20,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { type ContentStatus, ContentType, EmployeeRole, TagCategory } from "@prisma/browser.ts"
 import { ContentFilter } from "@shared/enum.ts"
+import { FileType } from "@shared/filetype.ts"
 import type { ContentListItem } from "@shared/types.ts"
 import {
 	IconCheck,
@@ -30,6 +31,9 @@ import {
 	IconDoorExit,
 	IconDownload,
 	IconEdit,
+	IconFileTypeDocx,
+	IconFileTypePpt,
+	IconFileTypeXls,
 	IconFileUpload,
 	IconMessageCircleUser,
 	IconPencil,
@@ -166,6 +170,40 @@ export function MetadataSidebar({
 		content.type !== ContentType.Object &&
 		(content.checkedOutBy?.id === profile?.id ||
 			(content.checkedOutBy?.id && profile?.role === EmployeeRole.Admin))
+
+	const objectMetadata = content.type === ContentType.Object ? content.object.Metadata : undefined
+	const fileType = objectMetadata?.filetype as string | undefined
+
+	const officeLauncher = (() => {
+		if (fileType === FileType.Excel) {
+			return {
+				label: "Open in Excel",
+				color: "green",
+				scheme: "ms-excel:ofe|u|",
+				icon: <IconFileTypeXls strokeWidth={1.5} />,
+			}
+		}
+
+		if (fileType === FileType.Powerpoint) {
+			return {
+				label: "Open in PowerPoint",
+				color: "orange",
+				scheme: "ms-powerpoint:ofe|u|",
+				icon: <IconFileTypePpt strokeWidth={1.5} />,
+			}
+		}
+
+		if (fileType === FileType.WordDocument) {
+			return {
+				label: "Open in Word",
+				color: "blue",
+				scheme: "ms-word:ofe|u|",
+				icon: <IconFileTypeDocx strokeWidth={1.5} />,
+			}
+		}
+
+		return undefined
+	})()
 
 	const [confirmCheckoutOpen, { open: openConfirmCheckout, close: closeConfirmCheckout }] =
 		useDisclosure(false)
@@ -474,14 +512,33 @@ export function MetadataSidebar({
 					/>
 				</div>
 				{canUpdateFile && (
-					<Button
-						fullWidth
-						variant="light"
-						leftSection={<IconFileUpload />}
-						onClick={openFileEditDialog}
-					>
-						Update file
-					</Button>
+					<>
+						<Button
+							fullWidth
+							variant="light"
+							leftSection={<IconFileUpload />}
+							onClick={openFileEditDialog}
+						>
+							Update file
+						</Button>
+
+						{officeLauncher && (
+							<Button
+								fullWidth
+								color={officeLauncher.color}
+								leftSection={officeLauncher.icon}
+								onClick={async () => {
+									const res = await trpcClient.content.getWebDAVToken.query({
+										id: content.id,
+									})
+									const url = `${officeLauncher.scheme}${window.location.origin}/webdav/${res.token}/${res.filename}`
+									window.location.href = url
+								}}
+							>
+								{officeLauncher.label}
+							</Button>
+						)}
+					</>
 				)}
 				{canUpdateLink && (
 					<Button fullWidth variant="light" leftSection={<IconEdit />} onClick={openLinkEditDialog}>

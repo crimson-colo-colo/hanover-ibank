@@ -34,6 +34,9 @@ export const env = createEnv({
 		VITE_SEARCH_SIMILARITY_THRESHOLD: z.coerce.number().default(0.1),
 		WORKERS_AI_API_KEY: z.string(),
 		WORKERS_AI_ACCOUNT_ID: z.string(),
+		HTTPS_KEY_PATH: z.string().optional(),
+		HTTPS_CERT_PATH: z.string().optional(),
+		HTTPS_PORT: z.coerce.number().default(443),
 	},
 	runtimeEnv: process.env,
 })

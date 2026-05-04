@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises"
+import https from "node:https"
 import { createExpressMiddleware } from "@trpc/server/adapters/express"
 import express from "express"
 import morgan from "morgan"
@@ -6,6 +8,7 @@ import { env } from "./env.ts"
 import { appRouter } from "./router.ts"
 import { avatarRouter } from "./routers/avatar.ts"
 import { contentDownloadRouter } from "./routers/download.ts"
+import { webdavMiddleware } from "./routers/webdav.ts"
 import { createContext } from "./trpc.ts"
 
 declare module "http" {
@@ -35,6 +38,7 @@ app.use(
 
 app.use(contentDownloadRouter)
 app.use(avatarRouter)
+app.use(webdavMiddleware)
 
 app.use(
 	"/trpc",
@@ -61,6 +65,16 @@ app.use((req, res, next) => {
 app.listen(env.PORT, () => {
 	console.log(`[dev] ready on ${env.APP_URL || `http://localhost:${env.PORT}`}`)
 })
+
+if (env.HTTPS_KEY_PATH && env.HTTPS_CERT_PATH) {
+	const server = https.createServer({
+		key: await readFile(env.HTTPS_KEY_PATH),
+		cert: await readFile(env.HTTPS_CERT_PATH),
+	})
+	server.on("request", app).listen(env.HTTPS_PORT, () => {
+		console.log(`[dev] https ready at https://localhost:${env.HTTPS_PORT}`)
+	})
+}
 
 if (env.CLI_TOKEN) {
 	console.warn("[environ] CLI access is enabled")

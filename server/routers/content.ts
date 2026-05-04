@@ -21,7 +21,7 @@ import {
 	logActivity,
 } from "../lib/content.ts"
 import { embedFile } from "../lib/embedFile.ts"
-import { getFileTypeFromFile } from "../lib/filetype.ts"
+import { getFileExtensionForType, getFileTypeFromFile } from "../lib/filetype.ts"
 import {
 	notifyContentCheckedIn,
 	notifyContentCheckedOut,
@@ -115,6 +115,47 @@ export const contentRouter = router({
 				opts.ctx.auth.sub
 			)
 		}),
+
+	getWebDAVToken: authProcedure.input(z.object({ id: z.string() })).query(async (opts) => {
+		const content = await db.content.findUnique({ where: { id: opts.input.id } })
+		if (!content) {
+			throw new TRPCError({ code: "NOT_FOUND", message: "Content not found" })
+		}
+
+		if (!content.objectId) {
+			throw new TRPCError({ code: "NOT_FOUND", message: "Content has no object in storage" })
+		}
+
+		// Get FileType from S3 metadata
+		let fileExtension = ".docx" // default for backward compatibility
+		try {
+			const metadata = await s3.headObject({
+				Bucket: bucketName,
+				Key: content.objectId,
+			})
+			const fileType = metadata.Metadata?.filetype as string | undefined
+			if (fileType) {
+				fileExtension = getFileExtensionForType(fileType)
+			}
+		} catch (_e) {
+			// If we can't get metadata, fall back to default
+		}
+
+		const filename = content.title.includes(".")
+			? content.title
+			: `${content.title}${fileExtension}`
+
+		const token = await new jose.SignJWT({
+			sub: opts.ctx.auth.sub,
+			aud: "webdav",
+			contentId: opts.input.id,
+		})
+			.setProtectedHeader({ alg: "HS256" })
+			.setIssuedAt()
+			.setExpirationTime("1h")
+			.sign(new TextEncoder().encode(env.APP_SECRET))
+		return { token, filename }
+	}),
 
 	update: authProcedure
 		.input(
