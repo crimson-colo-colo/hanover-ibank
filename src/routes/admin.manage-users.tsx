@@ -168,7 +168,10 @@ function RouteComponent() {
 	}
 
 	const rows = table.getRowModel().rows.map((row) => (
-		<Table.Tr key={row.id} bg={row.getIsSelected() ? "fuchsia.0" : undefined}>
+		<Table.Tr
+			key={row.id}
+			className={clsx("content-row", row.getIsSelected() && "bg-fuchsia-50 dark:bg-fuchsia-900/40")}
+		>
 			{row.getVisibleCells().map((cell) => (
 				<Table.Td key={cell.id}>
 					{flexRender(cell.column.columnDef.cell, cell.getContext())}
